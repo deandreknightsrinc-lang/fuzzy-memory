@@ -4,14 +4,18 @@ Outputs (in <week>/build/):
   run_of_show.md         timecoded order of service for the whole team
   scripts/NN-<id>.txt    teleprompter / text-to-speech scripts, one per segment
   edit_list.csv          the editor's assembly list: order, timecodes, source, expected asset file
-  prompts.md             AI prompt pack: b-roll, thumbnail, social clips
+  prompts.md             OpenArt prompt pack: b-roll stills -> image-to-video, thumbnail, social clips
+  heygen.md              HeyGen hand-off: avatar + ElevenLabs audio file for each avatar segment
+  timeline.fcpxml        Final Cut Pro timeline with a labeled placeholder + chapter marker per segment
   youtube.md             title, description with chapters, tags, AI disclosure
   checklist.md           who does what, Monday through Sunday
 """
 
 import csv
+import re
 from pathlib import Path
 
+from . import fcpxml
 from .brand import Brand, load_yaml
 
 AI_SOURCES = {"ai_avatar", "ai_voice"}
@@ -59,6 +63,26 @@ def segment_script(seg: dict) -> str:
     return "\n\n".join(parts)
 
 
+def spoken_ref(ref: str) -> str:
+    """'Proverbs 18:20-21' -> 'Proverbs chapter 18, verses 20 through 21' so the AI voice reads it naturally."""
+    def one(m):
+        book, ch, v1, v2 = m.group(1), m.group(2), m.group(3), m.group(4)
+        return f"{book} chapter {ch}, verse{'s' if v2 else ''} {v1}" + (f" through {v2}" if v2 else "")
+    return re.sub(r"((?:[1-3] )?[A-Z][a-z]+) (\d+):(\d+)(?:-(\d+))?", one, ref)
+
+
+def speakable_text(seg: dict) -> str:
+    """Exactly what the AI voice says: script, scripture and announcements, no outline notes."""
+    parts = []
+    if seg.get("script"):
+        parts.append(spoken_ref(seg["script"].strip()))
+    for s in seg.get("scripture", []):
+        parts.append(f"{spoken_ref(s['ref'])}. {' '.join(s['text'].split())}")
+    for item in seg.get("items", []):
+        parts.append(item)
+    return "\n\n".join(parts)
+
+
 def check_consent(brand: Brand, segments: list) -> list:
     problems = []
     for seg in segments:
@@ -93,6 +117,7 @@ def build(week_dir: Path) -> Path:
             "n": n, "seg": seg, "start": start, "end": t, "speaker": speaker,
             "asset": f"assets/{n:02d}-{seg['id']}.mp4",
             "script": segment_script(seg),
+            "audio": f"audio/{n:02d}-{seg['id']}.mp3" if seg.get("source") in AI_SOURCES else "",
         })
 
     # Scripts
@@ -136,20 +161,24 @@ def build(week_dir: Path) -> Path:
     # Edit list
     with open(out / "edit_list.csv", "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["order", "segment", "start", "end", "source", "speaker", "expected_asset", "on_screen", "script_file"])
+        w.writerow(["order", "segment", "start", "end", "source", "speaker", "expected_asset", "elevenlabs_audio", "on_screen", "script_file"])
         for r in rows:
             seg = r["seg"]
             w.writerow([
                 r["n"], seg["id"], timecode(r["start"]), timecode(r["end"]), seg["source"],
-                r["speaker"]["name"] if r["speaker"] else "", r["asset"],
+                r["speaker"]["name"] if r["speaker"] else "", r["asset"], r["audio"],
                 " | ".join(fill(x, brand, week, seg) for x in seg.get("on_screen", [])),
                 f"scripts/{r['n']:02d}-{seg['id']}.txt" if r["script"] else "",
             ])
 
     # Prompt pack
-    p = [f"# AI Prompt Pack - {week['title']}", "",
-         "Paste into your image/video generator (Midjourney, Runway, Kling, Veo, Sora, etc.). "
-         "Keep the same style suffix on every prompt so the service looks like one film.", "",
+    p = [f"# OpenArt Prompt Pack - {week['title']}", "",
+         "1. **Create Image** in OpenArt with each prompt below at **16:9** (b-roll) - generate 4, keep the best.",
+         "2. Send the keeper to **image-to-video** (5-10 s, slow camera move: push-in, pan, or parallax).",
+         "3. Save as `broll/<segment>-<n>.mp4` and drop it over that segment in Final Cut.",
+         "",
+         "Keep the same style suffix on every prompt so the whole service looks like one film. "
+         "Never generate a real minister's face in OpenArt - real people come from camera footage or their HeyGen avatar.", "",
          "**Style suffix:** `cinematic, 35mm film, warm tungsten and window light, shallow depth of field, "
          f"reverent, gold accent {brand.colors['accent']}, no text`", ""]
     for r in rows:
@@ -158,11 +187,34 @@ def build(week_dir: Path) -> Path:
     p += ["", "## Thumbnail", "",
           f"- Close-up portrait photo of the speaker (real photo, not AI) on the right third; left side bold text "
           f"\"{week['title'].upper()}\"; background: open Bible in dramatic light; brand colors {brand.colors['primary']} / {brand.colors['accent']}.",
-          "", "## Social clips (cut from the sermon)", "",
-          "- 3 vertical 9:16 clips, 30-60s each, one per sermon point, burned-in captions, end with the service link."]
+          "", "## Social clips (cut from the sermon in Final Cut)", "",
+          "- 3 vertical 9:16 clips (Final Cut: duplicate project, change to vertical, use Smart Conform), 30-60s each, one per sermon point, burned-in captions, end with the service link."]
     for o in next((s.get("outline", []) for s in segments if s["type"] == "sermon"), []):
         p.append(f"  - {o['point']} ({o.get('scripture', '')})")
     (out / "prompts.md").write_text("\n".join(p) + "\n")
+
+    # HeyGen hand-off
+    h = [f"# HeyGen Hand-off - {week['date']}", "",
+         "For each segment: HeyGen > Create Video > pick the avatar > **Upload audio** > choose the ElevenLabs file "
+         "from `build/audio/` (made by `python -m studio voice`). Using the ElevenLabs audio keeps the voice identical "
+         "across HeyGen, voice-overs and the news show.", "",
+         "Export: 1080p, 16:9, then save as the file name in the last column.", "",
+         "| # | Segment | Avatar | Avatar ID | Audio file | Save as |",
+         "|---|---------|--------|-----------|------------|---------|"]
+    avatar_rows = [r for r in rows if r["seg"]["source"] == "ai_avatar"]
+    for r in avatar_rows:
+        h.append(f"| {r['n']} | {r['seg']['id']} | {r['speaker']['name']} | "
+                 f"{r['speaker'].get('avatar_id') or '(set avatar_id in brand.yaml)'} | {r['audio']} | {r['asset']} |")
+    if not avatar_rows:
+        h.append("| - | No avatar segments this week | | | | |")
+    h += ["", "## Scripts (in case you type instead of uploading audio)", ""]
+    for r in avatar_rows:
+        h += [f"### {r['n']}. {r['seg']['id']}", "", "```", speakable_text(r["seg"]), "```", ""]
+    (out / "heygen.md").write_text("\n".join(h) + "\n")
+
+    # Final Cut Pro timeline
+    (out / "timeline.fcpxml").write_text(fcpxml.build(
+        rows, project_name=f"{week['date']} {week['title']}", event_name=f"{brand.ministry['short_name']} {week['date']}"))
 
     # YouTube package
     uses_ai = any(r["seg"]["source"] in AI_SOURCES for r in rows)
@@ -198,11 +250,14 @@ def build(week_dir: Path) -> Path:
     c += [f"- [ ] {name}: review and approve script" for name in sorted(owners)]
     c += ["## Wednesday - record & generate",
           "- [ ] Record all `recorded` segments (sermon, prayer, invitation)",
-          "- [ ] Generate AI avatar / voice segments from the approved scripts",
-          "- [ ] Generate b-roll from prompts.md",
-          "## Thursday - edit",
-          "- [ ] Assemble in order from edit_list.csv; name files exactly as expected_asset",
-          "- [ ] Lower thirds, scripture overlays, captions, color grade, loudness -14 LUFS",
+          "- [ ] ElevenLabs: `python -m studio voice <week>` renders every AI voice file into build/audio/",
+          "- [ ] HeyGen: make each avatar segment from its ElevenLabs audio (see heygen.md)",
+          "- [ ] OpenArt: generate b-roll stills, then image-to-video (see prompts.md)",
+          "## Thursday - edit (Final Cut Pro)",
+          "- [ ] File > Import > XML > build/timeline.fcpxml: segments + chapter markers are pre-laid",
+          "- [ ] Drop each clip over its placeholder (the to-do marker names the file); drop voice-overs + b-roll",
+          "- [ ] Lower thirds, scripture overlays, captions (Final Cut: Transcribe to Captions), color grade, loudness -14 LUFS",
+          "- [ ] Share > YouTube & Facebook keeps the chapter markers",
           "## Friday - review",
           "- [ ] Pastor watches full cut; theology + accuracy check on every AI segment",
           "- [ ] Newspaper issue finalized and exported to PDF",

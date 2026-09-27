@@ -25,12 +25,19 @@ studio/                           the builders
 
 ## Commands
 
-Requires Python 3.10+ with `pyyaml` and `jinja2` (`pip install pyyaml jinja2`). PDF export uses Chrome/Chromium if installed.
+Tools this is built around: **ElevenLabs** (voice), **HeyGen** (avatars), **OpenArt** (b-roll), **Final Cut Pro** (edit), with **Kaggle** for analytics.
+
+**Mac setup (one time):** open Terminal, run `xcode-select --install` (gives you Python 3), then
+`python3 -m pip install pyyaml jinja2`. Use `python3` wherever this page says `python`.
+Newspaper PDF export uses Google Chrome if it's installed; otherwise open `issue.html` and Print → Save as PDF.
 
 ```bash
 # Weekly service
 python -m studio new-week 2026-10-11                  # copy last week as a starting point
-python -m studio service service/weeks/2026-10-11     # → build/: run of show, scripts, edit list, prompts, YouTube package, checklist
+python -m studio service service/weeks/2026-10-11     # → build/: run of show, scripts, HeyGen sheet, OpenArt prompts,
+                                                      #   Final Cut timeline (timeline.fcpxml), YouTube package, checklist
+export ELEVENLABS_API_KEY=your-key
+python -m studio voice service/weeks/2026-10-11       # → build/audio/*.mp3, one ElevenLabs file per AI segment
 
 # Weekly newspaper
 python -m studio new-issue 2026-10-11

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE fcpxml>
+<fcpxml version="1.10">
+  <resources>
+    <format id="r1" name="FFVideoFormat1080p30" frameDuration="100/3000s" width="1920" height="1080" colorSpace="1-1-1 (Rec. 709)"/>
+  </resources>
+  <library>
+    <event name="BAC 2026-10-04">
+      <project name="2026-10-04 Death and Life Are in the Power of the Tongue">
+        <sequence format="r1" duration="3990s" tcStart="0s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
+          <spine>
+        <gap name="01 Countdown" offset="0s" start="0s" duration="300s">
+          <chapter-marker start="0s" duration="100/3000s" value="01 Countdown" posterOffset="0s"/>
+          <marker start="0s" duration="100/3000s" value="Place assets/01-countdown.mp4" completed="0"/>
+        </gap>
+        <gap name="02 Cold Open" offset="300s" start="0s" duration="60s">
+          <chapter-marker start="0s" duration="100/3000s" value="02 Cold Open" posterOffset="0s"/>
+          <marker start="0s" duration="100/3000s" value="Place assets/02-cold-open.mp4 (audio: audio/02-cold-open.mp3)" completed="0"/>
+        </gap>
+        <gap name="03 Welcome" offset="360s" start="0s" duration="120s">
+          <chapter-marker start="0s" duration="100/3000s" value="03 Welcome" posterOffset="0s"/>
+          <marker start="0s" duration="100/3000s" value="Place assets/03-welcome.mp4 (audio: audio/03-welcome.mp3)" completed="0"/>
+        </gap>
+        <gap name="04 Worship" offset="480s" start="0s" duration="720s">
+          <chapter-marker start="0s" duration="100/3000s" value="04 Worship" posterOffset="0s"/>
+          <marker start="0s" duration="100/3000s" value="Place assets/04-worship.mp4" completed="0"/>
+        </gap>
+        <gap name="05 Scripture Reading" offset="1200s" start="0s" duration="120s">
+          <chapter-marker start="0s" duration="100/3000s" value="05 Scripture Reading" posterOffset="0s"/>
+          <marker start="0s" duration="100/3000s" value="Place assets/05-scripture.mp4 (audio: audio/05-scripture.mp3)" completed="0"/>
+        </gap>
+        <gap name="06 Prayer" offset="1320s" start="0s" duration="240s">
+          <chapter-marker start="0s" duration="100/3000s" value="06 Prayer" posterOffset="0s"/>
+          <marker start="0s" duration="100/3000s" value="Place assets/06-prayer.mp4" completed="0"/>
+        </gap>
+        <gap name="07 Announcements" offset="1560s" start="0s" duration="180s">
+          <chapter-marker start="0s" duration="100/3000s" value="07 Announcements" posterOffset="0s"/>
+          <marker start="0s" duration="100/3000s" value="Place assets/07-announcements.mp4 (audio: audio/07-announcements.mp3)" completed="0"/>
+        </gap>
+        <gap name="08 Offering" offset="1740s" start="0s" duration="180s">
+          <chapter-marker start="0s" duration="100/3000s" value="08 Offering" posterOffset="0s"/>
+          <marker start="0s" duration="100/3000s" value="Place assets/08-offering.mp4 (audio: audio/08-offering.mp3)" completed="0"/>
+        </gap>
+        <gap name="09 Sermon" offset="1920s" start="0s" duration="1800s">
+          <chapter-marker start="0s" duration="100/3000s" value="09 Sermon" posterOffset="0s"/>
+          <marker start="0s" duration="100/3000s" value="Place assets/09-sermon.mp4" completed="0"/>
+        </gap>
+        <gap name="10 Invitation" offset="3720s" start="0s" duration="180s">
+          <chapter-marker start="0s" duration="100/3000s" value="10 Invitation" posterOffset="0s"/>
+          <marker start="0s" duration="100/3000s" value="Place assets/10-invitation.mp4" completed="0"/>
+        </gap>
+        <gap name="11 Benediction" offset="3900s" start="0s" duration="60s">
+          <chapter-marker start="0s" duration="100/3000s" value="11 Benediction" posterOffset="0s"/>
+          <marker start="0s" duration="100/3000s" value="Place assets/11-benediction.mp4 (audio: audio/11-benediction.mp3)" completed="0"/>
+        </gap>
+        <gap name="12 End Card" offset="3960s" start="0s" duration="30s">
+          <chapter-marker start="0s" duration="100/3000s" value="12 End Card" posterOffset="0s"/>
+          <marker start="0s" duration="100/3000s" value="Place assets/12-end-card.mp4" completed="0"/>
+        </gap>
+          </spine>
+        </sequence>
+      </project>
+    </event>
+  </library>
+</fcpxml>

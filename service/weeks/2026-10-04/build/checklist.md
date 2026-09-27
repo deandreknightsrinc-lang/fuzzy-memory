@@ -9,11 +9,14 @@
 - [ ] Dr. Minister Daniel Alejandro Harris Bey: review and approve script
 ## Wednesday - record & generate
 - [ ] Record all `recorded` segments (sermon, prayer, invitation)
-- [ ] Generate AI avatar / voice segments from the approved scripts
-- [ ] Generate b-roll from prompts.md
-## Thursday - edit
-- [ ] Assemble in order from edit_list.csv; name files exactly as expected_asset
-- [ ] Lower thirds, scripture overlays, captions, color grade, loudness -14 LUFS
+- [ ] ElevenLabs: `python -m studio voice <week>` renders every AI voice file into build/audio/
+- [ ] HeyGen: make each avatar segment from its ElevenLabs audio (see heygen.md)
+- [ ] OpenArt: generate b-roll stills, then image-to-video (see prompts.md)
+## Thursday - edit (Final Cut Pro)
+- [ ] File > Import > XML > build/timeline.fcpxml: segments + chapter markers are pre-laid
+- [ ] Drop each clip over its placeholder (the to-do marker names the file); drop voice-overs + b-roll
+- [ ] Lower thirds, scripture overlays, captions (Final Cut: Transcribe to Captions), color grade, loudness -14 LUFS
+- [ ] Share > YouTube & Facebook keeps the chapter markers
 ## Friday - review
 - [ ] Pastor watches full cut; theology + accuracy check on every AI segment
 - [ ] Newspaper issue finalized and exported to PDF

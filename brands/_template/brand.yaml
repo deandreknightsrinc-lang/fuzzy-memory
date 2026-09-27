@@ -23,6 +23,14 @@ fonts:
   body: "Libre Baskerville"
   sans: "Open Sans"
 
+# ElevenLabs render settings used by `python -m studio voice`.
+# Higher stability = steadier, more "pulpit" delivery; lower = more expressive.
+elevenlabs:
+  model_id: eleven_multilingual_v2
+  stability: 0.5
+  similarity_boost: 0.8
+  style: 0.0
+
 staff:
   - key: pastor
     name: ""

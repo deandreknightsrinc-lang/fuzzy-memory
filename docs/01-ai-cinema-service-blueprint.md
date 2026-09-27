@@ -41,40 +41,75 @@ Each person in `brands/bac-ministries/brand.yaml` has `roles`. The run of show a
 
 **Tip:** give each associate minister one fixed segment every week. It builds their presence with the members and spreads out the recording work.
 
-## 3. Tools by job
+## 3. Your tools: ElevenLabs, HeyGen, OpenArt, Final Cut Pro, Kaggle
 
-Plug in the tools you already use. Each job only needs one tool.
+| Job | Your tool | How it connects to this repo |
+|---|---|---|
+| Voice (every AI line) | **ElevenLabs** | `python -m studio voice <week>` renders one MP3 per AI segment into `build/audio/` using each minister's `voice_id` |
+| Talking-head presenter | **HeyGen** | `build/heygen.md` lists each avatar segment, its `avatar_id`, and the ElevenLabs audio to upload |
+| B-roll, thumbnails | **OpenArt** | `build/prompts.md`: image prompts with one shared style, then image-to-video |
+| Edit, captions, clips | **Final Cut Pro** | `build/timeline.fcpxml`: import it and every segment is already on the timeline with chapter markers |
+| Numbers / growth tracking | **Kaggle** | Optional; see "Where Kaggle fits" below |
+| Scripts, social copy | Claude | Draft the cold open, announcements, and newspaper articles from the sermon outline |
+| Music | CCLI Streaming License or royalty-free | Put it in the `songs:` license field so it's on record |
 
-| Job | Options |
-|---|---|
-| Sermon prep and scripts | Claude / ChatGPT (outline, cold-open script, announcements, social copy) |
-| Voice cloning / TTS | ElevenLabs (Professional Voice Clone from 30+ min of the pastor's clean audio) |
-| Talking-head avatar | HeyGen (Custom/Digital Twin), Synthesia, Captions.ai |
-| AI b-roll video | Runway, Kling, Google Veo, OpenAI Sora, Pika, Luma |
-| AI stills / thumbnails | Midjourney, Ideogram (good with text), Canva, Adobe Firefly |
-| Editing | CapCut (fastest), DaVinci Resolve (free, pro color), Premiere Pro, Descript (edit by transcript) |
-| Captions and clips | CapCut, Opus Clip, Descript |
-| Audio cleanup | Adobe Podcast Enhance, Descript Studio Sound |
-| Streaming / premiere | YouTube Premieres; Restream to push to Facebook as well |
-| Worship music license | CCLI Streaming License (if you use covers); or original / royalty-free |
+### One voice for everything: ElevenLabs → HeyGen
+
+Make the audio in **ElevenLabs first**, then give that file to **HeyGen** ("Upload audio") instead of typing the script into HeyGen. The apostle's voice then sounds the same in avatar segments, voice-overs, the newspaper audio edition, and the news show. It's also your own clone, not a HeyGen stock voice.
+
+- **Clone:** ElevenLabs *Professional Voice Clone* trained on 30+ minutes of clean sermon audio (a lav mic, no crowd noise, no music). Copy the Voice ID into `brand.yaml`.
+- **Settings:** in `brand.yaml` under `elevenlabs:`. Stability around 0.5 gives a natural preaching cadence. Raise it if the voice wanders.
+- **Scripture:** the builder rewrites "Proverbs 18:20-21" as "Proverbs chapter 18, verses 20 through 21" so the voice reads references aloud correctly.
+- **Placeholders:** the voice command refuses any script that still has `[bracketed]` text, so you never pay credits to have ElevenLabs read "[giving link]" out loud.
+
+### HeyGen avatar tips
+
+- Record the avatar training footage in the **same outfit, set, and light** as your real sermon camera. Then cutting from the real sermon to an avatar welcome or benediction looks like one room.
+- Use avatars for the short, repeatable parts: welcome, announcements, benediction. Keep them to 1–3 minutes.
+- Export 1080p 16:9 and save each file with the name in `heygen.md`, so it matches the placeholder in Final Cut.
+
+### OpenArt b-roll
+
+- Generate stills at 16:9 with the shared style suffix, keep the best of 4, then image-to-video with a slow camera move (push-in, pan, parallax). Slow moves look cinematic, and fast AI motion looks fake.
+- Use a 9:16 version of the same prompts for Reels and Shorts.
+- Keep a folder of your best b-roll. After a few months you'll reuse more than you generate.
+- **Don't generate real ministers' faces in OpenArt.** Real people come from the camera or their own HeyGen avatar, made with their consent.
+
+### Final Cut Pro workflow
+
+1. **File → Import → XML** → `build/timeline.fcpxml`. You get a project with a labeled placeholder for every segment, at its planned length, with a chapter marker and a to-do marker naming the file that goes there.
+2. Drop each clip over its placeholder (from HeyGen, the camera, and worship), then connect voice-overs and OpenArt b-roll above.
+3. Build your lower third, scripture overlay, and countdown **once** as Motion templates saved in Titles. Every week after that is drag and drop.
+4. Captions: **Transcribe to Captions**, then proofread names and Scripture references.
+5. **Share → YouTube & Facebook** keeps the chapter markers. Paste the description from `youtube.md`.
+6. For vertical clips, duplicate the project, switch it to vertical, and use **Smart Conform**.
+
+The timeline is 1080p at 30 fps. If you shoot 24 fps for a film look, change it in Project Properties after import.
+
+### Where Kaggle fits
+
+Kaggle is for notebooks and data. It isn't part of the weekly video production, but it's useful in two places:
+
+- **Growth dashboard (recommended):** each month, export YouTube Studio analytics (views, watch time, subscribers, and which segments people drop off at) as CSV, and chart them in a Kaggle notebook. That tells you which segments to shorten, and it's the proof you'll show other ministries when you sell the white-label service.
+- **Running the builders without a Mac setup:** a Kaggle notebook can run these Python commands. On a Mac with Final Cut, running them locally in Terminal is simpler (see the README).
 
 ## 4. The weekly pipeline
 
-The repo does the planning and paperwork. You and your team do the ministry and the edit.
-
 ```
 Mon  service.yaml ──► python -m studio service service/weeks/<date>
-                        │
-                        ├─ scripts/*.txt      → each minister reviews and approves their script
-                        ├─ prompts.md         → generate b-roll + thumbnail
-                        ├─ run_of_show.md     → whole team sees the order and timing
-                        ├─ edit_list.csv      → editor assembles in this order
+                        ├─ scripts/*.txt      → each minister approves their script
+                        ├─ run_of_show.md     → whole team sees order and timing
+                        ├─ heygen.md          → avatar segments + which audio to upload
+                        ├─ prompts.md         → OpenArt b-roll + thumbnail
+                        ├─ timeline.fcpxml    → Final Cut Pro project, pre-laid
+                        ├─ edit_list.csv      → same order as a spreadsheet
                         ├─ youtube.md         → title, description, chapters, AI disclosure
                         └─ checklist.md       → the week, day by day
-Wed  record real segments + generate AI segments
-Thu  edit
+Tue  scripts approved ──► python -m studio voice service/weeks/<date>   (ElevenLabs → build/audio/)
+Wed  record real segments (camera) · HeyGen avatars from the audio · OpenArt b-roll
+Thu  Final Cut Pro: import timeline.fcpxml, fill placeholders, titles, captions
 Fri  pastor review (theology + accuracy on every AI line)
-Sat  schedule YouTube Premiere + clips; newspaper PDF out
+Sat  Share → YouTube Premiere + vertical clips; newspaper PDF out
 Sun  premiere, with live chat moderators and prayer team online
 ```
 
@@ -84,9 +119,11 @@ Start a new week by copying the last one:
 python -m studio new-week 2026-10-11
 # edit service/weeks/2026-10-11/service.yaml
 python -m studio service service/weeks/2026-10-11
+export ELEVENLABS_API_KEY=your-key      # once per Terminal window
+python -m studio voice service/weeks/2026-10-11
 ```
 
-The builder **will not run** if a segment uses an AI avatar or AI voice for someone whose `consent_on_file` is `false`. That check is on purpose. See `04-consent-and-disclosure.md`.
+The builder and the voice command **will not run** if a segment uses an AI avatar or AI voice for someone whose `consent_on_file` is `false`. That check is on purpose. See `04-consent-and-disclosure.md`.
 
 ## 5. Recording the real parts so they look cinematic (low budget)
 
@@ -100,7 +137,7 @@ The builder **will not run** if a segment uses an AI avatar or AI voice for some
 
 | Phase | Weeks | What you do |
 |---|---|---|
-| 1. Foundation | 1–4 | Brand kit (logo sting, lower thirds, countdown, end card). Consent signed. Voice clone trained. First 2 services made with this pipeline. |
+| 1. Foundation | 1–4 | Brand kit in Final Cut/Motion (logo sting, lower thirds, countdown, end card). Consent signed. ElevenLabs Professional Voice Clone + HeyGen avatar trained. First 2 services made with this pipeline. |
 | 2. Consistency | 5–12 | Same day, same time, every week. Add associate ministers to fixed segments. Start 3 vertical clips a week. Newspaper goes out every week with the service. |
 | 3. Scale | 13+ | Sermon series with trailers. Member testimonies. Start packaging the white-label version (`02-white-label-playbook.md`). |
 

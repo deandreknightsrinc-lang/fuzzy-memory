@@ -46,8 +46,8 @@ The newspaper is the **written version of Sunday**. Each section has a place in 
 
 | Stage | Format | How |
 |---|---|---|
-| **1. Audio edition** (month 1–2) | 8–12 min podcast: the paper read aloud | ElevenLabs voice of the editor (with consent) reading the articles; music bed; publish to Spotify / Apple / YouTube |
-| **2. Video bulletin** (month 3–4) | 5–8 min YouTube video | AI presenter (HeyGen) reads a script made from `issue.yaml`, with a news-desk background, lower thirds, and scripture overlays |
+| **1. Audio edition** (month 1–2) | 8–12 min podcast: the paper read aloud | The same ElevenLabs voice used in the service reads the articles; music bed added in Final Cut; publish to Spotify / Apple / YouTube |
+| **2. Video bulletin** (month 3–4) | 5–8 min YouTube video | HeyGen presenter lip-synced to ElevenLabs audio of a script made from `issue.yaml`; OpenArt news-desk set and b-roll; assembled in Final Cut |
 | **3. The BAC Ministries News Show** (month 5+) | 15–20 min weekly show | Two hosts (Apostle Knight + co-host), real or AI-assisted; segments from the table above; field pieces from members; sponsor slots from the directory |
 | **4. White-label** | Same show for client ministries | Same brand-profile approach as the service; add it to the Premium package |
 

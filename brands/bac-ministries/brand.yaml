@@ -24,9 +24,19 @@ fonts:
   body: "Libre Baskerville"
   sans: "Open Sans"
 
-# Pulpit staff. `voice_id` / `avatar_id` are the IDs from your AI tools
-# (e.g. ElevenLabs voice, HeyGen avatar). Only fill them in for people who
-# have signed the likeness consent form (docs/04-consent-and-disclosure.md).
+# ElevenLabs render settings used by `python -m studio voice`.
+# Higher stability = steadier, more "pulpit" delivery; lower = more expressive.
+elevenlabs:
+  model_id: eleven_multilingual_v2
+  stability: 0.5
+  similarity_boost: 0.8
+  style: 0.0
+
+# Pulpit staff. Only fill in voice_id / avatar_id for people who have signed
+# the likeness consent form (docs/04-consent-and-disclosure.md).
+#   voice_id:  ElevenLabs > Voices > (their cloned voice) > "ID" button
+#   avatar_id: HeyGen > Avatars > (their avatar) > ... > copy avatar ID
+#              (only needed for the heygen.md hand-off sheet)
 staff:
   - key: apostle
     name: Apostle Sir DeAndre Knight

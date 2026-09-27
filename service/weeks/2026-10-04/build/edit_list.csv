@@ -1,13 +1,13 @@
-order,segment,start,end,source,speaker,expected_asset,on_screen,script_file
-1,countdown,0:00,5:00,graphics,,assets/01-countdown.mp4,Service begins in {countdown} | BAC Ministries - The Power of the Word,
-2,cold-open,5:00,6:00,ai_voice,Apostle Sir DeAndre Knight,assets/02-cold-open.mp4,,scripts/02-cold-open.txt
-3,welcome,6:00,8:00,ai_avatar,Apostle Sir DeAndre Knight,assets/03-welcome.mp4,lower_third:apostle,scripts/03-welcome.txt
-4,worship,8:00,20:00,music,,assets/04-worship.mp4,,
-5,scripture,20:00,22:00,ai_voice,Apostle Sir DeAndre Knight,assets/05-scripture.mp4,,scripts/05-scripture.txt
-6,prayer,22:00,26:00,recorded,Dr. Minister Daniel Alejandro Harris Bey,assets/06-prayer.mp4,lower_third:harris,scripts/06-prayer.txt
-7,announcements,26:00,29:00,ai_avatar,Apostle Sir DeAndre Knight,assets/07-announcements.mp4,,scripts/07-announcements.txt
-8,offering,29:00,32:00,ai_voice,Apostle Sir DeAndre Knight,assets/08-offering.mp4,giving_qr,scripts/08-offering.txt
-9,sermon,32:00,1:02:00,recorded,Apostle Sir DeAndre Knight,assets/09-sermon.mp4,,scripts/09-sermon.txt
-10,invitation,1:02:00,1:05:00,recorded,Apostle Sir DeAndre Knight,assets/10-invitation.mp4,,scripts/10-invitation.txt
-11,benediction,1:05:00,1:06:00,ai_avatar,Apostle Sir DeAndre Knight,assets/11-benediction.mp4,,scripts/11-benediction.txt
-12,end-card,1:06:00,1:06:30,graphics,,assets/12-end-card.mp4,Subscribe | Next week: Speak Life: The Word Over Your Household | Give: [giving link],
+order,segment,start,end,source,speaker,expected_asset,elevenlabs_audio,on_screen,script_file
+1,countdown,0:00,5:00,graphics,,assets/01-countdown.mp4,,Service begins in {countdown} | BAC Ministries - The Power of the Word,
+2,cold-open,5:00,6:00,ai_voice,Apostle Sir DeAndre Knight,assets/02-cold-open.mp4,audio/02-cold-open.mp3,,scripts/02-cold-open.txt
+3,welcome,6:00,8:00,ai_avatar,Apostle Sir DeAndre Knight,assets/03-welcome.mp4,audio/03-welcome.mp3,lower_third:apostle,scripts/03-welcome.txt
+4,worship,8:00,20:00,music,,assets/04-worship.mp4,,,
+5,scripture,20:00,22:00,ai_voice,Apostle Sir DeAndre Knight,assets/05-scripture.mp4,audio/05-scripture.mp3,,scripts/05-scripture.txt
+6,prayer,22:00,26:00,recorded,Dr. Minister Daniel Alejandro Harris Bey,assets/06-prayer.mp4,,lower_third:harris,scripts/06-prayer.txt
+7,announcements,26:00,29:00,ai_avatar,Apostle Sir DeAndre Knight,assets/07-announcements.mp4,audio/07-announcements.mp3,,scripts/07-announcements.txt
+8,offering,29:00,32:00,ai_voice,Apostle Sir DeAndre Knight,assets/08-offering.mp4,audio/08-offering.mp3,giving_qr,scripts/08-offering.txt
+9,sermon,32:00,1:02:00,recorded,Apostle Sir DeAndre Knight,assets/09-sermon.mp4,,,scripts/09-sermon.txt
+10,invitation,1:02:00,1:05:00,recorded,Apostle Sir DeAndre Knight,assets/10-invitation.mp4,,,scripts/10-invitation.txt
+11,benediction,1:05:00,1:06:00,ai_avatar,Apostle Sir DeAndre Knight,assets/11-benediction.mp4,audio/11-benediction.mp3,,scripts/11-benediction.txt
+12,end-card,1:06:00,1:06:30,graphics,,assets/12-end-card.mp4,,Subscribe | Next week: Speak Life: The Word Over Your Household | Give: [giving link],

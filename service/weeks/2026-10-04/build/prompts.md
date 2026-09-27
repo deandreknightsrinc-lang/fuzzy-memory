@@ -1,6 +1,10 @@
-# AI Prompt Pack - Death and Life Are in the Power of the Tongue
+# OpenArt Prompt Pack - Death and Life Are in the Power of the Tongue
 
-Paste into your image/video generator (Midjourney, Runway, Kling, Veo, Sora, etc.). Keep the same style suffix on every prompt so the service looks like one film.
+1. **Create Image** in OpenArt with each prompt below at **16:9** (b-roll) - generate 4, keep the best.
+2. Send the keeper to **image-to-video** (5-10 s, slow camera move: push-in, pan, or parallax).
+3. Save as `broll/<segment>-<n>.mp4` and drop it over that segment in Final Cut.
+
+Keep the same style suffix on every prompt so the whole service looks like one film. Never generate a real minister's face in OpenArt - real people come from camera footage or their HeyGen avatar.
 
 **Style suffix:** `cinematic, 35mm film, warm tungsten and window light, shallow depth of field, reverent, gold accent #8a6d1d, no text`
 
@@ -14,9 +18,9 @@ Paste into your image/video generator (Midjourney, Runway, Kling, Veo, Sora, etc
 
 - Close-up portrait photo of the speaker (real photo, not AI) on the right third; left side bold text "DEATH AND LIFE ARE IN THE POWER OF THE TONGUE"; background: open Bible in dramatic light; brand colors #1b1b1b / #8a6d1d.
 
-## Social clips (cut from the sermon)
+## Social clips (cut from the sermon in Final Cut)
 
-- 3 vertical 9:16 clips, 30-60s each, one per sermon point, burned-in captions, end with the service link.
+- 3 vertical 9:16 clips (Final Cut: duplicate project, change to vertical, use Smart Conform), 30-60s each, one per sermon point, burned-in captions, end with the service link.
   - 1. Words are seeds (Proverbs 18:20)
   - 2. The Word created, the Word sustains (Genesis 1:3; John 1:1)
   - 3. The Bible as God's trust and estate (Isaiah 40:8)
