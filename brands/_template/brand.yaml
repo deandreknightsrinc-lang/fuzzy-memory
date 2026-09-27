@@ -40,6 +40,16 @@ staff:
     voice_id: ""
     avatar_id: ""
 
+news_show:
+  name: ""                   # defaults to "<ministry name> News"
+  anchor: pastor
+  co_anchor: ""
+  host_source:
+    pastor: recorded         # switch to ai_avatar only after consent is signed
+  desks: {}
+  words_per_minute: 150
+  sign_off: ""
+
 newspaper:
   title: "EXAMPLE MINISTRIES"
   editor: pastor

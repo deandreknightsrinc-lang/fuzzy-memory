@@ -213,8 +213,13 @@ def build(week_dir: Path) -> Path:
     (out / "heygen.md").write_text("\n".join(h) + "\n")
 
     # Final Cut Pro timeline
+    timeline = [{
+        "label": f"{r['n']:02d} {r['seg']['type'].replace('_', ' ').title()}",
+        "seconds": r["end"] - r["start"],
+        "todo": f"Place {r['asset']}" + (f" (audio: {r['audio']})" if r["audio"] else ""),
+    } for r in rows]
     (out / "timeline.fcpxml").write_text(fcpxml.build(
-        rows, project_name=f"{week['date']} {week['title']}", event_name=f"{brand.ministry['short_name']} {week['date']}"))
+        timeline, project_name=f"{week['date']} {week['title']}", event_name=f"{brand.ministry['short_name']} {week['date']}"))
 
     # YouTube package
     uses_ai = any(r["seg"]["source"] in AI_SOURCES for r in rows)

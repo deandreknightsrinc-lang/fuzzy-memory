@@ -1,4 +1,4 @@
-"""Write a Final Cut Pro timeline (FCPXML) for a service: one labeled placeholder per segment.
+"""Write a Final Cut Pro timeline (FCPXML): one labeled placeholder per segment or clip.
 
 Import with File > Import > XML. Each segment is a gap clip of the planned length, carrying:
   - a chapter marker (exports as YouTube chapters when you share from Final Cut)
@@ -11,25 +11,21 @@ from xml.sax.saxutils import quoteattr
 FRAME = "100/3000s"  # 30 fps, matches FFVideoFormat1080p30
 
 
-def seconds(value: float) -> str:
-    return f"{int(round(value))}s"
-
-
-def build(rows: list, project_name: str, event_name: str) -> str:
-    total = sum(int(round(r["end"] - r["start"])) for r in rows)
+def build(items: list, project_name: str, event_name: str) -> str:
+    """items: dicts with label, seconds, todo, and chapter (True = add a chapter marker)."""
+    total = sum(int(round(i["seconds"])) for i in items)
     spine = []
     offset = 0
-    for r in rows:
-        dur = int(round(r["end"] - r["start"]))
+    for i in items:
+        dur = int(round(i["seconds"]))
         if dur <= 0:
             continue
-        seg = r["seg"]
-        label = f"{r['n']:02d} {seg['type'].replace('_', ' ').title()}"
-        todo = f"Place {r['asset']}" + (f" (audio: {r['audio']})" if r.get("audio") else "")
+        chapter = (f'          <chapter-marker start="0s" duration="{FRAME}" value={quoteattr(i["label"])} posterOffset="0s"/>\n'
+                   if i.get("chapter", True) else "")
         spine.append(
-            f'        <gap name={quoteattr(label)} offset="{offset}s" start="0s" duration="{dur}s">\n'
-            f'          <chapter-marker start="0s" duration="{FRAME}" value={quoteattr(label)} posterOffset="0s"/>\n'
-            f'          <marker start="0s" duration="{FRAME}" value={quoteattr(todo)} completed="0"/>\n'
+            f'        <gap name={quoteattr(i["label"])} offset="{offset}s" start="0s" duration="{dur}s">\n'
+            f"{chapter}"
+            f'          <marker start="0s" duration="{FRAME}" value={quoteattr(i["todo"])} completed="0"/>\n'
             f"        </gap>"
         )
         offset += dur

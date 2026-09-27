@@ -3,7 +3,7 @@
 Two projects, one system. Both can be white-labeled for other ministries:
 
 1. **AI Cinema Service.** A weekly, film-quality church service video that uses the whole pulpit staff.
-2. **The Weekly Publication.** The BAC Ministries newspaper. Later it grows into an audio edition, then a video bulletin, then the BAC Ministries News Show.
+2. **The Weekly Publication.** The BAC Ministries newspaper, plus the **BAC Ministries News** show built from each issue.
 
 ## Start here
 
@@ -43,6 +43,11 @@ python -m studio voice service/weeks/2026-10-11       # → build/audio/*.mp3, o
 python -m studio new-issue 2026-10-11
 python -m studio newspaper newspaper/issues/2026-10-11   # → issue.html + issue.pdf
 
+# Weekly news show (built from that week's newspaper issue)
+python -m studio show  newspaper/issues/2026-10-11   # → show/: rundown, teleprompter, HeyGen sheet, OpenArt prompts,
+                                                     #   Final Cut timeline, YouTube package
+python -m studio voice newspaper/issues/2026-10-11   # → show/audio/*.mp3 for every AI line
+
 # Another ministry
 cp -r brands/_template brands/<their-slug>             # fill in brand.yaml
 python -m studio new-week 2026-10-11 --brand <their-slug>
@@ -53,3 +58,4 @@ python -m studio new-week 2026-10-11 --brand <their-slug>
 - `service/weeks/2026-10-04/` : "Death and Life Are in the Power of the Tongue" (Proverbs 18:21), with the full build output
 - `newspaper/issues/2024-09-01/` : Issue #10, moved over from the original Word file
 - `newspaper/issues/2026-10-04/` : Issue #11 template that goes with the 10/4 service
+- `newspaper/issues/*/show/` : the news show kit built from each of those issues

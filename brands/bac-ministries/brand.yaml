@@ -59,6 +59,20 @@ staff:
   #   roles: [worship]
   #   consent_on_file: false
 
+# The weekly news show built from each newspaper issue (`python -m studio show <issue>`).
+news_show:
+  name: "BAC Ministries News"
+  anchor: apostle            # opens the show, introduces each desk, signs off
+  co_anchor: ""              # staff key of a second host, once you have one
+  host_source:               # how each presenter appears: ai_avatar | ai_voice | recorded
+    apostle: ai_avatar       # HeyGen avatar lip-synced to his ElevenLabs voice
+    harris: recorded         # on camera until his likeness consent is signed
+  desks:                     # who presents each newspaper section (default: the article's author)
+    prayer_weekly: harris
+  words_per_minute: 150
+  max_story_minutes: {front: 4, the_word: 3, business: 3, community: 2}
+  sign_off: "That's the news for this week from BAC Ministries. Stay in the Word, speak life, and we'll see you next week."
+
 newspaper:
   title: BAC MINISTRIES
   editor: apostle

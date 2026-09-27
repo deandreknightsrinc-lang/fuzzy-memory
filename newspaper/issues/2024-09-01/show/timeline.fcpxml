@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE fcpxml>
+<fcpxml version="1.10">
+  <resources>
+    <format id="r1" name="FFVideoFormat1080p30" frameDuration="100/3000s" width="1920" height="1080" colorSpace="1-1-1 (Rec. 709)"/>
+  </resources>
+  <library>
+    <event name="BAC News 2024-09-01">
+      <project name="BAC Ministries News #10">
+        <sequence format="r1" duration="382s" tcStart="0s" tcFormat="NDF" audioLayout="stereo" audioRate="48k">
+          <spine>
+        <gap name="01 Cold Open" offset="0s" start="0s" duration="11s">
+          <chapter-marker start="0s" duration="100/3000s" value="01 Cold Open" posterOffset="0s"/>
+          <marker start="0s" duration="100/3000s" value="Place clips/01-cold-open-01-apostle.mp4 (audio: audio/01-cold-open-01-apostle.mp3)" completed="0"/>
+        </gap>
+        <gap name="02 Show Open" offset="11s" start="0s" duration="10s">
+          <marker start="0s" duration="100/3000s" value="Animated 'BAC Ministries News' title sting + music hit." completed="0"/>
+        </gap>
+        <gap name="03 Welcome &amp; Scripture (1)" offset="21s" start="0s" duration="4s">
+          <chapter-marker start="0s" duration="100/3000s" value="03 Welcome &amp; Scripture (1)" posterOffset="0s"/>
+          <marker start="0s" duration="100/3000s" value="Place clips/03-welcome-01-apostle.mp4 (audio: audio/03-welcome-01-apostle.mp3)" completed="0"/>
+        </gap>
+        <gap name="03 Welcome &amp; Scripture (2)" offset="25s" start="0s" duration="10s">
+          <marker start="0s" duration="100/3000s" value="Place clips/03-welcome-02-apostle.mp4 (audio: audio/03-welcome-02-apostle.mp3)" completed="0"/>
+        </gap>
+        <gap name="04 Top Story (1)" offset="35s" start="0s" duration="20s">
+          <chapter-marker start="0s" duration="100/3000s" value="04 Top Story (1)" posterOffset="0s"/>
+          <marker start="0s" duration="100/3000s" value="Place clips/04-top-story-01-apostle.mp4 (audio: audio/04-top-story-01-apostle.mp3)" completed="0"/>
+        </gap>
+        <gap name="04 Top Story (2)" offset="55s" start="0s" duration="100s">
+          <marker start="0s" duration="100/3000s" value="Place clips/04-top-story-02-apostle.mp4 (audio: audio/04-top-story-02-apostle.mp3)" completed="0"/>
+        </gap>
+        <gap name="05 The Word (1)" offset="155s" start="0s" duration="11s">
+          <chapter-marker start="0s" duration="100/3000s" value="05 The Word (1)" posterOffset="0s"/>
+          <marker start="0s" duration="100/3000s" value="Place clips/05-the-word-01-apostle.mp4 (audio: audio/05-the-word-01-apostle.mp3)" completed="0"/>
+        </gap>
+        <gap name="05 The Word (2)" offset="166s" start="0s" duration="125s">
+          <marker start="0s" duration="100/3000s" value="Place clips/05-the-word-02-apostle.mp4 (audio: audio/05-the-word-02-apostle.mp3)" completed="0"/>
+        </gap>
+        <gap name="06 Prayer Desk (1)" offset="291s" start="0s" duration="7s">
+          <chapter-marker start="0s" duration="100/3000s" value="06 Prayer Desk (1)" posterOffset="0s"/>
+          <marker start="0s" duration="100/3000s" value="Place clips/06-prayer-weekly-01-apostle.mp4 (audio: audio/06-prayer-weekly-01-apostle.mp3)" completed="0"/>
+        </gap>
+        <gap name="06 Prayer Desk (2)" offset="298s" start="0s" duration="54s">
+          <marker start="0s" duration="100/3000s" value="Place clips/06-prayer-weekly-02-harris.mp4" completed="0"/>
+        </gap>
+        <gap name="07 Bulletin Board" offset="352s" start="0s" duration="7s">
+          <marker start="0s" duration="100/3000s" value="Place clips/07-bulletin-01-apostle.mp4 (audio: audio/07-bulletin-01-apostle.mp3)" completed="0"/>
+        </gap>
+        <gap name="08 Sign-off" offset="359s" start="0s" duration="8s">
+          <chapter-marker start="0s" duration="100/3000s" value="08 Sign-off" posterOffset="0s"/>
+          <marker start="0s" duration="100/3000s" value="Place clips/08-sign-off-01-apostle.mp4 (audio: audio/08-sign-off-01-apostle.mp3)" completed="0"/>
+        </gap>
+        <gap name="09 End Card" offset="367s" start="0s" duration="15s">
+          <marker start="0s" duration="100/3000s" value="Subscribe, read the full issue (link), next week's service premiere time." completed="0"/>
+        </gap>
+          </spine>
+        </sequence>
+      </project>
+    </event>
+  </library>
+</fcpxml>

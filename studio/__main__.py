@@ -2,6 +2,8 @@
   python -m studio service   service/weeks/2026-10-04
   python -m studio voice     service/weeks/2026-10-04 [--force]   (needs ELEVENLABS_API_KEY)
   python -m studio newspaper newspaper/issues/2026-10-04 [--no-pdf]
+  python -m studio show      newspaper/issues/2026-10-04            (news show kit from the issue)
+  python -m studio voice     newspaper/issues/2026-10-04 [--force]  (ElevenLabs audio for the show)
   python -m studio new-week  2026-10-11 [--brand bac-ministries]
   python -m studio new-issue 2026-10-11 [--brand bac-ministries]
 """
@@ -11,7 +13,7 @@ import shutil
 import sys
 from pathlib import Path
 
-from . import newspaper, service, voice
+from . import newspaper, newsshow, service, voice
 from .brand import REPO_ROOT
 
 STARTERS = {
@@ -42,7 +44,7 @@ def new_from_latest(kind: str, day: str, brand: str) -> Path:
 
 def main():
     ap = argparse.ArgumentParser(prog="studio", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("command", choices=["service", "voice", "newspaper", *STARTERS])
+    ap.add_argument("command", choices=["service", "voice", "newspaper", "show", *STARTERS])
     ap.add_argument("target")
     ap.add_argument("--no-pdf", action="store_true")
     ap.add_argument("--force", action="store_true", help="voice: re-render audio files that already exist")
@@ -51,6 +53,8 @@ def main():
 
     if args.command == "service":
         print(f"Service kit written to {service.build(Path(args.target))}")
+    elif args.command == "show":
+        print(f"News show kit written to {newsshow.build(Path(args.target))}")
     elif args.command == "voice":
         written = voice.render(Path(args.target), force=args.force)
         print(f"{len(written)} ElevenLabs file(s) rendered into {Path(args.target) / 'build' / 'audio'}")

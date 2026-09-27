@@ -65,3 +65,18 @@ classifieds:
     text: "[Member-owned businesses. A good first sponsorship product.]"
   - title: "Prayer Requests"
     text: "[Form link or phone number]"
+
+# News show extras for this week (python -m studio show newspaper/issues/2026-10-04).
+# Everything else in the show is built from the articles above.
+show:
+  # Optional. Delete if there's no sponsor this week.
+  sponsor:
+    name: "[Member business name]"
+    read: "[One or two sentences about the business, and where to find them.]"
+  # Optional pre-recorded pieces from members: a testimony, an event recap, an interview.
+  field_pieces:
+    - who: "[Member name]"
+      intro: "[Anchor line introducing the piece.]"
+      file: clips/field-testimony.mp4
+      minutes: 2
+  # skip: [bulletin]     # leave out any segment by its id

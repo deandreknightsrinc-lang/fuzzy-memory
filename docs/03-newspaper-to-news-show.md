@@ -51,4 +51,43 @@ The newspaper is the **written version of Sunday**. Each section has a place in 
 | **3. The BAC Ministries News Show** (month 5+) | 15–20 min weekly show | Two hosts (Apostle Knight + co-host), real or AI-assisted; segments from the table above; field pieces from members; sponsor slots from the directory |
 | **4. White-label** | Same show for client ministries | Same brand-profile approach as the service; add it to the Premium package |
 
-The next step in code, when you're ready: a `python -m studio newsshow` builder that turns an `issue.yaml` into a segment-by-segment show script and teleprompter files. It's the same pattern as the service builder, and it only makes sense once the paper is going out every week.
+## 5. The show builder
+
+```bash
+python -m studio show  newspaper/issues/2026-10-04     # → newspaper/issues/2026-10-04/show/
+python -m studio voice newspaper/issues/2026-10-04     # ElevenLabs audio for every AI line
+```
+
+It turns the week's `issue.yaml` into a produced show, in this order:
+
+| # | Segment | Comes from |
+|---|---|---|
+| 1 | Cold open | The first three headlines, teased by the anchor |
+| 2 | Show open | Title sting (graphics) |
+| 3 | Welcome & Scripture | The anchor + the first verse in The Minister's Inspirations |
+| 4 | Top Story | The front-page article |
+| 5+ | The Word, Prayer Desk, Kingdom Business, Around the Ministry… | One segment per article, in issue order |
+| | Field Report | `show: field_pieces:` in the issue (member testimonies, event recaps) |
+| | Bulletin Board | The classifieds, read by the host and shown as a ticker |
+| | Sponsor | `show: sponsor:` in the issue (a member business) |
+| | Sign-off + End card | `news_show.sign_off` in the brand file |
+
+**What you get in `show/`:**
+
+- `rundown.md`: the timed rundown. Any line still holding `[placeholder]` text is flagged **NEEDS COPY**.
+- `teleprompter.txt` and `scripts/`: every line, labeled by presenter.
+- `heygen.md`: each AI-avatar line with its ElevenLabs audio and the file name to save as. It also lists who records what on camera.
+- `prompts.md`: the OpenArt news-desk set (make it once) and b-roll for each story.
+- `timeline.fcpxml`: a Final Cut project with one placeholder per line (so you can cut between anchors) and a chapter marker per segment.
+- `youtube.md`: title, chapters (short ones folded so YouTube accepts them), and the AI label.
+
+**Setting up the show (once, in `brand.yaml` → `news_show:`):**
+
+- `anchor` / `co_anchor`: who hosts. The co-anchor reads the bulletin board.
+- `host_source`: how each person appears (`ai_avatar`, `ai_voice`, or `recorded`). The builder won't make an AI version of anyone without `consent_on_file: true`.
+- `desks`: who presents each section. The default is the article's author, so Dr. Harris presents the Prayer Desk.
+- `max_story_minutes`: the time budget per section. Longer articles are trimmed at a sentence break and flagged in the rundown.
+
+**For a tighter read:** add `show_copy:` to any article. The anchor reads that instead of the trimmed article. Newspaper writing and TV writing differ: TV uses short sentences, one idea each, and says the scripture reference before the verse.
+
+It's the same brand-profile approach as everything else, so it's already white-label: a client's news show comes from their own `brand.yaml` and their own issues.
