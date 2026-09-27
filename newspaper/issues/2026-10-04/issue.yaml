@@ -1,0 +1,67 @@
+# Issue #11 goes with the 2026-10-04 service (service/weeks/2026-10-04/service.yaml).
+# The paper is the written version of Sunday. Each section has a spot in the service,
+# and later each section becomes a segment of the news show.
+#
+# Bracketed [text] is a placeholder. Replace it before you publish.
+
+brand: bac-ministries
+date: 2026-10-04
+number: 11
+tagline: "Series: The Power of the Word"
+
+inspirations:
+  kicker: "The Minister's Inspirations"
+  title: "Speak Life"
+  verses:
+    - ref: "Proverbs 18:21"
+      text: "Death and life are in the power of the tongue: and they that love it shall eat the fruit thereof."
+    - ref: "Genesis 1:3"
+      text: "And God said, Let there be light: and there was light."
+    - ref: "Isaiah 40:8"
+      text: "The grass withereth, the flower fadeth: but the word of our God shall stand for ever."
+    - ref: "Colossians 3:16"
+      text: "Let the word of Christ dwell in you richly in all wisdom."
+
+articles:
+  - section: front
+    author: apostle
+    headline: "Death and Life Are in the Power of the Tongue"
+    deck: "This Sunday's message: what are your words building? Watch the full service on our YouTube channel."
+    body: |
+      [Three to five paragraphs summarizing Sunday's sermon, written from the sermon outline in service.yaml: words are seeds, the Word created and sustains, the Bible as God's trust and estate, choose life with your lips.]
+
+      > What you say, you eat.
+
+      ## This Week's Challenge
+
+      [The 7-day speech fast from complaining, with how members can report back.]
+
+  - section: prayer_weekly
+    author: harris
+    headline: "The Prayer Weekly"
+    deck: "Kundalino Ministries"
+    body: |
+      [Dr. Harris's weekly prayer. It is the same text he prays in the service's prayer segment.]
+
+  - section: business
+    author: apostle
+    flow: true
+    headline: "[Business Section: Kingdom Economics]"
+    deck: "[Trusts, estates, and generational wealth, seen through Scripture]"
+    body: |
+      [Your weekly business column. This fits your "Bible as a trust and estates blueprint" teaching.]
+
+  - section: community
+    author: apostle
+    flow: true
+    headline: "[Around the Ministry]"
+    body: |
+      [Birthdays, anniversaries, testimonies, member spotlights, prayer requests you have permission to share.]
+
+classifieds:
+  - title: "Midweek Bible Study"
+    text: "[Day, time, link]"
+  - title: "Member Business Directory"
+    text: "[Member-owned businesses. A good first sponsorship product.]"
+  - title: "Prayer Requests"
+    text: "[Form link or phone number]"

@@ -1,0 +1,56 @@
+# Brand profile for BAC Ministries.
+# Every generator (service kit, newspaper, future news show) reads this file.
+# To white-label for another ministry, copy brands/_template/ and fill it in.
+
+ministry:
+  name: BAC Ministries
+  short_name: BAC
+  tagline: "In the beginning was the Word"
+  website: ""            # e.g. https://bacministries.org
+  youtube: ""            # channel URL
+  giving_url: ""         # online giving link shown on screen during offering
+  service_day: Sunday
+  service_time: "11:00 AM"
+
+colors:
+  primary: "#1b1b1b"     # masthead / headlines
+  accent: "#8a6d1d"      # gold rules, lower-third bar
+  paper: "#fbf8f1"       # newspaper background
+  ink: "#222222"
+
+fonts:
+  masthead: "Playfair Display"
+  headline: "Libre Baskerville"
+  body: "Libre Baskerville"
+  sans: "Open Sans"
+
+# Pulpit staff. `voice_id` / `avatar_id` are the IDs from your AI tools
+# (e.g. ElevenLabs voice, HeyGen avatar). Only fill them in for people who
+# have signed the likeness consent form (docs/04-consent-and-disclosure.md).
+staff:
+  - key: apostle
+    name: Apostle Sir DeAndre Knight
+    title: Senior Pastor / Apostle
+    roles: [sermon, welcome, benediction, editor]
+    consent_on_file: true
+    voice_id: ""
+    avatar_id: ""
+  - key: harris
+    name: Dr. Minister Daniel Alejandro Harris Bey
+    title: Minister of Prayer, Kundalino Ministries
+    roles: [prayer, prayer_column]
+    consent_on_file: false
+    voice_id: ""
+    avatar_id: ""
+  # Add associate ministers, worship leader, announcements host, deacons...
+  # - key: worship
+  #   name: ""
+  #   title: Worship Leader
+  #   roles: [worship]
+  #   consent_on_file: false
+
+newspaper:
+  title: BAC MINISTRIES
+  editor: apostle
+  next_issue_number: 11
+  sections: [front, the_word, prayer_weekly, business, community, classifieds]

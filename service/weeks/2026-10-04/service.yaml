@@ -1,0 +1,151 @@
+# One weekly service = one of these files.
+# Fill in the scripts, run `python service/build_service.py service/weeks/2026-10-04`
+# and hand the generated build/ folder to your editor (or yourself in CapCut / Premiere).
+#
+# source options per segment:
+#   ai_avatar  - generated talking-head video (HeyGen / Synthesia / etc.) from the script + avatar_id
+#   ai_voice   - voice-over only (ElevenLabs etc.) laid over b-roll or slides
+#   recorded   - real camera footage of the speaker (phone, webcam, sanctuary cam)
+#   music      - worship / licensed or original music video
+#   graphics   - motion graphics only (countdown, end card)
+
+brand: bac-ministries
+date: 2026-10-04
+series: "The Power of the Word"
+title: "Death and Life Are in the Power of the Tongue"
+theme_scripture: "Proverbs 18:21"
+bible_version: KJV
+
+segments:
+  - id: countdown
+    type: countdown
+    source: graphics
+    minutes: 5
+    on_screen: ["Service begins in {countdown}", "{ministry} - {series}"]
+    music: "Instrumental worship bed (royalty-free / licensed)"
+
+  - id: cold-open
+    type: cold_open
+    source: ai_voice
+    speaker: apostle
+    minutes: 1
+    script: |
+      Words built the world. "And God said, Let there be light: and there was light."
+      This week, we open the Word and ask a simple question: what are your words building?
+    broll:
+      - "Slow cinematic push-in on an open Bible on a wooden pulpit, warm window light, dust in the air, 24fps film look"
+      - "Sunrise breaking over a city skyline, time-lapse, golden hour"
+
+  - id: welcome
+    type: welcome
+    source: ai_avatar
+    speaker: apostle
+    minutes: 2
+    script: |
+      Welcome to BAC Ministries, whether you are joining us for the first time or you have been with us from the beginning.
+      Grab your Bible, grab a notebook, and let us make room for the Word today.
+    on_screen: ["lower_third:apostle"]
+
+  - id: worship
+    type: worship
+    source: music
+    minutes: 12
+    songs:
+      - title: ""
+        artist: ""
+        license: "CCLI streaming license # / original / royalty-free"
+    notes: "Use your own praise team recording or properly licensed music only."
+
+  - id: scripture
+    type: scripture_reading
+    source: ai_voice
+    speaker: apostle
+    minutes: 2
+    scripture:
+      - ref: "Proverbs 18:20-21"
+        text: |
+          A man's belly shall be satisfied with the fruit of his mouth; and with the increase of his lips shall he be filled.
+          Death and life are in the power of the tongue: and they that love it shall eat the fruit thereof.
+      - ref: "John 1:1"
+        text: "In the beginning was the Word, and the Word was with God, and the Word was God."
+
+  - id: prayer
+    type: prayer
+    source: recorded
+    speaker: harris
+    minutes: 4
+    script: |
+      Be careful for nothing; but in everything by prayer and supplication with thanksgiving
+      let your requests be made known unto God. (Philippians 4:6)
+      [Dr. Harris - full weekly prayer here. Same text runs as "The Prayer Weekly" column in the newspaper.]
+    on_screen: ["lower_third:harris"]
+
+  - id: announcements
+    type: announcements
+    source: ai_avatar
+    speaker: apostle
+    minutes: 3
+    items:
+      - "Issue #11 of the BAC Ministries Weekly is out - read it at the link below."
+      - "Midweek Bible study: [day / time / link]"
+      - "Prayer requests: [form link or phone]"
+
+  - id: offering
+    type: offering
+    source: ai_voice
+    speaker: apostle
+    minutes: 3
+    script: |
+      "Give, and it shall be given unto you." (Luke 6:38)
+      Thank you for sowing into this ministry. You can give securely at the link on screen.
+    on_screen: ["giving_qr"]
+
+  - id: sermon
+    type: sermon
+    source: recorded      # strongly recommended: the sermon is the apostle's real voice and face
+    speaker: apostle
+    minutes: 30
+    outline:
+      - point: "1. Words are seeds"
+        scripture: "Proverbs 18:20"
+        notes: "What you say, you eat. The fruit of the mouth feeds the belly."
+      - point: "2. The Word created, the Word sustains"
+        scripture: "Genesis 1:3; John 1:1"
+        notes: "God framed the world by speaking. We are made in His image."
+      - point: "3. The Bible as God's trust and estate"
+        scripture: "Isaiah 40:8"
+        notes: "Grantor, instructions, beneficiaries for all generations."
+      - point: "4. Choose life with your lips"
+        scripture: "Proverbs 18:21; Colossians 3:16"
+        notes: "Practical: 7-day speech fast from complaining."
+    script: |
+      [Full sermon manuscript or detailed notes. Recorded on camera; the outline above
+      drives the on-screen point titles and scripture overlays.]
+    broll:
+      - "Seeds falling into dark rich soil, macro shot, shallow depth of field"
+      - "Old parchment will and testament with wax seal, candle light, cinematic"
+      - "Congregation silhouettes with hands raised, backlit stage haze (stock footage)"
+
+  - id: invitation
+    type: invitation
+    source: recorded
+    speaker: apostle
+    minutes: 3
+    script: |
+      [Altar call / invitation to salvation, and how to connect: link, phone, text line.]
+
+  - id: benediction
+    type: benediction
+    source: ai_avatar
+    speaker: apostle
+    minutes: 1
+    script: |
+      The Lord bless thee, and keep thee: the Lord make his face shine upon thee, and be gracious unto thee:
+      the Lord lift up his countenance upon thee, and give thee peace. (Numbers 6:24-26)
+
+  - id: end-card
+    type: end_card
+    source: graphics
+    minutes: 0.5
+    on_screen: ["Subscribe", "Next week: {next_title}", "Give: {giving_url}"]
+    next_title: "Speak Life: The Word Over Your Household"

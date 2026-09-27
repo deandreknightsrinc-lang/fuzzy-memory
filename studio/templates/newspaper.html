@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ brand.newspaper.title or brand.ministry.name }} - Issue #{{ issue.number }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family={{ brand.fonts.masthead|replace(' ', '+') }}:wght@700;900&family={{ brand.fonts.headline|replace(' ', '+') }}:ital,wght@0,400;0,700;1,400&family={{ brand.fonts.sans|replace(' ', '+') }}:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: {{ brand.colors.primary }};
+    --accent: {{ brand.colors.accent }};
+    --paper: {{ brand.colors.paper }};
+    --ink: {{ brand.colors.ink }};
+    --masthead: "{{ brand.fonts.masthead }}", Georgia, serif;
+    --headline: "{{ brand.fonts.headline }}", Georgia, serif;
+    --body: "{{ brand.fonts.body }}", Georgia, serif;
+    --sans: "{{ brand.fonts.sans }}", Arial, sans-serif;
+  }
+  @page {
+    size: letter;
+    margin: 0.5in 0.5in 0.6in;
+    @bottom-center { content: "{{ brand.newspaper.title or brand.ministry.name }}  \2022  Issue #{{ issue.number }}  \2022  Page " counter(page); font: 8pt var(--sans); color: #666; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 10pt/1.45 var(--body); }
+  .sheet { max-width: 7.5in; margin: 0 auto; padding: 16px; }
+  @media print { .sheet { padding: 0; max-width: none; } body { background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+
+  /* Masthead */
+  .masthead { border-top: 4px double var(--primary); border-bottom: 4px double var(--primary); display: grid; grid-template-columns: 1.25in 1fr 1.25in; align-items: center; padding: 6px 0; gap: 12px; }
+  .masthead .meta { font: 8.5pt var(--sans); text-transform: uppercase; letter-spacing: .06em; }
+  .masthead .meta.right { text-align: right; }
+  .masthead h1 { margin: 0; white-space: nowrap; font: 900 34pt/1 var(--masthead); letter-spacing: .02em; color: var(--primary); text-align: center; }
+  .tagline { text-align: center; font: italic 10pt var(--headline); color: var(--accent); border-bottom: 1px solid var(--primary); padding: 3px 0 5px; margin-bottom: 12px; }
+
+  /* Front page */
+  .front { display: grid; grid-template-columns: 2.1in 1fr; gap: 16px; }
+  .sidebar { border-right: 1px solid #bbb; padding-right: 14px; }
+  .sidebar h3 { font: 700 13pt var(--headline); margin: 0 0 2px; }
+  .sidebar .kicker { font: 600 8pt var(--sans); text-transform: uppercase; color: var(--accent); letter-spacing: .08em; }
+  .verse { margin: 8px 0; font-size: 9pt; }
+  .verse b { display: block; color: var(--accent); font-family: var(--sans); font-size: 8pt; text-transform: uppercase; letter-spacing: .05em; }
+  .lead h2 { font: 700 22pt/1.15 var(--headline); margin: 4px 0 6px; }
+  .deck { font: italic 11.5pt/1.35 var(--headline); color: #444; margin: 0 0 8px; }
+  .byline { font: 600 8pt var(--sans); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+  .cols { column-count: 2; column-gap: 16px; column-rule: 1px solid #ddd; text-align: justify; hyphens: auto; }
+  .cols p { margin: 0 0 7px; }
+  figure { margin: 0 0 10px; }
+  figure img { display: block; max-width: 100%; max-height: 3.2in; margin: 0 auto; filter: grayscale(15%); }
+  figure.portrait { break-inside: avoid; }
+  figure.portrait img { max-height: 2.6in; }
+  figcaption { font: 7.5pt/1.3 var(--sans); color: #555; margin-top: 3px; }
+  h4 { font: 700 10.5pt var(--headline); margin: 10px 0 4px; break-after: avoid; }
+  blockquote { margin: 10px 0; padding: 8px 10px; border-top: 2px solid var(--accent); border-bottom: 2px solid var(--accent); font: italic 13pt/1.3 var(--headline); text-align: center; break-inside: avoid; }
+
+  .inside-box { display: grid; grid-template-columns: repeat(auto-fit, minmax(1.9in, 1fr)); gap: 0; border-top: 3px solid var(--primary); margin-top: 16px; }
+  .inside-box > div { padding: 8px 10px; border-right: 1px solid #bbb; }
+  .inside-box > div:last-child { border-right: 0; }
+  .inside-box .label { font: 700 7.5pt var(--sans); text-transform: uppercase; color: var(--accent); letter-spacing: .1em; }
+  .inside-box .h { font: 700 11pt/1.2 var(--headline); margin: 2px 0; }
+  .inside-box .who { font: 8pt var(--sans); }
+
+  /* Inside pages */
+  .article { break-before: page; }
+  .article.flow { break-before: auto; margin-top: 18px; padding-top: 10px; border-top: 1px solid #999; }
+  .section-bar { background: var(--primary); color: var(--paper); font: 700 9pt var(--sans); text-transform: uppercase; letter-spacing: .15em; padding: 4px 8px; display: flex; justify-content: space-between; }
+  .article h2 { font: 700 20pt/1.15 var(--headline); margin: 8px 0 4px; }
+  .article .cols.three { column-count: 3; }
+  .source { font: 7.5pt/1.3 var(--sans); color: #666; margin-top: 6px; column-span: all; }
+
+  .classifieds { column-count: 3; column-gap: 14px; column-rule: 1px solid #ccc; }
+  .ad { break-inside: avoid; border: 1px solid var(--primary); padding: 6px 8px; margin-bottom: 10px; font-size: 9pt; }
+  .ad b { display: block; font: 700 9pt var(--sans); text-transform: uppercase; }
+
+  @media screen and (max-width: 640px) {
+    .front { grid-template-columns: 1fr; }
+    .sidebar { border-right: 0; padding-right: 0; border-bottom: 1px solid #bbb; padding-bottom: 10px; }
+    .cols, .article .cols.three, .classifieds { column-count: 1; }
+    .masthead { grid-template-columns: 1fr; text-align: center; }
+    .masthead .meta.right { text-align: center; }
+    .masthead h1 { font-size: 30pt; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <header class="masthead">
+    <div class="meta">{{ date_str }}</div>
+    <h1>{{ brand.newspaper.title or brand.ministry.name }}</h1>
+    <div class="meta right">Issue #{{ issue.number }}</div>
+  </header>
+  <div class="tagline">{{ issue.tagline or brand.ministry.tagline }}{% if editor %} &nbsp;&bull;&nbsp; Editor: {{ editor.name }}{% endif %}</div>
+
+  <section class="front">
+    <aside class="sidebar">
+      {% if issue.inspirations %}
+      <div class="kicker">{{ issue.inspirations.kicker or "The Minister's Inspirations" }}</div>
+      <h3>{{ issue.inspirations.title or "The Word" }}</h3>
+      {% for v in issue.inspirations.verses %}
+      <div class="verse"><b>{{ v.ref }}</b>{{ v.text }}</div>
+      {% endfor %}
+      {% endif %}
+    </aside>
+    <div class="lead">
+      {% for a in front %}
+      {% if a.image %}<figure><img src="{{ a.image }}" alt="{{ a.caption or a.headline }}">{% if a.caption %}<figcaption>{{ a.caption }}</figcaption>{% endif %}</figure>{% endif %}
+      <h2>{{ a.headline }}</h2>
+      {% if a.deck %}<p class="deck">{{ a.deck }}</p>{% endif %}
+      <div class="byline">By {{ a.author_name }}</div>
+      <div class="cols">{{ a.body_html|safe }}{% if a.source %}<div class="source">Source: {{ a.source }}</div>{% endif %}</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if inside %}
+  <nav class="inside-box">
+    {% for a in inside[:3] %}
+    <div><div class="label">{{ a.section|replace('_', ' ') }}</div><div class="h">{{ a.headline }}</div><div class="who">{{ a.author_name }}</div></div>
+    {% endfor %}
+  </nav>
+  {% endif %}
+
+  {% for a in inside %}
+  <article class="article{% if a.flow %} flow{% endif %}">
+    <div class="section-bar"><span>{{ a.section|replace('_', ' ') }}</span><span>{{ brand.ministry.name }}</span></div>
+    {% if a.image and a.image_layout != 'portrait' %}<figure><img src="{{ a.image }}" alt="{{ a.caption or a.headline }}">{% if a.caption %}<figcaption>{{ a.caption }}</figcaption>{% endif %}</figure>{% endif %}
+    <h2>{{ a.headline }}</h2>
+    {% if a.deck %}<p class="deck">{{ a.deck }}</p>{% endif %}
+    <div class="byline">By {{ a.author_name }}</div>
+    <div class="cols{% if a.columns == 3 %} three{% endif %}">{% if a.image and a.image_layout == 'portrait' %}<figure class="portrait"><img src="{{ a.image }}" alt="{{ a.caption or a.headline }}">{% if a.caption %}<figcaption>{{ a.caption }}</figcaption>{% endif %}</figure>{% endif %}{{ a.body_html|safe }}{% if a.source %}<div class="source">Source: {{ a.source }}</div>{% endif %}</div>
+  </article>
+  {% endfor %}
+
+  {% if issue.classifieds %}
+  <article class="article">
+    <div class="section-bar"><span>Classifieds &amp; Public Notices</span><span>{{ brand.ministry.name }}</span></div>
+    <div class="classifieds" style="margin-top:10px">
+      {% for ad in issue.classifieds %}<div class="ad"><b>{{ ad.title }}</b>{{ ad.text }}</div>{% endfor %}
+    </div>
+  </article>
+  {% endif %}
+</div>
+</body>
+</html>

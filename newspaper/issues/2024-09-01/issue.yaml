@@ -1,0 +1,89 @@
+# Issue #10, moved over from the original Word file (word-newspaper_BAC_MINISTIES.pdf).
+# Only real content was brought over. Pages 3-4 of the Word version were still the
+# template's sample text ("To make your document look professionally produced...").
+# That filler is gone. The Business section is left blank for you to write.
+#
+# Body text rules: blank line = new paragraph, "## " = subheading, "> " = pull quote, *word* = italics.
+
+brand: bac-ministries
+date: 2024-09-01
+number: 10
+
+inspirations:
+  kicker: "The Minister's Inspirations"
+  title: "The Word"
+  verses:
+    - ref: "John 1:1"
+      text: "In the beginning was the Word, and the Word was with God, and the Word was God."
+    - ref: "Proverbs 18:20-21"
+      text: "A man's belly shall be satisfied with the fruit of his mouth; and with the increase of his lips shall he be filled. Death and life are in the power of the tongue: and they that love it shall eat the fruit thereof."
+    - ref: "John 17:17"
+      text: "Sanctify them in the truth; your word is truth."
+    - ref: "Matthew 24:35"
+      text: "Heaven and earth will pass away, but my words will not pass away."
+    - ref: "Colossians 3:16"
+      text: "Let the word of Christ dwell in you richly, teaching and admonishing one another in all wisdom, singing psalms and hymns and spiritual songs, with thankfulness in your hearts to God."
+    - ref: "Luke 11:28"
+      text: "But he said, \"Blessed rather are those who hear the word of God and keep it!\""
+    - ref: "Isaiah 40:8"
+      text: "The grass withers, the flower fades, but the word of our God will stand forever."
+
+articles:
+  - section: front
+    author: apostle
+    headline: "Magic Words: Can What You Say Help You Get Your Way?"
+    deck: "The Bible should be examined as a Trust and Estates blueprint book. It's God's trust agreement as well as instructions for its success, as the Grantor, and success for all beneficiaries for all future generations."
+    body: |
+      ## The Magic Spell Hypothesis
+
+      Researchers tested their hypothesis by asking 200 non-lawyers to write laws and stories about crimes. The participants naturally used convoluted structures when writing laws prohibiting crimes such as drunk driving, burglary, arson, and drug trafficking, but opted for plain English in their fiction stories. The pattern held true even when participants were asked to revise their drafts.
+
+      Instead, the study supports what the researchers call the "magic spell hypothesis." Just as spells are distinguished by a unique style that sets them apart from everyday language, legalese seems to convey a similar sense of formality and power. "People seem to understand that there's an implicit rule that this is how laws should sound, and they write them that way," says Edward Gibson, an MIT professor of brain and cognitive sciences and the senior author of the study.
+
+      In a 2022 study, the same team examined 3.5 million words from legal contracts, comparing them with movie scripts, newspaper articles, and academic papers. Their analysis uncovered a common pattern in legal documents: lengthy definitions often interrupt sentences, a structure known as "center-embedding."
+
+      In another series of experiments, around 80 participants were asked to draft laws and then write descriptions explaining those laws to visitors from another country. When crafting the laws they consistently used center-embedded structures, but avoided that phrasing in the explanations. This switching points to the idea that legalese is more about signaling authority than giving clarity.
+
+      > Death and life are in the power of the tongue.
+    source: "Research summary adapted from MIT News reporting on the work of Edward Gibson and colleagues (MIT Department of Brain and Cognitive Sciences)."
+
+  - section: the_word
+    author: apostle
+    headline: "The Word: \"Let There Be Light\""
+    deck: "Genesis 1:3. And God said, \"Let there be light.\" The Power of Words: how language shapes reality."
+    columns: 3
+    body: |
+      In the digital age, where communication happens in an instant and words can travel across the globe in seconds, the importance of language has never been more pronounced. Words, often seen as mere vessels for communication, carry immense power. They can shape perceptions, influence emotions, and even alter reality. This has led some to liken words to spells, highlighting their ability to manifest thoughts, desires, and intentions into tangible outcomes.
+
+      ## The Impact of Words on Thought and Behavior
+
+      Words are not just passive tools; they actively shape the way we think and behave. This concept, known as linguistic relativity or the Sapir-Whorf hypothesis, suggests that the language we use influences our perception of the world. Similarly, positive affirmations, simple repeated phrases, can lead to a more optimistic mindset, while negative language can foster self-doubt and anxiety.
+
+      The words we choose in our daily interactions can either build bridges or burn them. Compliments and encouragement can uplift someone, reinforcing their confidence and well-being. Conversely, harsh criticism or derogatory language can cause deep emotional wounds, sometimes lasting a lifetime. This is why words are often described as having the power to heal or harm.
+
+      ## Words as Spells: The Art of Manifestation
+
+      The idea that words are like spells is rooted in the belief that language can bring about real-world changes. This concept is not new; it has been a cornerstone of spiritual and philosophical traditions for centuries. In many cultures words are seen as sacred, with prayers and declarations believed to invoke divine forces.
+
+      The logic is simple: by repeatedly verbalizing a goal or outcome, one aligns their thoughts and actions with that desired reality. Phrases like "speak it into existence" or "what you say is what you get" are common. The words we use reflect our inner beliefs, and by consciously choosing our language we can steer our lives in the direction we want.
+
+  - section: prayer_weekly
+    author: harris
+    flow: true
+    headline: "The Prayer Weekly"
+    deck: "Kundalino Ministries"
+    image: images/harris.png
+    image_layout: portrait
+    caption: "Dr. Minister Daniel Alejandro Harris Bey"
+    body: |
+      *Philippians 4:6.* Be careful for nothing; but in everything by prayer and supplication with thanksgiving let your requests be made known unto God.
+
+      "The Lord keeps you from all harm and watches over your life. The Lord keeps watch over you as you come and go, both now and forever." *Psalm 121:7-8 NLT*
+
+      Our Father, who art in Heaven, hallowed be thy name. Thy kingdom come, thy will be done, on earth as it is in Heaven. Give us this day our daily bread, and forgive us our trespasses, as we forgive those who trespass against us. And lead us not into temptation, but deliver us from all that is evil. For thine is the kingdom, the power, and the glory, forever and ever, in YASHUA's name.
+
+      Amen.
+
+classifieds:
+  - title: "Public Notice"
+    text: "Your notices, events, and member business listings go here."

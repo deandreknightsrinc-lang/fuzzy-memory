@@ -1,0 +1,39 @@
+# White-label brand profile. Copy this folder to brands/<ministry-slug>/
+# and fill in every field. Nothing else in the system needs to change.
+
+ministry:
+  name: "Example Ministries"
+  short_name: "EM"
+  tagline: ""
+  website: ""
+  youtube: ""
+  giving_url: ""
+  service_day: Sunday
+  service_time: "10:00 AM"
+
+colors:
+  primary: "#1b1b1b"
+  accent: "#2a5d9f"
+  paper: "#ffffff"
+  ink: "#222222"
+
+fonts:
+  masthead: "Playfair Display"
+  headline: "Libre Baskerville"
+  body: "Libre Baskerville"
+  sans: "Open Sans"
+
+staff:
+  - key: pastor
+    name: ""
+    title: Senior Pastor
+    roles: [sermon, welcome, benediction, editor]
+    consent_on_file: false
+    voice_id: ""
+    avatar_id: ""
+
+newspaper:
+  title: "EXAMPLE MINISTRIES"
+  editor: pastor
+  next_issue_number: 1
+  sections: [front, the_word, prayer_weekly, community, classifieds]
