@@ -66,3 +66,18 @@ Recurring lines tie the two albums together:
 - Each lyric sheet is sized to fit Suno's lyric limit (about 3,000 to 4,000 characters).
 - To keep the sound consistent, generate 2 to 4 takes per song and extend the best one. Once you land on the Knight Lyfe voice, save it as a Persona and reuse it across both albums.
 - These are **first drafts** for discovering the sound. Rewrite, cut, and rebuild freely.
+
+---
+
+## Canon Added During Drafting (Hazel 01–10)
+- **Big Otis Monroe:** Hazel's father. An ex-hustler who now runs Monroe Tire & Brake. Her mother **Lorraine** died of drug use, and Otis was in prison when she was buried.
+- **Green ink:** as a child Hazel wrote her father letters in green ink, then stopped at 15. In "Hazel Ink" (H13) she uses green ink for Knight because it's her eye color in the sun. *Rewrite idea: tie the two reasons together.*
+- **Gold eyes:** Knight first sees them in "Ride, Don't Die" (H07). According to Mother Ruth, the only other time was at Lorraine's funeral.
+- **The ledger:** a black-and-white composition notebook with Hazel's lipstick blotted inside the cover (H09). She hides it at Mother Ruth's, first in her book bag and later in a lockbox under the floor (H14).
+- **Planted for STALEMATE:**
+  - Smoke's count comes up short every Friday, setting up "En Passant."
+  - Deacon Bishop's too-long smile and his "heavy reading" remark about Hazel's bag hint that he's the informant.
+  - Otis gives Knight three bullets, which end up in the Cutlass ashtray.
+  - Knight dreams of a barbershop on Ninth with chess boards in the window.
+- **"I love you":** Hazel says it first, on the answering machine the night of the raid (H10).
+- **Hospital and wedding (Hazel 11–20):** Hazel works at Mercy General and passes her nursing boards. The courthouse wedding happens in Room 214, and Lil Tre witnesses by collect call from upstate.
