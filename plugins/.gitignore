@@ -6,3 +6,4 @@ out/
 *.xcodeproj/
 *.xcworkspace/
 .DS_Store
+.deps/

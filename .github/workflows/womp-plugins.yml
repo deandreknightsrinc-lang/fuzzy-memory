@@ -1,0 +1,131 @@
+name: WOMP Plugins
+
+on:
+  push:
+    paths:
+      - "plugins/**"
+      - ".github/workflows/womp-plugins.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: womp-plugins-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Keep in sync with WOMP_JUCE_TAG in plugins/CMakeLists.txt.
+  JUCE_TAG: "8.0.15"
+  JUCE_DIR: ${{ github.workspace }}/plugins/.deps/JUCE
+
+jobs:
+  macos:
+    name: macOS (AU + VST3, universal)
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache JUCE source
+        id: juce-cache
+        uses: actions/cache@v4
+        with:
+          path: plugins/.deps/JUCE
+          key: juce-src-${{ env.JUCE_TAG }}
+
+      - name: Fetch JUCE
+        if: steps.juce-cache.outputs.cache-hit != 'true'
+        run: git clone --depth 1 --branch "$JUCE_TAG" https://github.com/juce-framework/JUCE.git "$JUCE_DIR"
+
+      - name: Configure
+        run: >
+          cmake -S plugins -B plugins/build
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+          -DWOMP_JUCE_TAG="$JUCE_TAG"
+          -DFETCHCONTENT_SOURCE_DIR_JUCE="$JUCE_DIR"
+          -DWOMP_COPY_PLUGIN_AFTER_BUILD=OFF
+
+      - name: Build
+        run: cmake --build plugins/build --config Release --parallel "$(sysctl -n hw.ncpu)"
+
+      - name: Test
+        run: ctest --test-dir plugins/build -C Release --output-on-failure
+
+      - name: Collect, verify & ad-hoc sign
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          for p in WompLowEnd WompDust; do
+            art="plugins/build/$p/${p}_artefacts/Release"
+            cp -R "$art/AU/$p.component" dist/
+            cp -R "$art/VST3/$p.vst3" dist/
+          done
+          for b in dist/*.component dist/*.vst3; do
+            codesign --force --deep -s - "$b"
+            codesign --verify --verbose "$b"
+            exe=$(find "$b/Contents/MacOS" -type f | head -n 1)
+            lipo -info "$exe"
+          done
+
+      - name: auval (non-fatal)
+        continue-on-error: true
+        run: |
+          mkdir -p ~/Library/Audio/Plug-Ins/Components
+          cp -R dist/*.component ~/Library/Audio/Plug-Ins/Components/
+          killall -9 AudioComponentRegistrar 2>/dev/null || true
+          auval -a | grep -i KnLf || echo "KnLf components not listed yet"
+          status=0
+          auval -v aufx WmLe KnLf || status=1
+          auval -v aufx WmDs KnLf || status=1
+          exit $status
+
+      - name: Zip bundles
+        run: |
+          set -euo pipefail
+          cd dist
+          # ditto keeps bundle structure, symlinks and the code signature intact.
+          for b in *.component *.vst3; do
+            ditto -c -k --sequesterRsrc --keepParent "$b" "$b.zip"
+          done
+          ls -la
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: WOMP-Plugins-macOS
+          path: dist/*.zip
+          if-no-files-found: error
+
+  linux:
+    name: Linux (VST3 + tests)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build \
+            libasound2-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxext-dev \
+            libxcomposite-dev libfreetype-dev libfontconfig1-dev libgl1-mesa-dev
+
+      - name: Cache JUCE source
+        id: juce-cache
+        uses: actions/cache@v4
+        with:
+          path: plugins/.deps/JUCE
+          key: juce-src-${{ env.JUCE_TAG }}
+
+      - name: Fetch JUCE
+        if: steps.juce-cache.outputs.cache-hit != 'true'
+        run: git clone --depth 1 --branch "$JUCE_TAG" https://github.com/juce-framework/JUCE.git "$JUCE_DIR"
+
+      - name: Configure
+        run: >
+          cmake -S plugins -B plugins/build -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+          -DWOMP_JUCE_TAG="$JUCE_TAG"
+          -DFETCHCONTENT_SOURCE_DIR_JUCE="$JUCE_DIR"
+
+      - name: Build
+        run: cmake --build plugins/build --parallel
+
+      - name: Test
+        run: ctest --test-dir plugins/build --output-on-failure

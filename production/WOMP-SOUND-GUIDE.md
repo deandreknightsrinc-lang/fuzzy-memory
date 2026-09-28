@@ -195,7 +195,7 @@ These aren't needed, since the W.O.M.P. tools and Logic stock plugins cover it, 
 | **WOMP 808 Glide** | Logic Scripter (MIDI FX) | Turns overlapping notes into 808 pitch-bend slides. Also does octave-drop accents. |
 | **WOMP Soul Chords** | Logic Scripter (MIDI FX) | One finger in, 70s soul and gospel voicings out (min9, maj9, 13, 7#9, 11), key-aware, with strum |
 | **WOMP Whistle** | Logic Scripter (MIDI FX) | G-funk lead helper: portamento plus delayed vibrato for that high whine |
-| **WOMP Low End** | Audio Unit / VST3 plugin | 808 and bass weapon: harmonic drive, sub mono, low punch, tight low-pass |
+| **WOMP Low End** | Audio Unit / VST3 plugin | 808 and bass weapon: harmonic drive, sub mono, low punch, "Tight" rumble high-pass, sub boost |
 | **WOMP Dust** | Audio Unit / VST3 plugin | "It's a 1976 record": tape saturation, wow and flutter, vinyl crackle, vintage bandwidth |
 
 See `logic-tools/README.md` and `plugins/README.md` for install instructions.

@@ -160,11 +160,20 @@ const std::vector<std::pair<juce::String, Generator>>& signals()
 }
 
 //==============================================================================
-template <typename Processor>
-void stabilityTests (const juce::String& name, const std::vector<std::pair<juce::String, ParamSet>>& paramSets, float bound)
+struct NamedSet
 {
-    for (double sr : { 44100.0, 48000.0 })
-        for (const auto& [setName, set] : paramSets)
+    juce::String name;
+    ParamSet params;
+    float bound; // max |output| allowed for test signals peaking at ~1.4
+};
+
+template <typename Processor>
+void stabilityTests (const juce::String& name, const std::vector<NamedSet>& paramSets)
+{
+    for (const auto& [setName, set, bound] : paramSets)
+    {
+        float worstPeak = 0.0f;
+        for (double sr : { 44100.0, 48000.0 })
             for (const auto& [sigName, gen] : signals())
             {
                 Processor p;
@@ -176,7 +185,10 @@ void stabilityTests (const juce::String& name, const std::vector<std::pair<juce:
                 const auto tag = name + " @" + juce::String ((int) sr) + " [" + setName + "] " + sigName;
                 check (s.finite, tag + ": output contains NaN/Inf");
                 check (s.peak < bound, tag + ": output out of bounds, peak=" + juce::String (s.peak));
+                worstPeak = juce::jmax (worstPeak, s.peak);
             }
+        info ("  stability [" + setName + "]: worst peak " + juce::String (worstPeak, 3) + " (bound " + juce::String (bound, 1) + ")");
+    }
 
     // Mono bus layout.
     for (double sr : { 44100.0, 48000.0 })
@@ -189,9 +201,8 @@ void stabilityTests (const juce::String& name, const std::vector<std::pair<juce:
         p.prepareToPlay (sr, 256);
         const auto out = render (p, sr, 1, (int) sr, eightOhEight, { 256 });
         const auto s = analyse (out);
-        check (s.finite && s.peak < bound, name + " mono: finite & bounded (peak=" + juce::String (s.peak) + ")");
+        check (s.finite && s.peak < 2.0f, name + " mono: finite & bounded (peak=" + juce::String (s.peak) + ")");
     }
-    info ("  stability: done");
 }
 
 template <typename Processor>
@@ -287,6 +298,33 @@ void lowEndSpecificTests()
             info ("  latency @" + juce::String ((int) sr) + " = " + juce::String (p.getLatencySamples()) + " samples");
         }
 
+        // Wet path alignment: with everything neutral, the output/input cross-correlation must peak at the
+        // reported latency (i.e. the high band and the oversampled low band are time-aligned with the report).
+        {
+            WompLowEndProcessor p;
+            applyParams (p.apvts, { { drive, 0.0f }, { harmonics, 0.0f }, { punch, 0.0f }, { subBoost, 0.0f },
+                                    { tight, 20.0f }, { monoBelow, 0.0f }, { mix, 100.0f } });
+            p.prepareToPlay (sr, 512);
+            juce::AudioBuffer<float> in;
+            const auto out = render (p, sr, 2, (int) sr, noise, { 512 }, &in);
+            int bestLag = -1;
+            double best = -1.0;
+            for (int lag = 0; lag < 256; ++lag)
+            {
+                double acc = 0.0;
+                for (int i = 4096; i < out.getNumSamples(); ++i)
+                    acc += (double) out.getSample (0, i) * in.getSample (0, i - lag);
+                if (acc > best)
+                {
+                    best = acc;
+                    bestLag = lag;
+                }
+            }
+            check (bestLag == p.getLatencySamples(), tag + ": wet path peak lag " + juce::String (bestLag)
+                                                         + " == reported latency " + juce::String (p.getLatencySamples()));
+            info ("  wet alignment @" + juce::String ((int) sr) + ": xcorr peak lag " + juce::String (bestLag));
+        }
+
         // Mono Below: a stereo 40 Hz sine with different L/R amplitude & phase must come out identical in L/R.
         const Generator stereoLow = [] (int ch, int i, double rate) {
             return ch == 0 ? sine (40.0, 0.5, i, rate) : sine (40.0, 0.3, i, rate, 1.2);
@@ -374,21 +412,46 @@ void dustSpecificTests()
 
 } // namespace
 
+/** Renders an editor offscreen to PNG (no window / display needed). Also exercises editor construction. */
+template <typename Processor>
+void snapshotEditor (const juce::File& dir, const juce::String& fileName)
+{
+    Processor p;
+    std::unique_ptr<juce::AudioProcessorEditor> editor (p.createEditor());
+    check (editor != nullptr && editor->getWidth() > 0 && editor->getHeight() > 0, fileName + ": editor created");
+    const auto image = editor->createComponentSnapshot (editor->getLocalBounds(), true, 2.0f);
+    juce::PNGImageFormat png;
+    const auto file = dir.getChildFile (fileName);
+    file.deleteFile();
+    juce::FileOutputStream out (file);
+    check (out.openedOk() && png.writeImageToStream (image, out), fileName + ": snapshot written");
+    info ("  wrote " + file.getFullPathName());
+}
+
 //==============================================================================
-int main()
+int main (int argc, char** argv)
 {
     juce::ScopedJuceInitialiser_GUI juceInit;
+
+    // Optional: WompTests --snapshot <dir>  => also render both editors to PNG.
+    if (argc >= 3 && juce::String (argv[1]) == "--snapshot")
+    {
+        const juce::File dir (juce::File::getCurrentWorkingDirectory().getChildFile (argv[2]));
+        dir.createDirectory();
+        info ("== Editor snapshots ==");
+        snapshotEditor<WompLowEndProcessor> (dir, "WompLowEnd.png");
+        snapshotEditor<WompDustProcessor> (dir, "WompDust.png");
+    }
 
     using namespace LowEndIDs;
     info ("== WOMP Low End ==");
     stabilityTests<WompLowEndProcessor> (
         "LowEnd",
-        { { "defaults", {} },
+        { { "defaults", {}, 2.0f },
           { "max", { { drive, 100.0f }, { harmonics, 100.0f }, { subBoost, 6.0f }, { monoBelow, 6.0f },
-                     { punch, 100.0f }, { tight, 40.0f }, { mix, 100.0f }, { output, 0.0f } } },
+                     { punch, 100.0f }, { tight, 40.0f }, { mix, 100.0f }, { output, 0.0f } }, 8.0f },
           { "min", { { drive, 0.0f }, { harmonics, 0.0f }, { subBoost, 0.0f }, { monoBelow, 0.0f },
-                     { punch, 0.0f }, { tight, 20.0f }, { mix, 0.0f }, { output, -24.0f } } } },
-        4.0f);
+                     { punch, 0.0f }, { tight, 20.0f }, { mix, 0.0f }, { output, -24.0f } }, 2.0f } });
     mixZeroTest<WompLowEndProcessor> ("LowEnd", { { drive, 100.0f }, { punch, 100.0f }, { subBoost, 6.0f } });
     stateTest<WompLowEndProcessor> ("LowEnd");
     lowEndSpecificTests();
@@ -396,16 +459,15 @@ int main()
     info ("== WOMP Dust ==");
     stabilityTests<WompDustProcessor> (
         "Dust",
-        { { "defaults", {} },
+        { { "defaults", {}, 2.0f },
           { "max", { { DustIDs::tapeDrive, 100.0f }, { DustIDs::wow, 100.0f }, { DustIDs::flutter, 100.0f },
                      { DustIDs::crackle, 100.0f }, { DustIDs::hiss, 100.0f }, { DustIDs::lowCut, 300.0f },
                      { DustIDs::highCut, 4000.0f }, { DustIDs::age, 100.0f }, { DustIDs::mix, 100.0f },
-                     { DustIDs::output, 0.0f } } },
+                     { DustIDs::output, 0.0f } }, 4.0f },
           { "min", { { DustIDs::tapeDrive, 0.0f }, { DustIDs::wow, 0.0f }, { DustIDs::flutter, 0.0f },
                      { DustIDs::crackle, 0.0f }, { DustIDs::hiss, 0.0f }, { DustIDs::lowCut, 20.0f },
                      { DustIDs::highCut, 20000.0f }, { DustIDs::age, 0.0f }, { DustIDs::mix, 0.0f },
-                     { DustIDs::output, -24.0f } } } },
-        4.0f);
+                     { DustIDs::output, -24.0f } }, 2.0f } });
     mixZeroTest<WompDustProcessor> ("Dust", { { DustIDs::crackle, 100.0f }, { DustIDs::hiss, 100.0f }, { DustIDs::wow, 100.0f } });
     stateTest<WompDustProcessor> ("Dust");
     dustSpecificTests();

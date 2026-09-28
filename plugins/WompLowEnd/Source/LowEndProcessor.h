@@ -22,7 +22,7 @@ inline constexpr const char* mix       = "mix";
 
     Signal flow (per channel, stereo-linked detectors):
       in ─┬─────────────────────────────────────────────── dry (latency-aligned) ─┐
-          └ Tight HPF ─ LR4 split @150 Hz ┬ low ─ Punch ─ [4x OS: drive/harmonics] ─ DC ┐   │
+          └ Tight HPF ─ LR4 split @150 Hz ┬ low ─ [4x OS: drive/harmonics] ─ DC ─ Punch ┐   │
                                           └ high ─ delay(latency) ───────────────────── + ─ Sub shelf ─ Mono Below ─ Mix ─ Output
 */
 class WompLowEndProcessor final : public juce::AudioProcessor
@@ -102,7 +102,7 @@ private:
 
     float currentSubGainDb = -1000.0f;
     bool monoWasActive = false;
-    float currentMonoFreq = 0.0f;
+    int currentMonoIndex = 1;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WompLowEndProcessor)
 };

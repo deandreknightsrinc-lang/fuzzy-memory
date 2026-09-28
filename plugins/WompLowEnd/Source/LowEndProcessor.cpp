@@ -101,8 +101,8 @@ void WompLowEndProcessor::prepareToPlay (double newSampleRate, int samplesPerBlo
     splitFilter.setCutoffFrequency (kSplitFrequency);
 
     monoFilter.prepare (spec);
-    currentMonoFreq = juce::jmax (60.0f, monoBelowFrequency ((int) pMonoBelow->load()));
-    monoFilter.setCutoffFrequency (currentMonoFreq);
+    currentMonoIndex = juce::jmax (1, juce::roundToInt (pMonoBelow->load()));
+    monoFilter.setCutoffFrequency (monoBelowFrequency (currentMonoIndex));
     monoWasActive = false;
 
     subShelf.reset();
@@ -210,25 +210,7 @@ void WompLowEndProcessor::processChunk (juce::dsp::AudioBlock<float> block)
         }
     }
 
-    // 2) Punch: transient emphasis on the low band (stereo-linked detector).
-    for (int i = 0; i < n; ++i)
-    {
-        float level = 0.0f;
-        for (int ch = 0; ch < numCh; ++ch)
-            level = juce::jmax (level, std::abs (lowBuffer.getSample (ch, i)));
-
-        fastEnv += (level > fastEnv ? fastAttack : fastRelease) * (level - fastEnv);
-        slowEnv += (level > slowEnv ? slowAttack : slowRelease) * (level - slowEnv);
-
-        const float punch = punchSmooth.getNextValue();
-        const float transient = juce::jlimit (0.0f, 1.0f, (fastEnv - slowEnv) / (fastEnv + 1.0e-5f));
-        const float gain = juce::Decibels::decibelsToGain (punch * 12.0f * transient);
-
-        for (int ch = 0; ch < numCh; ++ch)
-            lowBuffer.setSample (ch, i, lowBuffer.getSample (ch, i) * gain);
-    }
-
-    // 3) Drive / harmonics at 4x with RMS-tracking auto gain compensation.
+    // 2) Drive / harmonics at 4x with RMS-tracking auto gain compensation.
     {
         auto lowBlock = juce::dsp::AudioBlock<float> (lowBuffer).getSubsetChannelBlock (0, (size_t) numCh).getSubBlock (0, (size_t) n);
         auto os = oversampler.processSamplesUp (lowBlock);
@@ -251,7 +233,7 @@ void WompLowEndProcessor::processChunk (juce::dsp::AudioBlock<float> block)
             const float tb = std::tanh (bias);
             const float wet = h * juce::jmin (1.0f, d * 4.0f);
             const float comp = std::sqrt ((inPower + 1.0e-9f) / (outPower + 1.0e-9f));
-            const float gain = 1.0f + wet * (juce::jlimit (0.25f, 4.0f, comp) - 1.0f);
+            const float gain = 1.0f + wet * (juce::jlimit (0.03125f, 2.0f, comp) - 1.0f);
 
             float inSum = 0.0f, outSum = 0.0f;
             for (int ch = 0; ch < numCh; ++ch)
@@ -271,18 +253,40 @@ void WompLowEndProcessor::processChunk (juce::dsp::AudioBlock<float> block)
         oversampler.processSamplesDown (lowBlock);
     }
 
+    // 3) DC-block the (asymmetrically) saturated low band, then Punch: transient emphasis
+    //    after the saturator so the attack survives the squash (stereo-linked detector).
+    for (int i = 0; i < n; ++i)
+    {
+        float level = 0.0f;
+        for (int ch = 0; ch < numCh; ++ch)
+        {
+            const float v = dcBlocker.process (ch, lowBuffer.getSample (ch, i));
+            lowBuffer.setSample (ch, i, v);
+            level = juce::jmax (level, std::abs (v));
+        }
+
+        fastEnv += (level > fastEnv ? fastAttack : fastRelease) * (level - fastEnv);
+        slowEnv += (level > slowEnv ? slowAttack : slowRelease) * (level - slowEnv);
+
+        const float punch = punchSmooth.getNextValue();
+        const float transient = juce::jlimit (0.0f, 1.0f, (fastEnv - slowEnv) / (fastEnv + 1.0e-5f));
+        const float gain = juce::Decibels::decibelsToGain (punch * 9.0f * transient);
+
+        for (int ch = 0; ch < numCh; ++ch)
+            lowBuffer.setSample (ch, i, lowBuffer.getSample (ch, i) * gain);
+    }
+
     // 4) Recombine, sub shelf, mono-below, mix, output.
     const int monoIndex = juce::roundToInt (pMonoBelow->load());
     const bool monoActive = monoIndex > 0 && numCh == 2;
     if (monoActive)
     {
-        const float f = monoBelowFrequency (monoIndex);
         if (! monoWasActive)
             monoFilter.reset();
-        if (f != currentMonoFreq)
+        if (monoIndex != currentMonoIndex)
         {
-            currentMonoFreq = f;
-            monoFilter.setCutoffFrequency (f);
+            currentMonoIndex = monoIndex;
+            monoFilter.setCutoffFrequency (monoBelowFrequency (monoIndex));
         }
     }
     monoWasActive = monoActive;
@@ -296,8 +300,7 @@ void WompLowEndProcessor::processChunk (juce::dsp::AudioBlock<float> block)
         float wet[2] {};
         for (int ch = 0; ch < numCh; ++ch)
         {
-            const float low = dcBlocker.process (ch, lowBuffer.getSample (ch, i));
-            wet[ch] = subShelf.process (ch, low + highBuffer.getSample (ch, i));
+            wet[ch] = subShelf.process (ch, lowBuffer.getSample (ch, i) + highBuffer.getSample (ch, i));
         }
 
         if (monoActive)

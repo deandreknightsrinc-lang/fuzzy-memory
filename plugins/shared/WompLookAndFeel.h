@@ -134,6 +134,9 @@ public:
         slider.setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
         slider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, 90, 18);
         slider.setRotaryParameters (juce::degreesToRadians (225.0f), juce::degreesToRadians (495.0f), true);
+        slider.setColour (juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+        slider.setColour (juce::Slider::textBoxBackgroundColourId, juce::Colours::transparentBlack);
+        slider.setColour (juce::Slider::textBoxTextColourId, Palette::textDim.brighter (0.4f));
         addAndMakeVisible (slider);
 
         label.setText (caption.toUpperCase(), juce::dontSendNotification);
