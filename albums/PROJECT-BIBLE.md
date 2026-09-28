@@ -1,0 +1,68 @@
+# Knight Lyfe: Project Bible (First Draft)
+
+Two connected albums set in one world.
+- **STALEMATE** by King Bishop Knight: a chess-themed street saga.
+- **HAZEL**: the love story running beside it, told in R&B soul and hardcore rap.
+
+Hazel is the **Queen** on Knight's board. Stalemate is the war. Hazel is what he was fighting for.
+Either album works alone. Played together, they tell one story.
+
+---
+
+## The World
+
+**The 64:** a neighborhood of 64 blocks, like the 64 squares of a chessboard. Corner stores, a church on
+Diagonal Ave, housing towers people call "the Rooks," and a pawn shop on the main strip.
+
+### Characters
+| Piece | Character | Who they are |
+|---|---|---|
+| Knight | **Knight** (narrator) | Smart and restless. His life never moves in a straight line; he moves in L-shapes, around obstacles. Raised by his mother and grandmother. |
+| King | **King Reese** | The OG who runs the 64. Protected by everyone and rarely moves himself. He's a father figure to Knight, until he isn't. |
+| Bishop | **Deacon Bishop** | Preacher on Sunday and supplier the rest of the week. He only moves on diagonals, always at an angle. Later revealed to be feeding the feds. |
+| Rook | **The Rooks / "Castle"** | The towers and the crew that holds them: the fortress and the stash. |
+| Pawn | **Lil Tre** | Knight's little brother. Starts as a pawn and pays the highest price. |
+| Queen | **Hazel Monroe** | The most powerful piece on the board. A nursing student from the other side of Diagonal Ave, raised by her grandmother Mother Ruth. Her eyes change color: green in the sun, brown in the dark, gold when she cries. |
+| — | **Mama Knight** | Knight's mother. Her voice is the conscience of both albums. |
+| — | **Agent Cole** | The fed who puts Knight in a pin. |
+
+### The Story Arc
+1. Knight grows up a pawn in the 64 and learns the board.
+2. King Reese recruits him, and Deacon Bishop blesses the operation.
+3. Knight gets promoted (the money comes) and meets Hazel, his Queen.
+4. Heat arrives: raids, a friend's betrayal, and Lil Tre takes a charge for him.
+5. The feds pin Knight. Every move exposes someone he loves.
+6. Knight learns that Bishop was the informant all along. King Reese is checkmated (killed or indicted).
+7. **STALEMATE:** Knight is left alive and not in check, but he has **no legal moves**. He can't go back to the streets and can't fully get out. Nobody wins.
+8. HAZEL tells the same years from the love side: meeting, falling, the pressure of the streets, prison
+   visits, Hazel caught in crossfire, survival, and finally a future built on the rubble (marriage, a daughter).
+
+---
+
+## The Knight Lyfe Sound
+
+**STALEMATE:** dark cinematic boom-bap fused with modern trap. Minor-key piano, tense orchestral strings,
+church organ for Bishop's scenes, and 808s that slide like pieces across a board. **Signature motif:** a ticking chess clock
+and the click of a piece being set down, in intros and outros. Vocals: gritty baritone male storytelling rap with vivid,
+cinematic detail. Hooks are chanted or half-sung, never pop.
+
+**HAZEL:** 70s soul samples, warm Rhodes, live bass, gospel choir stacks, and vinyl crackle, set against
+**hard** hip-hop drums. The male vocal switches between aggressive hardcore verses and a smooth R&B
+croon. A female soul vocal (Hazel's voice) sings hooks and some verses. **Signature motif:** a church-choir "Haaa-zel"
+swell and a Rhodes lick that returns across tracks.
+
+**Shared DNA:** storytelling first. Every song is a scene with a time, a place, a smell, and a consequence.
+Recurring lines tie the two albums together:
+- "No legal moves" (Stalemate)
+- "Green in the sun, brown in the dark, gold when she cry" (Hazel)
+- "Knight moves: never straight, but I get there"
+
+---
+
+## Using These with Suno
+- Paste the **Style** block into the *Style of Music* field. Every style prompt stays under 1,000 characters and names no real artists.
+- Paste the **Lyrics** block into the *Lyrics* field (Custom mode). The bracketed tags ([Verse], [Hook],
+  [Bridge], [Outro], and so on) steer the structure. Parenthetical lines like `(ad-lib)` are usually sung as background vocals.
+- Each lyric sheet is sized to fit Suno's lyric limit (about 3,000 to 4,000 characters).
+- To keep the sound consistent, generate 2 to 4 takes per song and extend the best one. Once you land on the Knight Lyfe voice, save it as a Persona and reuse it across both albums.
+- These are **first drafts** for discovering the sound. Rewrite, cut, and rebuild freely.
