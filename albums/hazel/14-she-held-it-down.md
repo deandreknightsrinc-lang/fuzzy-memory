@@ -6,25 +6,25 @@ Release day. Knight walks out of county with a plastic bag of belongings, and Ha
 
 ## Suno Style Prompt
 ```
-West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 96 BPM, C minor Dorian, triumphant release-day victory lap, big 70s funk horn section lead, Hammond B3 fast Leslie, booming kick and cracking snare, distorted Moog bass, signature Rhodes lick under the verses, gate buzzer, car door slam and engine rev intro, beat thins to Rhodes and kick in verse three, male hardcore rap verses with dense multisyllabic rhymes and relentless energy, crowd-chant gang vocals on the hook, female soul vocal for Hazel belting gospel ad-libs over the final hook, choir Haaa-zel swell, loud wide arena-ready mix, punchy low end
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 152 BPM half-time backbeat with double-time energy, C minor Dorian, triumphant release-day victory lap, big 70s funk horn section lead, Hammond B3 fast Leslie, booming kick and cracking snare, huge distorted 808 rolling 16ths with octave glides, triplet and 1/32 hat rolls, signature Rhodes lick under the verses, gate buzzer, car door slam and engine rev intro, beat thins to Rhodes, kick and 808 in verse three, male hardcore rap with dense multisyllabic rhymes and relentless energy, crowd-chant gang vocal hook, female soul vocal for Hazel belting gospel ad-libs, choir Haaa-zel swell, 808-forward mix, loud punchy master
 ```
 
 ### Exclude Styles
 ```
-pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, stadium rock
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, stadium rock
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 96 BPM, C minor (Dorian: A natural), swing 54%.
-- **Progression:** Verses: Cm9 – F9 (i9–IV9). Hook: Abmaj9 – Bb – Cm9 – Cm9, with Cm9 – Bb – Ab – G7#9 as the turnaround. V3: Cm9 – Abmaj9 on Rhodes only. Final hook tag: F – Fm6 – C (IV–iv–I with a major lift: he's home).
-- **Drums:** DMD "Big" kit, snare + two claps, tambourine on 2 and 4 in all hooks, hand claps on the final hook. WOMP Pocket: Snare/Clap Lay-back 8 ms, Swing % 54. Parallel crush at 30%.
-- **Bass:** 808 on C1 (33 Hz) with octave-drop accents at the end of each hook line. The Moog lane is distorted (WOMP Low End Drive 45%) playing funk 16ths. V2 bars 1–4: Moog only. V3: 808 whole notes.
-- **Samples & Keys:** Studio Horns (full section) play the hook riff Eb–F–G–Bb–C on the "and" of 4, through WOMP Dust for a "1976" bite. Vintage B3 fast Leslie on hooks. Suitcase Rhodes plays the signature lick under the verses, transposed to C minor (G–Bb–C–D–C–Bb–G).
+- **BPM / Key / Swing:** 152 BPM, Knock lane, C minor (Dorian: A natural). WOMP Pocket: Swing % 52, Swing Grid 16th, Swing Applies To "Hats & Percussion".
+- **Progression:** Verses: Cm9 – F9 (i9–IV9). Hook: Abmaj9 – Bb – Cm9 – Cm9, turnaround Cm9 – Bb – Ab – G7#9. V3: Cm9 – Abmaj9 on Rhodes. Final hook tag: F – Fm6 – C (IV–iv–I with a major lift: he's home).
+- **Drums:** DMD "Big" kit: busy kick, snare + two claps on 3, tambourine on every beat in hooks, hand claps on the final hook. WOMP Pocket: Snare/Clap Lay-back 3 ms, Timing Humanize 2 ms, Velocity Humanize 8, Hat Accents Downbeats Loud, Ghost Snare Chance 20%. WOMP Rolls: Roll Target Hi-Hats, Trigger Both, Velocity Threshold 108, Roll Chance 30%, Roll Rate 1/32, Roll Length 1/8, Velocity Shape Crescendo. Parallel crush 30%.
+- **Bass:** 808 on C1 (32.7 Hz) in rolling 16ths; each hook line ends on an octave jump C2 → C1 slide. WOMP 808 Glide: Mode Retrigger + Slide, Glide Time 40 ms, Glide Curve 808 (fast start), Bend Range 12, Velocity Floor 105. Stutters: WOMP Rolls on the 808, Roll Target Single Note, Single Note 24 (C1), Trigger Velocity Threshold, Velocity Threshold 120, Roll Rate 1/32, Roll Length 1/8, Velocity Shape Crescendo. WOMP Low End: Drive 62%, Harmonics Mix 45%, Sub Boost 4 dB, Mono Below 120 Hz, Punch 60%, Tight 28 Hz. The Moog (Drive via ChromaGlow) plays funk 16ths above 120 Hz on hooks only. V3: 808 whole notes.
+- **Samples & Keys:** Studio Horns (full section) hook riff Eb–F–G–Bb–C on the "and" of 4, through WOMP Dust (Tape Drive 35%, High Cut 9 kHz) for a "1976" bite. B3 fast Leslie on hooks. Rhodes plays the signature lick under the verses in C minor (G–Bb–C–D–C–Bb–G).
 - **Street Gospel layer:** Choir stabs on "down," 12 voices; the "Haaa-zel" swell explodes into the final hook; Hazel's belted ad-libs answer the gang vocals.
-- **Arrangement map:** Intro 4 (buzzer, engine, spoken) → V1 12 → Hook 8 → V2 12 (808 out bars 1–4; drums out last 2 bars) → Hook 8 (+B3, choir) → V3 8 (Rhodes + kick only) → Final Hook 8 (+claps, Hazel ad-libs, horns doubled) → Outro 2 (spoken).
-- **Vocal direction:** Knight loud, with punch-ins on the last 2–4 words of each bar. Gang vocals 6× doubles, ±60. Hazel ad-libs 40L/40R.
-- **Mix note:** Automate the drum bus +1.5 dB for the final hook to make the return feel bigger than it is.
-- **Suno tips:** Knight Persona; Extend the final hook with Hazel Persona. Weirdness 36%, Style Influence 74%.
+- **Arrangement map:** Intro 4 (buzzer, engine, spoken) → V1 12 → Hook 8 → V2 12 (808 half notes bars 1–4; drums out last 2 bars) → Hook 8 (+B3, choir) → V3 8 (Rhodes, kick, 808 only) → Final Hook 8 (+claps, Hazel ad-libs, horns doubled) → Outro 2 (spoken). (Bar counts are half-time bars: 8 beats at 152 BPM, one lyric line each.)
+- **Vocal direction:** Knight loud, punch-ins on the last 2–4 words of each bar, triplet bursts over the rolls. Gang vocals 6× doubles ±60. Hazel ad-libs 40L/40R.
+- **Mix note:** Drum bus +1.5 dB on the final hook; 808 ducked −4 dB from the kick. Master −8.5 to −7.5 LUFS integrated, true peak −1 dBTP.
+- **Suno tips:** Knight Persona; Extend the final hook with Hazel Persona. Weirdness 36%, Style Influence 75%.
 
 ## Lyrics
 ```

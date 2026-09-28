@@ -6,25 +6,25 @@ Eight months after the shooting, on a Tuesday evening, in the small apartment th
 
 ## Suno Style Prompt
 ```
-West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 90 BPM, F major with D minor Dorian verses, grown mature reflective and quietly warm, muted wah guitar lead and warm Rhodes, head-nodding drums with soft swing, round Moog bass, subtle muted-horn replay, talkbox echoes the hook in the outro, one distant car backfire before the bridge, calm grown male rap verses with intricate internal rhymes, female soul vocal for Hazel singing the hook and a heartfelt sung-rapped verse, male R&B croon joining in harmony on the final hook, smooth duet chemistry, brief choir Haaa-zel under the bridge, clean spacious mix with a gentle groove
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, bouncy full-time 102 BPM grown R&B hip hop, F major with D minor Dorian verses, mature reflective quietly warm, muted wah guitar lead and warm Rhodes, head-nodding knocking drums, smooth heavy 808 bassline with slides, swung hats with 1/32 rolls, subtle muted-horn replay, talkbox echoes the hook in the outro, one distant car backfire before the bridge, calm grown male rap with intricate internal rhymes, female soul vocal for Hazel singing the hook and a sung-rapped verse, male R&B croon harmony on the final hook, brief choir Haaa-zel under the bridge, 808-forward mix, loud punchy master
 ```
 
 ### Exclude Styles
 ```
-pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, smooth jazz, adult contemporary
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, smooth jazz, adult contemporary
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 90 BPM, F major (verses in D minor Dorian: B natural), swing 55%.
+- **BPM / Key / Swing:** 102 BPM, Bounce lane, F major (verses in D minor Dorian: B natural). WOMP Pocket: Swing % 55, Swing Grid 16th, Swing Applies To "Hats & Percussion".
 - **Progression:** Verses: Dm9 – G9 (i9–IV9). Hook: Bbmaj9 – Am7 – Gm9 – C13, then Gm9 – C13 – Fmaj9 (ii9–V13–Imaj9). Bridge: Bbmaj9 – C13 – Am7 – Dm9, then Bb – Bbm6 – F (IV–iv–I).
-- **Drums:** DMD warm kit, relaxed: kick on 1 and 3½, snare on 2 and 4, soft open hat on the "and" of 4. WOMP Pocket: Snare/Clap Lay-back 12 ms, Swing % 55, Velocity Humanize 10. The drums tighten slightly on the final hook.
-- **Bass:** The Moog lane leads with round melodic lines. The 808 on D1 (37 Hz) and F1 (44 Hz) plays half notes with 70 ms glides. Hazel's V2 has no 808 for the first 4 bars.
-- **Samples & Keys:** A muted wah guitar (Pedalboard Wah parked half-open) plays the lead fills. Suitcase Rhodes with maj9 and 13 voicings from Soul Chords. A muted-horn replay (Studio Horns trumpet, cup-mute EQ) through WOMP Dust. The EVOC talkbox echoes "Still Hazel" in the outro.
-- **Street Gospel layer:** Subtle: the "Haaa-zel" choir under the bridge (Rhodes and bass only there), and a B3 pad on the final hook.
-- **Arrangement map:** Intro 4 (spoken over Rhodes) → V1 12 → Hook 8 → V2 8 (Hazel) → V3 12 (drums out last 2 bars; backfire FX on the final beat) → Hook 8 (+croon harmony, B3) → Bridge 4 (Rhodes, bass, choir) → Outro 4 (croon, talkbox).
-- **Vocal direction:** Knight is calm, conversational and unhurried. Hazel's hook is warm, with a 3rd above on "still choosin' you." Trade the final two hook lines.
-- **Mix note:** Keep the drum bus compression light (1–2 dB) and let the song breathe.
-- **Suno tips:** Knight Persona base, Hazel Persona for hook and V2 Extends. Weirdness 36%, Style Influence 68%. If it drifts into smooth jazz, push Style Influence to 75%.
+- **Drums:** DMD warm kick on 1, the "a" of 2 and the "and" of 3; snare + clap on 2 and 4; soft open hat on the "and" of 4; swung 16th hats. WOMP Pocket: Snare/Clap Lay-back 8 ms, Timing Humanize 3 ms, Velocity Humanize 10, Hat Accents Offbeats Loud, Ghost Snare Chance 20%. WOMP Rolls: Roll Target Hi-Hats, Trigger Random Chance, Roll Chance 10%, Roll Rate 1/32, Roll Length 1/16, Velocity Shape Crescendo. Tighten Timing Humanize to 1 ms on the final hook.
+- **Bass:** 808 carries the melodic bassline: D1 (36.7 Hz) in verses, F1 (43.7 Hz) on hooks, locked to the kick with slides between roots. WOMP 808 Glide: Mode Legato Slide, Glide Time 50 ms, Glide Curve 808 (fast start), Bend Range 12, Velocity Floor 90. WOMP Low End: Drive 45%, Harmonics Mix 35%, Sub Boost 3 dB, Mono Below 120 Hz, Punch 40%, Tight 28 Hz. The Moog adds round fills above 120 Hz only in hooks. Hazel's V2 bars 1–4: 808 whole notes.
+- **Samples & Keys:** Muted wah guitar (Pedalboard Wah parked half-open) plays lead fills. Rhodes via WOMP Soul Chords: Key F, Scale Major (Soul), Chord Style Gospel 13ths. Muted-horn replay through WOMP Dust (Tape Drive 25%, High Cut 9 kHz). EVOC talkbox echoes "Still Hazel" in the outro.
+- **Street Gospel layer:** Subtle: the "Haaa-zel" choir under the bridge, and a B3 pad on the final hook.
+- **Arrangement map:** Intro 4 (spoken over Rhodes, no drums) → V1 12 → Hook 8 → V2 8 (Hazel) → V3 12 (drums out last 2 bars; backfire on the final beat) → Hook 8 (+croon harmony, B3) → Bridge 4 (Rhodes, 808 sustain, choir) → Outro 4 (croon, talkbox).
+- **Vocal direction:** Knight calm and unhurried even at 102. Hazel's hook warm, 3rd above on "still choosin' you." Trade the final two hook lines.
+- **Mix note:** Drum bus compression 2–3 dB, no more; 808 ducked −3 dB from the kick. Master −8.5 to −7.5 LUFS integrated, true peak −1 dBTP.
+- **Suno tips:** Knight Persona base, Hazel Persona for hook and V2 Extends. Weirdness 36%, Style Influence 70%. If it drifts into smooth jazz, Style Influence 75%.
 
 ## Lyrics
 ```

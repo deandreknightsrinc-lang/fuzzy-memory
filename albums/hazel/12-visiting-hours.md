@@ -6,25 +6,25 @@ Saturday, 10 AM, county lockup off Route 9, a few months into Knight's short bid
 
 ## Suno Style Prompt
 ```
-West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 84 BPM, D minor Dorian, melancholy and tender Saturday visit, lonely muted flugelhorn lead with 70s soul strings, dusty Rhodes, live upright-style Moog bass, crisp kick and rimshot, jail buzzer, phone receiver clicks, heavy door slam, telephone EQ on some lines, restrained heavy male storytelling rap verses with internal rhymes, soft aching female soul vocal hook for Hazel with gospel runs, smooth male R&B croon bridge, faint choir Haaa-zel at the end, intimate dry mix, vocals close to the mic
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, bouncy full-time 95 BPM soul rap, D minor Dorian, melancholy tender Saturday visit, lonely muted flugelhorn lead with 70s soul strings, dusty Rhodes, heavy 808 walking the bassline with slides, crisp kick and rimshot, swung hats with 1/32 rolls, jail buzzer, phone receiver clicks, heavy door slam, telephone EQ on some lines, restrained heavy male storytelling rap with internal rhymes, aching female soul hook for Hazel with gospel runs, smooth male R&B croon bridge, faint choir Haaa-zel at the end, 808-forward mix, loud punchy master
 ```
 
 ### Exclude Styles
 ```
-pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, jazz rap, lounge
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, jazz rap, lounge
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 84 BPM, D minor (Dorian: B natural), swing 56%.
-- **Progression:** Verses: Dm9 – G9 (i9–IV9). Hook: Bbmaj9 – A7#9 – Dm9 – Dm9, then Gm9 – C13 – Fmaj9 – A7#9 (soul ii9–V13–Imaj9 in F). Bridge croon: Gm9 – C13 – Fmaj9 – A7#9. Final tag: Bb – Bbm6 – F.
-- **Drums:** DMD kit with a crisp acoustic kick and a rimshot instead of a snare in the verses; a full snare on the hooks. WOMP Pocket: Snare/Clap Lay-back 12 ms, Swing % 56.
-- **Bass:** The Moog lane plays an upright-style part (LPF 600 Hz, short envelope, walking quarter notes D–E–F–G). The 808 on D1 (37 Hz) doubles only the hooks. In V2 bars 1–4 there's no 808, just the walk.
-- **Samples & Keys:** Studio Horns solo flugelhorn (harmon-mute feel via Channel EQ bandpass 500 Hz–4 kHz) plays the lonely lead: A–C–D–F–E–D. Studio Strings sustain on the hooks. Rhodes with Soul Chords (min9). Everything through WOMP Dust.
+- **BPM / Key / Swing:** 95 BPM, Bounce lane, D minor (Dorian: B natural). WOMP Pocket: Swing % 56, Swing Grid 16th, Swing Applies To "Hats & Percussion".
+- **Progression:** Verses: Dm9 – G9 (i9–IV9). Hook: Bbmaj9 – A7#9 – Dm9 – Dm9, then Gm9 – C13 – Fmaj9 – A7#9 (ii9–V13–Imaj9 in F). Bridge croon: Gm9 – C13 – Fmaj9 – A7#9. Final tag: Bb – Bbm6 – F.
+- **Drums:** DMD crisp kick on 1, the "and" of 2 and the "a" of 3; rimshot + clap on 2 and 4 in verses, full snare on hooks; swung 16th hats. WOMP Pocket: Snare/Clap Lay-back 10 ms, Timing Humanize 3 ms, Velocity Humanize 10, Hat Accents Offbeats Loud, Ghost Snare Chance 20%. WOMP Rolls: Roll Target Hi-Hats, Trigger Velocity Threshold, Velocity Threshold 116, Roll Rate 1/32, Roll Length 1/16, Velocity Shape Crescendo.
+- **Bass:** The old upright walk now lives in the 808: D1 (36.7 Hz) walking D–E–F–G with slides, notes landing with the kick. WOMP 808 Glide: Mode Legato Slide, Glide Time 55 ms, Glide Curve 808 (fast start), Bend Range 12, Velocity Floor 90. WOMP Low End: Drive 50%, Harmonics Mix 35%, Sub Boost 3 dB, Mono Below 120 Hz, Punch 40%, Tight 28 Hz. The Moog doubles the walk an octave up (LPF 600 Hz) in V2 bars 1–4 only, while the 808 holds D.
+- **Samples & Keys:** Studio Horns solo flugelhorn (Channel EQ bandpass 500 Hz–4 kHz) plays the lonely lead: A–C–D–F–E–D. Strings sustain on hooks. Rhodes via WOMP Soul Chords (Key D, Scale Dorian (G-Funk), Chord Style Soul 9ths). Everything through WOMP Dust (Tape Drive 25%, Crackle 20%, High Cut 9 kHz).
 - **Street Gospel layer:** Hazel's gospel runs on "Close as I can be"; B3 soft swell into the second hook; faint "Haaa-zel" at the end.
-- **Arrangement map:** Intro 2 (buzzer, guard) → V1 12 (first 2 lines telephone EQ) → Hook 8 → V2 12 (808 out bars 1–4; drums out last 2 bars) → Hook 8 (+strings) → Bridge 4 (croon) → V3 8 ("Time.") → Outro 4 (Hazel, choir, receiver click).
-- **Vocal direction:** Knight restrained; no ad-libs. Hazel's hook is close, with a 3rd above on the "visiting hours" lines.
-- **Mix note:** Put Knight's first two lines through the Telephone EQ, then automate it off on bar 3.
-- **Suno tips:** Knight Persona, Hazel Persona for hook Extends. Weirdness 38%, Style Influence 70%. If the horn turns into smooth jazz, add "dusty 70s soul record."
+- **Arrangement map:** Intro 2 (buzzer, guard) → V1 12 (first 2 lines telephone EQ) → Hook 8 → V2 12 (drums out last 2 bars) → Hook 8 (+strings) → Bridge 4 (croon; hats off, 808 sustains) → V3 8 ("Time.") → Outro 4 (Hazel, choir, receiver click).
+- **Vocal direction:** Knight restrained, no ad-libs, but locked in the pocket. Hazel's hook is close, 3rd above on the "visiting hours" lines.
+- **Mix note:** Telephone EQ on Knight's first two lines, automated off on bar 3; 808 ducked −3 dB from the kick. Master −8.5 to −7.5 LUFS integrated, true peak −1 dBTP.
+- **Suno tips:** Knight Persona, Hazel Persona for hook Extends. Weirdness 38%, Style Influence 70%. If the horn turns smooth jazz, add "dusty 70s soul record."
 
 ## Lyrics
 ```

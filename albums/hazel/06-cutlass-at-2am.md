@@ -6,25 +6,25 @@ Two in the morning in late spring, the '86 Cutlass parked behind the old high sc
 
 ## Suno Style Prompt
 ```
-West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 66 BPM half-time quiet-storm slow jam, G-flat major with lush maj9 chords, 2 a.m. parked under a water tower, talkbox lead melody, warm Rhodes, soft felt kick and rimshot, round sub 808, rain on a windshield, car-radio static, engine ignition at the end, strings swell at sunrise, smooth male R&B croon lead with falsetto, soulful female vocal duet for Hazel, one laid-back half-rapped male verse with internal rhyme, soft choir Haaa-zel pad, intimate close-mic vocals, warm sensual analog mix
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, warm uptempo 96 BPM late-night R&B bounce, G-flat major with lush maj9 chords, 2 a.m. parked under a water tower, talkbox lead melody, warm Rhodes, stripped Rhodes and croon intro then heavy 808 drops, round distorted 808 sliding under the chorus, swung hats with soft 1/32 rolls, rain on a windshield, car-radio static, engine ignition at the end, strings swell at sunrise, smooth male R&B croon lead with falsetto, soulful female vocal duet for Hazel, one half-rapped male verse with internal rhyme, soft choir Haaa-zel pad, 808-forward mix, loud punchy master
 ```
 
 ### Exclude Styles
 ```
-pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, slow EDM, ambient
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, ambient
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 66 BPM half-time, Gb major, 16th swing 58% on the shaker.
+- **BPM / Key / Swing:** 96 BPM, Bounce lane, Gb major. Warm and tender, but the 808 bangs. WOMP Pocket: Swing % 57, Swing Grid 16th, Swing Applies To "Hats & Percussion".
 - **Progression:** Verses: Gbmaj9 – Ebm9 – Abm9 – Db13. Chorus: Cbmaj9 – Bbm7 – Abm9 – Db13 (IV–iii–ii–V). Bridge: Gb – Ebm7 – Abm7 – Db7. Outro tag: Cb – Cbm6 – Gb.
-- **Drums:** DMD soft kit: felt kick on 1 and the "a" of 2, rimshot on 3 (half-time backbeat), shaker 16ths. WOMP Pocket: Snare/Clap Lay-back 16 ms, Velocity Humanize 14.
-- **Bass:** 808 on Gb1 (46 Hz), short and round, glides 120 ms only on the chorus. The Moog lane plays long whole notes under the verses. WOMP Low End: Drive 10%, Tight 30 Hz, plus a Channel EQ low-pass at 80 Hz.
-- **Samples & Keys:** EVOC 20 talkbox plays the chorus melody after each sung chorus ("tell me all your dreams"). Suitcase Rhodes, tremolo 30%, slow Phaser, voiced by WOMP Soul Chords (maj9). Studio Strings enter only in the outro for the sunrise. WOMP Dust Wow 25%.
+- **Drums:** DMD punchy kick on 1 and the "a" of 2 (plus the "and" of 3 in choruses); rimshot + clap on 2 and 4; swung 16th hats with a shaker. WOMP Pocket: Snare/Clap Lay-back 12 ms, Timing Humanize 4 ms, Velocity Humanize 14, Hat Accents Offbeats Loud, Ghost Snare Chance 15%, Ghost Velocity 22. WOMP Rolls: Roll Target Hi-Hats, Trigger Velocity Threshold, Velocity Threshold 118, Roll Rate 1/32, Roll Length 1/16, Velocity Shape Decrescendo (soft rolls).
+- **Bass:** 808 on Gb1 (46.2 Hz), round but driven, locked to the kick; slides Abm9 → Db (Ab1 51.9 Hz down to Db1 34.6 Hz) in the chorus. WOMP 808 Glide: Mode Legato Slide, Glide Time 75 ms, Glide Curve 808 (fast start), Bend Range 12, Velocity Floor 85. WOMP Low End: Drive 45%, Harmonics Mix 30%, Sub Boost 4 dB, Mono Below 120 Hz, Punch 35%, Tight 28 Hz. The Moog plays long whole notes only in the intro, then drops out.
+- **Samples & Keys:** EVOC 20 talkbox plays the chorus melody after each chorus ("tell me all your dreams"). Suitcase Rhodes (tremolo 30%, slow Phaser) voiced by WOMP Soul Chords: Key F#/Gb, Scale Major (Soul), Chord Style Soul 9ths, Voicing Open (spread 3rd), Strum 18 ms. Strings enter in the outro for the sunrise. WOMP Dust: Wow 25%, Crackle 20%, High Cut 9 kHz.
 - **Street Gospel layer:** Hushed: an 8-voice "Haaa-zel" pad in the bridge, low in the mix, Concert Hall 3 s.
-- **Arrangement map:** Intro 4 (rain, static, croon) → V1 6 (croon) → Chorus 8 → V2 7 (Hazel, 808 out) → V3 16 (half-rap; drums out bars 15–16) → Chorus 8 (+talkbox answer) → Bridge 4 (trade, choir) → Outro 4 (strings, engine starts, Rhodes lick).
+- **Arrangement map:** Intro 4 (rain, static, croon; Rhodes only) → 808 drop → V1 6 (croon) → Chorus 8 → V2 7 (Hazel, 808 whole notes) → V3 16 (half-rap; drums out bars 15–16) → Chorus 8 (+talkbox) → Bridge 4 (stripped: Rhodes, 808 sustain, choir) → Outro 4 (strings, engine starts, Rhodes lick).
 - **Vocal direction:** Knight croons close with falsetto on "lies." Hazel answers in chest voice; they sing the last chorus in 3rds.
-- **Mix note:** Low-pass the rain at 6 kHz and duck it under vocals.
-- **Suno tips:** Duet: generate with Knight Persona, Extend V2 with Hazel Persona. Weirdness 40%, Style Influence 68%. If it gets too fast, add "half-time" twice.
+- **Mix note:** Low-pass the rain at 6 kHz, ducked under vocals. Side-chain the 808 −3 dB from the kick. Master −8.5 to −7.5 LUFS integrated, true peak −1 dBTP.
+- **Suno tips:** Duet: Knight Persona, Extend V2 with Hazel Persona. Weirdness 40%, Style Influence 70%. If it turns into a slow jam, move "uptempo 96 BPM" to the front.
 
 ## Lyrics
 ```

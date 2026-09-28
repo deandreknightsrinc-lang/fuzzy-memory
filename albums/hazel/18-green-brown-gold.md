@@ -6,24 +6,24 @@ Day three in the ICU at Mercy General. Knight has been sleeping in the vinyl rec
 
 ## Suno Style Prompt
 ```
-West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 76 BPM half-time soul ballad, D-flat major, tender luminous hopeful ICU dusk into morning, signature Rhodes lick front and center, sweet flugelhorn and 70s strings replay, talkbox answering gold, soft punchy drums, melodic Moog bass runs, slow hospital monitor beep intro, window blinds opening, smooth male R&B croon lead with falsetto on the hook, one melodic male rap verse with warm internal rhymes, female soul vocal for Hazel answering softly then soaring on the final chorus, layered gospel harmonies, choir Haaa-zel blooming under the last chorus, glowing warm mix, wide stereo strings
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, warm uptempo 100 BPM soul R&B bounce, D-flat major, tender luminous hopeful ICU dusk into morning, signature Rhodes lick front and center, sweet flugelhorn and 70s strings replay, talkbox answering gold, stripped monitor-beep and Rhodes intro then heavy 808 bounce, melodic 808 runs with slides, swung hats with soft 1/32 rolls, window blinds opening, smooth male R&B croon lead with falsetto, one melodic male rap verse, female soul vocal for Hazel answering softly then soaring on the final chorus, gospel harmonies, choir Haaa-zel blooming under the last chorus, 808-forward mix, loud punchy master
 ```
 
 ### Exclude Styles
 ```
-pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, adult contemporary pop
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, adult contemporary
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 76 BPM half-time, Db major, swing 56%.
-- **Progression:** Verses: Dbmaj9 – Bbm9 – Ebm9 – Ab13 (I–vi–ii–V). Chorus: Gbmaj9 – Fm7 – Ebm9 – Ab13 (IV–iii–ii–V). Bridge: Ebm9 – Ab13 – Dbmaj9 – F7#9 (ii9–V13–Imaj9, with a V/vi push). Final chorus end: Gb – Gbm6 – Db (the "Amen" cadence as relief).
-- **Drums:** DMD soft punchy kit: kick on 1 and the "and" of 2, snare on 3, shaker 16ths. WOMP Pocket: Snare/Clap Lay-back 14 ms, Velocity Humanize 12. The monitor beep in the intro sits at 76 BPM on beat 1.
-- **Bass:** The Moog lane plays melodic runs up to each chord (Ab–Bb–C–Db). The 808 on Db1 (35 Hz) plays roots in the chorus, with 100 ms glides. V2 bars 1–4 have no 808.
-- **Samples & Keys:** Suitcase Rhodes plays the signature lick, in Db (F–Ab–Bb–C–Bb–Ab–F), as the main hook instrument. Studio Horns flugelhorn plus Studio Strings replay the melody (Ab–Bb–Db–Eb–F), through WOMP Dust. The EVOC 20 talkbox sings "gold" after each chorus.
-- **Street Gospel layer:** Gospel harmonies on "gold when she cry"; the choir "Haaa-zel" blooms under the final chorus; B3 enters only for the final chorus.
-- **Arrangement map:** Intro 4 (monitor, hum) → V1 8 (croon) → Chorus 6 → V2 12 (rap; drums out last 2 bars) → Chorus 6 (+Hazel harmony) → V3 6 (Hazel) → Bridge 5 (spoken over Rhodes) → Final Chorus 8 (+choir, B3, talkbox) → Outro 2 (Hazel spoken).
-- **Vocal direction:** Knight croons with falsetto on "gold." Hazel starts weak (breathy, low level), then opens to full voice and a 3rd above on the final chorus.
-- **Mix note:** Automate the stereo width of the strings from 60% to 120% across the bridge-to-final-chorus transition.
+- **BPM / Key / Swing:** 100 BPM, Bounce lane, Db major. WOMP Pocket: Swing % 56, Swing Grid 16th, Swing Applies To "Hats & Percussion". The intro monitor beep sits on beat 1 at 100 BPM.
+- **Progression:** Verses: Dbmaj9 – Bbm9 – Ebm9 – Ab13 (I–vi–ii–V). Chorus: Gbmaj9 – Fm7 – Ebm9 – Ab13 (IV–iii–ii–V). Bridge: Ebm9 – Ab13 – Dbmaj9 – F7#9 (ii9–V13–Imaj9 with a V/vi push). Final chorus: Gb – Gbm6 – Db.
+- **Drums:** DMD punchy kick on 1, the "and" of 2 and the "a" of 3; snare + clap on 2 and 4; swung 16th hats and shaker. WOMP Pocket: Snare/Clap Lay-back 10 ms, Timing Humanize 4 ms, Velocity Humanize 12, Hat Accents Offbeats Loud, Ghost Snare Chance 15%. WOMP Rolls: Roll Target Hi-Hats, Trigger Velocity Threshold, Velocity Threshold 118, Roll Rate 1/32, Roll Length 1/16, Velocity Shape Decrescendo.
+- **Bass:** 808 on Db1 (34.6 Hz), locked to the kick, with melodic runs up into each chord (Ab–Bb–C–Db). WOMP 808 Glide: Mode Legato Slide, Glide Time 55 ms, Glide Curve 808 (fast start), Bend Range 12, Velocity Floor 88. WOMP Low End: Drive 45%, Harmonics Mix 35%, Sub Boost 4 dB, Mono Below 120 Hz, Punch 40%, Tight 26 Hz. No Moog.
+- **Samples & Keys:** Suitcase Rhodes plays the signature lick in Db (F–Ab–Bb–C–Bb–Ab–F) as the hook instrument; WOMP Soul Chords: Key C#/Db, Scale Major (Soul), Chord Style Soul 9ths. Flugelhorn and strings replay the melody (Ab–Bb–Db–Eb–F) through WOMP Dust (Tape Drive 20%, Crackle 15%). EVOC 20 talkbox sings "gold" after each chorus.
+- **Street Gospel layer:** Gospel harmonies on "gold when she cry"; the choir "Haaa-zel" blooms under the final chorus; B3 enters only there.
+- **Arrangement map:** Intro 4 (monitor, hum, Rhodes; no drums) → V1 8 (croon; kick, hats, 808) → Chorus 6 (full kit) → V2 12 (rap; drums out last 2 bars) → Chorus 6 (+Hazel harmony) → V3 6 (Hazel; 808 whole notes) → Bridge 5 (stripped: spoken over Rhodes) → Final Chorus 8 (+choir, B3, talkbox) → Outro 2 (Hazel spoken).
+- **Vocal direction:** Knight croons with falsetto on "gold." Hazel starts breathy and low, then opens to full voice, 3rd above on the final chorus.
+- **Mix note:** Strings width 60% → 120% across bridge into final chorus; 808 ducked −3 dB from the kick. Master −8.5 to −7.5 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Knight Persona; Extend V3 and the final chorus with Hazel Persona. Weirdness 36%, Style Influence 70%.
 
 ## Lyrics

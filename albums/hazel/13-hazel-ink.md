@@ -6,24 +6,24 @@ Months into the bid, Knight and Hazel keep each other alive through letters, and
 
 ## Suno Style Prompt
 ```
-West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 88 BPM, E-flat major with bittersweet C minor turns, warm nostalgic prison letters, 70s flute and harp replay loop, mellow Rhodes lick, walking Moog bass fills, whistle synth lead in the final hook, paper unfolding, pen scratching on paper, pen cap click, male rap verses with conversational multisyllabic flow, female soul vocal for Hazel singing the hook and rapping one warm rhythmic verse, gospel harmony stacks in the hook, choir Haaa-zel rising in the final hook, drums hit hard but the mix is soft around the edges, warm analog tape
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, bouncy full-time 99 BPM, E-flat major with bittersweet C minor turns, warm nostalgic prison letters, 70s flute and harp replay loop, mellow Rhodes lick, booming 808 sliding through the ii-V, swung hats with 1/32 rolls, whistle synth lead in the final hook, paper unfolding, pen scratching, pen cap click, male rap verses with conversational multisyllabic flow, female soul vocal for Hazel singing the hook and rapping one warm rhythmic verse, gospel harmony stacks, choir Haaa-zel rising in the final hook, 808-forward mix, loud punchy master
 ```
 
 ### Exclude Styles
 ```
-pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, orchestral, harp solo
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, orchestral, harp solo
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 88 BPM, Eb major with turns into C minor, swing 56%.
+- **BPM / Key / Swing:** 99 BPM, Bounce lane, Eb major with turns into C minor. WOMP Pocket: Swing % 56, Swing Grid 16th, Swing Applies To "Hats & Percussion".
 - **Progression:** Verses: Ebmaj9 – Cm9 – Fm9 – Bb13 (I–vi–ii–V). Hook: Abmaj9 – G7#9 – Cm9 – Cm9, then Fm9 – Bb13 – Ebmaj9. Final hook ends Ab – Abm6 – Eb (IV–iv–I "Amen").
-- **Drums:** DMD hard kick, crisp snare, hats swung. Pen scratches on the offbeats (Quick Sampler). WOMP Pocket: Snare/Clap Lay-back 12 ms, Swing % 56, Velocity Humanize 10.
-- **Bass:** The Moog lane plays walking fills into each chord. The 808 on Eb1 (39 Hz) plays roots, with 80 ms glides on the ii–V. Hazel's V2 bars 1–4 are 808-free.
-- **Samples & Keys:** Replayed "sample": flute (Studio Woodwinds) and harp (Sampler) figure G–Bb–C–Eb, looped 2 bars and printed through WOMP Dust (Wow 30%, Bandwidth 8 kHz). The Rhodes plays the signature lick transposed to Eb major (G–Bb–C–D–C–Bb–G). WOMP Whistle lead joins only the final hook.
+- **Drums:** DMD hard kick on 1, the "a" of 2 and the "and" of 3; crisp snare + clap on 2 and 4; swung 16th hats; pen scratches on the offbeats (Quick Sampler). WOMP Pocket: Snare/Clap Lay-back 9 ms, Timing Humanize 3 ms, Velocity Humanize 10, Hat Accents Offbeats Loud, Ghost Snare Chance 20%. WOMP Rolls: Roll Target Hi-Hats, Trigger Velocity Threshold, Velocity Threshold 115, Roll Rate 1/32, Roll Length 1/8, Velocity Shape Crescendo.
+- **Bass:** 808 on Eb1 (38.9 Hz) and C1 (32.7 Hz), locked to the kick, sliding F1 → Bb1 (43.7 → 58.3 Hz) on every ii–V. WOMP 808 Glide: Mode Legato Slide, Glide Time 60 ms, Glide Curve 808 (fast start), Bend Range 12, Velocity Floor 92. WOMP Low End: Drive 48%, Harmonics Mix 35%, Sub Boost 3 dB, Mono Below 120 Hz, Punch 40%, Tight 28 Hz. The Moog plays only walking pickups into each chord, above 120 Hz. Hazel's V2 bars 1–4: 808 whole notes.
+- **Samples & Keys:** Replayed "sample": flute (Studio Woodwinds) and harp (Sampler) figure G–Bb–C–Eb, looped 2 bars and printed through WOMP Dust (Wow 30%, High Cut 8 kHz, Crackle 25%). The Rhodes plays the signature lick in Eb major (G–Bb–C–D–C–Bb–G). WOMP Whistle joins only the final hook (Glide Time 150 ms, Octave 1).
 - **Street Gospel layer:** Hook harmonies stack 3rd above and 5th below; the choir "Haaa-zel" rises through the final hook; tambourine on 2 and 4 there.
-- **Arrangement map:** Intro 4 (paper unfolding, "Dear Knight") → V1 12 (Knight's letter) → Hook 6 → V2 10 (Hazel's letter; 808 out bars 1–4) → Hook 6 → V3 10 (Knight; drums out last 2 bars) → Bridge 4 (spoken over Rhodes, beat out) → Final Hook 8 (+whistle, choir, tambourine) → Outro 2 (pen cap).
-- **Vocal direction:** Both "letters" are close and conversational. Hazel's rap is sung-rhythmic. "Come home straight" is spoken once dry, then sung.
-- **Mix note:** Give each letter a slightly different room (Knight's small, Hazel's warmer), set by ChromaVerb size.
+- **Arrangement map:** Intro 4 (paper, "Dear Knight", no drums) → V1 12 → Hook 6 → V2 10 (Hazel's letter; 808 whole notes bars 1–4) → Hook 6 → V3 10 (drums out last 2 bars) → Bridge 4 (spoken over Rhodes, beat out) → Final Hook 8 (+whistle, choir, tambourine) → Outro 2 (pen cap).
+- **Vocal direction:** Both letters close and conversational. Hazel's rap is sung-rhythmic. "Come home straight" spoken once dry, then sung.
+- **Mix note:** Give each letter its own room (Knight small, Hazel warmer) via ChromaVerb size; 808 ducked −3 dB from the kick. Master −8.5 to −7.5 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Knight Persona base; Extend V2 with Hazel Persona. Weirdness 38%, Style Influence 70%. If the flute and harp go cinematic, move "70s flute and harp replay loop" right after the key.
 
 ## Lyrics

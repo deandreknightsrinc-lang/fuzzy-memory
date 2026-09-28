@@ -6,25 +6,25 @@ Golden hour on Diagonal Ave, the avenue that cuts the 64 in half: the Rooks, the
 
 ## Suno Style Prompt
 ```
-West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 86 BPM, F-sharp minor Dorian, golden-hour lowrider stroll across the avenue, high portamento whistle synth lead, muted jazz guitar licks, warm Rhodes, 70s soul string replay, bus brakes hissing, traffic horns, distant church bells and ice-cream truck chime, conversational male rap verses dense with internal rhyme, soulful female vocal hook and smooth half-sung female rap verse for Hazel, smooth male R&B croon bridge, back-and-forth male and female trade verse, choir Haaa-zel swell, crisp vocals, wide whistle lead, warm analog mix
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, bouncy full-time 95 BPM lowrider groove, F-sharp minor Dorian, golden-hour stroll across the avenue, high portamento whistle synth lead, muted jazz guitar licks, warm Rhodes, 70s soul string replay, 808 sliding under every kick, swung hats with 1/32 rolls, bus brakes hissing, traffic horns, distant church bells and ice-cream truck chime, conversational male rap dense with internal rhyme, soulful female hook and half-sung female rap verse for Hazel, smooth male R&B croon bridge, male and female trade verse, choir Haaa-zel swell, 808-forward mix, loud punchy master
 ```
 
 ### Exclude Styles
 ```
-pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, smooth jazz
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, smooth jazz
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 86 BPM, F# minor (Dorian: D# natural), 16th swing 57%, the laziest pocket on the album.
-- **Progression:** Verses: F#m7 – B9 (i7–IV9, the core lowrider loop). Hook (soul lift to A): Bm9 – E13 – Amaj9 – C#7#9. Bridge turnaround: A – F#m7 – Bm7 – E7. V3 trade: Dmaj9 – C#m7 – Bm9 – E13.
-- **Drums:** DMD kit with a dusty acoustic kick and rim-heavy snare; shaker 16ths. Kick on 1 and the "and" of 3. WOMP Pocket: Snare/Clap Lay-back 14 ms, Swing % 57, Velocity Humanize 12.
-- **Bass:** 808 on F#1 (46 Hz), glide 80 ms up to B on bar 2. The Moog lane plays short syncopated pops on A2/C#3 above it. Hazel's V2 bars 1–4 are 808-free; the synth bass walks. WOMP Low End: Mono Below 120 Hz, Punch 30%.
-- **Samples & Keys:** **WOMP Whistle** on Retro Synth (sine, glide 200 ms, vibrato 5 Hz, delay 300 ms) plays the hook melody an octave up, doubled an octave down at −12 dB. Muted jazz guitar answers the verses. Strings replay a rising 3-note figure through WOMP Dust.
+- **BPM / Key / Swing:** 95 BPM, Bounce lane, F# minor (Dorian: D# natural). The laziest pocket on the album: WOMP Pocket Swing % 57, Swing Grid 16th, Swing Applies To "Hats & Percussion".
+- **Progression:** Verses: F#m7 – B9 (i7–IV9, the lowrider loop). Hook (soul lift to A): Bm9 – E13 – Amaj9 – C#7#9. Bridge turnaround: A – F#m7 – Bm7 – E7. V3 trade: Dmaj9 – C#m7 – Bm9 – E13.
+- **Drums:** DMD dusty kick on 1, the "and" of 2 and the "and" of 3; rim-heavy snare + clap on 2 and 4; shaker and swung 16th hats. WOMP Pocket: Snare/Clap Lay-back 12 ms, Timing Humanize 4 ms, Velocity Humanize 12, Hat Accents Offbeats Loud, Ghost Snare Chance 20%. WOMP Rolls: Roll Target Hi-Hats, Trigger Random Chance, Roll Chance 8%, Roll Rate 1/32, Roll Length 1/16, Velocity Shape Flat.
+- **Bass:** 808 on F#1 (46.2 Hz), locked to the kick, sliding up to B1 (61.7 Hz) on bar 2. WOMP 808 Glide: Mode Legato Slide, Glide Time 65 ms, Glide Curve 808 (fast start), Bend Range 12, Velocity Floor 92. WOMP Low End: Drive 48%, Harmonics Mix 35%, Sub Boost 3 dB, Mono Below 120 Hz, Punch 40%, Tight 28 Hz. The Moog adds short pops on A2/C#3 only. In Hazel's V2 bars 1–4 the 808 plays whole notes.
+- **Samples & Keys:** WOMP Whistle on Retro Synth (sine) plays the hook melody: Mode Legato Slide, Glide Time 160 ms, Glide Curve Smooth (fast start), Octave 1, Vibrato Rate 5.2 Hz, Vibrato Depth 22 cents, Vibrato Delay 250 ms, Vibrato Rise 300 ms; doubled an octave down at −12 dB. Muted jazz guitar answers verses. Strings replay a rising 3-note figure through WOMP Dust (Wow 20%, High Cut 9 kHz).
 - **Street Gospel layer:** Choir "Haaa-zel" in the bridge; church bells (Sampler) on beat 1 of the bridge; tambourine joins the final hook.
-- **Arrangement map:** Intro 4 (bus brakes, spoken trade) → V1 12 → Hook 8 (+whistle) → V2 12 (Hazel, 808 out bars 1–4) → Bridge 6 (croon + harmony, choir) → V3 8 (trade, drums drop last 2 bars) → Hook 8 (+wah guitar, tambourine) → Outro 4 (bus brakes, Rhodes lick).
+- **Arrangement map:** Intro 4 (bus brakes, spoken trade, no drums) → V1 12 → Hook 8 (+whistle) → V2 12 (Hazel, 808 whole notes bars 1–4) → Bridge 6 (croon + harmony, choir) → V3 8 (trade; drums out last 2 bars) → Hook 8 (+wah, tambourine) → Outro 4 (bus brakes, Rhodes lick).
 - **Vocal direction:** Knight loose and conversational; Hazel half-sings V2 in a cool alto. In V3 each doubles the other's last word.
-- **Mix note:** Side-chain the whistle lead −2 dB from the lead vocal so it sings between lines, not over them.
-- **Suno tips:** Knight Persona take first; Extend V2 with Hazel Persona. Weirdness 40%, Style Influence 68%. If the whistle vanishes, move it right after the tempo.
+- **Mix note:** Side-chain the whistle −2 dB from the lead vocal; 808 −3 dB from the kick. Master −8.5 to −7.5 LUFS integrated, true peak −1 dBTP.
+- **Suno tips:** Knight Persona first; Extend V2 with Hazel Persona. Weirdness 40%, Style Influence 70%. If the whistle vanishes, move it right after the key.
 
 ## Lyrics
 ```
