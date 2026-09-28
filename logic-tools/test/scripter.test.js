@@ -176,3 +176,44 @@ test("Soul Chords: voicings stay within MIDI range at extremes", () => {
   for (const e of s.out) if (e.pitch !== undefined) assert.ok(e.pitch >= 0 && e.pitch <= 127);
   assertBalanced(s.out);
 });
+
+test("Rolls: high-velocity hat becomes a tempo-locked 1/32 roll with crescendo", () => {
+  const s = load(S("WOMP-Rolls.js"), { timing: { playing: true, tempo: 150 } });
+  s.on(42, 120); s.off(42);
+  const ons = s.notes("NoteOn");
+  assert.strictEqual(ons.length, 4);                 // 1/8 length / 1/32 rate
+  const step = (1 / 8) * 60000 / 150;                // 50 ms
+  ons.forEach((e, i) => assert.ok(Math.abs(e.t - i * step) < 0.01));
+  assert.ok(ons[0].velocity < ons[3].velocity, "crescendo");
+  assert.strictEqual(s.notes("NoteOff").length, 4, "user note-off swallowed, roll owns its offs");
+  assertBalanced(s.out);
+});
+
+test("Rolls: low-velocity hats and non-target notes pass through untouched", () => {
+  const s = load(S("WOMP-Rolls.js"), { timing: { playing: true, tempo: 96 } });
+  s.on(42, 90); s.off(42); s.on(38, 127); s.off(38);
+  assert.deepStrictEqual(s.out.map((e) => [e.type, e.pitch, e.velocity]),
+    [["NoteOn", 42, 90], ["NoteOff", 42, 0], ["NoteOn", 38, 127], ["NoteOff", 38, 0]]);
+});
+
+test("Rolls: Single Note mode stutters the 808 at 1/16T over a quarter", () => {
+  const s = load(S("WOMP-Rolls.js"), {
+    params: { "Roll Target": 2, "Single Note": 36, "Trigger": 1, "Roll Chance": 100, "Roll Rate": 0, "Roll Length": 2, "Velocity Shape": 0 },
+    timing: { playing: true, tempo: 100 },
+  });
+  s.on(36, 100); s.off(36); s.on(37, 100); s.off(37);
+  const ons36 = s.notes("NoteOn").filter((e) => e.pitch === 36);
+  assert.strictEqual(ons36.length, 6);
+  assert.ok(ons36.every((e) => e.velocity === 100));
+  assert.strictEqual(s.notes("NoteOn").filter((e) => e.pitch === 37).length, 1);
+  assertBalanced(s.out);
+});
+
+test("Rolls: velocities stay in range and rolls work with transport stopped", () => {
+  const s = load(S("WOMP-Rolls.js"), { params: { "Roll Rate": 3, "Roll Length": 2, "Velocity Shape": 2 }, timing: { playing: false, tempo: 0 } });
+  s.on(46, 127); s.off(46);
+  const ons = s.notes("NoteOn");
+  assert.strictEqual(ons.length, 16);
+  for (const e of ons) assert.ok(e.velocity >= 1 && e.velocity <= 127);
+  assertBalanced(s.out);
+});

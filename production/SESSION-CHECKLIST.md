@@ -36,7 +36,7 @@ song stands across both albums.
 - [ ] A/B against references at matched loudness.
 
 ## Stage 6: Master and Deliver
-- [ ] Master to −9 to −8 LUFS integrated for bangers, or −11 to −10 LUFS for soul cuts. True peak −1.0 dBTP.
+- [ ] Master to −8.5 to −7.5 LUFS integrated (Uptempo 808 Mode). True peak −1.0 dBTP.
 - [ ] Bounce: 24-bit WAV master, instrumental, a cappella, TV track (the beat plus the hooks), and clean edits.
 - [ ] Metadata: ISRC, credits, splits. Register with your PRO and The MLC.
 
@@ -45,9 +45,9 @@ song stands across both albums.
 ## The "WOMP Template" (build it once in Logic, then File → Save as Template)
 | Track | Instrument / FX |
 |---|---|
-| DRUMS (DMD) | WOMP Pocket (MIDI FX) → DMD kit → routed to DRUM BUS |
-| 808 | WOMP 808 Glide → Sampler 808 → WOMP Low End → Compressor (sidechain: kick) |
-| SYNTH BASS | Retro Synth "funk mono" → Channel EQ HPF 70 Hz → Compressor (sidechain: kick) |
+| DRUMS (DMD) | WOMP Pocket → WOMP Rolls (MIDI FX) → DMD kit → routed to DRUM BUS |
+| 808 | WOMP 808 Glide → WOMP Rolls (Single Note) → Sampler 808 → WOMP Low End (Drive 45–70%) |
+| SYNTH BASS | Retro Synth "funk mono" → Channel EQ HPF 120 Hz (the 808 owns the sub) |
 | RHODES | WOMP Soul Chords → Vintage Electric Piano → WOMP Dust |
 | B3 | WOMP Soul Chords → Vintage B3 |
 | WHISTLE | WOMP Whistle → Retro Synth sine → Tape Delay |

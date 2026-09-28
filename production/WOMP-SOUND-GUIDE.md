@@ -5,8 +5,12 @@
 ---
 
 ## 1. The Sound in One Sentence
-**West Coast G-funk roots fed through 70s/80s funk and R&B, with hard drums, deep heavy basslines, melodic 808s, and
-church on top.** It rides like a lowrider and hits like a raid, and the hook sounds like Sunday morning.
+**Uptempo, hip-hop-driven West Coast knock: heavy distorted 808s leading the beat, hard drums with fast hi-hat rolls,
+and 70s/80s funk and R&B chops, with church on top.** It hits like a raid, bounces like a lowrider on
+switches, and the hook sounds like Sunday morning.
+
+> **Current direction: Uptempo 808 Mode.** Every song rides one of two uptempo lanes (§2), and the 808 is the lead of
+> the low end. The slower G-funk settings further down still apply to sound design, but tempo and 808 rules now come from §2.
 
 ### The Five Pillars
 | Pillar | What it means | Reference feel (describe, don't copy) |
@@ -20,14 +24,22 @@ church on top.** It rides like a lowrider and hits like a raid, and the hook sou
 ---
 
 ## 2. Musical Rules
-**Tempo**
-| Range | Use | Notes |
-|---|---|---|
-| **84–98 BPM** | Home base | The G-funk bounce pocket |
-| 66–80 BPM | Ballads and soul cuts | Half-time drums |
-| 130–150 BPM | Rare modern tension cuts | Write as half-time so it still feels like 65–75 |
+**Tempo: two uptempo lanes. No song goes below 94 BPM.**
+| Lane | BPM | Drums | 808 |
+|---|---|---|---|
+| **BOUNCE** | 94–104 | Full-time: snare/clap on 2 and 4, swung 16th hats with occasional 1/32 rolls | Locked to the kick pattern, fast slides between chord roots |
+| **KNOCK** | 140–160 | Snare on 3 (half-time backbeat) with double-time energy: 1/16 hats with 1/32 and triplet rolls, busy kick | Rolling 16th-note patterns, fast glides, 808 stutters |
 
-**Swing:** 16th-note swing at 54–58% (Logic: set the region's Quantize to 16 Swing and adjust Q-Swing).
+- **Emotional songs** keep their minor keys and their story, but ride BOUNCE at 94–98. Give them a stripped intro or breakdown,
+  then bring the 808 back harder.
+- **Swing:** BOUNCE 55–57% on 16ths. KNOCK 51–54% (almost straight, so the rolls stay tight).
+
+**808 rules (Uptempo 808 Mode):**
+1. **The 808 is the bassline.** The synth bass supports the mids (HPF at 120 Hz) or drops out entirely.
+2. **Distortion:** WOMP Low End Drive at 45–70%, so the 808 growls on phones and in cars.
+3. **Tuning:** tune every 808 to the song's key, and write the root on each chord change. Use WOMP 808 Glide with Glide Time 35–80 ms.
+4. **Movement:** add a roll or stutter at the end of every 2 or 4 bars with WOMP Rolls (Roll Target "Single Note" set to the 808's note).
+5. **Kick and 808:** use a short punchy kick (under 120 ms) on top of the 808, or let the 808 be the kick. Sidechain only if they clash.
 
 **Keys and harmony:**
 - **Minor keys with Dorian color.** Minor 7th, minor 9th and minor 11th chords with a major 6th in the melody are the G-funk signature.
@@ -126,7 +138,8 @@ Everything below uses **Logic stock instruments and plugins**, so it works out o
   - Solo the kick and bass, listen on phone speakers, and make sure the 808 harmonics are audible.
 - **Mix bus:** Compressor (Vintage VCA, 2:1, slow attack, auto release, 1–2 dB) → Channel EQ tilt → ChromaGlow ~10%.
 - **Master, via Logic's Mastering Assistant (Character "Punch" or "Clean") or a manual chain:** Linear Phase EQ → Multipressor (gentle on the low band) → Adaptive Limiter.
-  - **Loudness:** −9 to −8 LUFS integrated for bangers, and −11 to −10 LUFS for soul ballads. **True peak −1.0 dBTP.**
+  - **Loudness:** −8.5 to −7.5 LUFS integrated for every song in Uptempo 808 Mode. **True peak −1.0 dBTP.**
+  - **Pushing the 808 into the limiter:** saturate it first (WOMP Low End Drive), because the harmonics limit more cleanly than a pure sine.
 - **References:** A/B against two or three released West Coast and soul records at matched loudness (Logic's Loudness Meter). Describe the target in words in your notes, not in Suno prompts.
 
 ---
@@ -157,21 +170,21 @@ The Style field holds **1,000 characters**. Build every prompt in this order, so
 
 `[W.O.M.P. core] + [album flavor] + [song-specific: BPM, key, mood, lead instrument, special FX] + [vocal] + [mix]`
 
-**W.O.M.P. core (paste into every prompt):**
+**W.O.M.P. core (paste into every prompt, Uptempo 808 Mode):**
 ```
-West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation
 ```
 **STALEMATE flavor:**
 ```
-dark cinematic minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks
+dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks
 ```
 **HAZEL flavor:**
 ```
-sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle
+70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle
 ```
 **Exclude Styles field (all songs):**
 ```
-pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B
 ```
 **Suno settings:**
 - **Advanced options:** Weirdness 35–45% and Style Influence 65–75%. Push Style Influence higher when the sound drifts.
@@ -192,7 +205,8 @@ These aren't needed, since the W.O.M.P. tools and Logic stock plugins cover it, 
 | Tool | Type | What it does |
 |---|---|---|
 | **WOMP Pocket** | Logic Scripter (MIDI FX) | West Coast groove engine: hat swing, late snare, velocity humanize, ghost notes |
-| **WOMP 808 Glide** | Logic Scripter (MIDI FX) | Turns overlapping notes into 808 pitch-bend slides. Also does octave-drop accents. |
+| **WOMP 808 Glide** | Logic Scripter (MIDI FX) | Turns overlapping notes into 808 pitch-bend slides |
+| **WOMP Rolls** | Logic Scripter (MIDI FX) | Tempo-locked hi-hat rolls (1/16T to 1/64) and 808 stutters, with velocity build-ups |
 | **WOMP Soul Chords** | Logic Scripter (MIDI FX) | One finger in, 70s soul and gospel voicings out (min9, maj9, 13, 7#9, 11), key-aware, with strum |
 | **WOMP Whistle** | Logic Scripter (MIDI FX) | G-funk lead helper: portamento plus delayed vibrato for that high whine |
 | **WOMP Low End** | Audio Unit / VST3 plugin | 808 and bass weapon: harmonic drive, sub mono, low punch, "Tight" rumble high-pass, sub boost |
