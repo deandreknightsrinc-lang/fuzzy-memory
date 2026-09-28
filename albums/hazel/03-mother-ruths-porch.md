@@ -6,8 +6,25 @@ A Sunday evening a week after the shooting, on the west side of Diagonal Ave. Kn
 
 ## Suno Style Prompt
 ```
-Southern gospel soul with a hip-hop undertone, 68 BPM in a slow 6/8 swing, B-flat major, warm church piano and Hammond organ, warm Rhodes, brushed drums over a soft boom-bap kick, tambourine, crickets and screen-door creak ambience, vinyl crackle, elderly female spoken-word matriarch voice, smooth male R&B croon on the hook, laid-back respectful male rap verses with internal rhyme, soulful female vocal bridge for Hazel, gospel choir call-and-response and "Haaa-zel" swell, sweet-tea warmth with a steel edge, intimate front-porch mix, natural room reverb
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 68 BPM slow 12/8 gospel sway with half-time drums, B-flat major, front-porch sweet tea and a warning, Hammond B3 slow Leslie and church piano lead, brushed snare over soft heavy kick, tambourine on the backbeat, crickets, screen-door creak, ice cracking in a glass, elderly female spoken matriarch voice, smooth male R&B croon hook with choir answering, laid-back respectful male rap verses with internal rhyme, soulful female vocal bridge for Hazel, gospel call-and-response, intimate porch mix, natural room reverb, warm analog tone
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, bluegrass, swing jazz
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 68 BPM in 12/8 (dotted-quarter pulse), Bb major. No extra swing: 12/8 is the swing.
+- **Progression:** Verses: Bbmaj9 – Gm9 – Cm9 – F13. Hook: Cm9 – F13 – Bbmaj9 – Bb7 (soul ii9–V13–Imaj9, then Bb7 pushes to IV). Hook tag: Eb – Ebm6 – Bb (gospel IV–iv–I). Bridge turnaround: Bb – Gm7 – Cm7 – F7.
+- **Drums:** DMD soft kit: round kick on 1 and 4 of the 12/8 bar, brushed snare on beat 7 (the half-time backbeat), tambourine on 4 and 10. WOMP Pocket: Snare Delay +18 ms (very lazy), Humanize 14, Ghost Notes on.
+- **Bass:** 808 is soft and low (Bb0, 29 Hz) on the downbeats only, with 120 ms glides on chord changes. The Moog lane plays walking gospel lines (Bb–C–D–Eb into F). WOMP Low End: Drive 15%, Tight LPF 90 Hz.
+- **Samples & Keys:** Vintage B3 lead, Leslie slow on verses, fast on hooks. Church piano (Steinway, Soft) doubles the right hand. Rhodes plays only the signature lick under Ruth's spoken lines.
+- **Street Gospel layer:** Call-and-response is built into the hook ("sweet tea and a warning" answered by the choir). Organ swells into every hook; a hand-clap layer on the final hook only.
+- **Arrangement map:** Intro 4 (door creak, crickets, Ruth spoken) → V1 12 → Hook 8 → Ruth spoken 4 (drums out) → V2 12 → Bridge 8 (Hazel through the screen door, Ruth answers, choir swell) → Hook 8 (+claps) → Outro 4 (Ruth spoken, organ hum, crickets).
+- **Vocal direction:** Knight raps quiet and polite. Hazel's bridge gets HPF 300 Hz ("through the screen"). Ruth is dry and close.
+- **Mix note:** Pan the crickets wide and quiet (−24 dB) and automate them down whenever the B3 swells.
+- **Suno tips:** Knight Persona; generate Ruth's lines separately if the persona masculinizes them. Weirdness 35%, Style Influence 72%. If it turns country, add "Black church gospel" early.
 
 ## Lyrics
 ```

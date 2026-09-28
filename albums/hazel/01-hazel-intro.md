@@ -6,8 +6,25 @@ July in the 64, a late-80s summer afternoon at Pop's Market on the corner of Nin
 
 ## Suno Style Prompt
 ```
-neo-soul intro into hardcore boom-bap, opens in free time around 70 BPM then beat switch to 88 BPM, E-flat minor, warm summer-afternoon mood with street grit, warm Rhodes, 70s soul sample chops, vinyl crackle, gospel choir swelling "Haaa-zel", smooth male R&B croon in chest voice and falsetto for the opening, then dusty hard kicks, cracking snare, walking live bass, gritty male hardcore rap verses dense with internal rhyme and punchlines, soulful female vocal hook for Hazel, sparse female ad-libs, tape saturation, dry upfront vocals, wide choir reverb, cinematic storytelling, ends on the signature Rhodes lick fading into crackle
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 88 BPM, E-flat minor Dorian, free-time Rhodes and croon intro then beat drops in, July-afternoon crush with street grit, signature Rhodes lick as lead, talkbox sings Haaa-zel, clav stabs on hooks, box-fan hum and cash-register ding, drums drop 2 bars before each hook, smooth male R&B croon intro in chest and falsetto, gritty male hardcore rap verses dense with internal rhyme, soulful female vocal hook for Hazel, gospel choir Haaa-zel swells, dry upfront vocals, wide choir hall, warm analog mix, ends on the Rhodes lick fading into crackle
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, jazz fusion, acoustic guitar
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 88 BPM, Eb minor (Dorian: C natural in the lead lines), 16th swing 56%. The croon intro is free time.
+- **Progression:** Intro (relative-major soul turn): Abm9 – Db13 – Gbmaj9 – Bb7#9. Verses: Ebm9 – Ab9 (i9–IV9 Dorian, 2 bars each). Hook: Cbmaj9 – Bbm7 – Ebm9 – Ab13. Last choir tag: Ab – Abm6 – Eb (IV–iv–I "Amen" with a Picardy lift).
+- **Drums:** DMD layered kick (acoustic + 808 click), snare/clap (+10 ms)/rim. Kick on 1 and the "a" of 2, snare on 2 and 4, open hat on the "and" of 2 and 4. WOMP Pocket: Snare Delay +12 ms, Hat Swing 56%, Humanize 10.
+- **Bass:** 808 enters at the beat switch on Eb1 (39 Hz), glide 90 ms into Ab on bar 2 (WOMP 808 Glide). Moog bass plays sparse Eb2–Eb3 octave pops; in V2 bars 1–4 the 808 drops and the Moog walks. WOMP Low End: Drive 25%, Mono Below 120 Hz.
+- **Samples & Keys:** Vintage EP "Suitcase", tremolo 25%, plays the **album signature lick** (Bb4–Db5–Eb5–F5–Eb5–Db5–Bb4). Save it as MIDI for later tracks. WOMP Dust Crackle 30%. Clav through Auto-Wah on hooks only.
+- **Street Gospel layer:** 8-voice "Haaa-zel" stack (Eb–Db–Bb), ±80 pan, Concert Hall 2.8 s. B3 volume swell 0→100 over the bar before each hook.
+- **Arrangement map:** Intro 8 (4 choir + Rhodes, 4 croon) → drum fill, beat drop → V1 16 (drums out bars 15–16) → Hook 8 → V2 16 (808 out bars 1–4) → Hook 8 (+talkbox double of "Haaa-zel") → Outro 8 (croon, choir, Rhodes fades into crackle).
+- **Vocal direction:** Knight croons intro/outro and raps the verses with end-of-bar punch-ins. Hazel sings the hook cool, 3rd above on "Green in the sun."
+- **Mix note:** Keep the Rhodes lick mono-center in the intro, then widen it to ±30 when the drums land so the switch feels bigger.
+- **Suno tips:** This take defines both Personas: save the best Knight take as **Knight Persona** and the best hook as **Hazel Persona**. Weirdness 38%, Style Influence 70%. If the intro gets a full drum kit, regenerate with "free-time intro, no drums" moved earlier in the prompt.
 
 ## Lyrics
 ```

@@ -6,8 +6,25 @@ Monroe Tire & Brake, behind Seventh Street by the tracks. Hazel's father, Big Ot
 
 ## Suno Style Prompt
 ```
-dark hardcore hip-hop, 86 BPM, E minor, raw claustrophobic mood, grimy boom-bap with heavy dusty kick and snapping snare, eerie detuned Rhodes, low menacing live bass, chopped 70s soul sample slowed and pitched down, tense cinematic strings, revolver cylinder spin and hammer click used as percussion, vinyl crackle, two gritty male hardcore rap voices, a younger hungry voice for Knight and an older gravelly baritone for the father, sparse haunting distant female soul vocal on the hook for Hazel, dry close vocals, heavy low end, one lone gospel choir "Haaa-zel" swell only at the very end
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 85 BPM, E minor Dorian, raw claustrophobic tire-shop back office, detuned Rhodes and slow creeping wah guitar lead, low B3 drone, grimy dusty kick and snapping snare, revolver cylinder spin and hammer click as percussion, air-wrench and freight-train rumble, two gritty male hardcore rap voices, younger hungry voice for Knight and older gravelly baritone for the father, sparse haunting distant female soul vocal hook for Hazel, one lone choir Haaa-zel swell only at the end, dry close vocals, heavy low end, dark narrow mix
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, choir-heavy gospel, bright horns
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 85 BPM, E minor (Dorian: C# natural), swing 56%.
+- **Progression:** Verses: Em9 – A9 (i9–IV9), grim and circular. Hook: Cmaj9 – B7#9 – Em9 – Em9. Otis's spoken bars: Em9 held, B3 drone only. Final bar: C – Cm6 – Em (a minor-plagal close, no resolution).
+- **Drums:** DMD dusty kick, snare with a 12 ms clap, no open hats. The revolver click sits on the "a" of 4 (Quick Sampler). WOMP Pocket: Snare Delay +16 ms, Humanize 12.
+- **Bass:** 808 on E1 (41 Hz), long, with a slow 150 ms glide from B down to E on the hook. The Moog lane is sparse and dark (LPF 500 Hz). In V2 (Otis) the 808 drops for 4 bars and the Moog walks.
+- **Samples & Keys:** Suitcase Rhodes detuned −15 cents with Chorus. The wah guitar (Pedalboard Wah, slow rocking) creeps in the gaps. Vintage B3 drone on E2, Leslie off. WOMP Dust at 50% Wow for a warped-record feel.
+- **Street Gospel layer:** Held back on purpose: only one "Haaa-zel" swell at the very end, 6 voices, long hall.
+- **Arrangement map:** Intro 4 (cylinder spin, Otis spoken) → V1 16 (Knight; drums out bars 15–16) → Hook 8 → V2 12 (Otis) → Spoken 4 (three bullets; beat drops to drone + clicks) → V3 12 (Knight) → Hook 8 (+guitar) → Outro 4 (choir swell, hammer click, silence).
+- **Vocal direction:** Knight is hungry and tense. Otis is slow and low with dry close mic, no doubles. Hazel's hook is distant: HPF 200 Hz, 1/8 dotted delay, 40% wet.
+- **Mix note:** Pitch Otis's ad-libs down 2 semitones to widen the age gap.
+- **Suno tips:** Two male voices are hard in one take: generate Knight with Knight Persona, then generate V2 without a Persona using "older gravelly baritone rap." Weirdness 45%, Style Influence 70%.
 
 ## Lyrics
 ```

@@ -6,8 +6,25 @@ Saturday, 10 AM, county lockup off Route 9, a few months into Knight's short bid
 
 ## Suno Style Prompt
 ```
-Soul rap, 84 BPM, D minor, melancholy and tender, warm 70s soul sample of a lonely horn and strings, dusty Rhodes chords, live upright-style bass, crisp boom-bap drums with rimshot, vinyl crackle, jail buzzer and phone-receiver click sound effects, male rap verses in a restrained, heavy storytelling tone with internal rhymes, female soul vocal hook for Hazel, soft and aching with gospel runs, male R&B croon on the bridge, intimate dry mix with vocals close to the mic, telephone EQ filter on some lines, faint Haaa-zel choir swell at the end as the beat fades
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 84 BPM, D minor Dorian, melancholy and tender Saturday visit, lonely muted flugelhorn lead with 70s soul strings, dusty Rhodes, live upright-style Moog bass, crisp kick and rimshot, jail buzzer, phone receiver clicks, heavy door slam, telephone EQ on some lines, restrained heavy male storytelling rap verses with internal rhymes, soft aching female soul vocal hook for Hazel with gospel runs, smooth male R&B croon bridge, faint choir Haaa-zel at the end, intimate dry mix, vocals close to the mic
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, jazz rap, lounge
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 84 BPM, D minor (Dorian: B natural), swing 56%.
+- **Progression:** Verses: Dm9 – G9 (i9–IV9). Hook: Bbmaj9 – A7#9 – Dm9 – Dm9, then Gm9 – C13 – Fmaj9 – A7#9 (soul ii9–V13–Imaj9 in F). Bridge croon: Gm9 – C13 – Fmaj9 – A7#9. Final tag: Bb – Bbm6 – F.
+- **Drums:** DMD kit with a crisp acoustic kick and a rimshot instead of a snare in the verses; a full snare on the hooks. WOMP Pocket: Snare Delay +12 ms, Hat Swing 56%.
+- **Bass:** The Moog lane plays an upright-style part (LPF 600 Hz, short envelope, walking quarter notes D–E–F–G). The 808 on D1 (37 Hz) doubles only the hooks. In V2 bars 1–4 there's no 808, just the walk.
+- **Samples & Keys:** Studio Horns solo flugelhorn (harmon-mute feel via Channel EQ bandpass 500 Hz–4 kHz) plays the lonely lead: A–C–D–F–E–D. Studio Strings sustain on the hooks. Rhodes with Soul Chords (min9). Everything through WOMP Dust.
+- **Street Gospel layer:** Hazel's gospel runs on "Close as I can be"; B3 soft swell into the second hook; faint "Haaa-zel" at the end.
+- **Arrangement map:** Intro 2 (buzzer, guard) → V1 12 (first 2 lines telephone EQ) → Hook 8 → V2 12 (808 out bars 1–4; drums out last 2 bars) → Hook 8 (+strings) → Bridge 4 (croon) → V3 8 ("Time.") → Outro 4 (Hazel, choir, receiver click).
+- **Vocal direction:** Knight restrained; no ad-libs. Hazel's hook is close, with a 3rd above on the "visiting hours" lines.
+- **Mix note:** Put Knight's first two lines through the Telephone EQ, then automate it off on bar 3.
+- **Suno tips:** Knight Persona, Hazel Persona for hook Extends. Weirdness 38%, Style Influence 70%. If the horn turns into smooth jazz, add "dusty 70s soul record."
 
 ## Lyrics
 ```

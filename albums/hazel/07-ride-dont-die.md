@@ -6,8 +6,25 @@ October, with police heat on the 64 like a fever. King Reese needs a spare tire 
 
 ## Suno Style Prompt
 ```
-hardcore rap with a soulful R&B hook, 90 BPM, G minor, urgent and conflicted, hard-hitting boom-bap drums with distorted kick and whip-crack snare, gritty live bass, dark Rhodes stabs, chopped pitched 70s soul vocal sample, tense strings, police-radio static texture, aggressive male hardcore rap verses with dense internal rhyme and a double-time section in verse two, soaring pleading female soul vocal hook for Hazel, smooth male R&B croon in the bridge, gospel choir "Haaa-zel" swell at the climax, heavy compression, dark cinematic mix
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 90 BPM, G minor Dorian, urgent and conflicted October night, tense orchestral strings lead, clavinet stabs, distorted kick, whip-crack snare, police-radio static, siren doppler, flashlight knock on a tire, relentless 16th shaker under a double-time rap section, aggressive male hardcore rap verses with dense internal rhyme and a double-time second verse, soaring pleading female soul vocal hook for Hazel, smooth male R&B croon bridge, gospel choir Haaa-zel swell at the climax, heavy drum compression, dark cinematic mix, dry lead vocals
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, drill, horrorcore
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 90 BPM, G minor (Dorian: E natural), swing 55%.
+- **Progression:** Verses: Gm9 – F – Eb – D7#9 (i9–bVII–bVI–V7#9). Hook: Gm9 – C9 twice, then Ebmaj9 – D7#9. Bridge: Cm9 – F13 – Bbmaj9 – D7#9 (soul ii–V–I in Bb, back to Gm). Last hook ends on Ebmaj9 – D7#9 – Gm9 held.
+- **Drums:** DMD kick through Distortion (Warm Drive 20%), whip-crack snare with a gated plate. The double-time V2 keeps the kit but adds a 16th shaker, no hi-hat rolls. WOMP Pocket: Snare Delay +10 ms, Hat Swing 55%.
+- **Bass:** 808 on G1 (49 Hz), gliding down to D on the V7#9 bar. The Moog lane plays hard staccato 8ths. V2 bars 1–4 are Moog only, like the car pulling off.
+- **Samples & Keys:** Studio Strings (short spiccato) lead in verses, long swells on the hook. Vintage Clav through a Phat FX envelope filter stabs on the "and" of 4. Rhodes stays dark and low. Police radio lines through the Telephone EQ.
+- **Street Gospel layer:** The choir only lands on the final hook and the "Haaa-zel" swell after the bridge; B3 fast Leslie swell into it.
+- **Arrangement map:** Intro 4 (radio, "Give me the keys") → V1 16 (drums out bars 15–16) → Hook 8 → V2 16 double-time → V3 12 (porch; strings only first 4) → Bridge 6 (croon, choir) → Hook 8 (+choir, clav) → Outro 4 (radio fades, Rhodes lick).
+- **Vocal direction:** Knight is tight and urgent; punch-ins on "logical/clinical." Hazel's hook soars, with an octave-up whisper double on "don't die."
+- **Mix note:** Automate a 200 Hz HPF sweep on the beat during the checkpoint bars.
+- **Suno tips:** Knight Persona; Extend hooks with Hazel Persona. Weirdness 42%, Style Influence 72%. If the double-time turns into trap, regenerate V2 alone with "boom-bap" repeated.
 
 ## Lyrics
 ```

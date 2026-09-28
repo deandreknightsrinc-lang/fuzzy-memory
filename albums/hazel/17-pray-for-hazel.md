@@ -6,8 +6,25 @@
 
 ## Suno Style Prompt
 ```
-Gospel soul rap, 72 BPM, G major shifting to E minor on the verses, reverent, desperate and cathartic, full Black church gospel choir with call-and-response, Hammond organ swells, warm Rhodes, live bass, tambourine and hand claps, slow heavy boom-bap drums entering under the choir, vinyl crackle, male rap verses delivered raw and pleading, cracking with emotion, dense internal rhymes, commanding elder female gospel lead for Mother Ruth, female soul choir stacks, a moment of spoken prayer, big church-hall reverb, dynamic mix that builds from hush to full-choir climax, the Haaa-zel choir swell as the central hook, lifted into a key change at the end
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 72 BPM half-time, G major with E minor verses, key change up to A-flat for the last hook, reverent desperate cathartic 4:30 a.m. hospital chapel, Hammond B3 lead with Leslie swells, full Black church choir call-and-response, tambourine and hand claps, slow heavy drums entering under the choir, vending-machine hum and chapel door creak, raw pleading male rap verses cracking with emotion, commanding elder female gospel lead for Mother Ruth, female soul choir stacks, spoken prayer, choir Haaa-zel as the central motif, big church-hall reverb, dynamic build from hush to full-choir climax
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, contemporary Christian pop
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 72 BPM half-time, G major (verses in E minor Dorian: C# natural), swing 57%. The last hook modulates up a half step to Ab major.
+- **Progression:** Verses: Em9 – A9 (i9–IV9). Hook: Am9 – D13 – Gmaj9 – E7#9, then C – Cm6 – G (gospel IV–iv–I). Ruth's bridge: G – Em7 – Am7 – D7 (I–vi7–ii7–V7 turnaround). Pivot: Eb7 (V of Ab). Final hook in Ab: Bbm9 – Eb13 – Abmaj9 – F7#9, Db – Dbm6 – Ab.
+- **Drums:** No drums in the intro or V1. A heavy DMD kick and snare with a gospel room enter at the first hook. Tambourine on 2 and 4 from V2; claps on the final hook. WOMP Pocket: Snare Delay +14 ms, Humanize 14.
+- **Bass:** The Moog lane plays gospel walk-ups (E–F#–G–A). The 808 on G1 (49 Hz) plays only the hooks, with 100 ms glides on the V13 bars, then shifts to Ab1 for the final hook.
+- **Samples & Keys:** Vintage B3 is the lead, with slow Leslie in the verses and fast Leslie plus volume-pedal swells into the hooks. Suitcase Rhodes plays the signature lick under Mama's entrance. The vending-machine hum is a 60 Hz sine at −30 dB, HPF'd in the mix.
+- **Street Gospel layer:** Everything: 12-voice choir (±100), call-and-response in Ruth's bridge ("Yes, Lord"), organ swells, tambourine, claps, the "Haaa-zel" stack as the hook bed.
+- **Arrangement map:** Intro 4 (organ hum, soft choir) → V1 12 (B3 + Rhodes) → Hook 8 (drums in) → V2 10 (building) → Bridge 8 (Ruth + choir) → V3 8 (spoken to rapped; drums back) → Eb7 pivot 1 → Final Hook 8 (Ab, +claps) → Outro 4 (choir, Mama spoken).
+- **Vocal direction:** Knight is raw, with cracks left in. Ruth leads big and dry-ish, with the choir answering the last 2–3 words.
+- **Mix note:** Ride the choir bus up 4 dB across the pivot bar.
+- **Suno tips:** Knight Persona; generate Ruth's bridge without a Persona using "elder female gospel lead." Weirdness 38%, Style Influence 72%.
 
 ## Lyrics
 ```

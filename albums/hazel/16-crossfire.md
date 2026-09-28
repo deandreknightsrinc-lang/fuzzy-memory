@@ -6,8 +6,25 @@ The worst night of both albums, the fallout from STALEMATE's "Touch Move." It's 
 
 ## Suno Style Prompt
 ```
-Dark cinematic hardcore hip-hop, 86 BPM switching to a double-time section, B-flat minor, ominous, tense and devastating, heavy boom-bap drums with thunderous kick, detuned minor piano, dark orchestral strings building tension, distorted 808 bass slides, reversed 70s soul vocal sample warped and haunted, vinyl crackle, ticking chess clock motif in the intro, tire screech and muffled gunshots used sparingly, heart-monitor beep in the outro, male hardcore rap with raw urgency and breathless double-time delivery, dense internal rhymes, female soul vocal hook for Hazel ghostly and distant, beat switch after the second verse, cinematic wide mix with dramatic silence before the drop, Haaa-zel choir swell turning into a wail at the end
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 87 BPM, B-flat minor, ominous devastating night drive, dark orchestral strings building tension, detuned whistle synth lead, distorted gliding 808, warped reversed 70s soul vocal replay, ticking chess clock intro, tire screech and muffled gunshots used sparingly, dramatic silence before a double-time switch, heart-monitor beep outro, male hardcore rap with raw urgency and breathless double-time delivery, dense internal rhymes, ghostly distant female soul vocal hook for Hazel, choir Haaa-zel swell turning into a wail at the end, cinematic wide mix, dry urgent lead vocal
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, horror score, trap
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 87 BPM, Bb minor, swing 55%. The double-time section keeps 87 BPM: the rap doubles and the kick pattern goes busier, with no hi-hat rolls.
+- **Progression:** V1: Bbm9 – Eb9 (Dorian i9–IV9, the calm drive). Hook: Gbmaj9 – F7#9 – Bbm9 – Bbm9. V2 and double-time V3: Bbm9 – Ab – Gb – F7#9 (i9–bVII–bVI–V7#9). Bridge: Bbm held with a string cluster. Outro: Gb – Gbm6 – Bbm (the gospel cadence denied its major).
+- **Drums:** DMD kit with a thunderous layered kick and a gated snare. In V3 the kick doubles on 16ths ("and-a") and a floor tom rolls into bar 1 of the switch. WOMP Pocket: Snare Delay +8 ms, Ghost Notes on.
+- **Bass:** 808 on Bb0 (29 Hz), distorted through WOMP Low End Drive 55%, with long 150 ms glides down from F. The Moog lane pulses 8ths in V3. V2 bars 1–4: no 808, just the strings and Moog bass.
+- **Samples & Keys:** Studio Strings build in V1 (tremolo) and hit full in V3. WOMP Whistle lead is detuned −20 cents and haunts the hook (Bb–Db–F–Gb–F). A reversed Hazel "Hold me" replay goes through WOMP Dust at 60% Wow.
+- **Street Gospel layer:** The only gospel is the ending choir: "Haaa-zel" stacks that turn from a swell into a wail, 12 voices, 4 s hall.
+- **Arrangement map:** Intro 4 (chess clock, spoken) → V1 12 (drums out last 2 bars) → Hook 8 → V2 8 (restrained) → 1 bar silence → V3 12 double-time → Hook 4 (fading) → Bridge 6 (silence, monitor, spoken) → Outro 4 (choir wail, clock stops).
+- **Vocal direction:** Knight is calm in V1, stunned in V2 and breathless in V3; no ad-libs. Hazel's hook is drenched (plate 3 s, 1/4 delay).
+- **Mix note:** Automate the full mix to −inf for exactly one bar before V3.
+- **Suno tips:** Knight Persona; Extend the hook with Hazel Persona. Weirdness 45%, Style Influence 72%.
 
 ## Lyrics
 ```

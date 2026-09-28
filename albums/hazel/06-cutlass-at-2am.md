@@ -6,8 +6,25 @@ Two in the morning in late spring, the '86 Cutlass parked behind the old high sc
 
 ## Suno Style Prompt
 ```
-late-night slow jam R&B with neo-soul, 64 BPM, F major with lush major-seventh chords, warm Rhodes, soft kick and brushed snare with dusty hip-hop swing, round live bass, quiet-storm clean guitar, vinyl crackle, rain on a windshield and car radio static textures, smooth male R&B croon lead with falsetto, soulful female vocal duet for Hazel, one laid-back half-rapped male verse with internal rhyme, intimate close-mic vocals, gentle choir pad "Haaa-zel" near the end, warm, sensual, dreamy, sunrise swell at the outro with strings
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 66 BPM half-time quiet-storm slow jam, G-flat major with lush maj9 chords, 2 a.m. parked under a water tower, talkbox lead melody, warm Rhodes, soft felt kick and rimshot, round sub 808, rain on a windshield, car-radio static, engine ignition at the end, strings swell at sunrise, smooth male R&B croon lead with falsetto, soulful female vocal duet for Hazel, one laid-back half-rapped male verse with internal rhyme, soft choir Haaa-zel pad, intimate close-mic vocals, warm sensual analog mix
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, slow EDM, ambient
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 66 BPM half-time, Gb major, 16th swing 58% on the shaker.
+- **Progression:** Verses: Gbmaj9 – Ebm9 – Abm9 – Db13. Chorus: Cbmaj9 – Bbm7 – Abm9 – Db13 (IV–iii–ii–V). Bridge: Gb – Ebm7 – Abm7 – Db7. Outro tag: Cb – Cbm6 – Gb.
+- **Drums:** DMD soft kit: felt kick on 1 and the "a" of 2, rimshot on 3 (half-time backbeat), shaker 16ths. WOMP Pocket: Snare Delay +16 ms, Humanize 14.
+- **Bass:** 808 on Gb1 (46 Hz), short and round, glides 120 ms only on the chorus. The Moog lane plays long whole notes under the verses. WOMP Low End: Drive 10%, Tight LPF 80 Hz.
+- **Samples & Keys:** EVOC 20 talkbox plays the chorus melody after each sung chorus ("tell me all your dreams"). Suitcase Rhodes, tremolo 30%, slow Phaser, voiced by WOMP Soul Chords (maj9). Studio Strings enter only in the outro for the sunrise. WOMP Dust Wow 25%.
+- **Street Gospel layer:** Hushed: an 8-voice "Haaa-zel" pad in the bridge, low in the mix, Concert Hall 3 s.
+- **Arrangement map:** Intro 4 (rain, static, croon) → V1 6 (croon) → Chorus 8 → V2 7 (Hazel, 808 out) → V3 16 (half-rap; drums out bars 15–16) → Chorus 8 (+talkbox answer) → Bridge 4 (trade, choir) → Outro 4 (strings, engine starts, Rhodes lick).
+- **Vocal direction:** Knight croons close with falsetto on "lies." Hazel answers in chest voice; they sing the last chorus in 3rds.
+- **Mix note:** Low-pass the rain at 6 kHz and duck it under vocals.
+- **Suno tips:** Duet: generate with Knight Persona, Extend V2 with Hazel Persona. Weirdness 40%, Style Influence 68%. If it gets too fast, add "half-time" twice.
 
 ## Lyrics
 ```

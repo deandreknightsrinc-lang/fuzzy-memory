@@ -6,8 +6,25 @@ Golden hour on Diagonal Ave, the avenue that cuts the 64 in half: the Rooks, the
 
 ## Suno Style Prompt
 ```
-smooth mid-tempo hip-hop with neo-soul, 84 BPM, D minor, laid-back golden-hour mood, boom-bap drums with swung hi-hats, walking live bass, warm Rhodes chords, muted jazz guitar licks, 70s soul string sample, city bus brakes and traffic ambience, vinyl crackle, conversational male rap verses dense with internal rhyme, soulful female vocal hook and a smooth half-sung female rap verse for Hazel, smooth male R&B croon in the bridge, back-and-forth male and female trade verse, gospel choir "Haaa-zel" swell in the bridge, crisp vocals, warm tape saturation
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 86 BPM, F-sharp minor Dorian, golden-hour lowrider stroll across the avenue, high portamento whistle synth lead, muted jazz guitar licks, warm Rhodes, 70s soul string replay, bus brakes hissing, traffic horns, distant church bells and ice-cream truck chime, conversational male rap verses dense with internal rhyme, soulful female vocal hook and smooth half-sung female rap verse for Hazel, smooth male R&B croon bridge, back-and-forth male and female trade verse, choir Haaa-zel swell, crisp vocals, wide whistle lead, warm analog mix
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, smooth jazz
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 86 BPM, F# minor (Dorian: D# natural), 16th swing 57%, the laziest pocket on the album.
+- **Progression:** Verses: F#m7 – B9 (i7–IV9, the core lowrider loop). Hook (soul lift to A): Bm9 – E13 – Amaj9 – C#7#9. Bridge turnaround: A – F#m7 – Bm7 – E7. V3 trade: Dmaj9 – C#m7 – Bm9 – E13.
+- **Drums:** DMD kit with a dusty acoustic kick and rim-heavy snare; shaker 16ths. Kick on 1 and the "and" of 3. WOMP Pocket: Snare Delay +14 ms, Hat Swing 57%, Humanize 12.
+- **Bass:** 808 on F#1 (46 Hz), glide 80 ms up to B on bar 2. The Moog lane plays short syncopated pops on A2/C#3 above it. Hazel's V2 bars 1–4 are 808-free; the synth bass walks. WOMP Low End: Mono Below 120 Hz, Punch 30%.
+- **Samples & Keys:** **WOMP Whistle** on Retro Synth (sine, glide 200 ms, vibrato 5 Hz, delay 300 ms) plays the hook melody an octave up, doubled an octave down at −12 dB. Muted jazz guitar answers the verses. Strings replay a rising 3-note figure through WOMP Dust.
+- **Street Gospel layer:** Choir "Haaa-zel" in the bridge; church bells (Sampler) on beat 1 of the bridge; tambourine joins the final hook.
+- **Arrangement map:** Intro 4 (bus brakes, spoken trade) → V1 12 → Hook 8 (+whistle) → V2 12 (Hazel, 808 out bars 1–4) → Bridge 6 (croon + harmony, choir) → V3 8 (trade, drums drop last 2 bars) → Hook 8 (+wah guitar, tambourine) → Outro 4 (bus brakes, Rhodes lick).
+- **Vocal direction:** Knight loose and conversational; Hazel half-sings V2 in a cool alto. In V3 each doubles the other's last word.
+- **Mix note:** Side-chain the whistle lead −2 dB from the lead vocal so it sings between lines, not over them.
+- **Suno tips:** Knight Persona take first; Extend V2 with Hazel Persona. Weirdness 40%, Style Influence 68%. If the whistle vanishes, move it right after the tempo.
 
 ## Lyrics
 ```

@@ -6,8 +6,25 @@ A bright Thursday in June at the county courthouse downtown, Room 214, ten minut
 
 ## Suno Style Prompt
 ```
-Joyful wedding soul into hip-hop outro, 80 BPM then beat switch to 92 BPM boom-bap, C major, celebratory, redemptive and deeply emotional, gospel choir wedding march with Hammond organ and tambourine, warm Rhodes signature lick, live bass, bright 70s soul sample of horns and strings, hand claps, vinyl crackle, courthouse ambience and a collect-call operator voice, hard warm boom-bap drums after the switch, smooth male R&B croon and female soul vocal for Hazel in a soaring duet, then a heartfelt male rap verse with rich internal rhymes, full choir finale, final ticking chess clock that stops, big warm cinematic mix, the Haaa-zel choir swell as the grand closing refrain
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 80 BPM gospel wedding march then beat switch to 92 BPM, C major, celebratory redemptive finale, Hammond B3 and tambourine, bright 70s funk horns and strings replay, signature Rhodes lick, whistle synth lead over the rap, courthouse footsteps, collect-call operator voice, doors opening to birds, chess clock that stops, smooth male R&B croon and female soul vocal for Hazel in a soaring duet, heartfelt male rap verse with rich internal rhymes, full gospel choir finale with Haaa-zel as the grand closing refrain, big warm cinematic mix, hand claps
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, wedding pop, orchestral
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 80 BPM (half-time gospel march) for the intro through the bridge, then a switch to 92 BPM, C major, swing 55%. Put a Logic tempo change at the "[Beat switch]" bar.
+- **Progression:** March and verses: Cmaj9 – Am9 – Dm9 – G13. Chorus: Fmaj9 – Em7 – Dm9 – G13, ending F – Fm6 – C (gospel IV–iv–I). V3 rap (92 BPM): Am9 – D9 (A Dorian i9–IV9), then Fmaj9 – E7#9 – Am9, then Dm9 – G13 into the chorus. Final turnaround: C – Am7 – Dm7 – G7.
+- **Drums:** Intro: tambourine and claps only. The march adds a soft kick on 1 and 3. At 92 BPM, a full DMD boom-bap kit hits. WOMP Pocket: Snare Delay +10 ms, Hat Swing 55%. Claps on the final chorus.
+- **Bass:** The Moog lane walks the march. At the switch, the 808 on C1 (33 Hz) and A0 plays with 90 ms glides and an octave drop into the final chorus.
+- **Samples & Keys:** Vintage B3, fast Leslie, leads the march. Horns and strings replay a bright 4-bar figure (E–G–A–C) through WOMP Dust. WOMP Whistle floats over V3. The Rhodes signature lick, in C (E–G–A–B–A–G–E), closes the album.
+- **Street Gospel layer:** Full: choir march "Haaa-zel," call-and-response on "off the board," tambourine, claps, organ swells.
+- **Arrangement map:** Intro 4 (footsteps, choir) → V1 4 (croon) → V2 4 (Hazel) → Chorus 8 → Bridge 8 (operator, vows, Tre) → switch → V3 16 (rap; drums out last 2 bars) → Final Chorus 8 (+choir, claps, horns) → Outro 8 (doors, spoken, choir, chess clock stops, silence).
+- **Vocal direction:** Knight and Hazel sing the duet in 3rds; Knight raps V3 tenderly. The operator and Tre go through the Telephone EQ.
+- **Mix note:** Let the final chess-clock tick ring dry, then cut all reverb tails with the clock stop.
+- **Suno tips:** Knight Persona; Extend V2 and the chorus with Hazel Persona. Weirdness 38%, Style Influence 70%.
 
 ## Lyrics
 ```

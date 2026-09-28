@@ -6,8 +6,25 @@ Fourth of July at the foot of the Rooks: King Reese's cookout, with smoke off th
 
 ## Suno Style Prompt
 ```
-hard hip-hop anthem, 94 BPM, C minor, triumphant and menacing, thunderous boom-bap drums with heavy kick and cracking snare, chopped 70s soul vocal sample, gospel choir stabs chanting, dark Rhodes and minor-key piano, tense orchestral strings, ticking chess clock and the click of a chess piece set down in the intro and outro, gritty live bass, aggressive male hardcore rap verses with multisyllabic rhymes and punchlines, chanted gang-vocal hook with choir, soulful female vocal belting the bridge for Hazel, choir "Haaa-zel" shout, loud punchy mix, stadium reverb on choir, dry hard vocals
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 95 BPM, C-sharp minor, triumphant and menacing Fourth of July cookout anthem, big 70s funk horn section stabs, high whistle synth lead on the hook, tense strings, chess clock ticking and wooden piece click in intro and outro, grill sizzle and firecracker pops, aggressive male hardcore rap verses with multisyllabic punchlines, chanted gang-vocal hook with gospel choir, soulful female vocal belting the bridge for Hazel, choir Haaa-zel shouts, loud punchy mix, stadium reverb on choir, dry hard lead vocals
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, stadium rock, orchestral epic
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 95 BPM, C# minor, 16th swing 54% (tighter, it's an anthem).
+- **Progression:** Verses: C#m9 – B – A – G#7#9 (i9–bVII–bVI–V7#9, the war loop). Hook: C#m7 – F#9 (Dorian i7–IV9) twice, then A – B – C#m. Bridge (Hazel): Amaj9 – B13 – G#m7 – C#m9. Last hook tag: A – Am6 – E (gospel IV–iv–I in the relative major).
+- **Drums:** DMD "Big Room" kick + 808 click, snare stacked with two claps, a floor-tom hit on beat 4 of every 4th bar. WOMP Pocket: Snare Delay +8 ms, Hat Swing 54%. Parallel crush send at 30%.
+- **Bass:** 808 on C#1 (35 Hz) with an octave-drop accent on the "a" of 4 (WOMP 808 Glide Octave Drop). The Moog lane doubles horn rhythms an octave down. V2 bars 1–4: 808 out, Moog bass only.
+- **Samples & Keys:** Studio Horns section stabs (G#–B–C#) on every "Queen!" call; strings sustain under V2. WOMP Whistle lead enters on hook 2. Chess clock and piece click (Sampler) open and close.
+- **Street Gospel layer:** Choir chants the hook with the gang vocals, 12 voices, ±100. B3 fast Leslie on hooks. "Haaa-zel!" is a shout, not a swell, here.
+- **Arrangement map:** Intro 8 (clock, spoken, choir shout) → V1 16 (drums out bars 15–16) → Hook 8 → V2 16 (the cookout; 808 out bars 1–4) → Hook 8 (+whistle lead) → Bridge 8 (Hazel belting, choir) → Hook 8 (+horns doubled, claps) → Outro 4 (clock, spoken, click).
+- **Vocal direction:** Knight loud and precise, end-of-bar punch-ins. Gang vocals 6 doubles ±60. Hazel belts, 3rd above on "don't make me a pawn."
+- **Mix note:** Carve 2–4 kHz on the horns when the rap is active; open it up on the hooks.
+- **Suno tips:** Knight Persona, Weirdness 35%, Style Influence 74%. If the hook comes out sung, move "chanted gang-vocal hook" forward. Extend the bridge with Hazel Persona.
 
 ## Lyrics
 ```

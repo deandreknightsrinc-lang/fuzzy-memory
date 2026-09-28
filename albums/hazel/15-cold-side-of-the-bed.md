@@ -6,8 +6,25 @@ Hazel's side of the story, a few months after Knight came home. He's free, but h
 
 ## Suno Style Prompt
 ```
-Slow female-led R&B and neo-soul ballad, 68 BPM, E-flat minor, lonely, late-night and aching, warm Rhodes chords with slow tremolo, deep round live bass, soft brushed drums under a heavy slow hip-hop kick and snare, vinyl crackle, rain against a window, distant sirens, lush muted strings, lead female soul vocal for Hazel with smoky low register, gospel-trained runs and raw breaks in the voice, intimate close-miked verses, layered self-harmonies in the chorus, a brief tired male R&B croon near the end, sparse spacious mix with long reverb tails, faint Haaa-zel choir swell in the last chorus like a memory
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 68 BPM half-time female-led soul ballad, E-flat minor, lonely aching late night, slow tremolo Rhodes lead, muted strings, sparse wah guitar, soft heavy half-time kick and snare with brushes, deep round Moog bass, rain against a window, keys in a lock, distant sirens, lead female soul vocal for Hazel with smoky low register, gospel runs and raw breaks, layered self-harmonies in the chorus, brief tired male R&B croon near the end, faint choir Haaa-zel like a memory in the last chorus, sparse spacious mix, long reverb tails
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, male rap lead, piano ballad pop
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 68 BPM half-time, Eb minor, swing 58%.
+- **Progression:** Verses: Ebm9 – Ab9 (i9–IV9). Pre-chorus: Abm9 – Db13 – Gbmaj9 – Bb7#9 (soul ii–V–I in Gb, back to Ebm). Chorus: Cbmaj9 – Bb7#9 – Ebm9 – Ebm9. Final chorus tag: Cb – Cbm6 – Gb.
+- **Drums:** DMD soft kit: heavy kick on 1, brushed snare on 3 (half-time), brush sweeps as hats. WOMP Pocket: Snare Delay +18 ms, Humanize 14.
+- **Bass:** The Moog lane leads: round, LPF 500 Hz, long notes. The 808 on Eb1 (39 Hz) only in choruses, 120 ms glides from Bb up to Eb. V2 opens with no 808.
+- **Samples & Keys:** Suitcase Rhodes with slow tremolo (20%) carries the song, with Soul Chords min11 voicings. Studio Strings, muted (LPF 6 kHz), sustain. Wah guitar only as slow swells on the pre-choruses. Rain and keys-in-lock through WOMP Dust.
+- **Street Gospel layer:** Hazel's gospel runs are the church; the choir "Haaa-zel" is a faint memory in the final chorus (−12 dB, long hall); no organ.
+- **Arrangement map:** Intro 2 (rain, keys, spoken "Eleven-forty") → V1 8 → Pre 4 → Chorus 8 → V2 12 (half-rap) → Chorus 8 (+strings) → Bridge 4 (Knight croon, distant) → V3 6 (spoken-sung over Rhodes, drums out) → Final Chorus 8 (+choir memory) → Outro 2 (rain fades).
+- **Vocal direction:** Hazel close and quiet on the verses, opening up in the chorus with self-harmony 3rd above and octave-up whisper on "who's holdin' mine?" Knight's croon: HPF 400 Hz and a long delay, like he's in the next room.
+- **Mix note:** Automate the rain up 2 dB between lines so the silence feels loud.
+- **Suno tips:** Generate with Hazel Persona only; add Knight's croon later via Extend or overdub. Weirdness 40%, Style Influence 68%. If a rap verse appears, regenerate with "female-led" moved to the front.
 
 ## Lyrics
 ```

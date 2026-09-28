@@ -6,8 +6,25 @@ Their first real date, a Friday night on the east side of the 64, the wrong side
 
 ## Suno Style Prompt
 ```
-smooth R&B and hardcore hip-hop blend, 92 BPM, A minor, sweet-then-dangerous Friday-night mood, 70s soul horn sample stabs, warm Rhodes, thick live bass, hard boom-bap drums with crispy snare, faint roller-rink organ and crowd ambience, vinyl crackle, smooth male R&B croon on the hook with stacked harmonies, gritty male hardcore rap verses with multisyllabic internal rhymes, soulful female vocal bridge for Hazel, gospel choir "Haaa-zel" swell after the bridge, sudden drum dropout before verse two for tension, warm analog mix, punchy low end, intimate vocals
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 92 BPM, F minor Dorian, sweet Friday-night date turning dangerous, roller-rink B3 organ intro with crowd, 70s funk horn stabs lead, wah guitar chicken-scratch, skate wheels, car alarm tails, full drum dropout before verse two then slam back, gritty male hardcore rap verses with multisyllabic internal rhyme, smooth male R&B croon hook with stacked harmonies, soulful female vocal bridge for Hazel, gospel choir Haaa-zel swell, punchy low end, intimate dry vocals, horns bright but tucked, warm analog mix
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, disco, roller disco pop
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 92 BPM, F minor (Dorian: D natural), 16th swing 55%. Rink intro is straight.
+- **Progression:** Verse 1: Fm9 – Bb9 (i9–IV9). Hook (soul lift toward Ab): Bbm9 – Eb13 – Abmaj9 – C7#9. Verse 2 (the Regal): Fm9 – Eb – Db – C7#9 (i9–bVII–bVI–V7#9 tension). Bridge: Dbmaj9 – Eb13 – Cm7 – Fm9. Final hook ends Db – Dbm6 – Ab.
+- **Drums:** DMD "Heavy" kick plus 808 click, fat snare with a 10 ms clap, tambourine on 2 and 4 in the hooks. WOMP Pocket: Snare Delay +10 ms, Hat Swing 55%, Ghost Notes on. Verse 2 bars 1–4 are kick-and-hat only (the parking lot), full kit at bar 5.
+- **Bass:** Retro Synth Moog lane plays syncopated 16ths with octave jumps (F1–F2) in V1. Per the guide, the 808 is out for V2 bars 1–4, then enters on Db with a 110 ms glide down to C. WOMP Low End: Punch 40%, Mono Below 120 Hz.
+- **Samples & Keys:** Studio Horns (trumpet, tenor, bari) stab on the "and" of 4, through WOMP Dust (Bandwidth 9 kHz). The B3 rink intro plays an F major figure that sours to F minor when the beat hits. Rhodes comps the hooks.
+- **Street Gospel layer:** The choir answers "love don't play fair" in the last hook; one "Haaa-zel" swell after the bridge; B3 swell into every hook.
+- **Arrangement map:** Intro 8 (rink organ, crowd) → V1 16 → Hook 8 → Drums out 2 bars → V2 16 (drive-by, sparse first 4) → Bridge 8 (Hazel, Rhodes and bass only + choir) → Hook 8 (+wah guitar) → Outro 8 (spoken over Rhodes lick).
+- **Vocal direction:** Knight raps V1 smiling, V2 breathless; croon hook stacked 3rd above/5th below. Hazel's bridge is calm, like she's holding pressure.
+- **Mix note:** Duck the horns −2 dB under the croon with a side-chain Compressor keyed from the vocal bus.
+- **Suno tips:** Knight Persona for the take, then regenerate the bridge with Hazel Persona via Extend. Weirdness 40%, Style Influence 70%. If it drifts disco, raise Style Influence to 75%.
 
 ## Lyrics
 ```

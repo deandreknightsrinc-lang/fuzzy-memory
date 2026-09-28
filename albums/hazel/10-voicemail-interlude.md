@@ -6,8 +6,25 @@ It's 11:52 p.m., the night the Rooks get raided (STALEMATE's "Check"). From Moth
 
 ## Suno Style Prompt
 ```
-spoken-word soul interlude, free time around 60 BPM, A-flat major, sparse, intimate, heartbreaking, lonely warm Rhodes, soft vinyl crackle, answering-machine beep and cassette tape hiss, distant police sirens and helicopter, muffled rain on a window, emotional female spoken voice for Hazel through a lo-fi band-passed telephone filter, brief soulful female vocal sung tag at the end, gospel choir "Haaa-zel" swell fading out, no drums until a single heartbeat kick at the close, close and raw mix
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 66 BPM rubato spoken interlude, A-flat major, lonely heartbreaking midnight, solo tremolo Rhodes with soft B3 bed, no drums until one heartbeat kick and sub 808 at the close, answering-machine beep and cassette hiss, distant sirens and helicopter, rain on a window, emotional female spoken voice for Hazel through a telephone band-pass filter, brief male recorded greeting, short soulful female vocal sung tag, gospel choir Haaa-zel swell fading out, close raw mix, spacious reverb, warm analog tape
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, drum loop, beat, rap
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 66 BPM grid for editing, performed rubato; Ab major. No swing (no drums until the close).
+- **Progression:** Under the voicemail: Abmaj9 – Fm9 – Bbm9 – Eb13 (I–vi–ii–V), 2 bars each, looping. Sung tag: Bbm9 – Eb13 – Abmaj9 – C7#9, then Db – Dbm6 – Ab (IV–iv–I "Amen").
+- **Drums:** None. One heartbeat kick (DMD soft kick doubled 120 ms apart) on the final bar. WOMP Pocket is bypassed.
+- **Bass:** No bassline. One sustained 808 Ab0 (26 Hz, felt more than heard) under the heartbeat kick, via WOMP Low End Drive 30% so it reads on phones.
+- **Samples & Keys:** Suitcase Rhodes alone, tremolo 30%, playing the signature lick transposed to Ab (C5–Eb5–F5–G5–F5–Eb5–C5). Vintage B3 soft bed with Leslie off. Cassette hiss and machine beep via WOMP Dust (Crackle 20%, Wow 35%).
+- **Street Gospel layer:** Only the closing "Haaa-zel" swell, 8 voices, decaying into the sirens.
+- **Arrangement map:** Intro 2 (tape hiss, greeting, beep) → Voicemail ~16 (spoken, Rhodes loop) → Beep + "End of messages" 2 → Sung tag 8 (Hazel) → Choir 4 → Outro 2 (sirens fade, heartbeat kick).
+- **Vocal direction:** Hazel is spoken and unrehearsed. Leave in the breaths and the "never mind." Voicemail chain: Telephone EQ (300 Hz–3 kHz), light Distortion, mono. The sung tag is full-range, close, with a 1/8 dotted delay.
+- **Mix note:** Automate the sirens up 3 dB during "They hit the Rooks" and down under "I love you."
+- **Suno tips:** Hazel Persona, Weirdness 45%, Style Influence 65%. The core prompt asks for hard drums, so Suno may add a beat: regenerate, or cut the drums in Logic with Stem Splitter. It's often faster to record the voicemail yourself and only use Suno for the tag.
 
 ## Lyrics
 ```

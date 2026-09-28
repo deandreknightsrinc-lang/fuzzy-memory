@@ -6,8 +6,25 @@ Release day. Knight walks out of county with a plastic bag of belongings, and Ha
 
 ## Suno Style Prompt
 ```
-Hardcore hip-hop anthem, 92 BPM, C minor, triumphant and aggressive, booming boom-bap drums with heavy kick and cracking snare, big chopped 70s soul horn sample, gospel choir stabs, distorted live bass, Rhodes lick returning under the verses, crowd-chant gang vocals on the hook, male hardcore rap verses with dense multisyllabic rhymes, punchlines and relentless energy, female soul vocal for Hazel belting a gospel ad-lib over the final hook, car-door slam and engine rev in the intro, loud, wide, arena-ready mix with punchy low end, Haaa-zel choir swell exploding into the last chorus
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 96 BPM, C minor Dorian, triumphant release-day victory lap, big 70s funk horn section lead, Hammond B3 fast Leslie, booming kick and cracking snare, distorted Moog bass, signature Rhodes lick under the verses, gate buzzer, car door slam and engine rev intro, beat thins to Rhodes and kick in verse three, male hardcore rap verses with dense multisyllabic rhymes and relentless energy, crowd-chant gang vocals on the hook, female soul vocal for Hazel belting gospel ad-libs over the final hook, choir Haaa-zel swell, loud wide arena-ready mix, punchy low end
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, stadium rock
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 96 BPM, C minor (Dorian: A natural), swing 54%.
+- **Progression:** Verses: Cm9 – F9 (i9–IV9). Hook: Abmaj9 – Bb – Cm9 – Cm9, with Cm9 – Bb – Ab – G7#9 as the turnaround. V3: Cm9 – Abmaj9 on Rhodes only. Final hook tag: F – Fm6 – C (IV–iv–I with a major lift: he's home).
+- **Drums:** DMD "Big" kit, snare + two claps, tambourine on 2 and 4 in all hooks, hand claps on the final hook. WOMP Pocket: Snare Delay +8 ms, Hat Swing 54%. Parallel crush at 30%.
+- **Bass:** 808 on C1 (33 Hz) with octave-drop accents at the end of each hook line. The Moog lane is distorted (WOMP Low End Drive 45%) playing funk 16ths. V2 bars 1–4: Moog only. V3: 808 whole notes.
+- **Samples & Keys:** Studio Horns (full section) play the hook riff Eb–F–G–Bb–C on the "and" of 4, through WOMP Dust for a "1976" bite. Vintage B3 fast Leslie on hooks. Suitcase Rhodes plays the signature lick under the verses, transposed to C minor (G–Bb–C–D–C–Bb–G).
+- **Street Gospel layer:** Choir stabs on "down," 12 voices; the "Haaa-zel" swell explodes into the final hook; Hazel's belted ad-libs answer the gang vocals.
+- **Arrangement map:** Intro 4 (buzzer, engine, spoken) → V1 12 → Hook 8 → V2 12 (808 out bars 1–4; drums out last 2 bars) → Hook 8 (+B3, choir) → V3 8 (Rhodes + kick only) → Final Hook 8 (+claps, Hazel ad-libs, horns doubled) → Outro 2 (spoken).
+- **Vocal direction:** Knight loud, with punch-ins on the last 2–4 words of each bar. Gang vocals 6× doubles, ±60. Hazel ad-libs 40L/40R.
+- **Mix note:** Automate the drum bus +1.5 dB for the final hook to make the return feel bigger than it is.
+- **Suno tips:** Knight Persona; Extend the final hook with Hazel Persona. Weirdness 36%, Style Influence 74%.
 
 ## Lyrics
 ```

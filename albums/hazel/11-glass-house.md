@@ -6,8 +6,25 @@
 
 ## Suno Style Prompt
 ```
-Aggressive R&B and hardcore hip-hop duet, 94 BPM, F minor, tense and heated, hard knocking boom-bap drums with snapping snare, distorted live bass, dark Rhodes stabs, chopped 70s soul string sample reversed, shattering glass sound effect in intro, vinyl crackle, male hardcore rap verses with rapid multisyllabic flow and raw anger, female soul vocal trading lines with fierce gospel grit, call-and-response hook between male and female, beat drops out for the bridge leaving only Rhodes and breath, soft male R&B croon in outro, gritty mix with punchy drums up front, faint Haaa-zel choir swell buried under the final chord
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, sweet 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 94 BPM, B minor Dorian, tense heated 3 a.m. fight, aggressive wah guitar lead with clavinet stabs, dark Rhodes, hard knocking snare, distorted Moog bass, reversed 70s string replay, glass shattering intro, phone buzzing on a nightstand, beat drops out for a Rhodes-only bridge, broom sweeping in the outro, male hardcore rap verses with rapid multisyllabic flow and raw anger, fierce female soul vocal for Hazel trading lines with gospel grit, male and female call-and-response hook, soft male R&B croon outro, gritty mix with punchy drums up front, faint Haaa-zel choir under the final chord
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, pop punk, emo rap
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 94 BPM, B minor (Dorian: G# natural), swing 55%.
+- **Progression:** Verses: Bm9 – A – G – F#7#9 (i9–bVII–bVI–V7#9). Hook: Bm7 – E9 (i7–IV9) twice, then Gmaj9 – F#7#9. Bridge (Rhodes only): Em9 – A13 – Dmaj9 – F#7#9 (soul ii–V–I in D, back to Bm). Outro croon: Gmaj9 – F#m7 – Em9 – Bm9.
+- **Drums:** DMD knocking kick, snare + clap + rim, open hat on the "and" of 4 only. WOMP Pocket: Snare Delay +8 ms (angry, less lazy), Hat Swing 55%, Ghost Notes on.
+- **Bass:** 808 on B0 (31 Hz) through WOMP Low End Drive 40% for growl; it glides down from F# to B at each loop turn. The Moog lane is distorted (ChromaGlow Crunch) with 16th octave jumps. For Hazel's V2 the 808 is out for 4 bars.
+- **Samples & Keys:** Wah guitar (Amp Designer, Pedalboard Wah) plays chicken-scratch 16ths, 30L, and a lead riff (B–D–E–F#) on hooks. Clav stabs 30R. Studio Strings replay reversed (Sampler Reverse) under V1 through WOMP Dust.
+- **Street Gospel layer:** Hazel's gospel grit is the church here. The only choir is a faint "Haaa-zel" pad under the final croon chord.
+- **Arrangement map:** Intro 2 (glass, "Who is Keys?") → V1 12 → Hook 8 → V2 8 (Hazel) → V3 8 (Knight; drums out last 2 bars) → Hook 8 (+wah lead) → Bridge 4 (beat out, Rhodes + breath) → V4 6 (half-spoken, kick + Rhodes) → Outro 4 (croon, broom, choir pad).
+- **Vocal direction:** Hook lines alternate Knight and Hazel; "Both" lines are sung in unison and then a 3rd apart. Pan Hazel's ad-libs 40L and Knight's 40R.
+- **Mix note:** Pull the whole beat down 3 dB for V4 so the tenderness lands.
+- **Suno tips:** Duet: Knight Persona base, Extend V2 and hooks with Hazel Persona. Weirdness 42%, Style Influence 70%.
 
 ## Lyrics
 ```
