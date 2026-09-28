@@ -92,3 +92,10 @@ Recurring lines tie the two albums together:
   - People: Sal (pawn shop owner), Fats, Big Dame, the Mendez twins, Ms. Dot.
   - Places: Earl's Wings (King Reese's back booth), Kemp and Pine streets.
   - Rival crew: the Hollow.
+
+## Canon Added During Drafting (Stalemate 11–20)
+- **Sentences:** Lil Tre gets four years in state prison. Knight pleads to a lesser charge and serves eleven months in county, which is his short bid in HAZEL 12. Tre still has two years left in HAZEL 19.
+- **Mama's health:** Mama Knight has kidney failure and goes to dialysis ("The Clock," S17).
+- **Reese's death:** a 15-year-old from the Hollow shoots King Reese at the fish fry behind the Rooks. Knight survives only because Mama asked him to sit with her at dialysis that Saturday.
+- **The indictment:** 22 names, and Knight's isn't one of them, so the 64 decides he's the informant. This is the core of "no legal moves" (S19). The housing authority's one-strike rule gets Mama evicted from apartment 9C.
+- **Grandma's cross:** at the courthouse wedding, Mama gives it to the baby, the first time it changes hands clean (S20). *Rewrite idea: add this moment to HAZEL 20 as well.*
