@@ -6,7 +6,7 @@ A bright Thursday in June at the county courthouse downtown, Room 214, ten minut
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 94 BPM gospel wedding march bounce with 808 and hand claps then beat switch to hard 104 BPM, C major, celebratory redemptive finale, Hammond B3 and tambourine, bright 70s funk horns and strings replay, signature Rhodes lick, booming 808 with octave slides and 1/32 hat rolls after the switch, whistle synth lead over the rap, courthouse footsteps, collect-call operator voice, doors opening to birds, chess clock that stops, smooth male R&B croon and female soul vocal for Hazel in a soaring duet, heartfelt male rap verse, full gospel choir with Haaa-zel as the closing refrain, 808-forward mix, loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 94 BPM gospel wedding march bounce with 808 and claps then beat switch to hard 104 BPM, C major, redemptive finale, B3 and tambourine, 70s horns and strings replay, signature Rhodes lick, booming 808 octave slides and 1/32 hat rolls after the switch, whistle synth over the rap, courthouse footsteps, collect-call operator, doors opening to birds, chess clock that stops, smooth male R&B croon and female soul vocal for Hazel in a soaring duet, heartfelt male rap verse, full gospel choir Haaa-zel finale, 808-forward mix, loud punchy master
 ```
 
 ### Exclude Styles
@@ -15,16 +15,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 94 BPM gospel march (Bounce) from the intro through the bridge, then a Logic tempo change to 104 BPM at the "[Beat switch]" bar. C major. WOMP Pocket: Swing % 57 (march), 55 (switch), Swing Grid 16th, Swing Applies To "Everything except Kick".
-- **Progression:** March and verses: Cmaj9 – Am9 – Dm9 – G13. Chorus: Fmaj9 – Em7 – Dm9 – G13, ending F – Fm6 – C (IV–iv–I). V3 rap: Am9 – D9 (A Dorian i9–IV9), then Fmaj9 – E7#9 – Am9, then Dm9 – G13 into the chorus. Final turnaround: C – Am7 – Dm7 – G7.
-- **Drums:** Intro: tambourine and claps. March: kick on 1 and the "a" of 2, claps on 2 and 4, swung hats. At 104: the hardest Bounce kit, kick on 1, "a" of 2, "and" of 3, snare + clap on 2 and 4, 16th hats. WOMP Pocket: Snare/Clap Lay-back 8 ms, Timing Humanize 3 ms, Velocity Humanize 10, Hat Accents Offbeats Loud, Ghost Snare Chance 20%. WOMP Rolls (after the switch): Roll Target Hi-Hats, Trigger Velocity Threshold, Velocity Threshold 112, Roll Rate 1/32, Roll Length 1/8, Velocity Shape Crescendo.
-- **Bass:** 808 on C1 (32.7 Hz) and A0 (27.5 Hz). March: 808 half notes walking the roots. At 104: locked to the kick with octave slides (C2 → C1) into the final chorus. WOMP 808 Glide: Mode Retrigger + Slide, Glide Time 55 ms, Glide Curve 808 (fast start), Bend Range 12, Velocity Floor 95. WOMP Low End: Drive 55%, Harmonics Mix 45%, Sub Boost 3 dB, Mono Below 120 Hz, Punch 50%, Tight 25 Hz. No Moog after the switch.
-- **Samples & Keys:** Vintage B3, fast Leslie, leads the march. Horns and strings replay a bright 4-bar figure (E–G–A–C) through WOMP Dust (Tape Drive 25%, Crackle 20%). WOMP Whistle floats over V3 (Glide Time 150 ms, Octave 1, Vibrato Rate 5.2 Hz). The Rhodes signature lick, in C (E–G–A–B–A–G–E), closes the album.
-- **Street Gospel layer:** Full: choir march "Haaa-zel," call-and-response on "off the board," tambourine, claps, organ swells.
-- **Arrangement map:** Intro 4 (footsteps, choir) → V1 4 (croon) → V2 4 (Hazel) → Chorus 8 → Bridge 8 (operator, vows, Tre; drums out, 808 sustains) → switch to 104 → V3 16 (drums out last 2 bars) → Final Chorus 8 (+choir, claps, horns) → Outro 8 (doors, spoken, choir, chess clock stops, silence).
-- **Vocal direction:** Knight and Hazel sing the duet in 3rds; Knight raps V3 tenderly but in the pocket. Operator and Tre through the Telephone EQ.
-- **Mix note:** Let the final chess-clock tick ring dry, then cut all reverb tails with the clock stop. 808 ducked −3 dB from the kick. Master −8.5 to −7.5 LUFS integrated, true peak −1 dBTP.
-- **Suno tips:** Knight Persona; Extend V2 and the chorus with Hazel Persona. Weirdness 38%, Style Influence 70%. If Suno ignores the tempo switch, generate the post-switch section separately at 104 BPM and splice in Logic.
+- **BPM / Key / Swing:** 94 BPM Bounce gospel march through the bridge, then a Logic tempo change to 104 BPM at "[Beat switch]". C major. WOMP Pocket Swing % 57 (march), 55 (after the switch).
+- **Progression:** March and verses: Cmaj9 – Am9 – Dm9 – G13. Chorus: Fmaj9 – Em7 – Dm9 – G13, ending F – Fm6 – C. V3: Am9 – D9 (A Dorian), then Fmaj9 – E7#9 – Am9, Dm9 – G13. Final turnaround: C – Am7 – Dm7 – G7.
+- **Drums:** March: kick on 1 and the "a" of 2, claps and tambourine on 2 and 4. At 104: full kit, kick on 1, "a" of 2, "and" of 3, snare + clap on 2 and 4. WOMP Pocket: Snare/Clap Lay-back 8 ms, Ghost Snare Chance 20%. WOMP Rolls: Roll Target Hi-Hats, Velocity Threshold 112, Roll Rate 1/32, Roll Length 1/8.
+- **Bass:** 808 on C1 (32.7 Hz) and A0 (27.5 Hz): half notes walking roots in the march; at 104 locked to the kick, with a C2 → C1 slide into the final chorus. WOMP 808 Glide: Mode Retrigger + Slide, Glide Time 55 ms. WOMP Low End: Drive 55%, Harmonics Mix 45%, Sub Boost 3 dB, Mono Below 120 Hz.
+- **Samples & Keys:** Fast-Leslie B3 leads the march. Horns and strings replay E–G–A–C through WOMP Dust. WOMP Whistle over V3 (Glide Time 150 ms, Octave 1). The Rhodes signature lick in C (E–G–A–B–A–G–E) closes the album.
+- **Street Gospel layer:** Full: choir march "Haaa-zel," call-and-response on "off the board."
+- **Arrangement map:** Intro 4 (footsteps, choir) → V1 4 → V2 4 (Hazel) → Chorus 8 → Bridge 8 (operator, vows, Tre; drums out) → switch to 104 → V3 16 (drums out last 2) → Final Chorus 8 (+choir, horns) → Outro 8 (doors, spoken, clock stops, silence).
+- **Vocal direction:** Duet in 3rds; Knight raps V3 tenderly but in the pocket. Operator and Tre through Telephone EQ.
+- **Mix note:** Final clock tick dry; cut all reverb tails with the stop. Side-chain the 808 −3 dB from the kick (60 ms release). Master −8.5 to −7.5 LUFS integrated, −1 dBTP true peak.
+- **Suno tips:** Knight Persona; Extend V2 and the chorus with Hazel Persona. Weirdness 38%, Style Influence 70%. If the switch is ignored, generate the 104 BPM section separately and splice.
 
 ## Lyrics
 ```

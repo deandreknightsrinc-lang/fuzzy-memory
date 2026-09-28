@@ -6,7 +6,7 @@ A Sunday evening a week after the shooting, on the west side of Diagonal Ave. Kn
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, bouncy full-time 96 BPM gospel shuffle, B-flat major, front-porch sweet tea and a warning, Hammond B3 and church piano lead, tambourine on the backbeat, booming 808 walking gospel lines with slides, shuffled hats with 1/32 rolls, crickets, screen-door creak, ice cracking in a glass, drums drop under the grandmother's spoken lines, elderly female spoken matriarch voice, smooth male R&B croon hook with choir answering, respectful male rap verses with internal rhyme, soulful female vocal bridge for Hazel, gospel call-and-response, 808-forward mix, loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, bouncy full-time 96 BPM gospel shuffle, B-flat major, front-porch sweet tea and a warning, Hammond B3 and church piano lead, tambourine backbeat, booming 808 walking gospel lines with slides, shuffled hats with 1/32 rolls, crickets, screen-door creak, ice in a glass, drums drop under spoken lines, elderly female spoken matriarch voice, smooth male R&B croon hook with choir answering, respectful male rap verses, soulful female bridge for Hazel, gospel call-and-response, 808-forward mix, loud punchy master
 ```
 
 ### Exclude Styles
@@ -15,16 +15,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 96 BPM, Bounce lane, Bb major. The old 12/8 sway becomes a 4/4 gospel shuffle: WOMP Pocket Swing % 60, Swing Grid 16th, Swing Applies To "Everything except Kick".
-- **Progression:** Verses: Bbmaj9 – Gm9 – Cm9 – F13. Hook: Cm9 – F13 – Bbmaj9 – Bb7 (soul ii9–V13–Imaj9, Bb7 pushing to IV). Hook tag: Eb – Ebm6 – Bb (gospel IV–iv–I). Bridge turnaround: Bb – Gm7 – Cm7 – F7.
-- **Drums:** DMD kick on 1, the "a" of 2 and 3; snare + clap on 2 and 4; tambourine doubles the backbeat; shuffled 16th hats. WOMP Pocket: Snare/Clap Lay-back 10 ms, Timing Humanize 4 ms, Velocity Humanize 12, Hat Accents Offbeats Loud, Ghost Snare Chance 30%, Ghost Velocity 26. WOMP Rolls: Roll Target Hi-Hats, Trigger Velocity Threshold, Velocity Threshold 118, Roll Rate 1/32, Roll Length 1/16, Velocity Shape Crescendo, only into hooks.
-- **Bass:** The 808 carries the gospel walk: Bb0 (29.1 Hz) root, walking Bb–C–D–Eb into F1 (43.7 Hz), locked to the kick. WOMP 808 Glide: Mode Legato Slide, Glide Time 70 ms, Glide Curve 808 (fast start), Bend Range 12, Octave 0, Velocity Floor 90. WOMP Low End: Drive 45%, Harmonics Mix 45% (Bb0 needs harmonics on phones), Sub Boost 2 dB, Mono Below 120 Hz, Punch 40%, Tight 25 Hz. No Moog bass.
-- **Samples & Keys:** Vintage B3 lead, Leslie slow on verses, fast on hooks. Church piano (Steinway, Soft) doubles the right hand. Rhodes plays only the signature lick under Ruth's spoken lines. WOMP Soul Chords: Key A#/Bb, Scale Major (Soul), Chord Style Gospel 13ths, Strum 14 ms. WOMP Dust: Crackle 20%, Age 30%.
-- **Street Gospel layer:** Call-and-response built into the hook ("sweet tea and a warning" answered by the choir). Organ swells into every hook; hand claps on the final hook only.
-- **Arrangement map:** Intro 4 (door creak, crickets, Ruth spoken, no drums) → V1 12 → Hook 8 → Ruth spoken 4 (drums out, 808 holds Bb) → V2 12 → Bridge 8 (Hazel through the screen door, Ruth answers, choir) → Hook 8 (+claps) → Outro 4 (Ruth spoken, organ hum, crickets).
-- **Vocal direction:** Knight raps polite but in the pocket. Hazel's bridge gets HPF 300 Hz ("through the screen"). Ruth is dry and close.
-- **Mix note:** Crickets wide and quiet (−24 dB), ducked under B3 swells. Side-chain the 808 −3 dB from the kick. Master −8.5 to −7.5 LUFS integrated, true peak −1 dBTP.
-- **Suno tips:** Knight Persona; generate Ruth's lines separately if the persona masculinizes them. Weirdness 35%, Style Influence 72%. If it turns country, add "Black church gospel" early; if it slows to a sway, repeat "uptempo 96 BPM".
+- **BPM / Key / Swing:** 96 BPM Bounce, Bb major. The old 12/8 sway becomes a 4/4 gospel shuffle: WOMP Pocket Swing % 60, Swing Applies To Everything except Kick.
+- **Progression:** Verses: Bbmaj9 – Gm9 – Cm9 – F13. Hook: Cm9 – F13 – Bbmaj9 – Bb7 (ii9–V13–Imaj9, Bb7 pushing to IV). Tag: Eb – Ebm6 – Bb. Bridge turnaround: Bb – Gm7 – Cm7 – F7.
+- **Drums:** Kick on 1, the "a" of 2 and 3; snare + clap on 2 and 4 doubled by tambourine; shuffled 16th hats. WOMP Pocket: Snare/Clap Lay-back 10 ms, Ghost Snare Chance 30%. WOMP Rolls: Roll Target Hi-Hats, Velocity Threshold 118, Roll Rate 1/32, Roll Length 1/16, only into hooks.
+- **Bass:** 808 carries the gospel walk: Bb0 (29.1 Hz), walking Bb–C–D–Eb into F1 (43.7 Hz), locked to the kick. WOMP 808 Glide: Mode Legato Slide, Glide Time 70 ms. WOMP Low End: Drive 45%, Harmonics Mix 45% (Bb0 needs harmonics on phones), Sub Boost 2 dB, Mono Below 120 Hz. No Moog.
+- **Samples & Keys:** B3 lead, slow Leslie on verses, fast on hooks; church piano doubles. Rhodes plays the signature lick under Ruth's lines. WOMP Soul Chords: Key A#/Bb, Scale Major (Soul), Chord Style Gospel 13ths.
+- **Street Gospel layer:** Choir answers "sweet tea and a warning"; organ swells into hooks; claps on the final hook.
+- **Arrangement map:** Intro 4 (door, crickets, Ruth; no drums) → V1 12 → Hook 8 → Ruth 4 (drums out, 808 holds Bb) → V2 12 → Bridge 8 (Hazel through the screen, choir) → Hook 8 (+claps) → Outro 4 (Ruth, organ, crickets).
+- **Vocal direction:** Knight polite but in the pocket. Hazel's bridge HPF 300 Hz ("through the screen"). Ruth dry and close.
+- **Mix note:** Crickets wide at −24 dB, ducked under B3 swells. Side-chain the 808 −3 dB from the kick (60 ms release). Master −8.5 to −7.5 LUFS integrated, −1 dBTP true peak.
+- **Suno tips:** Knight Persona; generate Ruth separately if needed. Weirdness 35%, Style Influence 72%. If it turns country, add "Black church gospel" early.
 
 ## Lyrics
 ```

@@ -6,7 +6,7 @@ It's 11:52 p.m., the night the Rooks get raided (STALEMATE's "Check"). From Moth
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, short spoken interlude over a bouncy 96 BPM 808 beat, A-flat major, lonely heartbreaking midnight, tremolo Rhodes loop with soft B3 bed, muted kick and rim with swung hats, deep 808 sliding softly under the voicemail, answering-machine beep and cassette hiss, distant sirens and helicopter, rain on a window, emotional female spoken voice for Hazel through a telephone filter, brief male recorded greeting, short soulful female sung tag, gospel choir Haaa-zel swell fading into a single heartbeat kick, 808-forward mix, loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, short spoken interlude over a bouncy 96 BPM 808 beat, A-flat major, lonely heartbreaking midnight, tremolo Rhodes loop over soft B3, muted kick and rim with swung hats, deep 808 sliding softly under the voicemail, answering-machine beep and cassette hiss, distant sirens and helicopter, rain on a window, emotional female spoken voice for Hazel through a telephone filter, brief male greeting, short soulful female sung tag, choir Haaa-zel swell into a single heartbeat kick, 808-forward mix, loud punchy master
 ```
 
 ### Exclude Styles
@@ -15,16 +15,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 96 BPM, Bounce lane, Ab major. Short interlude (~1:40). WOMP Pocket: Swing % 58, Swing Grid 16th, Swing Applies To "Hats & Percussion".
-- **Progression:** Under the voicemail: Abmaj9 – Fm9 – Bbm9 – Eb13 (I–vi–ii–V), 2 bars each, looping. Sung tag: Bbm9 – Eb13 – Abmaj9 – C7#9, then Db – Dbm6 – Ab (IV–iv–I "Amen").
-- **Drums:** Beat enters after the first beep: DMD muted kick on 1 and the "a" of 2, rim + soft clap on 2 and 4, swung 16th hats low in the mix. WOMP Pocket: Snare/Clap Lay-back 14 ms, Timing Humanize 5 ms, Velocity Humanize 14, Hat Accents Offbeats Loud, Ghost Snare Chance 10%. WOMP Rolls: Roll Target Hi-Hats, Trigger Velocity Threshold, Velocity Threshold 120, Roll Rate 1/32, Roll Length 1/16, Velocity Shape Decrescendo, one roll per 4 bars. Final bar: a single heartbeat kick (doubled 120 ms apart).
-- **Bass:** 808 on Ab1 (51.9 Hz) following the loop roots (F1, Bb1, Eb1), locked to the kick. WOMP 808 Glide: Mode Legato Slide, Glide Time 80 ms, Glide Curve 808 (fast start), Bend Range 12, Velocity Floor 80. WOMP Low End: Drive 45%, Harmonics Mix 35%, Sub Boost 3 dB, Mono Below 120 Hz, Punch 30%, Tight 30 Hz. No Moog.
-- **Samples & Keys:** Suitcase Rhodes (tremolo 30%) plays the signature lick in Ab (C5–Eb5–F5–G5–F5–Eb5–C5). Vintage B3 bed, Leslie off. WOMP Dust on the voicemail: Hiss 35%, Crackle 20%, Wow 35%, Low Cut 300 Hz, High Cut 3.5 kHz.
+- **BPM / Key / Swing:** 96 BPM Bounce, Ab major, ~1:40. WOMP Pocket Swing % 58.
+- **Progression:** Voicemail loop: Abmaj9 – Fm9 – Bbm9 – Eb13 (I–vi–ii–V), 2 bars each. Sung tag: Bbm9 – Eb13 – Abmaj9 – C7#9, then Db – Dbm6 – Ab (IV–iv–I).
+- **Drums:** After the first beep: muted kick on 1 and the "a" of 2, rim + soft clap on 2 and 4, swung hats low. WOMP Pocket: Snare/Clap Lay-back 14 ms, Velocity Humanize 14. WOMP Rolls: Roll Target Hi-Hats, Velocity Threshold 120, Roll Rate 1/32, Roll Length 1/16, Velocity Shape Decrescendo. Last bar: one heartbeat kick.
+- **Bass:** 808 on Ab1 (51.9 Hz) following the loop roots (F1, Bb1, Eb1). WOMP 808 Glide: Mode Legato Slide, Glide Time 80 ms. WOMP Low End: Drive 45%, Harmonics Mix 35%, Sub Boost 3 dB, Mono Below 120 Hz. No Moog.
+- **Samples & Keys:** Rhodes (tremolo 30%) plays the signature lick in Ab (C5–Eb5–F5–G5–F5–Eb5–C5) over a soft B3. WOMP Dust on the voicemail: Hiss 35%, Wow 35%, Low Cut 300 Hz, High Cut 3.5 kHz.
 - **Street Gospel layer:** Only the closing "Haaa-zel" swell, 8 voices, decaying into the sirens.
-- **Arrangement map:** Intro 2 (tape hiss, greeting, beep; Rhodes only) → Voicemail 16 (beat + 808 under Hazel) → Beep + "End of messages" 2 (beat stops dead) → Sung tag 8 (beat back, 808 slides) → Choir 4 (drums out, 808 sustains Ab) → Outro 2 (sirens, heartbeat kick).
-- **Vocal direction:** Hazel spoken and unrehearsed; keep the breaths and the "never mind." Voicemail chain: Telephone EQ (300 Hz–3 kHz), light Distortion, mono. Sung tag full-range, close, 1/8 dotted delay.
-- **Mix note:** Sirens up 3 dB on "They hit the Rooks," down under "I love you." Keep the beat −4 dB under the voicemail, full level for the tag. Master −8.5 to −7.5 LUFS integrated, true peak −1 dBTP.
-- **Suno tips:** Hazel Persona, Weirdness 45%, Style Influence 65%. If Suno raps over it, add "spoken word only" after the BPM. Often faster to record the voicemail yourself and use Suno for the beat and tag.
+- **Arrangement map:** Intro 2 (hiss, greeting, beep; Rhodes only) → Voicemail 16 (beat + 808) → Beep + "End of messages" 2 (beat stops dead) → Sung tag 8 (beat back) → Choir 4 (drums out, 808 holds Ab) → Outro 2 (sirens, heartbeat kick).
+- **Vocal direction:** Hazel spoken, unrehearsed; keep the breaths and the "never mind." Telephone EQ, mono. Sung tag full-range with a 1/8 dotted delay.
+- **Mix note:** Beat −4 dB under the voicemail, full for the tag; sirens up on "They hit the Rooks." Master −8.5 to −7.5 LUFS integrated, −1 dBTP true peak.
+- **Suno tips:** Hazel Persona, Weirdness 45%, Style Influence 65%. If Suno raps, add "spoken word only." Or record the voicemail yourself and use Suno for the beat and tag.
 
 ## Lyrics
 ```

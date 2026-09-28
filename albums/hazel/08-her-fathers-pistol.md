@@ -6,7 +6,7 @@ Monroe Tire & Brake, behind Seventh Street by the tracks. Hazel's father, Big Ot
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 140 BPM half-time backbeat with double-time energy, E minor Dorian, raw claustrophobic tire-shop back office, detuned Rhodes and creeping wah guitar lead, low B3 drone, grimy knocking drums, dark distorted 808 rolls with stutters and fast glides, revolver cylinder spin and hammer click as percussion, air-wrench and freight-train rumble, two gritty male hardcore rap voices, hungry younger voice for Knight and gravelly older baritone for the father, haunting distant female soul hook for Hazel, one lone choir Haaa-zel swell at the end, 808-forward mix, loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, 140 BPM half-time backbeat with double-time energy, E minor Dorian, raw claustrophobic tire-shop back office, detuned Rhodes and creeping wah guitar lead, low B3 drone, grimy knocking drums, dark distorted 808 rolls with stutters and glides, revolver cylinder spin and hammer click as percussion, air-wrench and freight-train rumble, two gritty male hardcore rap voices, hungry young Knight and gravelly older baritone father, haunting distant female hook for Hazel, one lone choir Haaa-zel at the end, 808-forward mix, loud punchy master
 ```
 
 ### Exclude Styles
@@ -15,16 +15,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 140 BPM, Knock lane (the slowest, most menacing Knock), E minor (Dorian: C# natural). WOMP Pocket: Swing % 54, Swing Grid 16th, Swing Applies To "Hats & Percussion".
-- **Progression:** Verses: Em9 – A9 (i9–IV9), grim and circular. Hook: Cmaj9 – B7#9 – Em9 – Em9. Otis's spoken bars: Em9 held, B3 drone only. Final bar: C – Cm6 – Em (minor-plagal close, no resolution).
-- **Drums:** DMD dusty kick, busy but dry; snare + 12 ms clap on 3; closed hats only, no open hats. Revolver click on the "a" of 4 (Quick Sampler). WOMP Pocket: Snare/Clap Lay-back 5 ms, Timing Humanize 3 ms, Velocity Humanize 12, Hat Accents Downbeats Loud, Ghost Snare Chance 20%, Ghost Velocity 20. WOMP Rolls: Roll Target Hi-Hats, Trigger Random Chance, Roll Chance 18%, Roll Rate 1/32T, Roll Length 1/8, Velocity Shape Decrescendo.
-- **Bass:** 808 on E1 (41.2 Hz), the darkest on the album: WOMP Low End Drive 65%, Harmonics Mix 45%, Sub Boost 2 dB, Mono Below 120 Hz, Punch 45%, Tight 30 Hz. Rolling 16ths in verses; on the hook it slides B1 (61.7 Hz) → E1. WOMP 808 Glide: Mode Legato Slide, Glide Time 80 ms, Glide Curve 808 (fast start), Bend Range 12, Velocity Floor 95. Stutters: WOMP Rolls on the 808, Roll Target Single Note, Single Note 28 (E1), Trigger Velocity Threshold, Velocity Threshold 120, Roll Rate 1/32, Roll Length 1/8, Velocity Shape Decrescendo. The Moog is gone; Otis's V2 bars 1–4 are 808 whole notes.
-- **Samples & Keys:** Suitcase Rhodes detuned −15 cents with Chorus. Wah guitar (Pedalboard Wah, slow rocking) creeps in the gaps. Vintage B3 drone on E2, Leslie off. WOMP Dust: Wow 50%, Age 60%, High Cut 8 kHz.
+- **BPM / Key / Swing:** 140 BPM Knock (the most menacing), E minor (Dorian: C# natural). WOMP Pocket Swing % 54.
+- **Progression:** Verses: Em9 – A9 (i9–IV9), grim and circular. Hook: Cmaj9 – B7#9 – Em9 – Em9. Otis's spoken bars: Em9 over a B3 drone. Final bar: C – Cm6 – Em (minor-plagal, no resolution).
+- **Drums:** Dusty kick, busy but dry; snare + 12 ms clap on 3; closed hats only. Revolver click on the "a" of 4. WOMP Pocket: Snare/Clap Lay-back 5 ms, Ghost Snare Chance 20%. WOMP Rolls: Roll Target Hi-Hats, Trigger Random Chance, Roll Chance 18%, Roll Rate 1/32T, Roll Length 1/8, Velocity Shape Decrescendo.
+- **Bass:** 808 on E1 (41.2 Hz), the darkest on the album, rolling 16ths; hook slides B1 → E1 (61.7 → 41.2 Hz). WOMP 808 Glide: Mode Legato Slide, Glide Time 80 ms. Stutters: WOMP Rolls, Roll Target Single Note, Single Note 28 (E1), Roll Rate 1/32, Roll Length 1/8. WOMP Low End: Drive 65%, Harmonics Mix 45%, Mono Below 120 Hz. No Moog.
+- **Samples & Keys:** Rhodes detuned −15 cents with Chorus. B3 drone on E2, Leslie off. WOMP Dust: Wow 50%, Age 60%, High Cut 8 kHz.
 - **Street Gospel layer:** Held back: one "Haaa-zel" swell at the very end, 6 voices, long hall.
-- **Arrangement map:** Intro 4 (cylinder spin, Otis spoken, no drums) → V1 16 (drums out bars 15–16) → Hook 8 → V2 12 (Otis) → Spoken 4 (three bullets: beat drops to drone, clicks and one sustained 808) → V3 12 (Knight) → Hook 8 (+guitar) → Outro 4 (choir swell, hammer click, silence). (Bar counts are half-time bars: 8 beats at 140 BPM, one lyric line each.)
-- **Vocal direction:** Knight hungry and tense, riding the rolls in triplets. Otis slow and low (half-time flow), dry close mic, no doubles. Hazel's hook is distant: HPF 200 Hz, 1/8 dotted delay, 40% wet.
-- **Mix note:** Pitch Otis's ad-libs down 2 semitones. Keep hats narrow (±20) so the room feels small; 808 ducked −4 dB from the kick. Master −8.5 to −7.5 LUFS integrated, true peak −1 dBTP.
-- **Suno tips:** Generate Knight with Knight Persona; generate V2 without a Persona using "older gravelly baritone rap." Weirdness 45%, Style Influence 72%.
+- **Arrangement map:** Intro 4 (cylinder, Otis; no drums) → V1 16 (drums out bars 15–16) → Hook 8 → V2 12 (Otis; 808 whole notes bars 1–4) → Spoken 4 (drone, clicks, one sustained 808) → V3 12 → Hook 8 (+guitar) → Outro 4 (choir, hammer click, silence). Bars are half-time (8 beats), one lyric line each.
+- **Vocal direction:** Knight hungry, riding the rolls in triplets. Otis slow half-time flow, dry, no doubles. Hazel distant: HPF 200 Hz, 1/8 dotted delay.
+- **Mix note:** Hats narrow (±20) so the room feels small. Side-chain the 808 −4 dB from the kick (50 ms release). Master −8.5 to −7.5 LUFS integrated, −1 dBTP true peak.
+- **Suno tips:** Knight Persona; generate V2 without a Persona using "older gravelly baritone rap." Weirdness 45%, Style Influence 72%.
 
 ## Lyrics
 ```

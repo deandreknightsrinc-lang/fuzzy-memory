@@ -52,6 +52,9 @@ These settings are for **Uptempo 808 Mode**, the current W.O.M.P. direction (see
 **WOMP Rolls:** write the hats you want rolled at velocity 115 or higher (the rest stay normal). Or use Trigger "Random
 Chance" for rolls that sprinkle in by themselves. On the 808 track, set Roll Target to "Single Note" and point
 Single Note at your 808's pitch to stutter it.
+"Single Note" is a MIDI note number. The song notes give it as a number plus its scientific name, e.g. **27 (Eb1)**. Logic's
+piano roll names octaves two lower by default (middle C = C3), so that same note shows as **D#0** in Logic. Go by
+the number.
 
 ## How They Work (for the curious)
 - **Pocket:** reads each note's song position, delays off-beat 16ths/8ths by the swing amount, adds snare lay-back and

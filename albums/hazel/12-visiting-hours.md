@@ -6,7 +6,7 @@ Saturday, 10 AM, county lockup off Route 9, a few months into Knight's short bid
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, bouncy full-time 95 BPM soul rap, D minor Dorian, melancholy tender Saturday visit, lonely muted flugelhorn lead with 70s soul strings, dusty Rhodes, heavy 808 walking the bassline with slides, crisp kick and rimshot, swung hats with 1/32 rolls, jail buzzer, phone receiver clicks, heavy door slam, telephone EQ on some lines, restrained heavy male storytelling rap with internal rhymes, aching female soul hook for Hazel with gospel runs, smooth male R&B croon bridge, faint choir Haaa-zel at the end, 808-forward mix, loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, bouncy full-time 95 BPM soul rap, D minor Dorian, melancholy tender Saturday visit, lonely muted flugelhorn lead with 70s soul strings, dusty Rhodes, heavy 808 walking the bassline with slides, crisp kick and rimshot, 1/32 hat rolls, jail buzzer, phone receiver clicks, door slam, telephone EQ on some lines, restrained male storytelling rap, aching female soul hook for Hazel with gospel runs, smooth male R&B croon bridge, faint choir Haaa-zel at the end, 808-forward mix, loud punchy master
 ```
 
 ### Exclude Styles
@@ -15,16 +15,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 95 BPM, Bounce lane, D minor (Dorian: B natural). WOMP Pocket: Swing % 56, Swing Grid 16th, Swing Applies To "Hats & Percussion".
-- **Progression:** Verses: Dm9 – G9 (i9–IV9). Hook: Bbmaj9 – A7#9 – Dm9 – Dm9, then Gm9 – C13 – Fmaj9 – A7#9 (ii9–V13–Imaj9 in F). Bridge croon: Gm9 – C13 – Fmaj9 – A7#9. Final tag: Bb – Bbm6 – F.
-- **Drums:** DMD crisp kick on 1, the "and" of 2 and the "a" of 3; rimshot + clap on 2 and 4 in verses, full snare on hooks; swung 16th hats. WOMP Pocket: Snare/Clap Lay-back 10 ms, Timing Humanize 3 ms, Velocity Humanize 10, Hat Accents Offbeats Loud, Ghost Snare Chance 20%. WOMP Rolls: Roll Target Hi-Hats, Trigger Velocity Threshold, Velocity Threshold 116, Roll Rate 1/32, Roll Length 1/16, Velocity Shape Crescendo.
-- **Bass:** The old upright walk now lives in the 808: D1 (36.7 Hz) walking D–E–F–G with slides, notes landing with the kick. WOMP 808 Glide: Mode Legato Slide, Glide Time 55 ms, Glide Curve 808 (fast start), Bend Range 12, Velocity Floor 90. WOMP Low End: Drive 50%, Harmonics Mix 35%, Sub Boost 3 dB, Mono Below 120 Hz, Punch 40%, Tight 28 Hz. The Moog doubles the walk an octave up (LPF 600 Hz) in V2 bars 1–4 only, while the 808 holds D.
-- **Samples & Keys:** Studio Horns solo flugelhorn (Channel EQ bandpass 500 Hz–4 kHz) plays the lonely lead: A–C–D–F–E–D. Strings sustain on hooks. Rhodes via WOMP Soul Chords (Key D, Scale Dorian (G-Funk), Chord Style Soul 9ths). Everything through WOMP Dust (Tape Drive 25%, Crackle 20%, High Cut 9 kHz).
-- **Street Gospel layer:** Hazel's gospel runs on "Close as I can be"; B3 soft swell into the second hook; faint "Haaa-zel" at the end.
-- **Arrangement map:** Intro 2 (buzzer, guard) → V1 12 (first 2 lines telephone EQ) → Hook 8 → V2 12 (drums out last 2 bars) → Hook 8 (+strings) → Bridge 4 (croon; hats off, 808 sustains) → V3 8 ("Time.") → Outro 4 (Hazel, choir, receiver click).
-- **Vocal direction:** Knight restrained, no ad-libs, but locked in the pocket. Hazel's hook is close, 3rd above on the "visiting hours" lines.
-- **Mix note:** Telephone EQ on Knight's first two lines, automated off on bar 3; 808 ducked −3 dB from the kick. Master −8.5 to −7.5 LUFS integrated, true peak −1 dBTP.
-- **Suno tips:** Knight Persona, Hazel Persona for hook Extends. Weirdness 38%, Style Influence 70%. If the horn turns smooth jazz, add "dusty 70s soul record."
+- **BPM / Key / Swing:** 95 BPM Bounce, D minor (Dorian: B natural). WOMP Pocket Swing % 56.
+- **Progression:** Verses: Dm9 – G9 (i9–IV9). Hook: Bbmaj9 – A7#9 – Dm9 – Dm9, then Gm9 – C13 – Fmaj9 – A7#9. Bridge: Gm9 – C13 – Fmaj9 – A7#9. Tag: Bb – Bbm6 – F.
+- **Drums:** Crisp kick on 1, the "and" of 2 and the "a" of 3; rimshot + clap on 2 and 4 (full snare on hooks); swung hats. WOMP Pocket: Snare/Clap Lay-back 10 ms, Ghost Snare Chance 20%. WOMP Rolls: Roll Target Hi-Hats, Velocity Threshold 116, Roll Rate 1/32, Roll Length 1/16.
+- **Bass:** The old upright walk now lives in the 808: D1 (36.7 Hz) walking D–E–F–G with slides, landing with the kick. WOMP 808 Glide: Mode Legato Slide, Glide Time 55 ms. WOMP Low End: Drive 50%, Harmonics Mix 35%, Sub Boost 3 dB, Mono Below 120 Hz. V2 bars 1–4: 808 holds D, Moog walks an octave up.
+- **Samples & Keys:** Flugelhorn (bandpass 500 Hz–4 kHz) plays the lonely lead: A–C–D–F–E–D. Strings on hooks. Rhodes via WOMP Soul Chords (Key D, Scale Dorian (G-Funk)). All through WOMP Dust (Crackle 20%, High Cut 9 kHz).
+- **Street Gospel layer:** Hazel's gospel runs on "Close as I can be"; B3 swell into hook 2; faint "Haaa-zel" at the end.
+- **Arrangement map:** Intro 2 (buzzer, guard) → V1 12 → Hook 8 → V2 12 (drums out last 2 bars) → Hook 8 (+strings) → Bridge 4 (croon; hats off) → V3 8 ("Time.") → Outro 4 (Hazel, choir, receiver click).
+- **Vocal direction:** Knight restrained, no ad-libs, locked in the pocket. Hazel close, 3rd above on "visiting hours."
+- **Mix note:** Telephone EQ on Knight's first two lines, off at bar 3. Side-chain the 808 −3 dB from the kick (60 ms release). Master −8.5 to −7.5 LUFS integrated, −1 dBTP true peak.
+- **Suno tips:** Knight Persona; Hazel Persona for hook Extends. Weirdness 38%, Style Influence 70%. If the horn turns smooth jazz, add "dusty 70s soul record."
 
 ## Lyrics
 ```
