@@ -81,3 +81,14 @@ Recurring lines tie the two albums together:
   - Knight dreams of a barbershop on Ninth with chess boards in the window.
 - **"I love you":** Hazel says it first, on the answering machine the night of the raid (H10).
 - **Hospital and wedding (Hazel 11–20):** Hazel works at Mercy General and passes her nursing boards. The courthouse wedding happens in Room 214, and Lil Tre witnesses by collect call from upstate.
+
+## Canon Added During Drafting (Stalemate 01–10)
+- **Grandma's gold cross:** pawned at Sal's in S02, bought back in S07 and put on Mama's neck. Grandma ("Sister Loretta") dies before S07.
+- **Mama's rule (S01):** "Don't touch a piece you ain't ready to move." Pays off in "Touch Move" (S14).
+- **Bishop's secret phone call (S05):** Knight sees Bishop on a flip phone by the church dumpster, next to a gray sedan. Pays off in "Discovered Attack" (S15).
+- **Tre and the walkie-talkie:** Knight gives Tre a walkie-talkie (S06). In "Check" (S10), Tre is caught with the backpack at the Rooks gate. Agent Cole first appears in the S10 bridge.
+- **Ages:** Knight is 13 in S02, 16 in S04, 19 in S07 and 21 in S09. Tre is 16 by S10.
+- **New names:**
+  - People: Sal (pawn shop owner), Fats, Big Dame, the Mendez twins, Ms. Dot.
+  - Places: Earl's Wings (King Reese's back booth), Kemp and Pine streets.
+  - Rival crew: the Hollow.
