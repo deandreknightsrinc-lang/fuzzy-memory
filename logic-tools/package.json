@@ -1,0 +1,9 @@
+{
+  "name": "womp-logic-tools",
+  "private": true,
+  "description": "W.O.M.P. Logic Pro Scripter MIDI FX tools (Knight Lyfe)",
+  "scripts": {
+    "build": "sh scripter/build.sh",
+    "test": "node --test test/scripter.test.js"
+  }
+}
