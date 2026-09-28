@@ -6,25 +6,25 @@ Saturday, 3 PM, the fourth-floor dialysis unit at Mercy General, the same day as
 
 ## Suno Style Prompt
 ```
-West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, cinematic minor-key shadows under major soul, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 76 BPM half-time soul ballad, A-flat major drifting into F minor, bittersweet and tender, loud analog chess clock tick as the rhythmic spine, dialysis machine beep sampled into the groove, warm Rhodes, lush 70s soul strings, brushed snare with a soft deep kick, slow heartbeat 808, weathered older female soul vocal singing the hook and speaking in the intro and bridge, gospel choir hum under the bridge, gritty baritone male rap softened and reflective, vinyl crackle, intimate warm mix, clock stops dead on the final bar
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 96 BPM, A-flat major sinking into F minor, bittersweet and heavy, loud analog chess clock tick as the rhythmic spine, dialysis machine beep chopped into the groove, warm Rhodes, 70s soul strings, heartbeat-pattern distorted 808 with slides and short rolls, weathered older female soul vocal singing the hook, choir hum in a stripped bridge, gritty baritone male rap, energetic but reflective, steady driving flow, clock stops dead on the final bar, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
 ```
-pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, gospel choir song, lullaby
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, gospel choir song, lullaby
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 76 BPM half-time, A-flat major drifting into F minor (808 roots Ab1 about 51.9 Hz and F1 about 43.7 Hz). 16th swing at 58%.
-- **Progression:** Verses: Abmaj9 → Fm9 → Bbm9 → Eb13 (I → vi → ii → V soul). Hook turns minor: Fm9 → Bb9 (F Dorian) twice, then Dbmaj9 → Cm7. Bridge: the Amen Db → Dbm6 → Abmaj7 under "You spent it on me today."
-- **Drums:** Brushed snare (Drummer brush kit or DMD brushes) on beat 3, soft kick. The clock tick plays quarter-note hats; the dialysis beep lands on the "and" of 4 every 2 bars. WOMP Pocket: swing 58%, snare +16 ms.
-- **Bass:** A heartbeat 808 (lub-dub on 1 and the "a" of 1), short decay so the Ab1 doesn't boom. Bass Player (fingerstyle) carries the harmony. V2 bars 1–4 (Mama's story): 808 out. WOMP Low End drive 15%.
-- **Samples & Keys:** Vintage EP "Suitcase" with WOMP Soul Chords maj9/13. Studio Strings 70s-style lines, LPF 8 kHz. WOMP Dust light across the keys. The Rhodes can quote a few notes of the public-domain hymn "Blessed Assurance" behind V1.
-- **Street Gospel layer:** A choir hum under the bridge and a quiet slow-Leslie B3 under Mama's hooks. No tambourine; it's a hospital.
-- **Arrangement map:** Intro 4 (clock, beeps, Mama spoken) → V1 16 → Hook 8 (Mama sings) → V2 16 (808 out bars 1–4; the buzz track mutes exactly on "5:02") → Hook 8 → Bridge 8 (Mama spoken, choir hum) → Hook 4 → Outro 4 (the clock slows and stops, 2 bars of silence, piece click).
-- **Vocal direction:** Knight soft and reflective, few doubles. Mama: warm plate plus a 1/8 dotted delay, a 3rd-above harmony on "tick, tock." Her spoken lines dry and close.
-- **Mix note:** Master at −11 LUFS. Automate the phone-buzz foley so it gets louder each time, then cut it dead on "5:02."
-- **Suno tips:** Tag hooks [Female vocal, older woman]. Weirdness 35%, Style Influence 70%. Regenerate if it turns into a pure gospel song.
+- **BPM / Key / Swing:** BOUNCE lane, 96 BPM, A-flat major sinking into F minor (808 roots Ab1, 51.9 Hz, and F1, 43.7 Hz). WOMP Pocket: Swing % 58, Swing Grid 16th, Snare/Clap Lay-back +12 ms.
+- **Progression:** Verses Abmaj9 → Fm9 → Bbm9 → Eb13 (I → vi → ii → V). Hook turns minor: Fm9 → Bb9 (F Dorian) twice, then Dbmaj9 → Cm7. Bridge: the Amen Db → Dbm6 → Abmaj7 under "You spent it on me today."
+- **Drums:** Kick on 1, the "a" of 1 and 3 (the heartbeat); snare plus rim on 2 and 4; the clock as swung 16th hats; the dialysis beep on the "and" of 4 every 2 bars. WOMP Rolls: Roll Target Hi-Hats, Trigger Velocity Threshold, Velocity Threshold 120, Roll Rate 1/32, Velocity Shape Decrescendo: the clock skipping.
+- **Bass:** The 808 is the heartbeat and the bassline: lub-dub on Ab1 and F1, locked to the kick, sliding Ab1 → F1 into every hook. WOMP 808 Glide: Mode Legato Slide, Glide Time 70 ms. WOMP Low End: Drive 45%, Harmonics Mix 40%. Fingerstyle bass supports the 9ths above 120 Hz.
+- **Samples & Keys:** Vintage EP on WOMP Soul Chords (maj9/13). 70s strings. The Rhodes can quote the public-domain hymn "Blessed Assurance" behind V1.
+- **Street Gospel layer:** Choir hum under the bridge, slow-Leslie B3 under Mama's hooks. No tambourine; it's a hospital.
+- **Arrangement map:** Intro 4 (clock, beeps, Mama) → V1 16 → Hook 8 (Mama sings) → V2 16 (808 out bars 1–2; buzz mutes on "5:02") → Hook 8 → Bridge 8 (stripped: Mama, choir, clock) → Hook 4 (full slam) → Outro 4 (clock stops, silence, click).
+- **Vocal direction:** Energetic but reflective. Mama warm, 3rd-above harmony on "tick, tock."
+- **Mix note:** Automate the phone buzz louder each time, then cut it dead on "5:02." Master −8.5 LUFS integrated, true peak −1 dBTP.
+- **Suno tips:** Tag hooks [Female vocal, older woman]. Weirdness 35%, Style Influence 70%. If it goes soft gospel, put "96 BPM" and "distorted 808" first.
 
 ## Lyrics
 ```

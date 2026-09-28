@@ -6,25 +6,25 @@ Before sunrise at the concrete chess tables in Diagonal Park, a grown Knight set
 
 ## Suno Style Prompt
 ```
-West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, dark cinematic minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 86 BPM, C# minor, patient ominous establishing shot, dusty felt piano motif over Rhodes minor 9th chords, whistle lead enters on the hook, low cello drone, distant church bells, early-morning rain and city ambience, clock ticks as hi-hat accents, piece clicks on downbeats, gritty baritone male storytelling rap, measured and confident, warm older female spoken intro, chanted half-sung hook with low group vocals, dry upfront lead vocal, wide strings on hooks, vinyl dust
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 96 BPM, C# minor, ominous swaggering establishing shot, dusty felt piano motif over Rhodes minor 9ths, whistle lead on the hook, distorted 808 locked to the kick with slides into each bar and quick 808 rolls into hooks, clock ticks as hat accents, rain and distant church bells, gritty baritone male rap, energetic, confident flow riding the swing, warm older female spoken intro, chanted group hook, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
 ```
-pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, horror ambient, epic trailer
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, horror ambient, epic trailer
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 86 BPM, C# minor (808 root C#1, about 34.6 Hz). 16th swing at 56%.
-- **Progression:** Verses loop C#m9 → F#9 (i9 → IV9 Dorian, two bars each). Hook: C#m9 → B → A → G#7#9. Outro: F#9 → F#m9 → C#m9, the Amen cadence bent back into minor.
-- **Drums:** DMD dusty kit (acoustic kick plus 808 click, snare plus rim, clap +10 ms). Kick on 1, the "and" of 2 and the "e" of 3; snare on 2 and 4. For V1's first 4 bars the clock tick is the hi-hat. WOMP Pocket: swing 56%, snare +14 ms, humanize ±10.
-- **Bass:** 808 roots C#1 → F#1 with 90 ms WOMP 808 Glide slides. Synth bass (Retro Synth, LPF 700 Hz) stays high and sparse. V2 bars 1–4: 808 out, synth bass walks the full range. WOMP Low End: drive 30%, Mono Below 120 Hz.
-- **Samples & Keys:** Piano motif E–D#–C#–G# through WOMP Dust (light wow). Vintage EP "Suitcase" with WOMP Soul Chords min9. Whistle (Retro Synth sine, glide 200 ms) plays G#–B–C#–E on hooks. Studio Strings cello drone on C#.
-- **Street Gospel layer:** Held back: church bells in the intro and a slow-Leslie B3 under V2's "Bishop's organ" couplet. The choir waits for track 05.
-- **Arrangement map:** Intro 8 (clock, Mama, click; no drums) → V1 16 (drop drums bars 15–16) → Hook 8 (whistle enters) → V2 16 (808 out bars 1–4, organ bars 9–10) → Hook 4 (add group doubles) → Outro 8 (clock slows, click).
-- **Vocal direction:** Measured, just behind the beat. Punch-in doubles on "pawn in my hand" and "who we are." Mama warm and close in a small room; outro dry.
-- **Mix note:** High-pass the clock tick at 2 kHz, pan it 20L and duck it 2 dB under the vocal. Keep the piano under 9 kHz so it reads as a record, not a score.
-- **Suno tips:** Build the Knight Persona from this song's best take. Weirdness 35%, Style Influence 70%. Regenerate if it goes orchestral-trailer or loses the swing; add a [Whistle lead] tag if the whistle never shows.
+- **BPM / Key / Swing:** BOUNCE lane, 96 BPM, C# minor (808 root C#1, 34.6 Hz). WOMP Pocket: Swing % 57, Swing Grid 16th, Snare/Clap Lay-back +8 ms.
+- **Progression:** Verses C#m9 → F#9 (i9 → IV9 Dorian, two bars each). Hook: C#m9 → B → A → G#7#9. Outro: F#9 → F#m9 → C#m9, the Amen bent back into minor.
+- **Drums:** Kick on 1, the "and" of 2 and the "e" of 3; snare plus clap on 2 and 4; swung 16th hats (the clock tick is the hat for V1's first 4 bars). WOMP Rolls: Roll Target Hi-Hats, Trigger Velocity Threshold, Velocity Threshold 115, Roll Rate 1/32, Roll Length 1/8, Velocity Shape Crescendo.
+- **Bass:** The 808 is the bassline, locked to the kick: C#1 → F#1, sliding up to E1 and G#1 at phrase ends. WOMP 808 Glide: Mode Legato Slide, Glide Time 60 ms. WOMP Low End: Drive 50%, Harmonics Mix 40%, Mono Below 120 Hz. Retro Synth bass only adds mids in hooks.
+- **Samples & Keys:** Piano motif E–D#–C#–G# through WOMP Dust. Vintage EP on WOMP Soul Chords (min9). WOMP Whistle (Glide Time 180 ms) plays G#–B–C#–E on hooks.
+- **Street Gospel layer:** Held back: church bells in the intro, a slow-Leslie B3 under V2's "Bishop's organ" couplet. The choir waits for track 05.
+- **Arrangement map:** Intro 8 (clock, Mama, click; 808 swell bar 8) → V1 16 (808 roll into the hook) → Hook 8 (whistle enters) → V2 16 (808 out bars 1–2) → Hook 8 → Outro 8 (drums out; clock slows over the 808 tail, click).
+- **Vocal direction:** Energetic, on top of the swing. Doubles on "pawn in my hand" and "who we are." Mama warm and close.
+- **Mix note:** Tune the kick to C#; sidechain the 808 −3 dB from it. High-pass the clock at 2 kHz. Master −8 LUFS integrated, true peak −1 dBTP.
+- **Suno tips:** Build the Knight Persona from this take. Weirdness 35%, Style Influence 75%. If it drags, move "96 BPM" and "distorted 808" to the front of the song-specific part.
 
 ## Lyrics
 ```

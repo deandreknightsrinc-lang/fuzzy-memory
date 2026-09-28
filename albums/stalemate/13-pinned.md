@@ -6,25 +6,25 @@ Saturday night, the day after the fork, Agent Cole pulls Knight off the 42 bus o
 
 ## Suno Style Prompt
 ```
-West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, dark cinematic minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 76 BPM half-time, C minor, claustrophobic cold interrogation noir, cheap wall-clock tick as the hi-hat, fluorescent light hum drone, sparse detuned Wurlitzer stabs, low cello pedal note, muffled heartbeat kick, flat palm slap on a metal table as the snare, photo slaps and piece clicks as accents, low muted whistle lead, gritty baritone male rap hushed and close like inner monologue, calm flat male spoken voice for the interrogator, half-whispered hook with stacked low harmonies, dry mix with sudden silences, ends on a door buzzer
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 140 BPM half-time snare with double-time energy, C minor, cold interrogation noir, wall-clock tick as the hi-hat, fluorescent light hum, detuned Wurlitzer stabs, low cello pedal, palm slap on a metal table as the snare, rolling 16th-note distorted 808 with glides and stutters, 1/32 hat rolls, photo slaps and piece clicks, gritty baritone male rap, energetic, hushed rapid inner-monologue flow, calm flat interrogator voice, whispered hook, ends on a door buzzer, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
 ```
-pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, horror, ambient
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, horror, ambient
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 76 BPM half-time, C minor, the King's key from track 04 (808 root C1, about 32.7 Hz). The clock stays straight; only the palm slap swings.
+- **BPM / Key / Swing:** KNOCK lane, 140 BPM, snare on 3, C minor, the King's key (808 root C1, 32.7 Hz). WOMP Pocket: Swing % 51, Swing Grid 16th, Swing Applies To Snare, Snare/Clap Lay-back +8 ms (only the palm slap drags).
 - **Progression:** Verses over a C pedal: Cm(add9) → Fm9/C → Abmaj7 → G7#9. Hook: Cm9 → Bb → Ab → G7#9. At "the bar towel" the Abmaj7 → G7#9 stab repeats twice.
-- **Drums:** Minimal DMD: heartbeat kick (kick low-passed at 120 Hz, lub-dub on 1 and the "a" of 1), palm slap on beat 3, the wall clock as straight 8th hats. WOMP Pocket on the slap only: +18 ms. Photo slaps on V1's four "Click." lines.
-- **Bass:** 808 only on the hooks. The verses hold a sustained Retro Synth sine on C. V2 bars 1–4 ([12:31 AM]): sine pad only. WOMP Low End: Mono Below 120, drive 15%.
-- **Samples & Keys:** Vintage EP "Wurli" detuned −20 cents through WOMP Dust (heavy bandwidth cut). Studio Strings cello pedal on C. Whistle muted and low, an octave down, on the hook's last line.
-- **Street Gospel layer:** Held back: there is no God in Room 4. The one exception is a single B3 chord swell on "got a pulpit and a phone," the first hint of Bishop.
-- **Arrangement map:** Intro 4 (hum, clock, Cole) → V1 16 ([11:52 PM]; drop to hum only on bar 16) → Hook 8 → V2 16 ([12:31 AM], 808 out bars 1–4; [1:14 AM] at bar 13) → Hook 8 → Outro 4 (buzzer, Cole, piece click, hum cuts).
-- **Vocal direction:** Hushed, close-mic inner monologue; use the proximity effect. No doubles except the whispered hook stack. Cole dry, center, small room (0.4 s).
-- **Mix note:** Gate every reverb so the silences are total. Automate the fluorescent hum up 3 dB on "turned to a scream in the light."
-- **Suno tips:** Weirdness 45%, Style Influence 65%. If it adds a full kit, add "minimal" to the song-specific part and regenerate.
+- **Drums:** Heartbeat kick (1 and the "a" of 1, plus the "and" of 2 and the "e" of 4), palm slap on 3, the wall clock as 1/16 hats. WOMP Rolls: Roll Target Hi-Hats, Trigger Velocity Threshold, Velocity Threshold 112, Roll Rate 1/32, Velocity Shape Crescendo: the clock itself panics. Photo slaps on V1's "Click." lines.
+- **Bass:** The 808 now leads the whole song: 16th pulses on C1, gliding to Eb1 and G0 in hooks. WOMP 808 Glide: Mode Retrigger + Slide, Glide Time 70 ms (verses), 40 ms (hooks). Stutters on "Click.": WOMP Rolls, Roll Target Single Note, Single Note C1, Roll Rate 1/32. WOMP Low End: Drive 55%, Harmonics Mix 50%.
+- **Samples & Keys:** Wurli detuned −20 cents through WOMP Dust (High Cut 6 kHz). Cello pedal on C. WOMP Whistle muted, Octave −1, on the hook's last line.
+- **Street Gospel layer:** No God in Room 4. One B3 swell on "got a pulpit and a phone," the first hint of Bishop.
+- **Arrangement map:** Intro 4 (hum, clock, Cole) → V1 16 ([11:52 PM]; hum and 808 only on bar 16) → Hook 8 → V2 16 ([12:31 AM], 808 out bars 1–2; [1:14 AM] bar 13) → Hook 8 → Outro 4 (buzzer, click, hum cuts).
+- **Vocal direction:** Hushed but fast inner monologue, close-mic. Cole dry, small room.
+- **Mix note:** Gate every reverb so silences are total. Master −8 LUFS integrated, true peak −1 dBTP.
+- **Suno tips:** Weirdness 45%, Style Influence 70%. If it adds a bright full kit, add "minimal" before "palm slap."
 
 ## Lyrics
 ```

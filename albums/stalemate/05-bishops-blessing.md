@@ -6,25 +6,25 @@ Sunday, 11 a.m., at Diagonal Ave Baptist. Mama Knight sits in pew three in her w
 
 ## Suno Style Prompt
 ```
-West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, dark cinematic minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 72 BPM half-time with a heavy 12/8 gospel swing, E-flat minor, sly sacred menace, roaring Hammond B3 lead with fast Leslie on hooks, full gospel choir stabs and call-and-response, tambourine and hand claps on 2 and 4, deep sliding 808s under the organ, creaking pews and footsteps, whispered flip-phone call in the bridge, gritty baritone male storytelling rap with a sly knowing delivery, booming older male preacher voice, big church hall reverb on choir, dry lead vocal, dark holy mix
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time gospel-shuffle bounce at 100 BPM, E-flat minor, sly sacred menace, roaring Hammond B3 lead with fast Leslie, gospel choir stabs and call-and-response, tambourine and claps on 2 and 4, distorted 808 walking under the organ with fast slides and rolls into hooks, creaking pews, whispered flip-phone call, gritty baritone male rap, energetic, sly knowing swung flow, booming older male preacher voice, church hall reverb on choir, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
 ```
-pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, contemporary worship, choir only
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, contemporary worship, choir only
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 72 BPM half-time, E-flat minor (808 root Eb1, about 38.9 Hz). The swing is 12/8: quantize hats and tambourine to 1/8 triplets instead of 16 Swing.
-- **Progression:** Verses: Ebm9 → Ab9 (i9 → IV9 Dorian). Hook: Ebm9 → Db → Cb → Bb7#9, then the Amen cadence Ab → Abm → Eb, a Picardy major that sounds holy and is a lie. Bridge organ solo: Ebm9 → Cbmaj7 → Bb7#9.
-- **Drums:** Big kick, claps plus snare on beat 3 (half-time), tambourine on 2 and 4. WOMP Pocket: snare +16 ms, humanize ±12.
-- **Bass:** 808 on Eb1/Ab1, sliding to Bb0 on the V7#9 (110 ms glide). Organ pedal high-passed at 90 Hz. V2 bars 1–4 (the basement stairs): 808 out, synth bass creeps Eb → D → Db → C. WOMP Low End drive 25%.
-- **Samples & Keys:** Vintage B3 is the lead: slow Leslie in verses, fast on hooks, WOMP Soul Chords 7#9 on stabs. Sampler choir through light WOMP Dust, like a 1970s church recording.
-- **Street Gospel layer:** Full force. Organ swells into every hook; the choir answers the last words ("bless 'em," "on the diagonal"). Stacks ±80, Concert Hall 2.8 s.
-- **Arrangement map:** Intro 8 (organ swell, choir, preacher, "Amen!") → V1 16 (drop drums bars 15–16) → Hook 8 → V2 16 (808 out bars 1–4) → Hook 8 → Bridge 8 (organ solo, spoken; the flip-phone whisper under it) → V3 8 → Outro 4 (choir, piece click).
-- **Vocal direction:** Sly, half a laugh in it. Doubles on "holy, not me." Preacher in a long hall with a 1/4-note slap. Bridge: a whisper layer through a 300 Hz–3 kHz bandpass.
-- **Mix note:** Dip the B3 3 dB at 1–3 kHz under the rap and open it on the hooks. Keep the choir on sends, not inserts.
-- **Suno tips:** Weirdness 40%, Style Influence 70%. If it comes back as pure gospel with no drums, move "hard punchy drums" and "deep sliding 808s" earlier and regenerate.
+- **BPM / Key / Swing:** BOUNCE lane, 100 BPM, E-flat minor (808 root Eb1, 38.9 Hz). The old 12/8 becomes a heavy gospel shuffle. WOMP Pocket: Swing % 62, Swing Grid 16th, Swing Applies To All, Snare/Clap Lay-back +10 ms.
+- **Progression:** Verses Ebm9 → Ab9 (i9 → IV9 Dorian). Hook: Ebm9 → Db → Cb → Bb7#9, then the Amen Ab → Abm → Eb, a Picardy major that sounds holy and is a lie. Bridge: Ebm9 → Cbmaj7 → Bb7#9.
+- **Drums:** Kick on 1, the "a" of 1 and 3; snare plus claps and tambourine on 2 and 4; swung 16th hats. WOMP Rolls: Roll Target Hi-Hats, Trigger Velocity Threshold, Velocity Threshold 112, Roll Rate 1/32, Roll Length 1/8, Velocity Shape Crescendo into every choir answer.
+- **Bass:** The 808 is the deacon's walk: Eb1/Ab1 locked to the kick, sliding down to Bb0 on the V7#9. WOMP 808 Glide: Mode Legato Slide, Glide Time 65 ms. WOMP Low End: Drive 50%, Harmonics Mix 45%. Organ pedal high-passed at 110 Hz. V2 bars 1–2: 808 out, synth bass creeps Eb → D.
+- **Samples & Keys:** Vintage B3 is the lead: slow Leslie in verses, fast on hooks, WOMP Soul Chords 7#9 stabs. Sampler choir through WOMP Dust like a 1970s church recording.
+- **Street Gospel layer:** Full force. Organ swells into every hook; the choir answers "bless 'em" and "on the diagonal."
+- **Arrangement map:** Intro 8 (organ, choir, preacher, "Amen!"; drums and 808 slam in bar 8) → V1 16 → Hook 8 → V2 16 → Hook 8 → Bridge 8 (organ solo, flip-phone whisper; kick and 808 keep going) → V3 8 → Outro 4 (choir, click).
+- **Vocal direction:** Sly, half a laugh, riding the shuffle. Doubles on "holy, not me." Preacher with a 1/4-note slap.
+- **Mix note:** Dip the B3 3 dB at 1–3 kHz under the rap; notch it at 39 and 78 Hz. Master −8 LUFS integrated, true peak −1 dBTP.
+- **Suno tips:** Weirdness 40%, Style Influence 70%. If it comes back as pure gospel, move "distorted 808" and "100 BPM" earlier.
 
 ## Lyrics
 ```

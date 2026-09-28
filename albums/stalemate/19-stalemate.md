@@ -6,25 +6,25 @@
 
 ## Suno Style Prompt
 ```
-West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, dark cinematic minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 78 BPM half-time, B minor, somber monumental and weary title track, lone grand piano motif, swelling strings, mournful whistle lead over the hooks, dusty heavy kick and cracking snare, deep 808 that slides like a piece dragged across a board, clock ticking throughout that gradually slows, piece click on the downbeat of every hook, winter wind and snow ambience, gritty baritone male storytelling rap measured then rising each verse, half-sung hook doubled by a low male choir, final bars stripped to piano and the clock stopping, wide dark mix
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 98 BPM, B minor, somber weary title track, lone grand piano motif, swelling strings, mournful whistle lead on hooks, dusty heavy kick and cracking snare, huge distorted 808 dragging like a piece across a board with slides and 808 rolls, clock that slowly slows, piece click on every hook downbeat, winter wind, gritty baritone male rap, energetic, measured flow rising each verse, hook with low male choir, stripped piano outro, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
 ```
-pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, film score, sad piano pop
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, film score, sad piano pop
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 78 BPM half-time, B minor (808 root B0, about 30.9 Hz). 16th swing at 57%.
-- **Progression:** Verses: Bm9 → E9 (i9 → IV9). Hook: Bm9 → A → G → F#7#9. V3's last 4 bars lift to D → A → Bm(add9) ("the board ain't all of life"). Outro: E → Em → Bm, the Amen that lands minor: a draw still bruises.
-- **Drums:** Dusty heavy kick, cracking snare on beat 3 (half-time). WOMP Pocket: swing 57%, snare +18 ms. The clock ticks throughout; step its interval from 1/4 to 1/2 to whole notes across the outro rather than touching the song tempo.
-- **Bass:** 808 on B0 with a 150 ms WOMP 808 Glide, the piece dragged across the board. WOMP Low End drive 40% so the sub reads on phones. V2 bars 1–4 (turned away at Tre's gate): 808 out, synth bass low. Drums and 808 drop out for V3's last 2 bars.
-- **Samples & Keys:** A grand piano motif F#–D–C#–B through WOMP Dust light. Studio Strings swell over 4 bars, a little higher each verse. Whistle on the hooks: glide 250 ms, vibrato 4 Hz, mournful.
-- **Street Gospel layer:** Mostly held back; there's no church left to go to. A low male choir doubles the hook, and a single B3 swell leads into the final hook.
-- **Arrangement map:** Intro 4 (wind, clock, spoken, click) → V1 16 (drop drums bars 15–16) → Hook 8 → V2 16 (808 out bars 1–4) → Hook 8 → V3 16 (strings rise; text chime bar 11; drums out bars 15–16) → Hook 4 → Outro 4 (piano plus clock, clock stops, piece click).
-- **Vocal direction:** Measured, rising each verse to near-shouting at V3 bar 10, then almost spoken for the last 4 lines. Doubles on "no legal moves."
-- **Mix note:** Master at −10 LUFS. Stereo winter wind high-passed at 300 Hz, −26 dB, automated up in the outro.
-- **Suno tips:** The title track: generate 4 takes. Weirdness 35%, Style Influence 75%. If it gets too orchestral, drop the strings wording and keep the piano and 808.
+- **BPM / Key / Swing:** BOUNCE lane, 98 BPM, B minor (808 root B0, 30.9 Hz). WOMP Pocket: Swing % 58, Swing Grid 16th, Snare/Clap Lay-back +12 ms.
+- **Progression:** Verses Bm9 → E9 (i9 → IV9). Hook: Bm9 → A → G → F#7#9. V3's last 4 bars lift to D → A → Bm(add9) ("the board ain't all of life"). Outro: E → Em → Bm, the Amen that lands minor: a draw still bruises.
+- **Drums:** Dusty heavy kick on 1, the "and" of 2 and the "a" of 3; cracking snare plus clap on 2 and 4; swung 16th hats. WOMP Rolls: Roll Target Hi-Hats, Trigger Velocity Threshold, Velocity Threshold 115, Roll Rate 1/32, Velocity Shape Crescendo into each hook. The outro clock steps 1/4 → 1/2 → whole notes.
+- **Bass:** The 808 drags like a piece across the board: B0 → E1 locked to the kick, a slow D1 → B0 slide at phrase ends, a fast one into hooks. WOMP 808 Glide: Mode Legato Slide, Glide Time 80 ms. WOMP Low End: Drive 60%, Harmonics Mix 55% so the 31 Hz root reads on phones. Synth bass out.
+- **Samples & Keys:** Grand piano motif F#–D–C#–B through WOMP Dust. Strings swell higher each verse. WOMP Whistle on hooks: Glide Time 220 ms, Vibrato Rate 4 Hz, Vibrato Delay 1/4.
+- **Street Gospel layer:** No church left: a low male choir doubles the hook, one B3 swell into the last hook.
+- **Arrangement map:** Intro 4 (wind, clock, click) → V1 16 → Hook 8 → V2 16 (808 out bars 1–2 at Tre's gate) → Hook 8 → V3 16 (text chime bar 11; drums and 808 out bars 15–16) → Hook 4 (full slam) → Outro 4 (stripped: piano, clock stops, click).
+- **Vocal direction:** Measured but energetic, near-shouting at V3 bar 10, then almost spoken. Doubles on "no legal moves."
+- **Mix note:** Winter wind high-passed at 300 Hz, up in the outro. Master −8.2 LUFS integrated, true peak −1 dBTP.
+- **Suno tips:** Title track: generate 4 takes. Weirdness 35%, Style Influence 75%. If it goes orchestral or slow, drop the strings wording.
 
 ## Lyrics
 ```

@@ -6,25 +6,25 @@ A gray Monday in April, ninth floor of the county courthouse, two months after t
 
 ## Suno Style Prompt
 ```
-West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, dark cinematic minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 70 BPM half-time soul ballad, D minor, mournful courtroom heartbreak, crying chopped 70s soul vocal sample, weeping string section, felt piano and Rhodes, round fingerstyle bass under a soft sliding 808, clock ticking in the intro that stops dead at a gavel strike, low gospel choir under the hook, gritty baritone male storytelling rap restrained and close to the mic, half-sung chanted hook, younger male voice for the spoken letter over piano only, warm room reverb on strings, heavy tender mix
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 94 BPM, D minor, mournful courtroom heartbreak that still bangs, crying chopped 70s soul vocal, weeping strings, felt piano and Rhodes, heavy distorted 808 locked to the kick with aching slides and 808 rolls into hooks, clock stopping dead at a gavel strike, low gospel choir under the hook, stripped piano breakdown, gritty baritone male rap, energetic but pained, steady urgent flow, half-sung hook, younger male spoken letter, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
 ```
-pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, sad piano pop, film score
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, sad piano pop, film score
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 70 BPM half-time, D minor (808 root D1, about 36.7 Hz). 16th swing at 58%, the deepest drag on the album.
-- **Progression:** Verses: Dm9 → G9 (i9 → IV9, slow). Hook: Dm9 → C → Bb → A7#9. Bridge (piano only): Bbmaj7 → Am7 → Gm7 → A7. The final hook ends on the Amen G → Gm → D: the one major chord is Tre's wink.
-- **Drums:** Soft kick, dry crisp snare on beat 3 (half-time), sparse 8th hats. WOMP Pocket: swing 58%, snare +20 ms. At the V2 gavel: everything cuts for 1 beat, the clock stops, then the drums return without it.
-- **Bass:** Bass Player (fingerstyle) carries the song. 808 only swells under the hooks, sustained with a 120 ms glide. V2 bars 1–4 (the laundry-room memory): 808 out as usual, bass alone. WOMP Low End drive 20%.
-- **Samples & Keys:** Replay a 70s soul "ooh" cry in Sampler, pitched −2 semitones, through WOMP Dust with heavy wow. Studio Strings legato, LPF 8 kHz. Soft piano plus Vintage EP with WOMP Soul Chords min9. Clock and gavel in Quick Sampler.
-- **Street Gospel layer:** A low choir under every hook, slow-Leslie B3 underneath. No tambourine or claps; nobody is celebrating.
-- **Arrangement map:** Intro 4 (clock, spoken) → V1 16 (drop drums bars 15–16) → Hook 8 → V2 16 (808 out bars 1–4; gavel on bar 10, clock stops) → Hook 8 → Bridge 8 (piano only, Tre's letter) → Hook 6 → Outro 4 (clock resumes, piece click).
-- **Vocal direction:** Restrained and close, almost no ad-libs. Punch-in doubles only on "Tre's dime." Tre's letter: a younger male voice, dry and close, a touch of tape.
-- **Mix note:** Master at −11 LUFS (ballad). Sidechain the strings 2 dB from the lead vocal so the story stays on top.
-- **Suno tips:** Weirdness 30%, Style Influence 75%. If it turns into a piano-pop ballad, regenerate; keep the take where the drums still hit hard at 70.
+- **BPM / Key / Swing:** BOUNCE lane, 94 BPM, D minor (808 root D1, 36.7 Hz). Emotional center, but the body bangs. WOMP Pocket: Swing % 59, Swing Grid 16th, Snare/Clap Lay-back +12 ms.
+- **Progression:** Verses Dm9 → G9 (i9 → IV9). Hook: Dm9 → C → Bb → A7#9. Bridge (piano only): Bbmaj7 → Am7 → Gm7 → A7. The final hook ends on the Amen G → Gm → D: the one major chord is Tre's wink.
+- **Drums:** Heavy kick on 1, the "and" of 2 and 3; crisp snare plus clap on 2 and 4; swung 16th hats. WOMP Rolls: Roll Target Hi-Hats, Trigger Velocity Threshold, Velocity Threshold 118, Roll Rate 1/32, Velocity Shape Decrescendo. At the V2 gavel everything cuts 1 beat, the clock stops, and the drums return without it.
+- **Bass:** The 808 carries the song: D1 → G1 locked to the kick, aching F1 → D1 slides at phrase ends. WOMP 808 Glide: Mode Legato Slide, Glide Time 75 ms. WOMP Low End: Drive 45%, Harmonics Mix 40%. Fingerstyle bass supports the mids above 100 Hz.
+- **Samples & Keys:** A 70s soul "ooh" cry, −2 semitones, through WOMP Dust. Legato strings. Piano plus Vintage EP on WOMP Soul Chords (min9).
+- **Street Gospel layer:** Low choir under every hook, slow-Leslie B3. No tambourine; nobody is celebrating.
+- **Arrangement map:** Intro 4 (clock, spoken; 808 swell) → V1 16 → Hook 8 → V2 16 (808 out bars 1–2; gavel bar 10) → Hook 8 → Bridge 8 (stripped: piano, Tre's letter) → Hook 6 (full slam) → Outro 4 (clock resumes, click).
+- **Vocal direction:** Energetic but pained, close. Punch-ins only on "Tre's dime." Tre's letter younger, dry.
+- **Mix note:** Sidechain strings 2 dB from the vocal. The bridge falls quiet, but master to −8.5 LUFS integrated, true peak −1 dBTP.
+- **Suno tips:** Weirdness 30%, Style Influence 75%. If it turns into a piano ballad, put "94 BPM" and "heavy distorted 808" first.
 
 ## Lyrics
 ```

@@ -6,25 +6,25 @@ Sunday evening after service, Knight walks into the Suds-N-Duds laundromat on Pi
 
 ## Suno Style Prompt
 ```
-West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, dark cinematic minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 144 BPM written half-time, G minor, cold urgent cause and effect, eerie minor string ostinato, ominous choir pad, sparse muted piano, whistle lead crying over the hooks, sliding glide 808s, a heavy wooden piece click layered on the snare, sudden full stops before key lines, one sharp crack in place of a gunshot, beat cuts to heartbeat and piece click in the bridge, ambulance siren fading through the outro, gritty baritone male rap breathless and urgent with whispered doubles, dark wide reverb, cold hard mix
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 148 BPM half-time snare with double-time energy, G minor, cold urgent cause and effect, eerie minor string ostinato, ominous choir pad, muted piano, crying whistle lead on hooks, rolling 16th-note distorted 808 with fast glides and stutters, 1/32 and triplet hat rolls, heavy wooden piece click on the snare, full stops, one sharp crack, ambulance siren fading out, gritty baritone male rap, energetic, breathless urgent flow with whispered doubles, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
 ```
-pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, drill, gunshot sound effects
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, gunshot sound effects
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 144 BPM written half-time (72 feel), G minor (808 root G1, about 49 Hz). 16th swing at 55%.
-- **Progression:** Verses: Gm9 → C9 (i9 → IV9). Hook: Gm9 → F → Eb → D7#9. Bridge: Ebmaj7 → D7#9. Outro: C → Cm → Gm, the Amen cadence that lands minor. No take-backs.
-- **Drums:** Half-time: snare on beat 3 layered with the piece click, kick on 1 and the "e" of 3, 8th hats. WOMP Pocket: swing 55%, snare +10 ms. Full stops (all tracks muted for 1 beat) before "Touch it and it's yours" and "Four shots."
-- **Bass:** 808 G1 with WOMP 808 Glide 90 ms and a tight WOMP Low End low-pass. V2 bars 1–4 (the aftermath): 808 out, strings and synth bass only. The bridge drops the 808 entirely; the heartbeat kick is the bass.
-- **Samples & Keys:** Studio Strings spiccato 8th ostinato G–Bb–D–Eb. Muted piano notes through WOMP Dust. Whistle only on the hooks, glide 220 ms, falling from D to G. The "crack" is a single transient (snare plus a reversed cymbal tail), not a gunshot.
-- **Street Gospel layer:** Mama's rule as a ghost: a choir "ooh" pad under the hooks. No organ, no tambourine.
-- **Arrangement map:** Intro 4 (click, silence, spoken) → V1 16 (full stop before bar 16) → Hook 8 → V2 16 (808 out bars 1–4; crack on bar 1; full stop before bar 13) → Hook 8 → Bridge 8 (heartbeat plus click) → Hook 4 → Outro 4 (siren fading, clock, piece click).
-- **Vocal direction:** Breathless and urgent. Whispered doubles ±30 on "touch move" and "Mama told me." The bridge is spoken almost to himself.
-- **Mix note:** On the crack, duck the whole mix 1 dB for 200 ms (compressor on the mix bus keyed from the crack) so it feels physical without a gunshot.
-- **Suno tips:** Weirdness 40%, Style Influence 75%. Regenerate any take that adds real gunshot effects or drill hats.
+- **BPM / Key / Swing:** KNOCK lane, 148 BPM, snare on 3, G minor (808 root G1, 49.0 Hz). WOMP Pocket: Swing % 52, Swing Grid 16th, Snare/Clap Lay-back +3 ms.
+- **Progression:** Verses Gm9 → C9 (i9 → IV9). Hook: Gm9 → F → Eb → D7#9. Bridge: Ebmaj7 → D7#9. Outro: C → Cm → Gm, the Amen that lands minor. No take-backs.
+- **Drums:** Snare on 3 layered with the piece click; busy kick on 1, the "a" of 1, the "e" of 3 and the "and" of 4; 1/16 hats. WOMP Rolls: Roll Target Hi-Hats, Trigger Both, Roll Chance 30%, Roll Rate 1/32 and 1/16T, Velocity Shape Crescendo. Full 1-beat stops before "Touch it and it's yours" and "Four shots."
+- **Bass:** Rolling 16th 808 on G1, fast glides to Bb1 and D1. WOMP 808 Glide: Mode Retrigger + Slide, Glide Time 40 ms. Stutters: WOMP Rolls, Roll Target Single Note, Single Note G1, Roll Chance 18%, Roll Rate 1/32. WOMP Low End: Drive 65%, Harmonics Mix 50%. The bridge drops the 808; the heartbeat kick is the bass.
+- **Samples & Keys:** Spiccato string ostinato G–Bb–D–Eb. Muted piano through WOMP Dust. WOMP Whistle on hooks, Glide Time 200 ms, falling D to G. The "crack" is snare plus a reversed cymbal, not a gunshot.
+- **Street Gospel layer:** Mama's rule as a ghost: choir "ooh" under the hooks. No organ, no tambourine.
+- **Arrangement map:** Intro 4 (click, silence, spoken) → V1 16 → Hook 8 → V2 16 (808 out bars 1–2; crack bar 1; stop before bar 13) → Hook 8 → Bridge 8 (stripped: heartbeat plus click) → Hook 4 (full slam) → Outro 4 (siren, clock, click).
+- **Vocal direction:** Breathless and fast. Whispered doubles on "touch move" and "Mama told me."
+- **Mix note:** On the crack, duck the mix 1 dB for 200 ms. Master −7.5 LUFS integrated, true peak −1 dBTP.
+- **Suno tips:** Weirdness 40%, Style Influence 75%. Regenerate takes with real gunshots or a slow 74 BPM feel.
 
 ## Lyrics
 ```

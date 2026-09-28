@@ -6,25 +6,25 @@ It's a July night in the Rooks, the two housing towers the crew holds like a for
 
 ## Suno Style Prompt
 ```
-West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, dark cinematic minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 98 BPM, F-sharp minor, aggressive crew war-chant anthem, blaring 70s horn section blasts, siren-like whistle lead, stadium stomps and claps, snare layered with a hard wooden piece click, walkie-talkie static and radio chirps as transitions, dark choir chants, half-time breakdown before the final hook, gritty baritone male rap with shouted energetic delivery, gang-vocal call-and-response hook, crowd ad-libs, young boy voice on a radio, loud punchy anthem mix with heavy low end
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 150 BPM half-time snare with double-time energy, F-sharp minor, aggressive crew war-chant anthem, blaring 70s horn blasts, siren-like whistle lead, stomps and claps, rolling 16th-note distorted 808 with octave-drop glides and 808 stutters, 1/32 and triplet hat rolls, walkie-talkie static and radio chirps, dark choir chants, gritty baritone male rap, energetic, shouted rapid-fire flow, gang-vocal call-and-response hook, crowd ad-libs, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
 ```
-pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, arena rock, drill
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, arena rock
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 98 BPM, F-sharp minor (808 root F#1, about 46.2 Hz). 16th swing at 55%, tight like soldiers on post.
-- **Progression:** Verses: F#m7 → B9 (i7 → IV9). Hook: F#m9 → E → D → C#7#9. Half-time bridge: F#m9 → Dmaj7 → C#7#9.
-- **Drums:** Stomps, claps and the piece click on the snare. Kick on 1, the "a" of 1, 3. WOMP Pocket: swing 55%, snare +8 ms. Parallel crush 30%. Bridge: snare on 3 only.
-- **Bass:** 808 with WOMP 808 Glide octave-drop accents on every "Castle!" Synth bass (Retro Synth saw, LPF 900 Hz) plays 16th funk lines. V2 bars 1–4 (1:58, AC units dripping): 808 out, synth bass pulses 8ths. Bridge: 808 and clock only. WOMP Low End drive 40%.
-- **Samples & Keys:** Studio Horns blasts on the downbeat of hook bars and the "and" of 4 in verses, through WOMP Dust. Whistle lead as a siren: glide 250 ms, rising C# → F# on each hook pickup. Walkie static and chirps in Quick Sampler, bandpassed.
-- **Street Gospel layer:** A tower, not a church: dark choir chants double "Castle!" (stacks ±80). No organ. Tambourine on 2 and 4 only on the final hook, the sunrise-on-the-roof moment.
-- **Arrangement map:** Intro 8 (walkie, clock, crew chant) → V1 16 (drop drums bars 15–16) → Hook 8 → V2 16 (808 out bars 1–4; drop drums bars 15–16) → Hook 4 → Bridge 4 (half-time, 808 plus clock) → Hook 8 (all in: horns, choir, tambourine) → Outro 4 (walkie, piece click).
-- **Vocal direction:** Shouted. Crew ad-libs ±40, 8-voice gang stacks. Tre's radio lines through phone EQ. Bridge half-spoken.
-- **Mix note:** Glue the horns and choir on one bus (VCA 2:1) so the chants hit as one wall. Solo the kick against the 808 on phone speakers: this track lives on the octave-drop harmonics.
-- **Suno tips:** Weirdness 35%, Style Influence 75%. If it goes arena rock or modern drill, regenerate with the BPM moved to the front of the song-specific part.
+- **BPM / Key / Swing:** KNOCK lane, 150 BPM, snare on 3, F-sharp minor (808 root F#1, 46.2 Hz). Tight like soldiers on post. WOMP Pocket: Swing % 52, Swing Grid 16th, Snare/Clap Lay-back +2 ms.
+- **Progression:** Verses F#m7 → B9 (i7 → IV9). Hook: F#m9 → E → D → C#7#9. Breakdown: F#m9 → Dmaj7 → C#7#9.
+- **Drums:** Stomps, claps and the piece click on the beat-3 snare. Busy kick: 1, the "a" of 1, the "and" of 2, the "e" and "a" of 4. 1/16 hats. WOMP Rolls: Roll Target Hi-Hats, Trigger Both, Roll Chance 30%, Roll Rate 1/32 (verses) and 1/32T (hooks), Velocity Shape Crescendo.
+- **Bass:** Rolling 16th 808 on F#1, octave-drop F#2 → F#1 glide on every "Castle!" WOMP 808 Glide: Mode Retrigger + Slide, Glide Time 40 ms. Stutters: WOMP Rolls, Roll Target Single Note, Single Note F#1, Roll Rate 1/32. WOMP Low End: Drive 65%, Harmonics Mix 55%. Synth bass out; horns fill the mids.
+- **Samples & Keys:** Studio Horns blasts on hook downbeats, through WOMP Dust. WOMP Whistle as a siren: Glide Time 250 ms, rising C# → F# into each hook. Walkie static bandpassed.
+- **Street Gospel layer:** A tower, not a church: dark choir chants double "Castle!" No organ. Tambourine only on the final hook, sunrise on the roof.
+- **Arrangement map:** Intro 8 (walkie, clock, chant; 808 roll bar 8) → V1 16 → Hook 8 → V2 16 (808 out bars 1–2, AC units dripping) → Hook 4 → Breakdown 4 (808 plus clock, hats out) → Hook 8 (all in) → Outro 4 (walkie, click).
+- **Vocal direction:** Shouted, rapid. Crew ad-libs, 8-voice gang stacks. Tre's radio lines through phone EQ.
+- **Mix note:** Glue horns and choir on one bus. Check the 808 harmonics on phone speakers. Master −7.5 LUFS integrated, true peak −1 dBTP.
+- **Suno tips:** Weirdness 35%, Style Influence 75%. If it goes arena rock, move "rolling 16th-note 808" to the front.
 
 ## Lyrics
 ```

@@ -6,25 +6,25 @@ It's a cold October night, and Knight, twenty-one, makes his biggest move yet. H
 
 ## Suno Style Prompt
 ```
-West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, dark cinematic minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 144 BPM written half-time so it rides like 72, B minor, cold tense nighttime betrayal, eerie detuned whistle lead, detuned Rhodes stabs, low haunting choir hum, sliding 808 glides, sparse verses with sudden drum dropouts, dirt bike engine whine and a pistol tapping on glass in verse one, clock ticking that speeds up into each hook, gritty baritone male rap, cold precise and conversational, half-sung haunting hook with low doubled vocals, heavy sidechained low end, claustrophobic mix with wide reverb tails
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 144 BPM half-time snare with double-time energy, B minor, cold tense nighttime betrayal, eerie detuned whistle lead, detuned Rhodes stabs, low haunting choir hum, rolling 16th-note distorted 808 with fast glides and stutters, 1/32 and triplet hat rolls, sudden drum dropouts, dirt bike engine whine, pistol tapping on glass, clock speeding into each hook, gritty baritone male rap, energetic, cold precise rapid flow, haunting half-sung hook, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
 ```
-pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, drill, UK drill
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, UK drill
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 144 BPM written half-time (72 feel), B minor (808 root B0, about 30.9 Hz). 16th swing at 55% on the 144 grid.
-- **Progression:** Verses: Bm9 → E9 (i9 → IV9, played cold and sparse). Hook: Bm9 → A → G → F#7#9. Bridge: Gmaj7 → F#7#9, held, the window closing.
-- **Drums:** Half-time: kick on 1 and the "a" of 2, snare on beat 3 of each bar. 8th hats, no rolls. WOMP Pocket: swing 55%, snare +10 ms. The clock ticks in quarters, then 8ths, then 16ths over the 2 bars before each hook (use the drum drop for this).
-- **Bass:** 808 on B0 with WOMP Low End drive 40% so it survives phone speakers. WOMP 808 Glide 100 ms, octave-drop accent on "shattered." V2 bars 1–4 (Reese: "Who?"): 808 out, synth bass pulses a single B. Sidechain the 808 to the kick at −5 dB.
-- **Samples & Keys:** Whistle (Retro Synth, two oscillators detuned −10 cents, glide 180 ms) sings F#–D–B–A# on the hooks. Rhodes stabs through WOMP Dust heavy. Dirt bike whine V1 bars 10–11; glass taps V1 bar 12.
-- **Street Gospel layer:** Held back: mercy with no church. Just a low choir hum under the hooks and a single B3 chord on "let the door close slow."
-- **Arrangement map:** Intro 4 (accelerating clock, spoken) → V1 16 (drop drums bars 15–16) → Hook 8 → V2 16 (808 out bars 1–4) → Hook 4 → Bridge 4 (beat out, clock only) → V3 8 → Hook 4 → Outro 4 (dirt bike fading, piece click).
-- **Vocal direction:** Cold and conversational. Doubles on "I seen you." Smoke's line through a muffled 500 Hz–2.5 kHz bandpass.
-- **Mix note:** Let the reverb tails run wide on the drops, then gate them hard on the downbeat of each hook so the return slams.
-- **Suno tips:** Weirdness 40%, Style Influence 75%. If Suno plays it as a fast double-time song, put "half-time" first and regenerate.
+- **BPM / Key / Swing:** KNOCK lane, 144 BPM, snare on 3, B minor (808 root B0, 30.9 Hz). WOMP Pocket: Swing % 53, Swing Grid 16th, Snare/Clap Lay-back +3 ms.
+- **Progression:** Verses Bm9 → E9 (i9 → IV9, cold and sparse on top). Hook: Bm9 → A → G → F#7#9. Bridge: Gmaj7 → F#7#9, held, the window closing.
+- **Drums:** Snare on 3; busy kick on 1, the "a" of 1, the "and" of 2 and the "e" of 4; 1/16 hats. WOMP Rolls: Roll Target Hi-Hats, Trigger Both, Roll Chance 25%, Roll Rate 1/32T, Velocity Shape Crescendo. The clock steps 1/4 → 1/8 → 1/16 over the 2 bars before each hook.
+- **Bass:** Rolling 16th 808 on B0, fast glides to D1 and F#1; octave drop on "shattered." WOMP 808 Glide: Mode Retrigger + Slide, Glide Time 40 ms. Stutters: WOMP Rolls, Roll Target Single Note, Single Note B0, Trigger Random Chance, Roll Chance 20%, Roll Rate 1/32. WOMP Low End: Drive 65%, Harmonics Mix 60% so the 31 Hz root survives phones. Synth bass out.
+- **Samples & Keys:** WOMP Whistle, two oscillators detuned −10 cents, Glide Time 160 ms, sings F#–D–B–A# on hooks. Rhodes stabs through heavy WOMP Dust. Dirt bike V1 bars 10–11; glass taps bar 12.
+- **Street Gospel layer:** Held back: mercy with no church. A low choir hum under hooks, one B3 chord on "let the door close slow."
+- **Arrangement map:** Intro 4 (accelerating clock) → V1 16 (drums drop bars 15–16) → Hook 8 → V2 16 (808 out bars 1–2 on "Who?") → Hook 4 → Bridge 4 (clock plus sustained 808) → V3 8 → Hook 4 → Outro 4 (dirt bike, click).
+- **Vocal direction:** Cold, precise, fast. Doubles on "I seen you." Smoke's line bandpassed.
+- **Mix note:** Reverb tails wide on the drops, gated on the hook downbeat so the return slams. Master −7.8 LUFS integrated, true peak −1 dBTP.
+- **Suno tips:** Weirdness 40%, Style Influence 75%. If Suno settles into a 72 BPM groove, move "double-time energy" first.
 
 ## Lyrics
 ```
