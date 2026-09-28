@@ -17,7 +17,7 @@ pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, m
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** 88 BPM, Eb major with turns into C minor, swing 56%.
 - **Progression:** Verses: Ebmaj9 – Cm9 – Fm9 – Bb13 (I–vi–ii–V). Hook: Abmaj9 – G7#9 – Cm9 – Cm9, then Fm9 – Bb13 – Ebmaj9. Final hook ends Ab – Abm6 – Eb (IV–iv–I "Amen").
-- **Drums:** DMD hard kick, crisp snare, hats swung. Pen scratches on the offbeats (Quick Sampler). WOMP Pocket: Snare Delay +12 ms, Hat Swing 56%, Humanize 10.
+- **Drums:** DMD hard kick, crisp snare, hats swung. Pen scratches on the offbeats (Quick Sampler). WOMP Pocket: Snare/Clap Lay-back 12 ms, Swing % 56, Velocity Humanize 10.
 - **Bass:** The Moog lane plays walking fills into each chord. The 808 on Eb1 (39 Hz) plays roots, with 80 ms glides on the ii–V. Hazel's V2 bars 1–4 are 808-free.
 - **Samples & Keys:** Replayed "sample": flute (Studio Woodwinds) and harp (Sampler) figure G–Bb–C–Eb, looped 2 bars and printed through WOMP Dust (Wow 30%, Bandwidth 8 kHz). The Rhodes plays the signature lick transposed to Eb major (G–Bb–C–D–C–Bb–G). WOMP Whistle lead joins only the final hook.
 - **Street Gospel layer:** Hook harmonies stack 3rd above and 5th below; the choir "Haaa-zel" rises through the final hook; tambourine on 2 and 4 there.

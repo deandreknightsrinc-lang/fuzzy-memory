@@ -17,8 +17,8 @@ pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, m
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** 68 BPM in 12/8 (dotted-quarter pulse), Bb major. No extra swing: 12/8 is the swing.
 - **Progression:** Verses: Bbmaj9 – Gm9 – Cm9 – F13. Hook: Cm9 – F13 – Bbmaj9 – Bb7 (soul ii9–V13–Imaj9, then Bb7 pushes to IV). Hook tag: Eb – Ebm6 – Bb (gospel IV–iv–I). Bridge turnaround: Bb – Gm7 – Cm7 – F7.
-- **Drums:** DMD soft kit: round kick on 1 and 4 of the 12/8 bar, brushed snare on beat 7 (the half-time backbeat), tambourine on 4 and 10. WOMP Pocket: Snare Delay +18 ms (very lazy), Humanize 14, Ghost Notes on.
-- **Bass:** 808 is soft and low (Bb0, 29 Hz) on the downbeats only, with 120 ms glides on chord changes. The Moog lane plays walking gospel lines (Bb–C–D–Eb into F). WOMP Low End: Drive 15%, Tight LPF 90 Hz.
+- **Drums:** DMD soft kit: round kick on 1 and 4 of the 12/8 bar, brushed snare on beat 7 (the half-time backbeat), tambourine on 4 and 10. WOMP Pocket: Snare/Clap Lay-back 18 ms (very lazy), Velocity Humanize 14, Ghost Snare Chance 30%.
+- **Bass:** 808 is soft and low (Bb0, 29 Hz) on the downbeats only, with 120 ms glides on chord changes. The Moog lane plays walking gospel lines (Bb–C–D–Eb into F). WOMP Low End: Drive 15%, Tight 30 Hz, plus a Channel EQ low-pass at 90 Hz.
 - **Samples & Keys:** Vintage B3 lead, Leslie slow on verses, fast on hooks. Church piano (Steinway, Soft) doubles the right hand. Rhodes plays only the signature lick under Ruth's spoken lines.
 - **Street Gospel layer:** Call-and-response is built into the hook ("sweet tea and a warning" answered by the choir). Organ swells into every hook; a hand-clap layer on the final hook only.
 - **Arrangement map:** Intro 4 (door creak, crickets, Ruth spoken) → V1 12 → Hook 8 → Ruth spoken 4 (drums out) → V2 12 → Bridge 8 (Hazel through the screen door, Ruth answers, choir swell) → Hook 8 (+claps) → Outro 4 (Ruth spoken, organ hum, crickets).

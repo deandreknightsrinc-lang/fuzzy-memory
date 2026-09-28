@@ -17,7 +17,7 @@ pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, m
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** 86 BPM, F# minor (Dorian: D# natural), 16th swing 57%, the laziest pocket on the album.
 - **Progression:** Verses: F#m7 – B9 (i7–IV9, the core lowrider loop). Hook (soul lift to A): Bm9 – E13 – Amaj9 – C#7#9. Bridge turnaround: A – F#m7 – Bm7 – E7. V3 trade: Dmaj9 – C#m7 – Bm9 – E13.
-- **Drums:** DMD kit with a dusty acoustic kick and rim-heavy snare; shaker 16ths. Kick on 1 and the "and" of 3. WOMP Pocket: Snare Delay +14 ms, Hat Swing 57%, Humanize 12.
+- **Drums:** DMD kit with a dusty acoustic kick and rim-heavy snare; shaker 16ths. Kick on 1 and the "and" of 3. WOMP Pocket: Snare/Clap Lay-back 14 ms, Swing % 57, Velocity Humanize 12.
 - **Bass:** 808 on F#1 (46 Hz), glide 80 ms up to B on bar 2. The Moog lane plays short syncopated pops on A2/C#3 above it. Hazel's V2 bars 1–4 are 808-free; the synth bass walks. WOMP Low End: Mono Below 120 Hz, Punch 30%.
 - **Samples & Keys:** **WOMP Whistle** on Retro Synth (sine, glide 200 ms, vibrato 5 Hz, delay 300 ms) plays the hook melody an octave up, doubled an octave down at −12 dB. Muted jazz guitar answers the verses. Strings replay a rising 3-note figure through WOMP Dust.
 - **Street Gospel layer:** Choir "Haaa-zel" in the bridge; church bells (Sampler) on beat 1 of the bridge; tambourine joins the final hook.

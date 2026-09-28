@@ -17,7 +17,7 @@ pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, m
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** 68 BPM half-time, Eb minor, swing 58%.
 - **Progression:** Verses: Ebm9 – Ab9 (i9–IV9). Pre-chorus: Abm9 – Db13 – Gbmaj9 – Bb7#9 (soul ii–V–I in Gb, back to Ebm). Chorus: Cbmaj9 – Bb7#9 – Ebm9 – Ebm9. Final chorus tag: Cb – Cbm6 – Gb.
-- **Drums:** DMD soft kit: heavy kick on 1, brushed snare on 3 (half-time), brush sweeps as hats. WOMP Pocket: Snare Delay +18 ms, Humanize 14.
+- **Drums:** DMD soft kit: heavy kick on 1, brushed snare on 3 (half-time), brush sweeps as hats. WOMP Pocket: Snare/Clap Lay-back 18 ms, Velocity Humanize 14.
 - **Bass:** The Moog lane leads: round, LPF 500 Hz, long notes. The 808 on Eb1 (39 Hz) only in choruses, 120 ms glides from Bb up to Eb. V2 opens with no 808.
 - **Samples & Keys:** Suitcase Rhodes with slow tremolo (20%) carries the song, with Soul Chords min11 voicings. Studio Strings, muted (LPF 6 kHz), sustain. Wah guitar only as slow swells on the pre-choruses. Rain and keys-in-lock through WOMP Dust.
 - **Street Gospel layer:** Hazel's gospel runs are the church; the choir "Haaa-zel" is a faint memory in the final chorus (−12 dB, long hall); no organ.

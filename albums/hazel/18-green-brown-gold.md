@@ -17,7 +17,7 @@ pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, m
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** 76 BPM half-time, Db major, swing 56%.
 - **Progression:** Verses: Dbmaj9 – Bbm9 – Ebm9 – Ab13 (I–vi–ii–V). Chorus: Gbmaj9 – Fm7 – Ebm9 – Ab13 (IV–iii–ii–V). Bridge: Ebm9 – Ab13 – Dbmaj9 – F7#9 (ii9–V13–Imaj9, with a V/vi push). Final chorus end: Gb – Gbm6 – Db (the "Amen" cadence as relief).
-- **Drums:** DMD soft punchy kit: kick on 1 and the "and" of 2, snare on 3, shaker 16ths. WOMP Pocket: Snare Delay +14 ms, Humanize 12. The monitor beep in the intro sits at 76 BPM on beat 1.
+- **Drums:** DMD soft punchy kit: kick on 1 and the "and" of 2, snare on 3, shaker 16ths. WOMP Pocket: Snare/Clap Lay-back 14 ms, Velocity Humanize 12. The monitor beep in the intro sits at 76 BPM on beat 1.
 - **Bass:** The Moog lane plays melodic runs up to each chord (Ab–Bb–C–Db). The 808 on Db1 (35 Hz) plays roots in the chorus, with 100 ms glides. V2 bars 1–4 have no 808.
 - **Samples & Keys:** Suitcase Rhodes plays the signature lick, in Db (F–Ab–Bb–C–Bb–Ab–F), as the main hook instrument. Studio Horns flugelhorn plus Studio Strings replay the melody (Ab–Bb–Db–Eb–F), through WOMP Dust. The EVOC 20 talkbox sings "gold" after each chorus.
 - **Street Gospel layer:** Gospel harmonies on "gold when she cry"; the choir "Haaa-zel" blooms under the final chorus; B3 enters only for the final chorus.

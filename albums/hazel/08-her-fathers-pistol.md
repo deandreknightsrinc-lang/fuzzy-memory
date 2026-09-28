@@ -17,9 +17,9 @@ pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, m
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** 85 BPM, E minor (Dorian: C# natural), swing 56%.
 - **Progression:** Verses: Em9 – A9 (i9–IV9), grim and circular. Hook: Cmaj9 – B7#9 – Em9 – Em9. Otis's spoken bars: Em9 held, B3 drone only. Final bar: C – Cm6 – Em (a minor-plagal close, no resolution).
-- **Drums:** DMD dusty kick, snare with a 12 ms clap, no open hats. The revolver click sits on the "a" of 4 (Quick Sampler). WOMP Pocket: Snare Delay +16 ms, Humanize 12.
+- **Drums:** DMD dusty kick, snare with a 12 ms clap, no open hats. The revolver click sits on the "a" of 4 (Quick Sampler). WOMP Pocket: Snare/Clap Lay-back 16 ms, Velocity Humanize 12.
 - **Bass:** 808 on E1 (41 Hz), long, with a slow 150 ms glide from B down to E on the hook. The Moog lane is sparse and dark (LPF 500 Hz). In V2 (Otis) the 808 drops for 4 bars and the Moog walks.
-- **Samples & Keys:** Suitcase Rhodes detuned −15 cents with Chorus. The wah guitar (Pedalboard Wah, slow rocking) creeps in the gaps. Vintage B3 drone on E2, Leslie off. WOMP Dust at 50% Wow for a warped-record feel.
+- **Samples & Keys:** Suitcase Rhodes detuned −15 cents with Chorus. The wah guitar (Pedalboard Wah, slow rocking) creeps in the gaps. Vintage B3 drone on E2, Leslie off. WOMP Dust with Wow at 50% for a warped-record feel.
 - **Street Gospel layer:** Held back on purpose: only one "Haaa-zel" swell at the very end, 6 voices, long hall.
 - **Arrangement map:** Intro 4 (cylinder spin, Otis spoken) → V1 16 (Knight; drums out bars 15–16) → Hook 8 → V2 12 (Otis) → Spoken 4 (three bullets; beat drops to drone + clicks) → V3 12 (Knight) → Hook 8 (+guitar) → Outro 4 (choir swell, hammer click, silence).
 - **Vocal direction:** Knight is hungry and tense. Otis is slow and low with dry close mic, no doubles. Hazel's hook is distant: HPF 200 Hz, 1/8 dotted delay, 40% wet.

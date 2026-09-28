@@ -17,7 +17,7 @@ pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, m
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** 90 BPM, G minor (Dorian: E natural), swing 55%.
 - **Progression:** Verses: Gm9 – F – Eb – D7#9 (i9–bVII–bVI–V7#9). Hook: Gm9 – C9 twice, then Ebmaj9 – D7#9. Bridge: Cm9 – F13 – Bbmaj9 – D7#9 (soul ii–V–I in Bb, back to Gm). Last hook ends on Ebmaj9 – D7#9 – Gm9 held.
-- **Drums:** DMD kick through Distortion (Warm Drive 20%), whip-crack snare with a gated plate. The double-time V2 keeps the kit but adds a 16th shaker, no hi-hat rolls. WOMP Pocket: Snare Delay +10 ms, Hat Swing 55%.
+- **Drums:** DMD kick through Distortion (Warm Drive 20%), whip-crack snare with a gated plate. The double-time V2 keeps the kit but adds a 16th shaker, no hi-hat rolls. WOMP Pocket: Snare/Clap Lay-back 10 ms, Swing % 55.
 - **Bass:** 808 on G1 (49 Hz), gliding down to D on the V7#9 bar. The Moog lane plays hard staccato 8ths. V2 bars 1–4 are Moog only, like the car pulling off.
 - **Samples & Keys:** Studio Strings (short spiccato) lead in verses, long swells on the hook. Vintage Clav through a Phat FX envelope filter stabs on the "and" of 4. Rhodes stays dark and low. Police radio lines through the Telephone EQ.
 - **Street Gospel layer:** The choir only lands on the final hook and the "Haaa-zel" swell after the bridge; B3 fast Leslie swell into it.

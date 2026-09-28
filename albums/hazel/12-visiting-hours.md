@@ -17,7 +17,7 @@ pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, m
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** 84 BPM, D minor (Dorian: B natural), swing 56%.
 - **Progression:** Verses: Dm9 – G9 (i9–IV9). Hook: Bbmaj9 – A7#9 – Dm9 – Dm9, then Gm9 – C13 – Fmaj9 – A7#9 (soul ii9–V13–Imaj9 in F). Bridge croon: Gm9 – C13 – Fmaj9 – A7#9. Final tag: Bb – Bbm6 – F.
-- **Drums:** DMD kit with a crisp acoustic kick and a rimshot instead of a snare in the verses; a full snare on the hooks. WOMP Pocket: Snare Delay +12 ms, Hat Swing 56%.
+- **Drums:** DMD kit with a crisp acoustic kick and a rimshot instead of a snare in the verses; a full snare on the hooks. WOMP Pocket: Snare/Clap Lay-back 12 ms, Swing % 56.
 - **Bass:** The Moog lane plays an upright-style part (LPF 600 Hz, short envelope, walking quarter notes D–E–F–G). The 808 on D1 (37 Hz) doubles only the hooks. In V2 bars 1–4 there's no 808, just the walk.
 - **Samples & Keys:** Studio Horns solo flugelhorn (harmon-mute feel via Channel EQ bandpass 500 Hz–4 kHz) plays the lonely lead: A–C–D–F–E–D. Studio Strings sustain on the hooks. Rhodes with Soul Chords (min9). Everything through WOMP Dust.
 - **Street Gospel layer:** Hazel's gospel runs on "Close as I can be"; B3 soft swell into the second hook; faint "Haaa-zel" at the end.

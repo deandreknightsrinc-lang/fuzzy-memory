@@ -17,7 +17,7 @@ pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, m
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** 96 BPM, C minor (Dorian: A natural), swing 54%.
 - **Progression:** Verses: Cm9 – F9 (i9–IV9). Hook: Abmaj9 – Bb – Cm9 – Cm9, with Cm9 – Bb – Ab – G7#9 as the turnaround. V3: Cm9 – Abmaj9 on Rhodes only. Final hook tag: F – Fm6 – C (IV–iv–I with a major lift: he's home).
-- **Drums:** DMD "Big" kit, snare + two claps, tambourine on 2 and 4 in all hooks, hand claps on the final hook. WOMP Pocket: Snare Delay +8 ms, Hat Swing 54%. Parallel crush at 30%.
+- **Drums:** DMD "Big" kit, snare + two claps, tambourine on 2 and 4 in all hooks, hand claps on the final hook. WOMP Pocket: Snare/Clap Lay-back 8 ms, Swing % 54. Parallel crush at 30%.
 - **Bass:** 808 on C1 (33 Hz) with octave-drop accents at the end of each hook line. The Moog lane is distorted (WOMP Low End Drive 45%) playing funk 16ths. V2 bars 1–4: Moog only. V3: 808 whole notes.
 - **Samples & Keys:** Studio Horns (full section) play the hook riff Eb–F–G–Bb–C on the "and" of 4, through WOMP Dust for a "1976" bite. Vintage B3 fast Leslie on hooks. Suitcase Rhodes plays the signature lick under the verses, transposed to C minor (G–Bb–C–D–C–Bb–G).
 - **Street Gospel layer:** Choir stabs on "down," 12 voices; the "Haaa-zel" swell explodes into the final hook; Hazel's belted ad-libs answer the gang vocals.

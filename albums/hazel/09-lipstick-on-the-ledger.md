@@ -17,7 +17,7 @@ pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, m
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** 72 BPM half-time, C# minor (Dorian: A# natural), swing 57%.
 - **Progression:** Verses: C#m9 – F#9 (i9–IV9). Hook: Amaj9 – G#7#9 – C#m9 – C#m9. Bridge (relative-major soul): F#m9 – B13 – Emaj9 – G#7#9. Final tag: A – Am6 – C#m (minor plagal).
-- **Drums:** DMD soft heavy kick, rimshot on 3, adding-machine clicks programmed as 16th hats (Quick Sampler). WOMP Pocket: Snare Delay +14 ms, Hat Swing 57%, Ghost Notes on.
+- **Drums:** DMD soft heavy kick, rimshot on 3, adding-machine clicks programmed as 16th hats (Quick Sampler). WOMP Pocket: Snare/Clap Lay-back 14 ms, Swing % 57, Ghost Snare Chance 30%.
 - **Bass:** 808 on C#1 (35 Hz) with long glides (WOMP 808 Glide 120 ms), sliding up to F# on bar 2. The Moog lane is minimal. For the rap verse, the first 4 bars are 808-free.
 - **Samples & Keys:** Vintage Clav through Auto-Wah (slow envelope) plays the lead riff (C#–E–F#–G#). Suitcase Rhodes, no tremolo, with Soul Chords min11 voicings. Studio Strings replay a two-note sigh, LPF 7 kHz, through WOMP Dust.
 - **Street Gospel layer:** Choir enters only for the bridge swell, low and dark (6 voices, Concert Hall); B3 whisper swell into the last hook.

@@ -17,7 +17,7 @@ pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, m
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** 80 BPM (half-time gospel march) for the intro through the bridge, then a switch to 92 BPM, C major, swing 55%. Put a Logic tempo change at the "[Beat switch]" bar.
 - **Progression:** March and verses: Cmaj9 – Am9 – Dm9 – G13. Chorus: Fmaj9 – Em7 – Dm9 – G13, ending F – Fm6 – C (gospel IV–iv–I). V3 rap (92 BPM): Am9 – D9 (A Dorian i9–IV9), then Fmaj9 – E7#9 – Am9, then Dm9 – G13 into the chorus. Final turnaround: C – Am7 – Dm7 – G7.
-- **Drums:** Intro: tambourine and claps only. The march adds a soft kick on 1 and 3. At 92 BPM, a full DMD boom-bap kit hits. WOMP Pocket: Snare Delay +10 ms, Hat Swing 55%. Claps on the final chorus.
+- **Drums:** Intro: tambourine and claps only. The march adds a soft kick on 1 and 3. At 92 BPM, a full DMD boom-bap kit hits. WOMP Pocket: Snare/Clap Lay-back 10 ms, Swing % 55. Claps on the final chorus.
 - **Bass:** The Moog lane walks the march. At the switch, the 808 on C1 (33 Hz) and A0 plays with 90 ms glides and an octave drop into the final chorus.
 - **Samples & Keys:** Vintage B3, fast Leslie, leads the march. Horns and strings replay a bright 4-bar figure (E–G–A–C) through WOMP Dust. WOMP Whistle floats over V3. The Rhodes signature lick, in C (E–G–A–B–A–G–E), closes the album.
 - **Street Gospel layer:** Full: choir march "Haaa-zel," call-and-response on "off the board," tambourine, claps, organ swells.

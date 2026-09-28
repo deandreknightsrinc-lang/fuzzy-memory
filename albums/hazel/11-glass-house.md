@@ -17,7 +17,7 @@ pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, m
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** 94 BPM, B minor (Dorian: G# natural), swing 55%.
 - **Progression:** Verses: Bm9 – A – G – F#7#9 (i9–bVII–bVI–V7#9). Hook: Bm7 – E9 (i7–IV9) twice, then Gmaj9 – F#7#9. Bridge (Rhodes only): Em9 – A13 – Dmaj9 – F#7#9 (soul ii–V–I in D, back to Bm). Outro croon: Gmaj9 – F#m7 – Em9 – Bm9.
-- **Drums:** DMD knocking kick, snare + clap + rim, open hat on the "and" of 4 only. WOMP Pocket: Snare Delay +8 ms (angry, less lazy), Hat Swing 55%, Ghost Notes on.
+- **Drums:** DMD knocking kick, snare + clap + rim, open hat on the "and" of 4 only. WOMP Pocket: Snare/Clap Lay-back 8 ms (angry, less lazy), Swing % 55, Ghost Snare Chance 30%.
 - **Bass:** 808 on B0 (31 Hz) through WOMP Low End Drive 40% for growl; it glides down from F# to B at each loop turn. The Moog lane is distorted (ChromaGlow Crunch) with 16th octave jumps. For Hazel's V2 the 808 is out for 4 bars.
 - **Samples & Keys:** Wah guitar (Amp Designer, Pedalboard Wah) plays chicken-scratch 16ths, 30L, and a lead riff (B–D–E–F#) on hooks. Clav stabs 30R. Studio Strings replay reversed (Sampler Reverse) under V1 through WOMP Dust.
 - **Street Gospel layer:** Hazel's gospel grit is the church here. The only choir is a faint "Haaa-zel" pad under the final croon chord.

@@ -17,7 +17,7 @@ pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, m
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** 92 BPM, F minor (Dorian: D natural), 16th swing 55%. Rink intro is straight.
 - **Progression:** Verse 1: Fm9 – Bb9 (i9–IV9). Hook (soul lift toward Ab): Bbm9 – Eb13 – Abmaj9 – C7#9. Verse 2 (the Regal): Fm9 – Eb – Db – C7#9 (i9–bVII–bVI–V7#9 tension). Bridge: Dbmaj9 – Eb13 – Cm7 – Fm9. Final hook ends Db – Dbm6 – Ab.
-- **Drums:** DMD "Heavy" kick plus 808 click, fat snare with a 10 ms clap, tambourine on 2 and 4 in the hooks. WOMP Pocket: Snare Delay +10 ms, Hat Swing 55%, Ghost Notes on. Verse 2 bars 1–4 are kick-and-hat only (the parking lot), full kit at bar 5.
+- **Drums:** DMD "Heavy" kick plus 808 click, fat snare with a 10 ms clap, tambourine on 2 and 4 in the hooks. WOMP Pocket: Snare/Clap Lay-back 10 ms, Swing % 55, Ghost Snare Chance 30%. Verse 2 bars 1–4 are kick-and-hat only (the parking lot), full kit at bar 5.
 - **Bass:** Retro Synth Moog lane plays syncopated 16ths with octave jumps (F1–F2) in V1. Per the guide, the 808 is out for V2 bars 1–4, then enters on Db with a 110 ms glide down to C. WOMP Low End: Punch 40%, Mono Below 120 Hz.
 - **Samples & Keys:** Studio Horns (trumpet, tenor, bari) stab on the "and" of 4, through WOMP Dust (Bandwidth 9 kHz). The B3 rink intro plays an F major figure that sours to F minor when the beat hits. Rhodes comps the hooks.
 - **Street Gospel layer:** The choir answers "love don't play fair" in the last hook; one "Haaa-zel" swell after the bridge; B3 swell into every hook.

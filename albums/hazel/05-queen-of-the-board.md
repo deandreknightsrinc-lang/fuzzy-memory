@@ -17,8 +17,8 @@ pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, m
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** 95 BPM, C# minor, 16th swing 54% (tighter, it's an anthem).
 - **Progression:** Verses: C#m9 – B – A – G#7#9 (i9–bVII–bVI–V7#9, the war loop). Hook: C#m7 – F#9 (Dorian i7–IV9) twice, then A – B – C#m. Bridge (Hazel): Amaj9 – B13 – G#m7 – C#m9. Last hook tag: A – Am6 – E (gospel IV–iv–I in the relative major).
-- **Drums:** DMD "Big Room" kick + 808 click, snare stacked with two claps, a floor-tom hit on beat 4 of every 4th bar. WOMP Pocket: Snare Delay +8 ms, Hat Swing 54%. Parallel crush send at 30%.
-- **Bass:** 808 on C#1 (35 Hz) with an octave-drop accent on the "a" of 4 (WOMP 808 Glide Octave Drop). The Moog lane doubles horn rhythms an octave down. V2 bars 1–4: 808 out, Moog bass only.
+- **Drums:** DMD "Big Room" kick + 808 click, snare stacked with two claps, a floor-tom hit on beat 4 of every 4th bar. WOMP Pocket: Snare/Clap Lay-back 8 ms, Swing % 54. Parallel crush send at 30%.
+- **Bass:** 808 on C#1 (35 Hz) with an octave-drop accent on the "a" of 4 (write it as an overlapping note an octave down so WOMP 808 Glide in Retrigger + Slide mode drops into it). The Moog lane doubles horn rhythms an octave down. V2 bars 1–4: 808 out, Moog bass only.
 - **Samples & Keys:** Studio Horns section stabs (G#–B–C#) on every "Queen!" call; strings sustain under V2. WOMP Whistle lead enters on hook 2. Chess clock and piece click (Sampler) open and close.
 - **Street Gospel layer:** Choir chants the hook with the gang vocals, 12 voices, ±100. B3 fast Leslie on hooks. "Haaa-zel!" is a shout, not a swell, here.
 - **Arrangement map:** Intro 8 (clock, spoken, choir shout) → V1 16 (drums out bars 15–16) → Hook 8 → V2 16 (the cookout; 808 out bars 1–4) → Hook 8 (+whistle lead) → Bridge 8 (Hazel belting, choir) → Hook 8 (+horns doubled, claps) → Outro 4 (clock, spoken, click).

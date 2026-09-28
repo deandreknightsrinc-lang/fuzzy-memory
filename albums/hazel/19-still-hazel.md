@@ -17,7 +17,7 @@ pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, m
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** 90 BPM, F major (verses in D minor Dorian: B natural), swing 55%.
 - **Progression:** Verses: Dm9 – G9 (i9–IV9). Hook: Bbmaj9 – Am7 – Gm9 – C13, then Gm9 – C13 – Fmaj9 (ii9–V13–Imaj9). Bridge: Bbmaj9 – C13 – Am7 – Dm9, then Bb – Bbm6 – F (IV–iv–I).
-- **Drums:** DMD warm kit, relaxed: kick on 1 and 3½, snare on 2 and 4, soft open hat on the "and" of 4. WOMP Pocket: Snare Delay +12 ms, Hat Swing 55%, Humanize 10. The drums tighten slightly on the final hook.
+- **Drums:** DMD warm kit, relaxed: kick on 1 and 3½, snare on 2 and 4, soft open hat on the "and" of 4. WOMP Pocket: Snare/Clap Lay-back 12 ms, Swing % 55, Velocity Humanize 10. The drums tighten slightly on the final hook.
 - **Bass:** The Moog lane leads with round melodic lines. The 808 on D1 (37 Hz) and F1 (44 Hz) plays half notes with 70 ms glides. Hazel's V2 has no 808 for the first 4 bars.
 - **Samples & Keys:** A muted wah guitar (Pedalboard Wah parked half-open) plays the lead fills. Suitcase Rhodes with maj9 and 13 voicings from Soul Chords. A muted-horn replay (Studio Horns trumpet, cup-mute EQ) through WOMP Dust. The EVOC talkbox echoes "Still Hazel" in the outro.
 - **Street Gospel layer:** Subtle: the "Haaa-zel" choir under the bridge (Rhodes and bass only there), and a B3 pad on the final hook.

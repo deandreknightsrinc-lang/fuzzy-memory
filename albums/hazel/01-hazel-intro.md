@@ -17,7 +17,7 @@ pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, m
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** 88 BPM, Eb minor (Dorian: C natural in the lead lines), 16th swing 56%. The croon intro is free time.
 - **Progression:** Intro (relative-major soul turn): Abm9 – Db13 – Gbmaj9 – Bb7#9. Verses: Ebm9 – Ab9 (i9–IV9 Dorian, 2 bars each). Hook: Cbmaj9 – Bbm7 – Ebm9 – Ab13. Last choir tag: Ab – Abm6 – Eb (IV–iv–I "Amen" with a Picardy lift).
-- **Drums:** DMD layered kick (acoustic + 808 click), snare/clap (+10 ms)/rim. Kick on 1 and the "a" of 2, snare on 2 and 4, open hat on the "and" of 2 and 4. WOMP Pocket: Snare Delay +12 ms, Hat Swing 56%, Humanize 10.
+- **Drums:** DMD layered kick (acoustic + 808 click), snare/clap (+10 ms)/rim. Kick on 1 and the "a" of 2, snare on 2 and 4, open hat on the "and" of 2 and 4. WOMP Pocket: Snare/Clap Lay-back 12 ms, Swing % 56, Velocity Humanize 10.
 - **Bass:** 808 enters at the beat switch on Eb1 (39 Hz), glide 90 ms into Ab on bar 2 (WOMP 808 Glide). Moog bass plays sparse Eb2–Eb3 octave pops; in V2 bars 1–4 the 808 drops and the Moog walks. WOMP Low End: Drive 25%, Mono Below 120 Hz.
 - **Samples & Keys:** Vintage EP "Suitcase", tremolo 25%, plays the **album signature lick** (Bb4–Db5–Eb5–F5–Eb5–Db5–Bb4). Save it as MIDI for later tracks. WOMP Dust Crackle 30%. Clav through Auto-Wah on hooks only.
 - **Street Gospel layer:** 8-voice "Haaa-zel" stack (Eb–Db–Bb), ±80 pan, Concert Hall 2.8 s. B3 volume swell 0→100 over the bar before each hook.

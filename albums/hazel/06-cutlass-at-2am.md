@@ -17,8 +17,8 @@ pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, m
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** 66 BPM half-time, Gb major, 16th swing 58% on the shaker.
 - **Progression:** Verses: Gbmaj9 – Ebm9 – Abm9 – Db13. Chorus: Cbmaj9 – Bbm7 – Abm9 – Db13 (IV–iii–ii–V). Bridge: Gb – Ebm7 – Abm7 – Db7. Outro tag: Cb – Cbm6 – Gb.
-- **Drums:** DMD soft kit: felt kick on 1 and the "a" of 2, rimshot on 3 (half-time backbeat), shaker 16ths. WOMP Pocket: Snare Delay +16 ms, Humanize 14.
-- **Bass:** 808 on Gb1 (46 Hz), short and round, glides 120 ms only on the chorus. The Moog lane plays long whole notes under the verses. WOMP Low End: Drive 10%, Tight LPF 80 Hz.
+- **Drums:** DMD soft kit: felt kick on 1 and the "a" of 2, rimshot on 3 (half-time backbeat), shaker 16ths. WOMP Pocket: Snare/Clap Lay-back 16 ms, Velocity Humanize 14.
+- **Bass:** 808 on Gb1 (46 Hz), short and round, glides 120 ms only on the chorus. The Moog lane plays long whole notes under the verses. WOMP Low End: Drive 10%, Tight 30 Hz, plus a Channel EQ low-pass at 80 Hz.
 - **Samples & Keys:** EVOC 20 talkbox plays the chorus melody after each sung chorus ("tell me all your dreams"). Suitcase Rhodes, tremolo 30%, slow Phaser, voiced by WOMP Soul Chords (maj9). Studio Strings enter only in the outro for the sunrise. WOMP Dust Wow 25%.
 - **Street Gospel layer:** Hushed: an 8-voice "Haaa-zel" pad in the bridge, low in the mix, Concert Hall 3 s.
 - **Arrangement map:** Intro 4 (rain, static, croon) → V1 6 (croon) → Chorus 8 → V2 7 (Hazel, 808 out) → V3 16 (half-rap; drums out bars 15–16) → Chorus 8 (+talkbox answer) → Bridge 4 (trade, choir) → Outro 4 (strings, engine starts, Rhodes lick).

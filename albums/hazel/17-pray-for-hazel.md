@@ -17,7 +17,7 @@ pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, m
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** 72 BPM half-time, G major (verses in E minor Dorian: C# natural), swing 57%. The last hook modulates up a half step to Ab major.
 - **Progression:** Verses: Em9 – A9 (i9–IV9). Hook: Am9 – D13 – Gmaj9 – E7#9, then C – Cm6 – G (gospel IV–iv–I). Ruth's bridge: G – Em7 – Am7 – D7 (I–vi7–ii7–V7 turnaround). Pivot: Eb7 (V of Ab). Final hook in Ab: Bbm9 – Eb13 – Abmaj9 – F7#9, Db – Dbm6 – Ab.
-- **Drums:** No drums in the intro or V1. A heavy DMD kick and snare with a gospel room enter at the first hook. Tambourine on 2 and 4 from V2; claps on the final hook. WOMP Pocket: Snare Delay +14 ms, Humanize 14.
+- **Drums:** No drums in the intro or V1. A heavy DMD kick and snare with a gospel room enter at the first hook. Tambourine on 2 and 4 from V2; claps on the final hook. WOMP Pocket: Snare/Clap Lay-back 14 ms, Velocity Humanize 14.
 - **Bass:** The Moog lane plays gospel walk-ups (E–F#–G–A). The 808 on G1 (49 Hz) plays only the hooks, with 100 ms glides on the V13 bars, then shifts to Ab1 for the final hook.
 - **Samples & Keys:** Vintage B3 is the lead, with slow Leslie in the verses and fast Leslie plus volume-pedal swells into the hooks. Suitcase Rhodes plays the signature lick under Mama's entrance. The vending-machine hum is a 60 Hz sine at −30 dB, HPF'd in the mix.
 - **Street Gospel layer:** Everything: 12-voice choir (±100), call-and-response in Ruth's bridge ("Yes, Lord"), organ swells, tambourine, claps, the "Haaa-zel" stack as the hook bed.
