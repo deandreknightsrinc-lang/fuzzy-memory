@@ -6,8 +6,25 @@ Sunday evening after service, Knight walks into the Suds-N-Duds laundromat on Pi
 
 ## Suno Style Prompt
 ```
-drill-adjacent dark hip-hop, 144 BPM, G minor, cold and urgent, sliding glide 808s, skippy syncopated hi-hats, ominous choir pad, eerie minor string melody, a heavy wooden chess piece click used as the snare accent, sparse muted piano notes, gritty baritone male rap with breathless urgent delivery and whispered doubles, sudden full stops before key lines, one sharp crack in place of a gunshot, beat cuts to only a heartbeat and piece click in the bridge, ambulance siren fading through the outro, dark wide reverb, cold hard mix
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, dark cinematic minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 144 BPM written half-time, G minor, cold urgent cause and effect, eerie minor string ostinato, ominous choir pad, sparse muted piano, whistle lead crying over the hooks, sliding glide 808s, a heavy wooden piece click layered on the snare, sudden full stops before key lines, one sharp crack in place of a gunshot, beat cuts to heartbeat and piece click in the bridge, ambulance siren fading through the outro, gritty baritone male rap breathless and urgent with whispered doubles, dark wide reverb, cold hard mix
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, drill, gunshot sound effects
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 144 BPM written half-time (72 feel), G minor (808 root G1, about 49 Hz). 16th swing at 55%.
+- **Progression:** Verses: Gm9 → C9 (i9 → IV9). Hook: Gm9 → F → Eb → D7#9. Bridge: Ebmaj7 → D7#9. Outro: C → Cm → Gm, the Amen cadence that lands minor. No take-backs.
+- **Drums:** Half-time: snare on beat 3 layered with the piece click, kick on 1 and the "e" of 3, 8th hats. WOMP Pocket: swing 55%, snare +10 ms. Full stops (all tracks muted for 1 beat) before "Touch it and it's yours" and "Four shots."
+- **Bass:** 808 G1 with WOMP 808 Glide 90 ms and a tight WOMP Low End low-pass. V2 bars 1–4 (the aftermath): 808 out, strings and synth bass only. The bridge drops the 808 entirely; the heartbeat kick is the bass.
+- **Samples & Keys:** Studio Strings spiccato 8th ostinato G–Bb–D–Eb. Muted piano notes through WOMP Dust. Whistle only on the hooks, glide 220 ms, falling from D to G. The "crack" is a single transient (snare plus a reversed cymbal tail), not a gunshot.
+- **Street Gospel layer:** Mama's rule as a ghost: a choir "ooh" pad under the hooks. No organ, no tambourine.
+- **Arrangement map:** Intro 4 (click, silence, spoken) → V1 16 (full stop before bar 16) → Hook 8 → V2 16 (808 out bars 1–4; crack on bar 1; full stop before bar 13) → Hook 8 → Bridge 8 (heartbeat plus click) → Hook 4 → Outro 4 (siren fading, clock, piece click).
+- **Vocal direction:** Breathless and urgent. Whispered doubles ±30 on "touch move" and "Mama told me." The bridge is spoken almost to himself.
+- **Mix note:** On the crack, duck the whole mix 1 dB for 200 ms (compressor on the mix bus keyed from the crack) so it feels physical without a gunshot.
+- **Suno tips:** Weirdness 40%, Style Influence 75%. Regenerate any take that adds real gunshot effects or drill hats.
 
 ## Lyrics
 ```

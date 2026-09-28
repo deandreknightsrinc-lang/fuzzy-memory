@@ -6,8 +6,25 @@ It's a July night in the Rooks, the two housing towers the crew holds like a for
 
 ## Suno Style Prompt
 ```
-hard aggressive trap anthem, 150 BPM, G minor, booming distorted 808s, stadium stomps and claps, loud brass horn blasts, dark choir chants, piercing siren-like synth lead, rapid hi-hat rolls, snare layered with a hard wooden chess piece click, walkie-talkie static and radio chirps as transitions, chess clock ticking in the intro, gritty baritone male rap with shouted energetic delivery, gang vocal crew chants and call-and-response hook, crowd ad-libs, half-time breakdown before final hook, loud punchy club-ready mix with heavy low end
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, dark cinematic minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 98 BPM, F-sharp minor, aggressive crew war-chant anthem, blaring 70s horn section blasts, siren-like whistle lead, stadium stomps and claps, snare layered with a hard wooden piece click, walkie-talkie static and radio chirps as transitions, dark choir chants, half-time breakdown before the final hook, gritty baritone male rap with shouted energetic delivery, gang-vocal call-and-response hook, crowd ad-libs, young boy voice on a radio, loud punchy anthem mix with heavy low end
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, arena rock, drill
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 98 BPM, F-sharp minor (808 root F#1, about 46.2 Hz). 16th swing at 55%, tight like soldiers on post.
+- **Progression:** Verses: F#m7 → B9 (i7 → IV9). Hook: F#m9 → E → D → C#7#9. Half-time bridge: F#m9 → Dmaj7 → C#7#9.
+- **Drums:** Stomps, claps and the piece click on the snare. Kick on 1, the "a" of 1, 3. WOMP Pocket: swing 55%, snare +8 ms. Parallel crush 30%. Bridge: snare on 3 only.
+- **Bass:** 808 with WOMP 808 Glide octave-drop accents on every "Castle!" Synth bass (Retro Synth saw, LPF 900 Hz) plays 16th funk lines. V2 bars 1–4 (1:58, AC units dripping): 808 out, synth bass pulses 8ths. Bridge: 808 and clock only. WOMP Low End drive 40%.
+- **Samples & Keys:** Studio Horns blasts on the downbeat of hook bars and the "and" of 4 in verses, through WOMP Dust. Whistle lead as a siren: glide 250 ms, rising C# → F# on each hook pickup. Walkie static and chirps in Quick Sampler, bandpassed.
+- **Street Gospel layer:** A tower, not a church: dark choir chants double "Castle!" (stacks ±80). No organ. Tambourine on 2 and 4 only on the final hook, the sunrise-on-the-roof moment.
+- **Arrangement map:** Intro 8 (walkie, clock, crew chant) → V1 16 (drop drums bars 15–16) → Hook 8 → V2 16 (808 out bars 1–4; drop drums bars 15–16) → Hook 4 → Bridge 4 (half-time, 808 plus clock) → Hook 8 (all in: horns, choir, tambourine) → Outro 4 (walkie, piece click).
+- **Vocal direction:** Shouted. Crew ad-libs ±40, 8-voice gang stacks. Tre's radio lines through phone EQ. Bridge half-spoken.
+- **Mix note:** Glue the horns and choir on one bus (VCA 2:1) so the chants hit as one wall. Solo the kick against the 808 on phone speakers: this track lives on the octave-drop harmonics.
+- **Suno tips:** Weirdness 35%, Style Influence 75%. If it goes arena rock or modern drill, regenerate with the BPM moved to the front of the song-specific part.
 
 ## Lyrics
 ```

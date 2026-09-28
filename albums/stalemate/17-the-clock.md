@@ -6,8 +6,25 @@ Saturday, 3 PM, the fourth-floor dialysis unit at Mercy General, the same day as
 
 ## Suno Style Prompt
 ```
-soul hip-hop, 88 BPM, A-flat major drifting into F minor, bittersweet and tender, a loud analog chess clock tick as the rhythmic spine, a dialysis machine beep sampled into the groove, warm Rhodes, lush 70s soul string section, brushed snare with a soft deep kick, slow heartbeat bassline, gritty baritone male rap softened and reflective, weathered older female soul vocal singing the hook and speaking in the intro and bridge, gospel choir hum under the bridge, vinyl crackle, intimate warm mix, the clock stops dead on the final bar followed by silence and one piece click
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, cinematic minor-key shadows under major soul, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 76 BPM half-time soul ballad, A-flat major drifting into F minor, bittersweet and tender, loud analog chess clock tick as the rhythmic spine, dialysis machine beep sampled into the groove, warm Rhodes, lush 70s soul strings, brushed snare with a soft deep kick, slow heartbeat 808, weathered older female soul vocal singing the hook and speaking in the intro and bridge, gospel choir hum under the bridge, gritty baritone male rap softened and reflective, vinyl crackle, intimate warm mix, clock stops dead on the final bar
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, gospel choir song, lullaby
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 76 BPM half-time, A-flat major drifting into F minor (808 roots Ab1 about 51.9 Hz and F1 about 43.7 Hz). 16th swing at 58%.
+- **Progression:** Verses: Abmaj9 → Fm9 → Bbm9 → Eb13 (I → vi → ii → V soul). Hook turns minor: Fm9 → Bb9 (F Dorian) twice, then Dbmaj9 → Cm7. Bridge: the Amen Db → Dbm6 → Abmaj7 under "You spent it on me today."
+- **Drums:** Brushed snare (Drummer brush kit or DMD brushes) on beat 3, soft kick. The clock tick plays quarter-note hats; the dialysis beep lands on the "and" of 4 every 2 bars. WOMP Pocket: swing 58%, snare +16 ms.
+- **Bass:** A heartbeat 808 (lub-dub on 1 and the "a" of 1), short decay so the Ab1 doesn't boom. Bass Player (fingerstyle) carries the harmony. V2 bars 1–4 (Mama's story): 808 out. WOMP Low End drive 15%.
+- **Samples & Keys:** Vintage EP "Suitcase" with WOMP Soul Chords maj9/13. Studio Strings 70s-style lines, LPF 8 kHz. WOMP Dust light across the keys. The Rhodes can quote a few notes of the public-domain hymn "Blessed Assurance" behind V1.
+- **Street Gospel layer:** A choir hum under the bridge and a quiet slow-Leslie B3 under Mama's hooks. No tambourine; it's a hospital.
+- **Arrangement map:** Intro 4 (clock, beeps, Mama spoken) → V1 16 → Hook 8 (Mama sings) → V2 16 (808 out bars 1–4; the buzz track mutes exactly on "5:02") → Hook 8 → Bridge 8 (Mama spoken, choir hum) → Hook 4 → Outro 4 (the clock slows and stops, 2 bars of silence, piece click).
+- **Vocal direction:** Knight soft and reflective, few doubles. Mama: warm plate plus a 1/8 dotted delay, a 3rd-above harmony on "tick, tock." Her spoken lines dry and close.
+- **Mix note:** Master at −11 LUFS. Automate the phone-buzz foley so it gets louder each time, then cut it dead on "5:02."
+- **Suno tips:** Tag hooks [Female vocal, older woman]. Weirdness 35%, Style Influence 70%. Regenerate if it turns into a pure gospel song.
 
 ## Lyrics
 ```

@@ -6,8 +6,25 @@
 
 ## Suno Style Prompt
 ```
-grimy boom-bap, 94 BPM, B-flat minor, anxious and cerebral, chopped 70s jazz piano loop that stutters and restarts, dusty hard kick and cracking snare, walking upright bass, vinyl hiss and tape warble, turntable scratches cut from a ticking chess clock, stop-start arrangement where the beat cuts out after each variation and restarts on a loud piece click, gritty baritone male rap in an analytical rapid-fire flow with dense internal rhymes, whispered counting under the hook, chanted gang-vocal hook, dry close mix, phone vibration buzz in the outro
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, dark cinematic minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 94 BPM, B-flat minor, anxious cerebral stop-start groove, chopped 70s jazz-funk Rhodes loop that stutters and restarts, chicken-scratch wah guitar, walking synth bass, dusty hard kick and cracking snare, turntable scratches cut from a ticking chess clock, beat cuts out after each variation and restarts on a loud piece click, parking garage wind, whistle lead on the hooks, gritty baritone male rap in an analytical rapid-fire flow with dense internal rhymes, whispered counting under the hook, chanted gang-vocal hook, phone buzz in the outro, dry close mix
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, jazz hop, boom bap revival
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 94 BPM, B-flat minor (808 root Bb0, about 29.1 Hz). 16th swing at 56%.
+- **Progression:** A 4-bar loop per variation: Bbm9 | Bbm9 | Eb9 | Eb9 (stutter). Hook: Bbm9 → Ab → Gb → F7#9. Every variation ends on F7#9, then the cut.
+- **Drums:** Dusty hard kit: kick on 1 and the "and" of 2, cracking snare on 2 and 4. WOMP Pocket: swing 56%, snare +14 ms. Scratches of the clock on beat 4 of bars 4 and 8. Each variation is 8 bars and ends with a 1-beat total cut, then the piece click restarts the next one.
+- **Bass:** Retro Synth walking bass in the variations; 808 in the hooks and Variation 3. Variation 2 ("Fight") bars 1–4: 808 out. WOMP 808 Glide 80 ms, WOMP Low End drive 40% for the Bb0.
+- **Samples & Keys:** Vintage EP loop chopped in Sampler through WOMP Dust. Use Remix FX (Repeater) for the stutter on bar 4 of each loop. Wah guitar 30L. Whistle on the hooks: F–Ab–Bb–Db.
+- **Street Gospel layer:** Held back: 4 AM, a concrete garage. A single B3 chord under "I become the Bishop, organ music and a lie."
+- **Arrangement map:** Intro 4 (clock, garage wind, spoken) → Hook 8 → V1 "Snitch" 8 → cut → V2 "Fight" 8 (808 out bars 1–4) → cut → V3 "Run" 8 → cut → Hook 8 → V4 "Sit" 8 → cut → Hook 4 → Outro 4 (phone buzz, Reese's text, "...Move.").
+- **Vocal direction:** Analytical rapid-fire, like calculating variations. Whispered counting ("one, two, three, four") panned ±50 under the hooks. Reese's text through phone EQ.
+- **Mix note:** Freeze the reverb and delay sends on every cut so the silence is total, then hit the piece click dry and loud.
+- **Suno tips:** Weirdness 45%, Style Influence 70%. Keep the [Beat cuts] tags in the lyrics; regenerate if the loop never stops.
 
 ## Lyrics
 ```

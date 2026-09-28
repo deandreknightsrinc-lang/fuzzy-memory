@@ -6,8 +6,25 @@ Knight is home from his eleven months in county, and the 64 won't let him settle
 
 ## Suno Style Prompt
 ```
-dark half-time trap, 140 BPM with a 70 BPM feel, F-sharp minor, menacing and torn, detuned bell melody, two pizzicato string lines panned hard left and hard right like two threats, sliding 808s, rolling triplet hi-hats, rimshot snare, ticking chess clock panned left for the King's side, soft warm Rhodes panned right for the Queen's side, gritty baritone male rap with a weary tense delivery, half-sung chanted hook, female soul vocal ad-libs answering from the right channel, beat drops to only clock and Rhodes for a call-and-response bridge, dark reverb, punchy low end, wide stereo tension
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, dark cinematic minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 92 BPM, F-sharp minor, menacing and torn in two, wah clavinet panned hard left for the King's side, warm Rhodes panned hard right for the Queen's side, two pizzicato string lines answering across the stereo field, whistle lead centered on the hooks, sliding 808s, rimshot snare, clock ticking on the left, female soul ad-libs answering from the right, beat drops to clock and Rhodes for a call-and-response bridge, gritty baritone male rap weary and tense, half-sung chanted hook, dark reverb, wide stereo tension
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, drill
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 92 BPM, F-sharp minor (808 root F#1, about 46.2 Hz). 16th swing at 56%.
+- **Progression:** Verses: F#m9 → B9 (i9 → IV9). Hook: F#m9 → E → D → C#7#9. Bridge (Rhodes alone): Dmaj9 → C#m7 → Bm9 → C#7#9.
+- **Drums:** Rimshot snare, round kick. Kick on 1, the "a" of 2 and 3; snare on 2 and 4. WOMP Pocket: swing 56%, snare +14 ms. Clock tick panned 60L all song.
+- **Bass:** 808 and bass stay dead center and mono below 120 Hz: the Knight is the middle of the fork. WOMP 808 Glide 90 ms. V2 bars 1–4 (the Mercy parking lot): 808 out, Retro Synth bass plays a softer line. WOMP Low End drive 30%.
+- **Samples & Keys:** King = Vintage Clav with Auto-Wah, hard left, clean and cold, WOMP Soul Chords 7#9. Queen = Vintage EP "Suitcase," hard right, warm, WOMP Soul Chords min9 plus WOMP Dust. Pizzicato lines answer L/R. Whistle centered on hooks.
+- **Street Gospel layer:** Held back: it's Friday night, not Sunday. One faint B3 swell on "the Lord ain't in a bullet" and nothing more.
+- **Arrangement map:** Intro 4 (clock, spoken) → V1 16 (drop drums bars 15–16) → Hook 8 → V2 16 (808 out bars 1–4; drop drums bars 15–16) → Hook 8 → Bridge 8 (clock left, Rhodes right; male lines left, female lines right; spoken sunrise) → Hook 4 → Outro 4.
+- **Vocal direction:** Weary and tense, center. Hazel's ad-libs 60R. Reese's quoted lines slightly lower and slower. Doubles on "forked" and "for keeps."
+- **Mix note:** Check mono often: the hard-panned clav and Rhodes must not cancel. Keep everything under 120 Hz mono with Direction Mixer.
+- **Suno tips:** Weirdness 40%, Style Influence 70%. Suno won't keep the L/R concept; pick for mood and hook, then build the stereo fork in Logic.
 
 ## Lyrics
 ```

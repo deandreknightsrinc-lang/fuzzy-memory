@@ -6,8 +6,25 @@ Knight is nineteen and the pawn has finally reached the eighth rank: forty thous
 
 ## Suno Style Prompt
 ```
-triumphant soulful hip-hop, 96 BPM, B-flat major with minor-key turns in the bridge, pitched-up celebratory 70s soul vocal sample, blaring live brass section, funky live bass, crisp boom-bap kick with hard claps, trap hi-hat rolls in the hook, cash-counter whir and car engine rev as ear candy, bright chess clock tick in the intro and a satisfying piece click on each hook opener, gritty baritone male rap with a confident victorious bounce, chantable hook with stacked backing vocals and crowd ad-libs, sparse soft piano breakdown for the bridge, warm glossy mix that drops to intimate at the end
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, triumphant cinematic Dorian minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 94 BPM, B-flat minor Dorian with bright major lifts, victory-lap lowrider bounce, pitched-up celebratory 70s soul vocal chop, blaring live brass section, talkbox singing the hook, slap funk bass, hard claps, cash-counter whir and V8 engine rev as ear candy, piece click opening each hook, gritty baritone male rap with a confident victorious bounce, chantable hook with stacked backing vocals and crowd ad-libs, soft Rhodes breakdown for the spoken bridge, glossy warm mix that turns intimate at the end
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, glossy radio pop
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 94 BPM, B-flat minor Dorian (808 root Bb0, about 29.1 Hz). 16th swing at 56%.
+- **Progression:** Verses: Bbm7 → Eb9 (Dorian, bright). Hook: Gbmaj7 → Ab → Bbm7 (bVI → bVII → i). Bridge: Bbm9 → Gbmaj9 → Fm7 → Eb9, ending on the Amen Eb → Ebm → Bb, a major chord that doesn't feel like winning.
+- **Drums:** Bright kit, snappy clap +10 ms, open hats on the "and" of 2 and 4. WOMP Pocket: swing 56%, snare +10 ms. Cash-counter whir as a 16th shaker in the intro; V8 rev as a riser into hook 1.
+- **Bass:** 808 with long 100 ms slides up to Eb; WOMP Low End drive 45% so a Bb0 sub still speaks on phones. Bass Player Session Player (slap) in hooks, higher and sparse against the 808. V2 bars 1–4 (back at Sal's): 808 out, slap bass alone.
+- **Samples & Keys:** A 70s-style soul vocal chop pitched +3 semitones through WOMP Dust. Studio Horns section on the "and" of 4. Talkbox (EVOC 20) sings "promotion." Bridge: Vintage EP "Suitcase," WOMP Soul Chords min9/maj9, no drums.
+- **Street Gospel layer:** Celebration gospel: B3 swells into hooks 2 and 3, choir "ooh" stacks behind hook 3, tambourine plus hand claps on the final hook. All of it drops away for Mama's bridge.
+- **Arrangement map:** Intro 4 (clock, counter, "Forty," brass hits) → V1 16 (drop drums bars 15–16) → Hook 8 → V2 14 (808 out bars 1–4) → Hook 4 → Bridge 4 (Rhodes plus Mama) → V3 8 (drums return half-strength) → Hook 4 (all in) → Outro 4 (brass fades, clock).
+- **Vocal direction:** Smiling and loud; doubles on "paid!" and "tall." Mama close and soft. V3 drops in energy on purpose.
+- **Mix note:** Mute every send except the Rhodes plate on the bridge so the drop to intimacy is real. Check the V8 riser on car speakers.
+- **Suno tips:** Weirdness 35%, Style Influence 70%. If it goes glossy or drops the grit, push Style Influence to 75% and put "gritty baritone" earlier.
 
 ## Lyrics
 ```

@@ -6,8 +6,25 @@ At 5:12 a.m. on a February morning, a battering ram hits Reese's door in Tower B
 
 ## Suno Style Prompt
 ```
-frantic cinematic trap, 132 BPM, E minor, urgent staccato orchestral strings, pounding war drums and toms, distorted 808s, police sirens and helicopter blades, battering ram impacts landing on downbeats, police radio chatter, phone vibration buzz, chess clock ticking that speeds up through each verse, abrupt stops and hard drops, breathless gritty baritone male rap in real-time present tense, shouted chant hook with crew backing, calm cold male spoken voice for the federal agent, soft female spoken voicemail in outro, loud aggressive widescreen cinematic mix
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, dark cinematic minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 138 BPM written half-time, E minor, frantic real-time raid, urgent staccato orchestral strings, 70s horn stabs like alarms, pounding war toms, distorted sliding 808s, battering ram impacts on downbeats, police sirens, helicopter blades and radio chatter, phone vibration buzz, clock ticking faster through each verse, abrupt stops and hard drops, breathless gritty baritone male rap in present tense, shouted Check chant hook with crew backing, calm cold male spoken voice for the agent, soft female voicemail in the outro, loud widescreen mix
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, metal, drill
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 138 BPM written half-time (69 feel), E minor (808 root E1, about 41.2 Hz). Swing only 54%: a raid doesn't lay back.
+- **Progression:** Verses: Em9 → A9 (i9 → IV9) as staccato string 16ths. Hook: Em9 → D → C → B7#9. Bridge: an Em(add9) string drone. Outro: Cmaj7 → B7#9, unresolved.
+- **Drums:** Half-time kit: snare on beat 3, war toms (DMD toms) filling 16ths into each hook, the battering-ram sample on beat 1 of every hook bar. WOMP Pocket: swing 54%, snare +6 ms. Automate the clock tick from 1/4 to 1/8 to 1/16 across each verse.
+- **Bass:** 808 distorted (WOMP Low End drive 50%), glide 60 ms. Synth bass stabs with the strings. V2 bars 1–4 (5:19, the window): 808 out, strings and clock carry. Sidechain 808 and bass −4 dB from the kick.
+- **Samples & Keys:** Studio Strings staccato 16ths, LPF 8 kHz. Studio Horns short alarm stabs on 1 and the "and" of 2. Sirens, helicopter and radio chatter in Quick Sampler, LPF 6 kHz, panned wide.
+- **Street Gospel layer:** Held back: no church in a raid. One choir "ahh" swell under the last 2 bars of V2 when Tre nods "Safe."
+- **Arrangement map:** Intro 4 (radio, ram hit) → V1 16 (drop drums bars 15–16) → Hook 8 → V2 16 (808 out bars 1–4) → Hook 4 → Bridge 8 (beat cuts, Cole spoken over the clock) → Hook 4 → Outro 4 (voicemail, beep, "Check," piece click).
+- **Vocal direction:** Breathless present tense, breaths left in. Crew shouts "Check!" as the answer. Cole bone-dry and close, no reverb. Hazel's voicemail through a 300 Hz–3 kHz bandpass.
+- **Mix note:** Make the stops real silence: freeze or mute the reverb returns on the stop bars. Duck the sirens under the vocal with a sidechain compressor.
+- **Suno tips:** Weirdness 45%, Style Influence 70%. If the agent's lines come back sung, regenerate; tag them [Spoken, calm male voice].
 
 ## Lyrics
 ```

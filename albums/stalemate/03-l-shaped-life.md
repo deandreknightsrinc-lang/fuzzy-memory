@@ -6,8 +6,25 @@ Ages twelve to fifteen. Knight tests into Westbrook Magnet across the city, wher
 
 ## Suno Style Prompt
 ```
-bouncy dark trap with boom-bap snares, 142 BPM half-time bounce, F minor, playful but sinister pizzicato strings, detuned music-box bell melody, knocking 808 with sliding bass notes, rapid triplet hi-hats and stutter rolls, crisp rimshots, wooden chess piece clicks placed on the offbeats, school bell and city bus air-brake sound effects in transitions, agile gritty baritone male rap switching between triplet and double-time flows, spoken-word bridge over a filtered beat, chanted gang-vocal hook with call and response, punchy modern mix with a clear upfront vocal
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, dark cinematic minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 96 BPM, F minor, playful but sinister bounce, wah clavinet stabs and plucked pizzicato strings, detuned music-box bell riff, 808 line that leaps two steps up and one over like a knight move, school bell and city bus air-brake hits in transitions, piece clicks on the offbeats, whistle lead on the hooks, agile gritty baritone male rap switching between triplet and double-time flows, spoken bridge over a filtered beat, chanted call-and-response gang-vocal hook, clear upfront vocal, bright tight mix
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, drill, nursery rhyme
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 96 BPM, F minor (808 root F1, about 43.7 Hz). 16th swing at 55%; he's young and rushing.
+- **Progression:** Verses: Fm7 → Bb9 (i7 → IV9, the lowrider loop). Hook: Fm9 → Eb → Db → C7#9. Bridge: Fm7 held under a filter sweep, then C7#9 on "Beat drops."
+- **Drums:** Tight kit, snare plus clap. Kick on 1, the "a" of 1 and 3. Piece clicks on offbeat 8ths in hooks. No hat rolls. WOMP Pocket: swing 55%, snare +8 ms, ghost notes on.
+- **Bass:** The knight-move 808: F1 → Ab1 (two up) → Bb1 (one over) across the Fm7 → Bb9 change, WOMP 808 Glide at 80 ms. Synth bass (Retro Synth) plays slap-style octave jumps. V2 bars 1–4: 808 out, synth bass carries the "late again" run. WOMP Low End drive 30%.
+- **Samples & Keys:** Vintage Clav through Auto-Wah, 16th stabs panned 25R. Studio Strings pizzicato doubles the clav rhythm. Music box (Sampler) detuned −15 cents through WOMP Dust. Whistle on hooks: C–Eb–F–Ab with 180 ms glide.
+- **Street Gospel layer:** Held back: school and street, no church yet. One B3 swell (0 → 100 over 1 bar) under "Voice in the back said" to announce the King.
+- **Arrangement map:** Intro 4 → V1 16 (school bell bar 1; drop drums bars 15–16) → Hook 8 → V2 16 (808 out bars 1–4; air-brake bar 1) → Hook 8 → Bridge 8 (beat LPF 400 Hz, spoken) → V3 8 → Hook 8 (add horn stabs) → Outro 4.
+- **Vocal direction:** Triplet flow in V1, double-time at the end of V2. Gang call "Two up!", 6-voice response "One over!". Bridge dry and close.
+- **Mix note:** Automate the Channel EQ low-pass from 400 Hz to fully open over the last beat of the bridge. High-pass the air-brake sample at 200 Hz so it doesn't fight the 808.
+- **Suno tips:** Weirdness 40%, Style Influence 70%. If Suno doubles the tempo into a modern bounce with rolls, move "96 BPM" to the front of the song-specific part and regenerate.
 
 ## Lyrics
 ```

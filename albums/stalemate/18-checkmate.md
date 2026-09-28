@@ -6,8 +6,25 @@ Saturday, 4:47 PM, at the fish fry in the lot behind the Rooks. For the first ti
 
 ## Suno Style Prompt
 ```
-cinematic dark trap, 150 BPM half-time feel, D minor, epic and funereal, massive orchestral brass and pounding timpani, a tolling church bell, distorted sliding 808s, rapid hi-hat rolls, deep choir chanting the hook, gritty baritone male rap that swings from aggressive to hushed, dramatic drops to total silence before key lines, chess clock ticking in the intro that ends with a hard board slam, funeral pipe organ alone in the bridge, wide cinematic reverb, heavy compressed low end
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, dark cinematic minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 84 BPM, D minor, epic and funereal lowrider march, massive 70s brass and pounding timpani, a tolling church bell, distorted sliding 808s, horn stabs on the hook, deep choir chanting Checkmate, dominoes slapping and fish-fry grease pops as ear candy, dramatic drops to total silence before key lines, clock ticking in the intro ending with a hard board slam, funeral pipe organ alone in the bridge, gritty baritone male rap swinging from aggressive to hushed, wide cinematic reverb, heavy compressed low end
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, marching band, epic trailer
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 84 BPM, D minor (808 root D1, about 36.7 Hz). 16th swing at 55%.
+- **Progression:** Verses: Dm9 → G9 (i9 → IV9). Hook: Dm9 → C → Bb → A7#9. Funeral-organ bridge: Gm9 → Dm/F → Bbmaj7 → A7sus4 → A7. Outro: G → Gm → Dm, the Amen with no resurrection.
+- **Drums:** A heavy kit with a march feel: kick on 1 and 3 plus the "a" of 2, snare on 2 and 4 with flams. Timpani on the downbeat of each hook bar. WOMP Pocket: swing 55%, snare +14 ms. Drum bus parallel crush at 30%.
+- **Bass:** 808 distorted (WOMP Low End drive 45%), 100 ms glides from D down to A. Synth bass doubles the hook horns an octave up. V2 bars 1–4 (Monday's helicopters): 808 out, timpani and synth bass only.
+- **Samples & Keys:** Studio Horns: sustained brass in the hooks, stabs in the verses, WOMP Dust medium. Timpani from a Sampler orchestral kit, high-passed at 60 Hz. The bell tolls every 2 bars in the intro and outro. Domino slaps plus grease pops as V1 foley.
+- **Street Gospel layer:** The choir chants the hook (stacks ±80). The bridge is funeral pipe organ alone. No tambourine; this is a burial.
+- **Arrangement map:** Intro 4 (clock, bell, spoken, board slam) → V1 16 (1 beat of total silence before "Four-forty-seven" on bar 13, then the dominoes) → Hook 8 → V2 16 (808 out bars 1–4; drop drums bars 15–16) → Hook 8 → Bridge 8 (organ only, spoken) → Hook 4 → Outro 4 (bell, board slam).
+- **Vocal direction:** Aggressive in V1, hushed in the bridge. Punch-in doubles on "walked right on through" and "that's a look." Choir answers "checkmate."
+- **Mix note:** Sidechain the brass 2 dB from the vocal. Put the board slam through the drum bus crush for extra weight.
+- **Suno tips:** Weirdness 35%, Style Influence 75%. If it becomes a marching band or a movie trailer, regenerate with "lowrider" earlier in the prompt.
 
 ## Lyrics
 ```

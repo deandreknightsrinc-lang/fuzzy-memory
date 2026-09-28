@@ -6,8 +6,25 @@ The first verse is neighborhood mythology: King Reese stood in the middle of Dia
 
 ## Suno Style Prompt
 ```
-dark regal orchestral trap, 72 BPM, C minor, ominous brass stabs, rolling timpani, deep male choir pads, eerie harpsichord motif, slow gliding 808 slides, sparse trap hi-hats with occasional triplet rolls, heavy wooden chess piece click on the downbeat of each hook bar, chess clock ticking in the intro, gritty baritone male storytelling rap with slow deliberate commanding cadence, deep gravelly older male spoken voice for the king, chanted crowd-style hook, cinematic wide reverb on strings, dry lead vocal, epic menacing throne-room atmosphere
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, dark cinematic minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 84 BPM, C minor, regal menacing throne-room swagger, 70s funk horn section stabs, Hammond organ pads, rolling timpani hits, low male choir hum, slow gliding 808 slides, talkbox answering the hook, heavy piece click on each hook downbeat, rain on a diner window, gritty baritone male storytelling rap with slow deliberate commanding cadence, deep gravelly older male spoken voice for the king, chanted crowd-style hook, dry lead vocal, wide reverb on horns, heavy lowrider bounce
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, epic trailer, marching band
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 84 BPM, C minor (808 root C1, about 32.7 Hz). 16th swing at 57%. The King never hurries.
+- **Progression:** Verses: Cm9 → F9 (i9 → IV9). Hook: Cm9 → Bb → Ab → G7#9. V3 closes on Abmaj7 → G7#9, held unresolved (a king cornered). Outro: Fm9 → Cm9.
+- **Drums:** Heavy kit, snare plus clap plus rim. Kick on 1 and the "and" of 2; snare on 2 and 4. Timpani plus piece click on beat 1 of each hook bar. WOMP Pocket: swing 57%, snare +18 ms, humanize ±8.
+- **Bass:** 808 long sustains with a 120 ms glide, rooted C1/F1. Synth bass (ES2 Moog-style) bounces 8ths an octave up in hooks only. V2 bars 1–4: 808 out while Knight walks into Earl's; synth bass alone. WOMP Low End drive 35%.
+- **Samples & Keys:** Studio Horns: short stabs on the "and" of 4, WOMP Dust at medium so it reads like a 1975 funk section. Vintage B3 as a pad, slow Leslie. Talkbox (EVOC 20 PolySynth) answers "long live" on hook 2. WOMP Soul Chords 7#9 on the G7#9 horn hits.
+- **Street Gospel layer:** A court, not a church: low male choir hum only (Sampler "Voices"), no tambourine. The organ plays pads, never a swell; Bishop's organ belongs to the next track.
+- **Arrangement map:** Intro 4 (clock, hum, Reese) → V1 16 (drop drums bars 15–16) → Hook 8 (timpani, horns) → V2 16 (808 out bars 1–4; rain) → Hook 8 (add talkbox) → V3 8 (organ plus drums) → Outro 4 (Reese, click).
+- **Vocal direction:** Slow and commanding, every syllable placed. Reese's voice: pitched down 2 semitones, Opto compression, a small booth room. Crowd hook: 8-voice stack of "long live" and "nobody."
+- **Mix note:** Dip the horns 2 dB at 2 kHz under the verses. High-pass the timpani at 50 Hz so the 808 owns the sub.
+- **Suno tips:** Weirdness 35%, Style Influence 75%. If it becomes an orchestral march, cut "timpani" and regenerate; the bounce matters more than the pomp.
 
 ## Lyrics
 ```

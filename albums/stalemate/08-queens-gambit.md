@@ -6,8 +6,25 @@ Late spring, and Knight is twenty. At the corner store on the far side of Diagon
 
 ## Suno Style Prompt
 ```
-soulful R&B-infused boom-bap, 84 BPM, D-flat major, warm Rhodes electric piano lick, chopped 70s soul sample, live round bass, vinyl crackle, hard dusty knocking drums, gospel choir swell singing a long drawn-out Haaa-zel, smooth sultry female soul vocal on hooks with melismatic runs, gritty baritone male rap verses that slide into a smooth croon, soft chess clock tick in the intro, gentle piece click on the last beat, summer afternoon ambience with corner store door chime and cicadas, warm analog mix, intimate hopeful and romantic but grounded
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, cinematic soul with minor-key tension, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 84 BPM, D-flat major, romantic and hopeful but grounded, warm Rhodes lick, talkbox and gospel choir swell singing a long Haaa-zel, live wah guitar, vinyl crackle, summer porch ambience with cicadas and a corner-store door chime, smooth sultry female soul vocal on the hooks with melismatic runs, gritty baritone male rap verses that slide into a smooth croon on the bridge, dry upfront rap vocal, warm analog intimate mix
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, smooth jazz, ballad pop
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 84 BPM, D-flat major (808 root Db1, about 34.6 Hz). 16th swing at 57%. HAZEL crossover harmony.
+- **Progression:** Verses: Ebm9 → Ab13 → Dbmaj9 → Bbm9 (ii9 → V13 → Imaj9 → vi9). Hook: Gbmaj9 → Fm7 → Ebm9 → Ab13. V2's Reese call turns to the relative minor: Bbm9 → Ab → Gb → F7#9. Bridge (I → vi7 → ii7 → V7): Dbmaj7 → Bbm7 → Ebm7 → Ab7. Final hook ends Gb → Gbm → Db.
+- **Drums:** Hard dusty kit with a softer snare. Kick on 1 and the "and" of 2; snare on 2 and 4. WOMP Pocket: swing 57%, snare +16 ms. Cicadas and a door chime in the intro only.
+- **Bass:** 808 plays roots only under the verses. Bass Player (fingerstyle) carries the hooks with ghost notes. V2 bars 1–4 (the Friday re-up): 808 out, Retro Synth bass plays the Bbm tension line. WOMP 808 Glide 80 ms; WOMP Low End drive 20%.
+- **Samples & Keys:** Vintage EP "Suitcase," tremolo 25%, with WOMP Soul Chords maj9/13. The Rhodes lick Db–F–Ab–C returns across HAZEL. Wah guitar chicken-scratch 30L. Talkbox (EVOC 20) doubles the choir "Haaa-zel." WOMP Dust light on the Rhodes.
+- **Street Gospel layer:** Choir "Haaa-zel" swells in the intro, the bridge and the outro. B3 low and slow under the hooks; no tambourine until the last hook.
+- **Arrangement map:** Intro 8 (chime, clock, hum, choir) → V1 16 (drop drums bars 15–16) → Hook 8 (female) → V2 16 (808 out bars 1–4) → Hook 8 → Bridge 8 (choir, croon) → V3 4 → Hook 6 → Outro 4 (choir, click).
+- **Vocal direction:** Knight relaxed and a little shy. Hazel's hook: 3rd-above harmony and an octave-up whisper on "what you willin' to yield?" Bridge croon through Opto compression with a 1/8 dotted delay.
+- **Mix note:** Carve 1 kHz out of the Rhodes under the female hook. Keep the cicadas above 3 kHz and under −26 dB.
+- **Suno tips:** Knight Persona for the verses; tag hooks [Female vocal]. Weirdness 35%, Style Influence 70%. If it slides into modern R&B, regenerate; the drums must stay hard.
 
 ## Lyrics
 ```

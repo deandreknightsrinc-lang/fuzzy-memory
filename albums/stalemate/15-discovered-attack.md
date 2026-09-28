@@ -6,8 +6,25 @@ Day nine of Hazel in the ICU at Mercy General, 3 AM in the empty hospital cafete
 
 ## Suno Style Prompt
 ```
-gospel trap, 70 BPM with double-time hi-hats, E-flat minor, revelatory and ominous, cathedral pipe organ with heavy swells, full gospel choir stabs and chants, tambourine on the twos, booming 808s under the organ, hard handclaps, a wooden piece click landing on every choir hit, gritty baritone male storytelling rap building from hushed to furious, spoken male preacher voice with sanctuary echo, choir-chanted hook, organ solo breakdown, big sanctuary reverb, dark and holy mix, church bell in the outro
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, dark cinematic minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 90 BPM, E-flat minor, revelatory and ominous, cathedral pipe organ and roaring Hammond with heavy swells, full gospel choir stabs and chanted hook, tambourine on 2 and 4, booming 808s under the organ, hard handclaps, piece click on every choir hit, fluorescent cafeteria hum in verse one, preacher voice with sanctuary echo, organ solo breakdown, church bell in the outro, gritty baritone male storytelling rap building from hushed to furious, big sanctuary reverb, dark holy mix
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, contemporary worship
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 90 BPM, E-flat minor, Bishop's key from track 05 (808 root Eb1, about 38.9 Hz). 16th swing at 56%.
+- **Progression:** Callback to "Bishop's Blessing": verses Ebm9 → Ab9, hook Ebm9 → Db → Cb → Bb7#9. The Amen is exposed: Ab → Abm → Ebm, the fake Picardy of track 05 now resolves minor. Organ solo: Cbmaj7 → Bb7#9.
+- **Drums:** V1 is kick plus hats only (the cafeteria). V2 is the full kit with claps and tambourine on 2 and 4. WOMP Pocket: swing 56%, snare +12 ms. A piece click on every choir stab.
+- **Bass:** 808 on Eb1 under the organ, 100 ms glides. Organ pedal high-passed at 100 Hz. V2 bars 1–4 (pew three): 808 out, synth bass low and quiet. WOMP Low End drive 30%.
+- **Samples & Keys:** A pipe organ patch (Sampler) for the preacher's scenes, Vintage B3 (fast Leslie) for the hooks. Choir stabs with WOMP Soul Chords 7#9 voicings. Church bell in the outro. WOMP Dust light on the choir.
+- **Street Gospel layer:** Full, but turned inside out: the choir chants "Discovered" as call-and-response. Organ swells from 0 to 100 into every hook. Stacks ±90, Concert Hall 2.8 s.
+- **Arrangement map:** Intro 4 (organ swell, preacher, choir, click) → V1 16 (hushed; drop drums bars 15–16) → Hook 8 → V2 16 (808 out bars 1–4, full drums from bar 5) → Hook 8 → Bridge 8 (organ solo, the preacher faltering, Knight's reply) → Hook 4 → Outro 4 (bell, organ fade, piece click).
+- **Vocal direction:** Hushed in V1, rising to furious by V2's last 4 bars, doubled there. The preacher with a 1/4-note echo in a long hall. "Nah, Deacon. Not this time." completely dry.
+- **Mix note:** Notch the organ at the 808 fundamental (39 Hz and 78 Hz). Automate the choir bus up 2 dB on the final hook.
+- **Suno tips:** Weirdness 40%, Style Influence 70%. If the choir swamps the rap, regenerate with the choir lines tagged [Choir] only.
 
 ## Lyrics
 ```

@@ -6,8 +6,25 @@
 
 ## Suno Style Prompt
 ```
-soulful hip-hop ballad, 74 BPM, E-flat major, hopeful and tender with a bittersweet edge, warm Rhodes and soft felt piano, a music-box melody that replays the album's minor piano theme in a major key, round live bass, brushed drums with a soft warm kick, lush 70s soul strings, gritty baritone male rap softened into an intimate letter-reading delivery, warm female soul vocal harmonies on the hook, gospel choir swell in the final hook, chess clock ticking in the intro that fades into an ultrasound heartbeat, light vinyl crackle, a wooden box lid closing as the final sound, warm airy mix
+West Coast G-funk hip hop, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, hard punchy drums with laid-back swing, deep heavy bassline, melodic sliding 808s, analog Moog synth bass, warm tape saturation, hopeful cinematic minor-to-major, tense orchestral strings easing warm, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 72 BPM half-time soul ballad, E-flat major, tender and bittersweet, warm Rhodes and felt piano, music-box melody replaying the album theme in major, fingerstyle bass under a soft 808, brushed drums, talkbox humming the hook, warm female soul vocal harmonies, gospel choir swell in the final hook, clock ticking fading into an ultrasound heartbeat, wooden box lid closing at the end, gritty baritone male rap softened into an intimate letter, light vinyl crackle, warm airy mix
 ```
+
+### Exclude Styles
+```
+pop, EDM, rock, country, trap hi-hat rolls, lo-fi, thin drums, heavy autotune, modern pop R&B, lullaby, children's music
+```
+
+## W.O.M.P. Production Notes (Logic Pro)
+- **BPM / Key / Swing:** 72 BPM half-time, E-flat major (808 root Eb1, about 38.9 Hz). 16th swing at 58%.
+- **Progression:** Verses: Fm9 → Bb13 → Ebmaj9 → Cm9 (ii9 → V13 → Imaj9 → vi9). Hook: Abmaj9 → Gm7 → Cm9 → Fm9 → Bb13. Bridge (I → vi7 → ii7 → V7): Ebmaj7 → Cm7 → Fm7 → Bb7. The final hook ends on the Amen Ab → Abm → Eb, the album's first clean one.
+- **Drums:** Brushed snare on beat 3, a warm soft kick. WOMP Pocket: swing 58%, snare +16 ms. Tambourine and hand claps enter only on the final hook.
+- **Bass:** Bass Player (fingerstyle) carries the song; a soft 808 swells under the hooks with an 80 ms glide. V2 bars 1–4 (the cross): 808 out. In the outro the ultrasound heartbeat replaces the kick. WOMP Low End drive 15%.
+- **Samples & Keys:** A music box plays the track 01 motif (E–D#–C#–G# in C#m) as G–F–Eb–Bb in Eb major. Vintage EP plus soft piano with WOMP Soul Chords maj9/13. Talkbox (EVOC 20) hums the hook. Strings through light WOMP Dust.
+- **Street Gospel layer:** Held until the end, then given fully: the choir swell, tambourine and claps arrive on the final hook with the major Amen. It's the first time the gospel layer resolves clean.
+- **Arrangement map:** Intro 4 (clock fading, spoken) → V1 16 (drop drums bars 15–16) → Hook 8 → V2 16 (808 out bars 1–4) → Hook 8 → Bridge 8 (music box, heartbeat, Hazel's soft line, spoken) → Hook 4 (choir swell) → Outro 6 (clock stops, ultrasound heartbeat, box lid).
+- **Vocal direction:** Intimate letter-reading, 3 AM quiet. Hazel's harmonies a 3rd above on the hook. Bridge female vocal soft with an octave-up whisper double.
+- **Mix note:** Master at −11 LUFS. Make the box lid the last transient with nothing after it, not even a reverb tail.
+- **Suno tips:** Knight Persona; tag the harmonies [Female vocal]. Weirdness 35%, Style Influence 70%. If the clock doesn't turn into the heartbeat, add [Clock fades into heartbeat] to the intro and regenerate.
 
 ## Lyrics
 ```
