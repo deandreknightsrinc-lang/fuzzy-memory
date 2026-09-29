@@ -7,7 +7,7 @@ Monday mornings at 8, a folding table in the fellowship hall at Diagonal Ave Bap
 ## Voice Map
 - **Hazel:** sung 30 lines / rap 22 lines (57.7% sung), plus 4 spoken lines (the page). Her rap is investigative double-time, cold and exact, the most technical flow on the album. She sings the church-girl grief with a gospel top, and the four lines of the page are spoken flat, like evidence read into the record.
 - **Guests:** Rook — 13 lines — spoken intro, a 7-line hardcore verse (the page in the wallet, the plate on his wall, the collection plate) and the verdict outro.
-- **Hazel share of all lines:** 81.6%
+- **Hazel share of all lines:** 81.2%
 
 ## Suno Style Prompt
 ```
@@ -26,7 +26,7 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Bass:** Rolling 16ths on Eb1, gliding to Gb1 and Bb0. WOMP 808 Glide: Mode Retrigger + Slide, Glide Time 42 ms. Stutter on every "carry the one": WOMP Rolls, Roll Target Single Note, Single Note 27 (Eb1), Roll Rate 1/32. WOMP Low End: Drive 62%, Harmonics Mix 50%.
 - **Samples & Keys:** B3 on slow Leslie, clavinet 16ths. WOMP Soul Chords: Key "D#/Eb", Scale Natural Minor, Chord Style 7#9. WOMP Dust: Crackle 15%, Hiss 10%.
 - **Street Gospel layer:** Choir answers "add it up." The organ swells into the bridge, and a church bell closes the outro.
-- **Arrangement map:** Intro 4 (Rook) → V1 12 → Pre 4 → Chorus 6 → V2 10 → Chorus 6 → Bridge 8 (hats out) → The Page 4 (808 only) → Rook verse 8 → Final Chorus 6 → Outro 2 (bell).
+- **Arrangement map:** Intro 4 (Rook) → V1 12 → Pre 4 → Chorus 6 → V2 10 → Chorus 6 → Bridge 8 (hats out) → The Page 4 (808 only) → Rook verse 7 → Final Chorus 6 → Outro 2 (bell).
 - **Vocal direction:** Hazel's rap is dry and doubled on the numbers. The sung parts get a 3rd-above harmony. Rook is dry and close, low-passed at 9 kHz, with a slight room, and his verse is slow and heavy.
 - **Mix/Master:** Notch the organ at 39 and 78 Hz. −7.8 LUFS integrated, −1 dBTP.
 - **Suno tips:** Lead Persona = Hazel. Tag the Rook verse clearly and regenerate if he takes the chorus.
@@ -77,7 +77,7 @@ Nine out of nine isn't Jesus, it's Judas—and patterns don't pray, they just ru
 Monday, eight-forty, gray sedan by the dumpster, the Deacon out there with no trash,
 Flip phone to his jaw, and the plate hid behind the lid—but a dent like a thumb in the back,
 April, Tre's sentencing: same gray, same dent, in the courthouse row marked FEDERAL ONLY,
-I copied the plate on the back of my hand and I shook in the Cutlass an hour, lonely.
+I copied the plate on the back of my hand and I shook in the Cutlass, lonely.
 
 [Chorus - Hazel (sung)]
 Add it up (add it up), Sunday into Monday,
@@ -121,6 +121,6 @@ Carry the one, Deacon, carry it through—
 I carried the one. And the one was you.
 
 [Outro - Rook (spoken)]
-He opened it mid-"Amen." Saw the green. Knew exactly whose hand.
+He opened it mid-"Amen." Saw the green. Knew whose hand.
 The Queen found the Bishop. The Knight just made the move.
 ```
