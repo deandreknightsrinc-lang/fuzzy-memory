@@ -99,3 +99,39 @@ Recurring lines tie the two albums together:
 - **Reese's death:** a 15-year-old from the Hollow shoots King Reese at the fish fry behind the Rooks. Knight survives only because Mama asked him to sit with her at dialysis that Saturday.
 - **The indictment:** 22 names, and Knight's isn't one of them, so the 64 decides he's the informant. This is the core of "no legal moves" (S19). The housing authority's one-strike rule gets Mama evicted from apartment 9C.
 - **Grandma's cross:** at the courthouse wedding, Mama gives it to the baby, the first time it changes hands clean (S20). *Rewrite idea: add this moment to HAZEL 20 as well.*
+
+---
+
+## ROOK: The Narrator of Every Album
+**Rook** is the voice that tells the Knight Lyfe stories. He opens, frames and closes the albums, and he steps in
+whenever the story needs someone who saw the whole board.
+
+- **Who he is:** For twenty years he ran the lookout for King Reese's towers, the Rooks, which he took his name from. From the ninth-floor window
+  he saw every move in the 64: who came, who left, who talked, who didn't come back. The Rook moves in straight lines
+  and guards the corners. He's the piece nobody watches, so he sees everything.
+- **Why he's telling it:** he never says outright. He knows too much about every piece, and he has a soft spot for the Queen.
+  *Rewrite idea: in the final outro, reveal that Rook is the one who stood between Hazel and the second shot on the Crossfire night.*
+- **His voice:** a **deep baritone**. He sings like a soul preacher (warm, low, gospel-worn) and raps like a **hardcore gangster**
+  (slow, heavy, every word a verdict). Spoken narration sits close to the mic, dry, like he's in the room with you.
+- **How he's used:**
+  - Narrator intros and outros (2–8 lines).
+  - Interlude monologues.
+  - Occasionally a hard 8–16 bar verse when the story turns violent.
+  - **He never takes the lead from the album's main artist.**
+- **Suno tag convention:** `[Intro - Rook (spoken)]`, `[Narration - Rook (sung)]`, `[Verse - Rook (rap)]`
+- **His signature opening line:** "Sixty-four squares. I watched 'em all from the ninth floor."
+
+## HAZEL: Her Album, Her Voice (Rewrite v2)
+HAZEL is now **Hazel Monroe's album**. She is the lead artist, and the fans should hear *her* story in *her* voice.
+- **Singing to rapping:** Hazel **sings about 60%** of her lines (hooks, pre-choruses, bridges, sung verses) and **raps about 40%**.
+  Her rap is precise, multisyllabic and literate: a nursing student who counts everything.
+  Her singing is 70s soul meeting modern R&B: warm alto with a gospel-trained top.
+- **Guests:** Knight, Mother Ruth, Big Otis, Lil Tre, Mama Knight and Rook serve her story. **Hazel carries at least 70%
+  of every song's lines.** The guests carry the rest.
+- **New canon:**
+  - **Bishop's numbers:** Hazel's ledger work is how the truth about Deacon Bishop comes out. She finds the numbers that don't add up
+    and brings Knight the proof, which feeds STALEMATE's "Discovered Attack."
+  - **Green ink:** she started writing Knight in green ink because it's what she used for her father's letters as a girl,
+    the only ink that ever got a man to write back. That ties both of the old green-ink reasons together.
+  - **Her decision:** she passes her nursing boards after the shooting. The courthouse wedding happens on *her* terms:
+    Knight is out of the game first.
