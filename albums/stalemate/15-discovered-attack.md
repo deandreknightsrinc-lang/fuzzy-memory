@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** Discovered attack: one piece steps aside and reveals the attack of the piece that was hiding behind it
 
 ## Story Concept
-Day nine of Hazel in the ICU at Mercy General, 3 AM in the empty hospital cafeteria. Agent Cole sits down across from Knight and slides over a transcript from confidential source 0417, code name "DEACON": Saturday-night "prayer meetings" where King Reese confessed on his knees at Diagonal Ave Baptist, the bar towel quoted word for word, and years of reports going back to the first duffel bag Bishop ever blessed. The gray sedan by the church dumpster finally makes sense. That Sunday, Knight sits in pew three beside Mama in her white hat while Deacon Bishop preaches on Judas and the thirty pieces of silver, and when the collection plate comes down the row, Knight lays page one of the transcript face-up in the velvet. The turn is the moment the usher carries it to the altar and Bishop reads it mid-"Amen": a knight's check can't be blocked, and now the whole board can see who was really attacking the King.
+Day nine of Hazel in the ICU at Mercy General, 3 AM in the empty hospital cafeteria. Agent Cole sits down across from Knight and slides over a transcript from confidential source 0417, code name "DEACON": Saturday-night "prayer meetings" where King Reese confessed on his knees at Diagonal Ave Baptist, the bar towel quoted word for word, and years of reports going back to the first duffel bag Bishop ever blessed. The gray sedan by the church dumpster finally makes sense. That Sunday, Knight sits in pew three beside Mama in her white hat while Deacon Bishop preaches on Judas and the thirty pieces of silver, and when the collection plate comes down the row, Knight lays page one of the transcript face-up in the velvet. The turn is the moment the usher carries it to the altar and Bishop reads it mid-"Amen": a knight's check can't be blocked, and now the whole board can see who was really attacking the King. Rook supplies the missing link (the gray sedan's plate number Knight collected from his wall the night before church) and watches Bishop's Lincoln slip out of the lot that Sunday night.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 144 BPM half-time snare with double-time energy, E-flat minor, revelatory and furious, cathedral pipe organ and roaring Hammond swells, gospel choir stabs and chanted hook, tambourine and claps, rolling 16th-note distorted 808 under the organ with fast glides and stutters, 1/32 and triplet hat rolls, piece click on every choir hit, preacher with sanctuary echo, church bell outro, gritty baritone male rap, energetic, flow building from hushed to furious, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 144 BPM half-time snare with double-time energy, E-flat minor, revelatory and furious, cathedral pipe organ and roaring Hammond swells, gospel choir stabs and chanted hook, tambourine and claps, rolling 16th-note distorted 808 under the organ with fast glides and stutters, 1/32 and triplet hat rolls, piece click on every choir hit, preacher with sanctuary echo, church bell outro, gritty baritone male rap, deep baritone male narrator, energetic, flow building from hushed to furious, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,12 +22,17 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** Pipe organ for the preacher, B3 fast Leslie for hooks. Choir stabs on WOMP Soul Chords 7#9 voicings. Church bell outro.
 - **Street Gospel layer:** Full, but inside out: the choir chants "Discovered"; the organ swells into every hook.
 - **Arrangement map:** Intro 4 (organ, preacher, choir, click) → V1 16 (hushed) → Hook 8 → V2 16 (808 out bars 1–2 in pew three) → Hook 8 → Bridge 8 (organ solo over a sustained 808) → Hook 4 → Outro 4 (bell, click).
-- **Vocal direction:** Hushed but quick in V1, furious and doubled by V2's end. "Nah, Deacon. Not this time." dry.
+- **Vocal direction:** Hushed but quick in V1, furious and doubled by V2's end. "Nah, Deacon. Not this time." dry. Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the organ swell before the intro and the church bell after the outro.
 - **Mix note:** Notch the organ at 39 and 78 Hz. Master −7.8 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Weirdness 40%, Style Influence 70%. If the choir swamps the rap, tag choir lines [Choir] only.
 
 ## Lyrics
 ```
+[Intro - Rook (spoken)]
+Night before church, the Knight climbed nine flights and knocked on my door.
+First man in twenty years to ask the lookout what he wrote on the wall.
+I gave him the plate number. He already had the rest.
+
 [Intro]
 [Organ swell]
 [Spoken, preacher with echo]
@@ -106,4 +111,9 @@ Every amen had a wire in it, brother.
 He blessed the board...
 Then sold the squares...
 [Piece click]
+
+[Outro - Rook (spoken)]
+11:40 that night, Bishop's Lincoln backed out the church lot, lights off.
+Trunk tied down, choir robe hangin' out the side.
+Piece that move on the diagonal leave the same way it came. At an angle. In the dark.
 ```

@@ -1,6 +1,8 @@
 # STALEMATE by King Bishop Knight
 *A 20-track chess-themed storytelling hip-hop album. First draft. See `../PROJECT-BIBLE.md` for the world and characters.*
 
+Narrated by **Rook** (see the bible).
+
 *Produced to the W.O.M.P. sound (`../../production/WOMP-SOUND-GUIDE.md`). Uptempo 808 Mode: every track rides the **Bounce** lane (94–104 BPM, full-time drums) or the **Knock** lane (140–160 BPM, snare on 3, double-time hi-hat rolls and rolling 808s). Each song file has its Suno style prompt, Exclude Styles and Logic Pro production notes.*
 
 | # | Title | Chess concept | Story beat | Lane | BPM | Key |

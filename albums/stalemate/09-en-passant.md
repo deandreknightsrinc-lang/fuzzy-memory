@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** En passant: a pawn that jumps two squares can be captured "in passing," but only on the very next move
 
 ## Story Concept
-It's a cold October night, and Knight, twenty-one, makes his biggest move yet. He jumps two squares at once, carrying a double load across Diagonal Ave straight to a buyer at the car wash on Kemp and skipping the usual stop, and only a few people know the route. At the red light on Diagonal and Kemp, two masked riders on a dirt bike roll up alongside the Monte Carlo, a pistol taps the glass, the bag is gone in six seconds, and the rider says, "Easy, college boy." Only one person has ever called him that: Smoke, his day-one. Reese wants a name, and Knight makes his first real decision on the board. He lies, saying he never saw faces, sells the Monte to cover the loss, and then drives to Smoke's grandmother's house with a gun in the glovebox that he never touches. He tells Smoke to be gone from the 64 by sunrise. The turn is the mercy and what it costs him: he spared a friend, lied to the King, and Tre saw all of it.
+It's a cold October night, and Knight, twenty-one, makes his biggest move yet. He jumps two squares at once, carrying a double load across Diagonal Ave straight to a buyer at the car wash on Kemp and skipping the usual stop, and only a few people know the route. At the red light on Diagonal and Kemp, two masked riders on a dirt bike roll up alongside the Monte Carlo, a pistol taps the glass, the bag is gone in six seconds, and the rider says, "Easy, college boy." Only one person has ever called him that: Smoke, his day-one. Reese wants a name, and Knight makes his first real decision on the board. He lies, saying he never saw faces, sells the Monte to cover the loss, and then drives to Smoke's grandmother's house with a gun in the glovebox that he never touches. He tells Smoke to be gone from the 64 by sunrise. The turn is the mercy and what it costs him: he spared a friend, lied to the King, and Tre saw all of it. Rook watched the dirt bike leave the Rooks' back lot and told Reese he saw nothing, so two men lied to the King that month, and only one of them was caught.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 144 BPM half-time snare with double-time energy, B minor, cold tense nighttime betrayal, eerie detuned whistle lead, detuned Rhodes stabs, low haunting choir hum, rolling 16th-note distorted 808 with fast glides and stutters, 1/32 and triplet hat rolls, sudden drum dropouts, dirt bike engine whine, pistol tapping on glass, clock speeding into each hook, gritty baritone male rap, energetic, cold precise rapid flow, haunting half-sung hook, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 144 BPM half-time snare with double-time energy, B minor, cold tense nighttime betrayal, eerie detuned whistle lead, detuned Rhodes stabs, low haunting choir hum, rolling 16th-note distorted 808 with fast glides and stutters, 1/32 and triplet hat rolls, sudden drum dropouts, dirt bike engine whine, pistol tapping on glass, clock speeding into each hook, gritty baritone male rap, deep baritone male narrator, energetic, cold precise rapid flow, haunting half-sung hook, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,12 +22,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** WOMP Whistle, two oscillators detuned −10 cents, Glide Time 160 ms, sings F#–D–B–A# on hooks. Rhodes stabs through heavy WOMP Dust. Dirt bike V1 bars 10–11; glass taps bar 12.
 - **Street Gospel layer:** Held back: mercy with no church. A low choir hum under hooks, one B3 chord on "let the door close slow."
 - **Arrangement map:** Intro 4 (accelerating clock) → V1 16 (drums drop bars 15–16) → Hook 8 → V2 16 (808 out bars 1–2 on "Who?") → Hook 4 → Bridge 4 (clock plus sustained 808) → V3 8 → Hook 4 → Outro 4 (dirt bike, click).
-- **Vocal direction:** Cold, precise, fast. Doubles on "I seen you." Smoke's line bandpassed.
+- **Vocal direction:** Cold, precise, fast. Doubles on "I seen you." Smoke's line bandpassed. Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the ticking intro and the dirt-bike outro.
 - **Mix note:** Reverb tails wide on the drops, gated on the hook downbeat so the return slams. Master −7.8 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Weirdness 40%, Style Influence 75%. If Suno settles into a 72 BPM groove, move "double-time energy" first.
 
 ## Lyrics
 ```
+[Intro - Rook (spoken)]
+October. First frost on the tower windows. 11:40 p.m.
+Dirt bike whined out the back lot, two on it, no lights.
+
 [Intro]
 [Chess clock ticking, getting faster]
 [Spoken, low]
@@ -108,4 +112,9 @@ En passant, I seen you, I seen you.
 [Outro]
 [Dirt bike fading in the distance]
 [Piece click]
+
+[Outro - Rook (spoken)]
+Reese asked me too. "You see the bike?" I said I ain't see nothin'.
+Two liars at that table that month. The King only caught one of us.
+And the one he caught... he waited on. Kings can wait.
 ```

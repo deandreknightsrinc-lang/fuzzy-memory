@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** Promotion: a pawn that reaches the last rank becomes any piece it chooses
 
 ## Story Concept
-Knight is nineteen and the pawn has finally reached the eighth rank: forty thousand dollars in a Timberland box under a loose tile on fourteen. In one glorious week he buys a pearl-gray Monte Carlo SS off a lot on Route 9, carries a Kroger bag of cash into the Rooks' management office to pay Mama's rent a year ahead, and walks into Sal's Main Line Pawn to find Grandma's gold cross still in the back, because Sal "knew you'd come back," now priced at twelve hundred against the sixty he paid. Grandma passed last winter, so Knight fastens the cross around Mama's neck at the kitchen table. The celebration is real, with the brass up, the whole strip saying his name, and Tre riding shotgun, and the wordplay turns on underpromotion: most pawns pick the Queen, but he picked the Knight, the piece that jumps. The turn is Mama, who doesn't count the money and doesn't smile, touches the cross and says a pawn that becomes a queen is still carved out of the same wood.
+Knight is nineteen and the pawn has finally reached the eighth rank: forty thousand dollars in a Timberland box under a loose tile on fourteen. In one glorious week he buys a pearl-gray Monte Carlo SS off a lot on Route 9, carries a Kroger bag of cash into the Rooks' management office to pay Mama's rent a year ahead, and walks into Sal's Main Line Pawn to find Grandma's gold cross still in the back, because Sal "knew you'd come back," now priced at twelve hundred against the sixty he paid. Grandma passed last winter, so Knight fastens the cross around Mama's neck at the kitchen table. The celebration is real, with the brass up, the whole strip saying his name, and Tre riding shotgun, and the wordplay turns on underpromotion: most pawns pick the Queen, but he picked the Knight, the piece that jumps. The turn is Mama, who doesn't count the money and doesn't smile, touches the cross and says a pawn that becomes a queen is still carved out of the same wood. Rook gives the promotion its odds (he can count on one hand the pawns still standing a year later) and sees Mama at the 9C window, the only other person on the ninth floor not clapping.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 104 BPM, B-flat minor Dorian with bright major lifts, victory-lap lowrider bounce, pitched-up 70s soul vocal chop, live brass section, talkbox singing the hook, distorted 808 locked to the kick with fast slides and victory 808 rolls, hard claps, cash-counter whir and V8 engine rev, gritty baritone male rap, energetic, confident victorious bounce flow, chantable hook with stacked backing vocals, stripped Rhodes bridge, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 104 BPM, B-flat minor Dorian with bright major lifts, victory-lap lowrider bounce, pitched-up 70s soul vocal chop, live brass section, talkbox singing the hook, distorted 808 locked to the kick with fast slides and victory 808 rolls, hard claps, cash-counter whir and V8 engine rev, gritty baritone male rap, deep baritone male narrator, energetic, confident victorious bounce flow, chantable hook with stacked backing vocals, stripped Rhodes bridge, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,12 +22,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** A 70s-style soul chop, +3 semitones, through WOMP Dust. Horns on the "and" of 4. Talkbox sings "promotion." Bridge: Vintage EP on WOMP Soul Chords, no drums.
 - **Street Gospel layer:** Celebration: B3 swells into hooks 2 and 3, choir "ooh" behind hook 3, tambourine and claps on the final hook. All of it drops for Mama's bridge.
 - **Arrangement map:** Intro 4 (clock, counter, "Forty," brass) → V1 16 → Hook 8 → V2 14 (808 out bars 1–2) → Hook 4 → Bridge 4 (Rhodes plus Mama, the only stripped moment) → V3 8 (full drums) → Hook 4 → Outro 4 (brass, clock).
-- **Vocal direction:** Smiling and loud; doubles on "paid!" and "tall." Mama close and soft.
+- **Vocal direction:** Smiling and loud; doubles on "paid!" and "tall." Mama close and soft. Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the cash-counter intro and the fading brass after the outro.
 - **Mix note:** Mute every send but the Rhodes plate on the bridge. Check the V8 riser in a car. Master −7.8 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Weirdness 35%, Style Influence 70%. If it goes glossy, push Style Influence to 75% and put "gritty baritone" earlier.
 
 ## Lyrics
 ```
+[Intro - Rook (spoken)]
+Twenty years I watched pawns reach the last rank.
+Could count on one hand the ones still standin' a year later.
+
 [Intro]
 [Chess clock ticking, cash counter whirring]
 [Spoken]
@@ -110,4 +114,10 @@ Crossed the whole board and I'm still standin' tall.
 [Outro]
 [Brass fades, clock ticking]
 [Piece click]
+
+[Narration - Rook (sung)]
+Pearl-gray Monte in the lot, horn blowin' half the night,
+Whole block cheerin' underneath it, every window full of light,
+Mama at the 9C window, lookin' down the way I do,
+Only two up there not clappin'... her and me. We knew.
 ```

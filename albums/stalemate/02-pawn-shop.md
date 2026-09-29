@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** Pawns: the smallest pieces, always first to be traded away
 
 ## Story Concept
-January, and Knight is thirteen. A pink FINAL NOTICE from the electric company is taped to the apartment door, Mama is at the kitchen table punching the same numbers into a calculator, and Tre is doing homework by the open oven for heat. While Grandma dozes over her Bible, Knight takes her gold cross off the dresser and walks eight snowy blocks to Sal's Main Line Pawn, where a glass case holds the whole neighborhood's history: a choir trumpet, a wedding band, a Purple Heart. Sal gives him sixty dollars and a ninety-day ticket, the lights come back on, and Grandma touches her bare neck and only says, "I know, baby. And the Lord know too." Outside the shop, Fats, one of King Reese's lookouts, has clocked the whole thing and plants the first seed: you ain't gotta sell your grandma, come see us. The turn is Knight learning that everyone in the 64 is somebody's pawn, and that the ticket runs on a clock too.
+January, and Knight is thirteen. A pink FINAL NOTICE from the electric company is taped to the apartment door, Mama is at the kitchen table punching the same numbers into a calculator, and Tre is doing homework by the open oven for heat. While Grandma dozes over her Bible, Knight takes her gold cross off the dresser and walks eight snowy blocks to Sal's Main Line Pawn, where a glass case holds the whole neighborhood's history: a choir trumpet, a wedding band, a Purple Heart. Sal gives him sixty dollars and a ninety-day ticket, the lights come back on, and Grandma touches her bare neck and only says, "I know, baby. And the Lord know too." Outside the shop, Fats, one of King Reese's lookouts, has clocked the whole thing and plants the first seed: you ain't gotta sell your grandma, come see us. The turn is Knight learning that everyone in the 64 is somebody's pawn, and that the ticket runs on a clock too. Rook reveals that Fats didn't spot Knight by luck: Rook called it down the stairwell, so the lookout is the one who first put the boy's name in the King's ear.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 142 BPM half-time snare with double-time energy, G minor, cold winter hustle, chopped pitched-down 70s soul vocal wail, muted Wurlitzer chords, rolling 16th-note distorted 808 with fast glides and stutters, 1/32 and triplet hat rolls, shop door bell and cash register ding, winter wind and snow crunch, gritty baritone male rap, energetic, detailed double-time storytelling flow, gruff older male spoken intro, chanted hook, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 142 BPM half-time snare with double-time energy, G minor, cold winter hustle, chopped pitched-down 70s soul vocal wail, muted Wurlitzer chords, rolling 16th-note distorted 808 with fast glides and stutters, 1/32 and triplet hat rolls, shop door bell and cash register ding, winter wind and snow crunch, gritty baritone male rap, deep baritone male narrator, energetic, detailed double-time storytelling flow, gruff older male spoken intro, chanted hook, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,12 +22,17 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** 70s-style female wail, −3 semitones, through WOMP Dust. Wurli on WOMP Soul Chords (min9). Door bell and register ding one-shots. WOMP Whistle doubles the hook, Octave +1, −12 dB.
 - **Street Gospel layer:** Grandma's Bible: slow-Leslie B3 and a 3-voice hum under V3 only, hats thinned to 8ths. No tambourine.
 - **Arrangement map:** Intro 4 (bell, clock, Sal; 808 filtered) → V1 16 (drums drop bars 15–16; 808 roll lands the ding on the hook) → Hook 8 → V2 16 (808 out bars 1–2) → Hook 4 → V3 8 → Outro 4 (spoken, ding, click).
-- **Vocal direction:** Double-time, conversational. Sal gruff and dry. Punch-ins on "holy thing" and "clock in the hood."
+- **Vocal direction:** Double-time, conversational. Sal gruff and dry. Punch-ins on "holy thing" and "clock in the hood." Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the filtered intro and the register-ding outro.
 - **Mix note:** Dip the wail 2–3 kHz under the rap; wind at −24 dB. Master −8 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Knight Persona, Weirdness 40%, Style Influence 75%. If it comes back as 71 BPM boom bap, move "double-time energy" and "rolling 16th-note 808" to the front.
 
 ## Lyrics
 ```
+[Intro - Rook (spoken)]
+January. Snow up to the curb. Ninth floor, radiator knockin'.
+Thirteen-year-old boy walkin' the strip with his fist in his pocket.
+You don't hold your pocket like that less somethin' in it worth holdin'.
+
 [Intro]
 [Door bell jingles, chess clock ticking]
 [Spoken, gruff older man]
@@ -100,4 +105,9 @@ Ninety days came and went, and I ain't have enough to reach her.
 Everybody pawn somethin'. Question is, you ever come back for it?
 [Register ding]
 [Piece click]
+
+[Outro - Rook (spoken)]
+Fats ain't see him first. I did.
+Called it down the stairwell: "Loretta's grandbaby. Sal's. Somethin' gold."
+That's how the King heard he was good with numbers. I told him.
 ```

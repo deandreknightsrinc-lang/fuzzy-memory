@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** The Queen's Gambit: offering up a pawn early to win control of the center
 
 ## Story Concept
-Late spring, and Knight is twenty. At the corner store on the far side of Diagonal Ave, Hazel's side, the afternoon sun hits the register just as a nursing student in navy scrubs buys ginger ale and Band-Aids for her grandmother, and her eyes turn green in the light. Hazel Monroe isn't impressed by the Monte Carlo or the chain, so Knight comes back every day for a week until she tells him that if he's serious, he can come to Mother Ruth's porch Friday at seven. Friday at seven is King Reese's re-up run. Knight makes the gambit, handing the run to Big Dame, eating his cut, and taking Reese's cold "You gave up a Friday for a girl?" to sit on a porch drinking sweet tea under Mother Ruth's stare. This is the bridge into the HAZEL album, with Hazel's voice singing the hook, and the turn is that for the first time Knight sacrifices something on purpose. He learns what the Queen is worth, and the King learns that his Knight has another piece he'd protect first.
+Late spring, and Knight is twenty. At the corner store on the far side of Diagonal Ave, Hazel's side, the afternoon sun hits the register just as a nursing student in navy scrubs buys ginger ale and Band-Aids for her grandmother, and her eyes turn green in the light. Hazel Monroe isn't impressed by the Monte Carlo or the chain, so Knight comes back every day for a week until she tells him that if he's serious, he can come to Mother Ruth's porch Friday at seven. Friday at seven is King Reese's re-up run. Knight makes the gambit, handing the run to Big Dame, eating his cut, and taking Reese's cold "You gave up a Friday for a girl?" to sit on a porch drinking sweet tea under Mother Ruth's stare. This is the bridge into the HAZEL album, with Hazel's voice singing the hook, and the turn is that for the first time Knight sacrifices something on purpose. He learns what the Queen is worth, and the King learns that his Knight has another piece he'd protect first. Rook saw Hazel before Knight did, tells us Reese phoned the ninth floor to find where his Knight was parked that Friday, and quietly starts watching over the Queen himself.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 96 BPM, D-flat major with minor-key tension, romantic hopeful but grounded, warm Rhodes lick, talkbox and gospel choir singing a long Haaa-zel, wah guitar, smooth distorted 808 carrying the bassline with long slides and short 808 rolls, summer porch cicadas and store door chime, sultry female soul hook vocal with runs, gritty baritone male rap, energetic, smooth confident flow sliding into a croon on the bridge, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 96 BPM, D-flat major with minor-key tension, romantic hopeful but grounded, warm Rhodes lick, talkbox and gospel choir singing a long Haaa-zel, wah guitar, smooth distorted 808 carrying the bassline with long slides and short 808 rolls, summer porch cicadas and store door chime, sultry female soul hook vocal with runs, gritty baritone male rap, deep baritone male narrator, energetic, smooth confident flow sliding into a croon on the bridge, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,12 +22,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** Vintage EP, tremolo 25%, on WOMP Soul Chords (maj9/13); the Rhodes lick Db–F–Ab–C returns across HAZEL. Wah guitar 30L. Talkbox doubles the choir "Haaa-zel."
 - **Street Gospel layer:** Choir "Haaa-zel" in the intro, bridge and outro. B3 low under hooks; tambourine on the last hook only.
 - **Arrangement map:** Intro 8 (chime, clock, choir; 808 enters bar 5) → V1 16 → Hook 8 (female) → V2 16 → Hook 8 → Bridge 8 (croon; kick and 808 stay, hats out) → V3 4 → Hook 6 → Outro 4 (choir, click).
-- **Vocal direction:** Knight energetic but a little shy. Hazel: 3rd-above harmony. Bridge croon with a 1/8 dotted delay.
+- **Vocal direction:** Knight energetic but a little shy. Hazel: 3rd-above harmony. Bridge croon with a 1/8 dotted delay. Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the humming intro and the choir-swell outro.
 - **Mix note:** Carve 1 kHz from the Rhodes under the female hook. Master −8.2 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Knight Persona; tag hooks [Female vocal]. Weirdness 35%, Style Influence 70%. If it slides into modern R&B, regenerate; the 808 must stay hard.
 
 ## Lyrics
 ```
+[Intro - Rook (spoken)]
+I seen her 'fore he did. Navy scrubs, every mornin', 6:40 bus to Mercy.
+Crossed Diagonal like she owned both sides of it.
+
 [Intro]
 [Corner store door chime, chess clock ticking softly]
 [Female vocal, humming]
@@ -111,4 +115,10 @@ Queen's gambit, baby, what you willin' to yield?
 [Choir swell]
 Haaa-zel...
 [Piece click]
+
+[Outro - Rook (spoken)]
+Friday, 6:05, Reese called the ninth floor. "Where my Knight parked?"
+I said, "Pine. Other side." Long quiet on the line.
+That's the night the King started watchin' the Knight 'stead of the board.
+And me? I started watchin' her. Somebody had to.
 ```

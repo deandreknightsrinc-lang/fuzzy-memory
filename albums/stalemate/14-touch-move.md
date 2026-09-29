@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** Touch-move: in tournament chess, once you touch a piece you must move it, with no take-backs
 
 ## Story Concept
-Sunday evening after service, Knight walks into the Suds-N-Duds laundromat on Pine, Hollow territory, telling himself he came to talk Smoke down, not to do what Reese ordered. The pistol from the bar towel is in his coat, loaded with the three bullets Big Otis Monroe gave him that have been sitting in the Cutlass ashtray. For one minute he and Smoke are ten years old again, until Smoke's cousin Dre comes out of the back too fast with his hand in his hoodie, and Knight's hand finds the grip before his mind does, breaking the rule Mama gave him on the first day: don't touch a piece you ain't ready to move. Dre lives with a rod in his leg, and the Hollow answer five nights later: at 12:50 AM, at the light on Diagonal and 9th, a gray Impala pulls up on the passenger side of the Cutlass, and the shots meant for Knight hit Hazel. The turn is the whole album's cause and effect in one song: he touched it on Sunday, and she bled on Friday.
+Sunday evening after service, Knight walks into the Suds-N-Duds laundromat on Pine, Hollow territory, telling himself he came to talk Smoke down, not to do what Reese ordered. The pistol from the bar towel is in his coat, loaded with the three bullets Big Otis Monroe gave him that have been sitting in the Cutlass ashtray. For one minute he and Smoke are ten years old again, until Smoke's cousin Dre comes out of the back too fast with his hand in his hoodie, and Knight's hand finds the grip before his mind does, breaking the rule Mama gave him on the first day: don't touch a piece you ain't ready to move. Dre lives with a rod in his leg, and the Hollow answer five nights later: at 12:50 AM, at the light on Diagonal and 9th, a gray Impala pulls up on the passenger side of the Cutlass, and the shots meant for Knight hit Hazel. The turn is the whole album's cause and effect in one song: he touched it on Sunday, and she bled on Friday. Rook steps out of the frame with a hard verse: he knew the Impala, the plate and the corner days ahead, and he admits he wasn't at his window at 12:50 that Friday, a secret he leaves for Hazel's album to tell.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 148 BPM half-time snare with double-time energy, G minor, cold urgent cause and effect, eerie minor string ostinato, ominous choir pad, muted piano, crying whistle lead on hooks, rolling 16th-note distorted 808 with fast glides and stutters, 1/32 and triplet hat rolls, heavy wooden piece click on the snare, full stops, one sharp crack, ambulance siren fading out, gritty baritone male rap, energetic, breathless urgent flow with whispered doubles, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 148 BPM half-time snare with double-time energy, G minor, cold urgent cause and effect, eerie minor string ostinato, ominous choir pad, muted piano, crying whistle lead on hooks, rolling 16th-note distorted 808 with fast glides and stutters, 1/32 and triplet hat rolls, heavy wooden piece click on the snare, full stops, one sharp crack, ambulance siren fading out, gritty baritone male rap, deep baritone male narrator with slow heavy rap verse, energetic, breathless urgent flow with whispered doubles, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,12 +22,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** Spiccato string ostinato G–Bb–D–Eb. Muted piano through WOMP Dust. WOMP Whistle on hooks, Glide Time 200 ms, falling D to G. The "crack" is snare plus a reversed cymbal, not a gunshot.
 - **Street Gospel layer:** Mama's rule as a ghost: choir "ooh" under the hooks. No organ, no tambourine.
 - **Arrangement map:** Intro 4 (click, silence, spoken) → V1 16 → Hook 8 → V2 16 (808 out bars 1–2; crack bar 1; stop before bar 13) → Hook 8 → Bridge 8 (stripped: heartbeat plus click) → Hook 4 (full slam) → Outro 4 (siren, clock, click).
-- **Vocal direction:** Breathless and fast. Whispered doubles on "touch move" and "Mama told me."
+- **Vocal direction:** Breathless and fast. Whispered doubles on "touch move" and "Mama told me." Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the silent intro, then a hard 8-bar verse on the full beat after the bridge.
 - **Mix note:** On the crack, duck the mix 1 dB for 200 ms. Master −7.5 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Weirdness 40%, Style Influence 75%. Regenerate takes with real gunshots or a slow 74 BPM feel.
 
 ## Lyrics
 ```
+[Intro - Rook (spoken)]
+Sunday, 6:15. I watched him cross Pine with his hand inside his coat.
+Man comin' to talk keep his hands where you can see 'em.
+
 [Intro]
 [Piece click. Silence.]
 [Spoken]
@@ -95,6 +99,16 @@ If I could set it back on the square...
 Every tournament got one rule, and it's there for a reason:
 You touched it. You meant it.
 [Beat drops]
+
+[Verse - Rook (rap)]
+Twenty years at the glass, I done seen it every way,
+Hand touch the grip on a Sunday, somebody bleed by Friday,
+Hollow had the Impala gassed and waitin' Wednesday night,
+Parked on Pine with the dome light out, just waitin' on a light,
+They ain't want the Knight, they wanted what the Knight would miss,
+That's how you break a man who don't flinch: hit the one he kiss,
+Knew the car, knew the plate, knew the corner it would creep,
+Twelve-fifty, I wasn't at my window. That one's the Queen's to speak.
 
 [Hook]
 Touch move (touch move),

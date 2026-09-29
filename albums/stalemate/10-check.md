@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** Check: the King is under attack, and every move must answer it
 
 ## Story Concept
-At 5:12 a.m. on a February morning, a battering ram hits Reese's door in Tower B, where Knight has been sleeping since the castle. The song plays in real time: flashbangs, "Search warrant!", Knight face-down on the carpet with a boot on his back, and his phone buzzing in an evidence bag with call after call from Hazel (the voicemail in HAZEL's "Voicemail" interlude). The King is in check, and the feds want Reese, but Reese isn't in the building, so every piece has to respond. Fats flushes, Big Dame eats a gun charge on the roof, and sixteen-year-old Lil Tre, remembering what Knight told him about the Rooks, runs up to fourteen, grabs the backpack, and sprints for the stairwell. Through the window, cuffed, Knight watches his little brother get tackled at the front gate with the bag. Agent Cole, in a windbreaker with a coffee, calm and polite, crouches down, calls Knight by his real name, and says one word. The turn is the moment the game stops being a game, and it hands the next track its tragedy.
+At 5:12 a.m. on a February morning, a battering ram hits Reese's door in Tower B, where Knight has been sleeping since the castle. The song plays in real time: flashbangs, "Search warrant!", Knight face-down on the carpet with a boot on his back, and his phone buzzing in an evidence bag with call after call from Hazel (the voicemail in HAZEL's "Voicemail" interlude). The King is in check, and the feds want Reese, but Reese isn't in the building, so every piece has to respond. Fats flushes, Big Dame eats a gun charge on the roof, and sixteen-year-old Lil Tre, remembering what Knight told him about the Rooks, runs up to fourteen, grabs the backpack, and sprints for the stairwell. Through the window, cuffed, Knight watches his little brother get tackled at the front gate with the bag. Agent Cole, in a windbreaker with a coffee, calm and polite, crouches down, calls Knight by his real name, and says one word. The turn is the moment the game stops being a game, and it hands the next track its tragedy. Rook reveals the call that woke Tre: at 5:04 he radioed the raid, and the only walkie listening was the one Knight gave his little brother, so the nod from the gate may have been meant for either ninth-floor window.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 156 BPM half-time snare with double-time energy, E minor, frantic real-time raid, staccato orchestral strings, 70s horn stabs like alarms, war toms, rolling 16th-note distorted 808 with fast glides and heavy stutters, 1/32 and triplet hat rolls, battering ram impacts, sirens, helicopter and radio chatter, clock ticking faster each verse, abrupt stops, gritty baritone male rap, energetic, breathless present-tense rapid flow, shouted Check chant hook, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 156 BPM half-time snare with double-time energy, E minor, frantic real-time raid, staccato orchestral strings, 70s horn stabs like alarms, war toms, rolling 16th-note distorted 808 with fast glides and heavy stutters, 1/32 and triplet hat rolls, battering ram impacts, sirens, helicopter and radio chatter, clock ticking faster each verse, abrupt stops, gritty baritone male rap, deep baritone male narrator, energetic, breathless present-tense rapid flow, shouted Check chant hook, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,12 +22,17 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** Staccato string 16ths, LPF 8 kHz. Horn alarm stabs on 1 and the "and" of 2. Sirens, helicopter, radio chatter panned wide. Clock tick steps 1/4 → 1/8 → 1/16 across each verse.
 - **Street Gospel layer:** Held back: no church in a raid. One choir "ahh" under V2's last 2 bars when Tre nods "Safe."
 - **Arrangement map:** Intro 4 (radio, ram) → V1 16 → Hook 8 → V2 16 (808 out bars 1–2, 5:19) → Hook 4 → Bridge 8 (Cole over clock and a sustained 808) → Hook 4 → Outro 4 (voicemail, "Check," click).
-- **Vocal direction:** Breathless present tense. Crew shouts "Check!" Cole bone-dry. Voicemail bandpassed.
+- **Vocal direction:** Breathless present tense. Crew shouts "Check!" Cole bone-dry. Voicemail bandpassed. Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the radio-chatter intro and the clock-only outro.
 - **Mix note:** Stops are real silence: mute reverb returns. Master −7.5 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Weirdness 45%, Style Influence 70%. If Cole's lines come back sung, tag them [Spoken, calm male voice].
 
 ## Lyrics
 ```
+[Intro - Rook (spoken)]
+5:04 a.m. Six vans, headlights off, rollin' up Kemp.
+I got on the radio. "Blue at the gate. Blue at the gate."
+Only one walkie in the Rooks was on at five in the mornin'.
+
 [Intro]
 [Police radio chatter, chess clock ticking fast]
 [Spoken, radio]
@@ -108,4 +113,9 @@ Baby, it's me... they sayin' the Rooks on the news... please pick up...
 [Spoken, calm male voice, close]
 Check.
 [Piece click]
+
+[Outro - Rook (spoken)]
+He looked up at the ninth floor. Everybody say he was lookin' at his brother.
+Two windows on nine was lit that mornin'.
+I still don't know which one he nodded at.
 ```

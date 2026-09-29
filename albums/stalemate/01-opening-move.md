@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** The opening: the first moves that decide the rest of the game
 
 ## Story Concept
-Before sunrise at the concrete chess tables in Diagonal Park, a grown Knight sets up a board the way his grandmother taught him on a milk crate outside the laundromat. The clock starts, and he walks us through the 64: the Rooks leaning over the skyline, King Reese's black Suburban that never stops, Deacon Bishop's handshakes, little Tre with his nose pressed to the pawn-shop glass, Smoke popping wheelies, and a girl named Hazel on the far side of the avenue he hasn't met yet. It is the album's establishing shot, with every character placed on a square before a single piece moves. Mama Knight's voice opens with a rule that will come back to haunt him on "Touch Move": never touch a piece you aren't ready to move. The turn is a quiet realization that he never chose to play. He woke up already in the game, with the clock running and a pawn in his hand.
+Before sunrise at the concrete chess tables in Diagonal Park, a grown Knight sets up a board the way his grandmother taught him on a milk crate outside the laundromat. The clock starts, and he walks us through the 64: the Rooks leaning over the skyline, King Reese's black Suburban that never stops, Deacon Bishop's handshakes, little Tre with his nose pressed to the pawn-shop glass, Smoke popping wheelies, and a girl named Hazel on the far side of the avenue he hasn't met yet. It is the album's establishing shot, with every character placed on a square before a single piece moves. Mama Knight's voice opens with a rule that will come back to haunt him on "Touch Move": never touch a piece you aren't ready to move. The turn is a quiet realization that he never chose to play. He woke up already in the game, with the clock running and a pawn in his hand. Rook, the old ninth-floor lookout, bookends the song: he names himself as the one who watched every square and warns that he already knows how this game ends.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 96 BPM, C# minor, ominous swaggering establishing shot, dusty felt piano motif over Rhodes minor 9ths, whistle lead on the hook, distorted 808 locked to the kick with slides into each bar and quick 808 rolls into hooks, clock ticks as hat accents, rain and distant church bells, gritty baritone male rap, energetic, confident flow riding the swing, warm older female spoken intro, chanted group hook, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 96 BPM, C# minor, ominous swaggering establishing shot, dusty felt piano motif over Rhodes minor 9ths, whistle lead on the hook, distorted 808 locked to the kick with slides into each bar and quick 808 rolls into hooks, clock ticks as hat accents, rain and distant church bells, gritty baritone male rap, deep baritone male narrator, energetic, confident flow riding the swing, warm older female spoken intro, chanted group hook, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,12 +22,18 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** Piano motif E–D#–C#–G# through WOMP Dust. Vintage EP on WOMP Soul Chords (min9). WOMP Whistle (Glide Time 180 ms) plays G#–B–C#–E on hooks.
 - **Street Gospel layer:** Held back: church bells in the intro, a slow-Leslie B3 under V2's "Bishop's organ" couplet. The choir waits for track 05.
 - **Arrangement map:** Intro 8 (clock, Mama, click; 808 swell bar 8) → V1 16 (808 roll into the hook) → Hook 8 (whistle enters) → V2 16 (808 out bars 1–2) → Hook 8 → Outro 8 (drums out; clock slows over the 808 tail, click).
-- **Vocal direction:** Energetic, on top of the swing. Doubles on "pawn in my hand" and "who we are." Mama warm and close.
+- **Vocal direction:** Energetic, on top of the swing. Doubles on "pawn in my hand" and "who we are." Mama warm and close. Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the clock-only intro and the drums-out outro.
 - **Mix note:** Tune the kick to C#; sidechain the 808 −3 dB from it. High-pass the clock at 2 kHz. Master −8 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Build the Knight Persona from this take. Weirdness 35%, Style Influence 75%. If it drags, move "96 BPM" and "distorted 808" to the front of the song-specific part.
 
 ## Lyrics
 ```
+[Intro - Rook (spoken)]
+Sixty-four squares. I watched 'em all from the ninth floor.
+Twenty years at one window. Lookout for the King.
+Nobody watch the Rook. That's how the Rook see everything.
+This ain't my story. I just know how it ends.
+
 [Intro]
 [Chess clock ticking]
 [Spoken, older woman, warm]
@@ -91,4 +97,9 @@ Opening move, ain't no turnin' it around.
 They call it the opening 'cause it opens you up.
 Your move. Nah... mine.
 [Piece click]
+
+[Outro - Rook (spoken)]
+Boy thought he was the only one up at them tables before sunrise.
+I had the binoculars on him. Same as I had 'em on everybody.
+Remember what his mama said about touchin' pieces. The board remember.
 ```

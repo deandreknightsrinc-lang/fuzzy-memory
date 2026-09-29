@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** Rooks and castling: the King and a Rook swap places so the King is tucked safe behind the wall
 
 ## Story Concept
-It's a July night in the Rooks, the two housing towers the crew holds like a fortress. Word comes up the stairwell that the Hollow crew is rolling through at two in the morning to test Tower B, where King Reese keeps his apartment and the stash sits on the ninth floor. Reese orders a castle: he slips across to the safe unit in Tower A, and Knight and Big Dame move into his place while the work gets carried up to fourteen. The song is a roll call and a war chant, with Dame on the roof, Fats at the gate, the Mendez twins in the stairwells, and fifteen-year-old Lil Tre on the stoop holding the walkie-talkie Knight handed him to keep him close without letting him in. The Hollow cars crawl past, see every window lit and every post manned, and keep driving, so the crew celebrates on the roof at sunrise. The turn comes after, when Knight lies awake in the King's bed and understands what castling really means: the Rook stands where the King used to be, so the bullets aimed at Reese now have Knight's address.
+It's a July night in the Rooks, the two housing towers the crew holds like a fortress. Word comes up the stairwell that the Hollow crew is rolling through at two in the morning to test Tower B, where King Reese keeps his apartment and the stash sits on the ninth floor. Reese orders a castle: he slips across to the safe unit in Tower A, and Knight and Big Dame move into his place while the work gets carried up to fourteen. The song is a roll call and a war chant, with Dame on the roof, Fats at the gate, the Mendez twins in the stairwells, and fifteen-year-old Lil Tre on the stoop holding the walkie-talkie Knight handed him to keep him close without letting him in. The Hollow cars crawl past, see every window lit and every post manned, and keep driving, so the crew celebrates on the roof at sunrise. The turn comes after, when Knight lies awake in the King's bed and understands what castling really means: the Rook stands where the King used to be, so the bullets aimed at Reese now have Knight's address. Rook watches the castle from Tower A's ninth floor, straight across from the King's window, and adds two things the crew never knew: the Hollow came back at 6:40, and Tre's walkie channel has always had a second listener.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 150 BPM half-time snare with double-time energy, F-sharp minor, aggressive crew war-chant anthem, blaring 70s horn blasts, siren-like whistle lead, stomps and claps, rolling 16th-note distorted 808 with octave-drop glides and 808 stutters, 1/32 and triplet hat rolls, walkie-talkie static and radio chirps, dark choir chants, gritty baritone male rap, energetic, shouted rapid-fire flow, gang-vocal call-and-response hook, crowd ad-libs, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 150 BPM half-time snare with double-time energy, F-sharp minor, aggressive crew war-chant anthem, blaring 70s horn blasts, siren-like whistle lead, stomps and claps, rolling 16th-note distorted 808 with octave-drop glides and 808 stutters, 1/32 and triplet hat rolls, walkie-talkie static and radio chirps, dark choir chants, gritty baritone male rap, deep baritone male narrator, energetic, shouted rapid-fire flow, gang-vocal call-and-response hook, crowd ad-libs, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,12 +22,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** Studio Horns blasts on hook downbeats, through WOMP Dust. WOMP Whistle as a siren: Glide Time 250 ms, rising C# → F# into each hook. Walkie static bandpassed.
 - **Street Gospel layer:** A tower, not a church: dark choir chants double "Castle!" No organ. Tambourine only on the final hook, sunrise on the roof.
 - **Arrangement map:** Intro 8 (walkie, clock, chant; 808 roll bar 8) → V1 16 → Hook 8 → V2 16 (808 out bars 1–2, AC units dripping) → Hook 4 → Breakdown 4 (808 plus clock, hats out) → Hook 8 (all in) → Outro 4 (walkie, click).
-- **Vocal direction:** Shouted, rapid. Crew ad-libs, 8-voice gang stacks. Tre's radio lines through phone EQ.
+- **Vocal direction:** Shouted, rapid. Crew ad-libs, 8-voice gang stacks. Tre's radio lines through phone EQ. Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the static intro, a filtered drop before the bridge, and the static outro.
 - **Mix note:** Glue horns and choir on one bus. Check the 808 harmonics on phone speakers. Master −7.5 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Weirdness 35%, Style Influence 75%. If it goes arena rock, move "rolling 16th-note 808" to the front.
 
 ## Lyrics
 ```
+[Intro - Rook (spoken)]
+Two towers. Everybody watch the roof. Nobody watch the ninth floor of A.
+That's where I sat. Straight across from the King's window.
+
 [Intro]
 [Walkie-talkie static]
 [Spoken, young boy on radio]
@@ -86,6 +90,10 @@ Rooks on the corners, stash up high,
 Swap the spots, tuck the King, lock the gate,
 Nobody in the Castle, nobody out the gate!
 
+[Narration - Rook (spoken)]
+Sunrise, they was dancin' on the roof. I stayed at the glass.
+That second Impala came back through at 6:40. Nobody saw it but me.
+
 [Bridge]
 [Half-time, beat drops out to 808 and clock]
 But I laid in the King's bed, starin' at the King's ceiling,
@@ -105,4 +113,8 @@ Nobody in the Castle, nobody out the gate!
 [Spoken, young boy]
 Tre to Knight... we good? ...Knight? Over.
 [Piece click]
+
+[Outro - Rook (spoken)]
+The boy asked his brother, "We good?" and the radio ain't answer.
+I heard him, though. My walkie been on that channel the whole time.
 ```

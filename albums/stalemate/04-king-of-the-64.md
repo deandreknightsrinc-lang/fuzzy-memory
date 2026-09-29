@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** The king: the piece everything protects, which moves only one square at a time
 
 ## Story Concept
-The first verse is neighborhood mythology: King Reese stood in the middle of Diagonal Ave during a shootout in '96 and never flinched, three men did his time without saying his name, he hands out turkeys every Thanksgiving, and he paid for Ms. Dot's son's funeral. Nobody says "Reese" on a phone. The second verse is Knight's first meeting, at sixteen, in the back booth at Earl's Wings on the main strip. Reese never stands up, stirs his sweet tea with a toothpick, calls Knight's grandmother by her church name, and mentions the gold cross sitting on Sal's shelf, which proves he sees everything. He sets a single pawn in Knight's palm and explains why the King only moves one square: everybody else moves for him. Knight walks out with a job and something more dangerous, the first man who ever called him "son." The final verse lets Mama's warning and a quiet image of foreshadowing (a king can't be taken, only trapped) crack the halo a little.
+The first verse is neighborhood mythology: King Reese stood in the middle of Diagonal Ave during a shootout in '96 and never flinched, three men did his time without saying his name, he hands out turkeys every Thanksgiving, and he paid for Ms. Dot's son's funeral. Nobody says "Reese" on a phone. The second verse is Knight's first meeting, at sixteen, in the back booth at Earl's Wings on the main strip. Reese never stands up, stirs his sweet tea with a toothpick, calls Knight's grandmother by her church name, and mentions the gold cross sitting on Sal's shelf, which proves he sees everything. He sets a single pawn in Knight's palm and explains why the King only moves one square: everybody else moves for him. Knight walks out with a job and something more dangerous, the first man who ever called him "son." The final verse lets Mama's warning and a quiet image of foreshadowing (a king can't be taken, only trapped) crack the halo a little. Rook punctures the legend from inside it: in '96 Reese hid behind a bread truck while Rook held the door, and the warm pawn Knight treasures is one Reese handed out to everybody he wanted.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 98 BPM, C minor, regal menacing throne-room swagger, 70s funk horn stabs, Hammond organ pads, timpani hits, low male choir hum, huge distorted 808 locked to the kick with slow-to-fast glides and 808 rolls into each hook, talkbox answering the hook, heavy piece click on hook downbeats, rain on a diner window, gritty baritone male rap, energetic, commanding punchy flow, deep gravelly older male spoken voice, crowd hook, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 98 BPM, C minor, regal menacing throne-room swagger, 70s funk horn stabs, Hammond organ pads, timpani hits, low male choir hum, huge distorted 808 locked to the kick with slow-to-fast glides and 808 rolls into each hook, talkbox answering the hook, heavy piece click on hook downbeats, rain on a diner window, gritty baritone male rap, deep baritone male narrator, energetic, commanding punchy flow, deep gravelly older male spoken voice, crowd hook, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,12 +22,17 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** Studio Horns stabs on the "and" of 4 through WOMP Dust, like a 1975 funk section. B3 pad, slow Leslie. Talkbox answers "long live" on hook 2. WOMP Soul Chords 7#9 on the G7#9 hits.
 - **Street Gospel layer:** A court, not a church: low male choir hum, no tambourine. Organ pads, never a swell; Bishop's organ belongs to track 05.
 - **Arrangement map:** Intro 4 (clock, hum, Reese; 808 hit bar 4) → V1 16 (808 roll bar 16) → Hook 8 (timpani, horns) → V2 16 (808 out bars 1–2 as Knight walks into Earl's; rain) → Hook 8 (talkbox) → V3 8 → Outro 4 (Reese, click).
-- **Vocal direction:** Commanding and punchy, every syllable on the grid. Reese pitched down 2 semitones. Crowd hook: 8-voice "long live."
+- **Vocal direction:** Commanding and punchy, every syllable on the grid. Reese pitched down 2 semitones. Crowd hook: 8-voice "long live." Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the choir-hum intro and a filtered outro tail.
 - **Mix note:** High-pass the timpani at 60 Hz so the 808 owns the sub. Master −7.8 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Weirdness 35%, Style Influence 75%. If it becomes an orchestral march, cut "timpani"; the 808 matters more than the pomp.
 
 ## Lyrics
 ```
+[Intro - Rook (spoken)]
+Everybody got a story 'bout King Reese. I got the true ones.
+'96, Diagonal Ave. He ain't stand in the middle of no street.
+He stood behind a bread truck. I know. I was holdin' the door.
+
 [Intro]
 [Chess clock ticking, choir hum]
 [Spoken, deep older man]
@@ -98,4 +103,9 @@ I ain't know I'd be the square he'd put his back against at last.
 [Spoken, deep older man]
 Long live the King, youngblood. Say it.
 [Piece click]
+
+[Outro - Rook (spoken)]
+Reese kept a pocket full of pawns. Warm ones.
+Put one in every hand he ever wanted.
+I still got mine. Twenty years. He never once called me "son."
 ```

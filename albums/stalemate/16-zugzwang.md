@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** Zugzwang: you are forced to move, and every possible move makes your position worse
 
 ## Story Concept
-4 AM on the top level of the Mercy General parking garage, the week after the church. Bishop has vanished, so Agent Cole needs Knight on the stand by Monday; the Hollow want a body for Dre's leg; King Reese, spooked and hunted, wants a sit-down. Knight sits in the Cutlass with Hazel's dried blood still in the seat stitching and plays out every option like a grandmaster analyzing variations: snitch, fight, run, or sit. Each one ends in the same place, someone he loves in a box. In chess you can't pass, and the song's structure refuses to let him either, cutting the beat after each variation like a clock being slapped. The turn comes at sunrise when his phone lights up with a text from Reese, "Fish fry. Saturday. Come see the King," and Knight is forced to make a move he doesn't want.
+4 AM on the top level of the Mercy General parking garage, the week after the church. Bishop has vanished, so Agent Cole needs Knight on the stand by Monday; the Hollow want a body for Dre's leg; King Reese, spooked and hunted, wants a sit-down. Knight sits in the Cutlass with Hazel's dried blood still in the seat stitching and plays out every option like a grandmaster analyzing variations: snitch, fight, run, or sit. Each one ends in the same place, someone he loves in a box. In chess you can't pass, and the song's structure refuses to let him either, cutting the beat after each variation like a clock being slapped. The turn comes at sunrise when his phone lights up with a text from Reese, "Fish fry. Saturday. Come see the King," and Knight is forced to make a move he doesn't want. Rook reveals what the fish-fry text really meant: Reese wanted Knight at his left hand in the open, one last castle with the Knight as the shield.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 152 BPM half-time snare with double-time energy, B-flat minor, anxious cerebral stop-start, chopped 70s Rhodes loop that stutters, wah guitar, rolling 16th-note distorted 808 with fast glides and heavy stutters, 1/32 and triplet hat rolls, scratches cut from a ticking chess clock, beat cuts after each variation and restarts on a loud piece click, garage wind, gritty baritone male rap, energetic, analytical rapid-fire flow, whispered counting, gang hook, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 152 BPM half-time snare with double-time energy, B-flat minor, anxious cerebral stop-start, chopped 70s Rhodes loop that stutters, wah guitar, rolling 16th-note distorted 808 with fast glides and heavy stutters, 1/32 and triplet hat rolls, scratches cut from a ticking chess clock, beat cuts after each variation and restarts on a loud piece click, garage wind, gritty baritone male rap, deep baritone male narrator, energetic, analytical rapid-fire flow, whispered counting, gang hook, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,12 +22,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** Vintage EP loop chopped through WOMP Dust, Remix FX Repeater on bar 4. Wah guitar 30L. WOMP Whistle on hooks: F–Ab–Bb–Db.
 - **Street Gospel layer:** 4 AM in a concrete garage. One B3 chord under "I become the Bishop, organ music and a lie."
 - **Arrangement map:** Intro 4 (clock, wind, spoken) → Hook 8 → V1 "Snitch" 8 → cut → V2 "Fight" 8 (808 out bars 1–2) → cut → V3 "Run" 8 → cut → Hook 8 → V4 "Sit" 8 → cut → Hook 4 → Outro 4 (phone buzz, "...Move.").
-- **Vocal direction:** Analytical rapid-fire. Whispered counting ±50 under hooks.
+- **Vocal direction:** Analytical rapid-fire. Whispered counting ±50 under hooks. Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the wind-and-clock intro and the whispered outro.
 - **Mix note:** Freeze reverb sends on every cut, then hit the click dry. Master −7.5 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Weirdness 45%, Style Influence 70%. Keep the [Beat cuts] tags; regenerate if the loop never stops.
 
 ## Lyrics
 ```
+[Intro - Rook (spoken)]
+Top of the Mercy garage, you can see the Rooks from the rail.
+Rooks can see you back.
+
 [Intro]
 [Chess clock ticking, garage wind]
 [Spoken]
@@ -111,4 +115,9 @@ Fish fry. Saturday. Come see the King.
 [Chess clock ticking, one piece click]
 [Whispered]
 ...Move.
+
+[Outro - Rook (spoken)]
+The King ain't want a meetin'. I heard him say it on nine:
+"Put the Knight at my left hand, out in the open. Let 'em see who stand with me."
+He wasn't invitin' the boy to eat. He was castlin'. One last time.
 ```

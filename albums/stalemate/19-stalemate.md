@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** Stalemate: the King is not in check but has no legal moves, so the game ends and nobody wins
 
 ## Story Concept
-2 AM in December at the stone chess tables in Diagonal Park, the same table where the album's clock first started. Knight brushes snow off the squares and sets up his life: one white King in the corner, not in check, but every square around him covered. The feds have no new charges, yet Cole's gray Ford idles outside the Rooks; the street says he sang because he's the only name missing from the indictment; the housing authority is evicting Mama from 9C under the one-strike rule; Tre's visits are denied; and every job application stops at the felony box. "No legal moves" cuts both ways, on the board and under the law, and he plays every illegal move out in his head until each one ends in a box. The turn comes when Hazel texts "Come home. Need to talk," and he remembers the one mercy in the rules: a stalemate ends the game. Nobody wins, but you can stand up from the table.
+2 AM in December at the stone chess tables in Diagonal Park, the same table where the album's clock first started. Knight brushes snow off the squares and sets up his life: one white King in the corner, not in check, but every square around him covered. The feds have no new charges, yet Cole's gray Ford idles outside the Rooks; the street says he sang because he's the only name missing from the indictment; the housing authority is evicting Mama from 9C under the one-strike rule; Tre's visits are denied; and every job application stops at the felony box. "No legal moves" cuts both ways, on the board and under the law, and he plays every illegal move out in his head until each one ends in a box. The turn comes when Hazel texts "Come home. Need to talk," and he remembers the one mercy in the rules: a stalemate ends the game. Nobody wins, but you can stand up from the table. Rook watches Cole watch for Knight, then walks down to the park after Knight leaves and pockets the one piece the snow didn't bury: the white King.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 98 BPM, B minor, somber weary title track, lone grand piano motif, swelling strings, mournful whistle lead on hooks, dusty heavy kick and cracking snare, huge distorted 808 dragging like a piece across a board with slides and 808 rolls, clock that slowly slows, piece click on every hook downbeat, winter wind, gritty baritone male rap, energetic, measured flow rising each verse, hook with low male choir, stripped piano outro, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 98 BPM, B minor, somber weary title track, lone grand piano motif, swelling strings, mournful whistle lead on hooks, dusty heavy kick and cracking snare, huge distorted 808 dragging like a piece across a board with slides and 808 rolls, clock that slowly slows, piece click on every hook downbeat, winter wind, gritty baritone male rap, deep baritone male narrator, energetic, measured flow rising each verse, hook with low male choir, stripped piano outro, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,12 +22,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** Grand piano motif F#–D–C#–B through WOMP Dust. Strings swell higher each verse. WOMP Whistle on hooks: Glide Time 220 ms, Vibrato Rate 4 Hz, Vibrato Delay 600 ms (about a quarter note at 98 BPM).
 - **Street Gospel layer:** No church left: a low male choir doubles the hook, one B3 swell into the last hook.
 - **Arrangement map:** Intro 4 (wind, clock, click) → V1 16 → Hook 8 → V2 16 (808 out bars 1–2 at Tre's gate) → Hook 8 → V3 16 (text chime bar 11; drums and 808 out bars 15–16) → Hook 4 (full slam) → Outro 4 (stripped: piano, clock stops, click).
-- **Vocal direction:** Measured but energetic, near-shouting at V3 bar 10, then almost spoken. Doubles on "no legal moves."
+- **Vocal direction:** Measured but energetic, near-shouting at V3 bar 10, then almost spoken. Doubles on "no legal moves." Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the wind intro and the piano tail after the clock stops.
 - **Mix note:** Winter wind high-passed at 300 Hz, up in the outro. Master −8.2 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Title track: generate 4 takes. Weirdness 35%, Style Influence 75%. If it goes orchestral or slow, drop the strings wording.
 
 ## Lyrics
 ```
+[Intro - Rook (spoken)]
+December. Cole's gray Ford idled under my window every night.
+He watched for the Knight. I watched Cole. Nobody watched me.
+
 [Intro]
 [Wind, chess clock ticking]
 [Spoken]
@@ -114,4 +118,9 @@ Nobody win. Nobody win. It's a draw, and a draw still bruise.
 Not in check... no legal moves...
 [Clock stops]
 [Piece click]
+
+[Outro - Rook (spoken)]
+Four a.m., I walked down to the park. First time off nine in a year.
+Snow had took every piece he left but one. The white King. Still standin'.
+I brushed him off and put him in my coat. Some pieces you keep.
 ```

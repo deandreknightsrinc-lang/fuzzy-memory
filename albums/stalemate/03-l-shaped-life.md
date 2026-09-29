@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** How the knight moves: two squares one way, one square over, and the only piece that can jump
 
 ## Story Concept
-Ages twelve to fifteen. Knight tests into Westbrook Magnet across the city, where Ms. Adeyemi holds his ninety-eighth-percentile score up to the class and a counselor draws him a straight line to college. The line breaks one square at a time: a shooting turns his bus transfer at Kemp and Diagonal into a crime-scene tent, the tardies pile up, and a rich kid named Preston jokes that Knight's mama cleans his mama's house, so Knight breaks his nose against the lockers and is expelled by Friday. Walking home, he finds Smoke on the bench, who hands him a rubber-banded knot of cash and asks the college boy to count for the Rooks, and the count comes back perfect. Because the knight is the only piece that jumps, he leaps over the older heads and gets a stash key in one summer, until a black Suburban slows beside him and a voice asks, "You the one that count?" The turn is that the detour turns out to be the road, and the album's thesis line is born: never straight, but I get there.
+Ages twelve to fifteen. Knight tests into Westbrook Magnet across the city, where Ms. Adeyemi holds his ninety-eighth-percentile score up to the class and a counselor draws him a straight line to college. The line breaks one square at a time: a shooting turns his bus transfer at Kemp and Diagonal into a crime-scene tent, the tardies pile up, and a rich kid named Preston jokes that Knight's mama cleans his mama's house, so Knight breaks his nose against the lockers and is expelled by Friday. Walking home, he finds Smoke on the bench, who hands him a rubber-banded knot of cash and asks the college boy to count for the Rooks, and the count comes back perfect. Because the knight is the only piece that jumps, he leaps over the older heads and gets a stash key in one summer, until a black Suburban slows beside him and a voice asks, "You the one that count?" The turn is that the detour turns out to be the road, and the album's thesis line is born: never straight, but I get there. Rook adds what Knight never knew: the lookout saw the crime-scene tape before the bus did, and it was his answer to Reese ("the one that jump") that sent the Suburban.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 102 BPM, F minor, playful sinister hustle, wah clavinet stabs and pizzicato strings, detuned music-box riff, distorted 808 that leaps two up and one over like a knight move with fast slides, 1/32 hat rolls at phrase ends, school bell and bus air-brake hits, whistle lead on hooks, gritty baritone male rap, energetic, agile flow switching triplet and double-time, chanted call-and-response gang hook, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 102 BPM, F minor, playful sinister hustle, wah clavinet stabs and pizzicato strings, detuned music-box riff, distorted 808 that leaps two up and one over like a knight move with fast slides, 1/32 hat rolls at phrase ends, school bell and bus air-brake hits, whistle lead on hooks, gritty baritone male rap, deep baritone male narrator, energetic, agile flow switching triplet and double-time, chanted call-and-response gang hook, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,12 +22,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** Vintage Clav through Auto-Wah, 16th stabs, doubled by pizzicato. Music box −15 cents through WOMP Dust. WOMP Whistle on hooks: C–Eb–F–Ab, Glide Time 150 ms.
 - **Street Gospel layer:** Held back: school and street. One B3 swell under "Voice in the back said" to announce the King.
 - **Arrangement map:** Intro 4 → V1 16 (school bell bar 1; drums drop bars 15–16) → Hook 8 → V2 16 (808 out bars 1–2; air-brake) → Hook 8 → Bridge 8 (beat LPF 400 Hz, spoken; 808 stays) → V3 8 → Hook 8 (horn stabs) → Outro 4.
-- **Vocal direction:** Triplet flow in V1, double-time at the end of V2. Gang call "Two up!", response "One over!"
+- **Vocal direction:** Triplet flow in V1, double-time at the end of V2. Gang call "Two up!", response "One over!" Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the filtered intro and the clock-only outro.
 - **Mix note:** Open the bridge low-pass over its last beat. High-pass the air-brake at 200 Hz. Master −7.8 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Weirdness 40%, Style Influence 70%. If Suno halves it into a knock, move "full-time bounce at 102 BPM" to the front.
 
 ## Lyrics
 ```
+[Intro - Rook (spoken)]
+Every mornin', 6:10, boy in starched khakis at the bus stop.
+Only kid in the 64 carryin' books the wrong direction.
+
 [Intro]
 [Piece click, piece click]
 [Spoken]
@@ -105,4 +109,9 @@ Knight moves: never straight, but I get there, though.
 [Piece click]
 [Spoken]
 Two up. One over. Check the board.
+
+[Outro - Rook (spoken)]
+From the ninth floor you could see the tape on Kemp before the bus did.
+Reese asked me who the boy was, countin' in the stairwell.
+I said, "That's the one that jump." Suburban rolled the next day.
 ```

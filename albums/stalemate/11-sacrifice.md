@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** Sacrifice: giving up a piece on purpose to save a more valuable one
 
 ## Story Concept
-A gray Monday in April, ninth floor of the county courthouse, two months after the raid. Lil Tre, sixteen and charged as an adult, stands up in an orange jumpsuit and swears the backpack from fourteen was his and his alone, so the weight never reaches his big brother. Knight, who pleads down to eleven months in county on a lesser charge, sits two rows back in a suit bought with promotion money while Mama Knight grips the pew with Grandma's gold cross in her fist. The judge gives Tre four years state, and Tre winks at Knight as the bailiff takes his elbow. It is the emotional center of the album: the promotion was never free, because the pawn was paying for it the whole time.
+A gray Monday in April, ninth floor of the county courthouse, two months after the raid. Lil Tre, sixteen and charged as an adult, stands up in an orange jumpsuit and swears the backpack from fourteen was his and his alone, so the weight never reaches his big brother. Knight, who pleads down to eleven months in county on a lesser charge, sits two rows back in a suit bought with promotion money while Mama Knight grips the pew with Grandma's gold cross in her fist. The judge gives Tre four years state, and Tre winks at Knight as the bailiff takes his elbow. It is the emotional center of the album: the promotion was never free, because the pawn was paying for it the whole time. Rook shows who else was in the courtroom (Fats, taking notes for Reese on whether the pawn would hold) and that Tre's first letter from upstate went to the lookout, asking him to watch his brother.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 94 BPM, D minor, mournful courtroom heartbreak that still bangs, crying chopped 70s soul vocal, weeping strings, felt piano and Rhodes, heavy distorted 808 locked to the kick with aching slides and 808 rolls into hooks, clock stopping dead at a gavel strike, low gospel choir under the hook, stripped piano breakdown, gritty baritone male rap, energetic but pained, steady urgent flow, half-sung hook, younger male spoken letter, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 94 BPM, D minor, mournful courtroom heartbreak that still bangs, crying chopped 70s soul vocal, weeping strings, felt piano and Rhodes, heavy distorted 808 locked to the kick with aching slides and 808 rolls into hooks, clock stopping dead at a gavel strike, low gospel choir under the hook, stripped piano breakdown, gritty baritone male rap, deep baritone male narrator, energetic but pained, steady urgent flow, half-sung hook, younger male spoken letter, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,12 +22,17 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** A 70s soul "ooh" cry, −2 semitones, through WOMP Dust. Legato strings. Piano plus Vintage EP on WOMP Soul Chords (min9).
 - **Street Gospel layer:** Low choir under every hook, slow-Leslie B3. No tambourine; nobody is celebrating.
 - **Arrangement map:** Intro 4 (clock, spoken; 808 swell) → V1 16 → Hook 8 → V2 16 (808 out bars 1–2; gavel bar 10) → Hook 8 → Bridge 8 (stripped: piano, Tre's letter) → Hook 6 (full slam) → Outro 4 (clock resumes, click).
-- **Vocal direction:** Energetic but pained, close. Punch-ins only on "Tre's dime." Tre's letter younger, dry.
+- **Vocal direction:** Energetic but pained, close. Punch-ins only on "Tre's dime." Tre's letter younger, dry. Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the ticking intro and the clock tail after the outro.
 - **Mix note:** Sidechain strings 2 dB from the vocal. The bridge falls quiet, but master to −8.5 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Weirdness 30%, Style Influence 75%. If it turns into a piano ballad, put "94 BPM" and "heavy distorted 808" first.
 
 ## Lyrics
 ```
+[Intro - Rook (spoken)]
+County building, ninth floor. Every bad thing in this story happen nine up.
+Fats sat in the last row with a church bulletin, takin' notes for the King.
+Reese wanted to know one thing: would the pawn hold.
+
 [Intro]
 [Chess clock ticking]
 [Spoken]
@@ -106,4 +111,9 @@ Every move I make is on Tre's dime.
 Knight still on the board...
 Pawn in the box...
 [Piece click]
+
+[Outro - Rook (spoken)]
+He held. Four years. Fats went back to Earl's and said one word: "Solid."
+First letter Tre wrote from upstate wasn't to his brother. It was to me.
+"You on the ninth floor. Watch him for me." So I did.
 ```

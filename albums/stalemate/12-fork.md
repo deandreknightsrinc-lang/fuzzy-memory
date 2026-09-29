@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** The fork: one move attacks two pieces at once, and only one can be saved
 
 ## Story Concept
-Knight is home from his eleven months in county, and the 64 won't let him settle. On a Friday at 9 PM, King Reese calls him to the back booth at Earl's Wings, stirs his sweet tea with a toothpick, and reveals he knows Knight lied about who robbed him: Smoke is back across the line running with the Hollow, and Reese blames him for the raid and for Tre. He slides over a pistol wrapped in a bar towel and says, "Sunday." At midnight Hazel is waiting outside Mercy General in the '86 Cutlass with a lease application for a one-bedroom past where the bus line ends, and she wants to leave Sunday too. One move, two threats: save the King's respect or save the Queen's future, and whichever he doesn't pick is lost. The song ends at sunrise with the towel in one hand and her keys in the other, setting up "Pinned" and "Touch Move."
+Knight is home from his eleven months in county, and the 64 won't let him settle. On a Friday at 9 PM, King Reese calls him to the back booth at Earl's Wings, stirs his sweet tea with a toothpick, and reveals he knows Knight lied about who robbed him: Smoke is back across the line running with the Hollow, and Reese blames him for the raid and for Tre. He slides over a pistol wrapped in a bar towel and says, "Sunday." At midnight Hazel is waiting outside Mercy General in the '86 Cutlass with a lease application for a one-bedroom past where the bus line ends, and she wants to leave Sunday too. One move, two threats: save the King's respect or save the Queen's future, and whichever he doesn't pick is lost. The song ends at sunrise with the towel in one hand and her keys in the other, setting up "Pinned" and "Touch Move." Rook reveals that Reese put the lookout on Knight to report which Sunday he chose, and that Rook watched the Cutlass sit at sunrise for two hours without calling it either way.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 146 BPM half-time snare with double-time energy, F-sharp minor, menacing and torn in two, wah clavinet hard left, warm Rhodes hard right, pizzicato strings answering across the stereo, whistle lead on hooks, rolling 16th-note distorted 808 dead center with fast glides and stutters, 1/32 and triplet hat rolls, rimshot, female soul ad-libs, gritty baritone male rap, energetic, weary tense rapid flow, half-sung chanted hook, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 146 BPM half-time snare with double-time energy, F-sharp minor, menacing and torn in two, wah clavinet hard left, warm Rhodes hard right, pizzicato strings answering across the stereo, whistle lead on hooks, rolling 16th-note distorted 808 dead center with fast glides and stutters, 1/32 and triplet hat rolls, rimshot, female soul ad-libs, gritty baritone male rap, deep baritone male narrator, energetic, weary tense rapid flow, half-sung chanted hook, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,12 +22,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** King = Clav with Auto-Wah, hard left, WOMP Soul Chords 7#9. Queen = Vintage EP, hard right, min9 through WOMP Dust. Pizzicato answers L/R. Whistle centered on hooks.
 - **Street Gospel layer:** Held back: Friday night, not Sunday. One faint B3 swell on "the Lord ain't in a bullet."
 - **Arrangement map:** Intro 4 (clock, spoken) → V1 16 → Hook 8 → V2 16 (808 out bars 1–2, the Mercy parking lot) → Hook 8 → Bridge 8 (clock left, Rhodes right, 808 sustains center) → Hook 4 → Outro 4.
-- **Vocal direction:** Weary but fast, center. Hazel's ad-libs 60R. Doubles on "forked" and "for keeps."
+- **Vocal direction:** Weary but fast, center. Hazel's ad-libs 60R. Doubles on "forked" and "for keeps." Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the ticking intro and the clock-only outro.
 - **Mix note:** Check mono: clav and Rhodes must not cancel. Master −7.8 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Weirdness 40%, Style Influence 70%. Suno won't keep the L/R idea; pick for 808 and hook, then build the fork in Logic.
 
 ## Lyrics
 ```
+[Intro - Rook (spoken)]
+Friday night, Reese climbed to the ninth floor. First time in six years.
+Stood at my window and said, "The Knight got two places to be Sunday. Tell me which one he pick."
+
 [Intro]
 [Chess clock ticking]
 [Spoken]
@@ -106,4 +110,9 @@ Whichever one I don't pick is the piece I lose for keeps.
 [Chess clock ticking]
 Up two... over one...
 [Piece click]
+
+[Outro - Rook (spoken)]
+Sunrise, the Cutlass sat in the lot under my window, engine off.
+Two hours. He never came up, never pulled out.
+I had the radio in my hand the whole time. I ain't call it either way.
 ```

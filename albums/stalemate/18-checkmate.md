@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** Checkmate: the King is attacked and has no square left to escape to
 
 ## Story Concept
-Saturday, 4:47 PM, at the fish fry in the lot behind the Rooks. For the first time in years King Reese sits out in the open: no Castle on his flank because the Rooks got raided, no Bishop in his ear because Bishop is gone, and no Knight on his left because Knight is at Mercy holding his mother's hand. A fifteen-year-old from the Hollow in a school hoodie, the same age Tre was on the stoop with the walkie, walks up and asks, "Mr. Reese?", and the King of the 64 is taken down by a pawn. Monday at dawn the indictment built from Bishop's tapes comes down with twenty-two names, and on Thursday Knight carries the front-left handle of Reese's casket at Diagonal Ave Baptist while a guest preacher reads from a pulpit Bishop left empty. The turn lands on the church steps: everybody close to the King is buried or booked except Knight, and in the 64 that looks like the worst thing a man can be.
+Saturday, 4:47 PM, at the fish fry in the lot behind the Rooks. For the first time in years King Reese sits out in the open: no Castle on his flank because the Rooks got raided, no Bishop in his ear because Bishop is gone, and no Knight on his left because Knight is at Mercy holding his mother's hand. A fifteen-year-old from the Hollow in a school hoodie, the same age Tre was on the stoop with the walkie, walks up and asks, "Mr. Reese?", and the King of the 64 is taken down by a pawn. Monday at dawn the indictment built from Bishop's tapes comes down with twenty-two names, and on Thursday Knight carries the front-left handle of Reese's casket at Diagonal Ave Baptist while a guest preacher reads from a pulpit Bishop left empty. The turn lands on the church steps: everybody close to the King is buried or booked except Knight, and in the 64 that looks like the worst thing a man can be. Rook raps the killing from his window, keying a radio with no one left to answer, then admits his name was missing from the indictment too, a fact the 64 never noticed because nobody watches the Rook.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 160 BPM half-time snare with double-time energy, D minor, epic funereal lowrider war, massive 70s brass and pounding timpani, tolling church bell, rolling 16th-note distorted 808 with fast glides and heavy stutters, 1/32 and triplet hat rolls, deep choir chanting Checkmate, dominoes slapping, drops to total silence before key lines, hard board slam, funeral pipe organ bridge, gritty baritone male rap, energetic, aggressive rapid flow turning hushed, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 160 BPM half-time snare with double-time energy, D minor, epic funereal lowrider war, massive 70s brass and pounding timpani, tolling church bell, rolling 16th-note distorted 808 with fast glides and heavy stutters, 1/32 and triplet hat rolls, deep choir chanting Checkmate, dominoes slapping, drops to total silence before key lines, hard board slam, funeral pipe organ bridge, gritty baritone male rap, deep baritone male narrator with slow heavy rap verse, energetic, aggressive rapid flow turning hushed, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,7 +22,7 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** Horns sustained in hooks, stabs in verses, through WOMP Dust. Timpani high-passed at 60 Hz. Bell tolls every 2 bars in intro and outro. Domino slaps as V1 foley.
 - **Street Gospel layer:** The choir chants the hook; the bridge is funeral pipe organ alone. No tambourine; this is a burial.
 - **Arrangement map:** Intro 4 (clock, bell, slam) → V1 16 (1 beat of silence before "Four-forty-seven") → Hook 8 → V2 16 (808 out bars 1–2, Monday's helicopters) → Hook 8 → Bridge 8 (stripped: organ only) → Hook 4 (full slam) → Outro 4 (bell, slam).
-- **Vocal direction:** Aggressive and rapid in V1, hushed in the bridge. Punch-ins on "walked right on through."
+- **Vocal direction:** Aggressive and rapid in V1, hushed in the bridge. Punch-ins on "walked right on through." Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the funeral-organ drop, then a slow, heavy 8-bar verse as the beat returns.
 - **Mix note:** Sidechain brass 2 dB from the vocal. Master −7.5 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Weirdness 35%, Style Influence 75%. If it turns marching band, move "rolling 16th-note 808" and "lowrider" earlier.
 
@@ -96,6 +96,16 @@ I stood behind him. He was right.
 He just never said what happen to the ones behind him when he fall.
 [Beat returns]
 
+[Verse - Rook (rap)]
+Four-forty-six, ninth floor, seen the hoodie slip the gate,
+Keyed the radio to call it, and the static said, "Too late,"
+Every post been empty since the raid, every walkie bagged and tagged,
+Twenty years I called every car, and the one that counted, nobody had,
+Lil' man crossed the lot with his hands in his pouch like a choirboy,
+Four shots slapped the brick, climbed nine flights, I heard every bit of the noise, boy,
+A Rook with no King is just a tower full of stairs,
+Set the radio down on the sill. It's still sittin' there.
+
 [Hook]
 (Choir) Checkmate (checkmate),
 King of the 64, no squares, no escape,
@@ -107,4 +117,8 @@ One move. That's all it take.
 The King is down...
 The pieces scatter...
 [Board slam]
+
+[Outro - Rook (spoken)]
+Twenty-two names on that indictment. Mine wasn't on it either.
+Nobody ever ask about the lookout. They only ask about the Knight.
 ```

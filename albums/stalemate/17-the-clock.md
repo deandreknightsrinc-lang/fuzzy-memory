@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** Time control: the chess clock, and the flag that falls when your time runs out
 
 ## Story Concept
-Saturday, 3 PM, the fourth-floor dialysis unit at Mercy General, the same day as King Reese's fish fry. Mama Knight's kidneys are failing, so three days a week she sits four hours in a vinyl recliner while a machine cleans her blood, fanning herself with a Diagonal Ave Baptist church fan she won't throw away. Knight's phone keeps buzzing with Reese's "Fish fry, four o'clock," and the song counts everybody's clock: Mama's transplant list that never moves, Tre's X'd-out calendar upstate, and Knight at twenty-three already owning a funeral suit. Mama, who doesn't know what's waiting behind the Rooks, asks for one thing: "Give your mama one Saturday." He stays. The turn is quiet and enormous: at 5:02 the buzzing stops all at once, and Knight doesn't yet know that his mother's clock just saved his life.
+Saturday, 3 PM, the fourth-floor dialysis unit at Mercy General, the same day as King Reese's fish fry. Mama Knight's kidneys are failing, so three days a week she sits four hours in a vinyl recliner while a machine cleans her blood, fanning herself with a Diagonal Ave Baptist church fan she won't throw away. Knight's phone keeps buzzing with Reese's "Fish fry, four o'clock," and the song counts everybody's clock: Mama's transplant list that never moves, Tre's X'd-out calendar upstate, and Knight at twenty-three already owning a funeral suit. Mama, who doesn't know what's waiting behind the Rooks, asks for one thing: "Give your mama one Saturday." He stays. The turn is quiet and enormous: at 5:02 the buzzing stops all at once, and Knight doesn't yet know that his mother's clock just saved his life. While Knight sits at dialysis, Rook sings what was happening at the same hour behind the Rooks: the empty chair at the King's left hand, a plate fixed for Knight, and a school hoodie slipping through the gate.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 96 BPM, A-flat major sinking into F minor, bittersweet and heavy, loud analog chess clock tick as the rhythmic spine, dialysis machine beep chopped into the groove, warm Rhodes, 70s soul strings, heartbeat-pattern distorted 808 with slides and short rolls, weathered older female soul vocal singing the hook, choir hum in a stripped bridge, gritty baritone male rap, energetic but reflective, steady driving flow, clock stops dead on the final bar, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 96 BPM, A-flat major sinking into F minor, bittersweet and heavy, loud analog chess clock tick as the rhythmic spine, dialysis machine beep chopped into the groove, warm Rhodes, 70s soul strings, heartbeat-pattern distorted 808 with slides and short rolls, weathered older female soul vocal singing the hook, choir hum in a stripped bridge, gritty baritone male rap, deep baritone male narrator, energetic but reflective, steady driving flow, clock stops dead on the final bar, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,7 +22,7 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** Vintage EP on WOMP Soul Chords (maj9/13). 70s strings. The Rhodes can quote the public-domain hymn "Blessed Assurance" behind V1.
 - **Street Gospel layer:** Choir hum under the bridge, slow-Leslie B3 under Mama's hooks. No tambourine; it's a hospital.
 - **Arrangement map:** Intro 4 (clock, beeps, Mama) → V1 16 → Hook 8 (Mama sings) → V2 16 (808 out bars 1–2; buzz mutes on "5:02") → Hook 8 → Bridge 8 (stripped: Mama, choir, clock) → Hook 4 (full slam) → Outro 4 (clock stops, silence, click).
-- **Vocal direction:** Energetic but reflective. Mama warm, 3rd-above harmony on "tick, tock."
+- **Vocal direction:** Energetic but reflective. Mama warm, 3rd-above harmony on "tick, tock." Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the filtered drop before the bridge and the silence after the clock stops.
 - **Mix note:** Automate the phone buzz louder each time, then cut it dead on "5:02." Master −8.5 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Tag hooks [Female vocal, older woman]. Weirdness 35%, Style Influence 70%. If it goes soft gospel, put "96 BPM" and "distorted 808" first.
 
@@ -87,6 +87,12 @@ Tick, tock, baby, spend it on what you got,
 Stay here with me, let the whole world knock,
 Tick, tock... tick, tock.
 
+[Narration - Rook (sung)]
+Four o'clock, smoke risin' off the lot behind the Rooks,
+Foldin' chair on the King's left hand, nobody in it, nobody looked,
+Four-forty-six, a school hoodie slipped the gate on Pine,
+And the only one watchin' was a old man up on nine.
+
 [Bridge]
 [Clock ticking louder, choir hum]
 [Spoken, older woman]
@@ -106,4 +112,9 @@ Tick, tock... tick, tock.
 [Clock ticking... slowing... stops]
 [Silence]
 [Piece click]
+
+[Outro - Rook (spoken)]
+His mama ain't know what she saved. I did.
+Chair on the King's left had a plate fixed and waitin': whiting, extra hot sauce, how the boy liked it.
+Nobody ever ate it.
 ```

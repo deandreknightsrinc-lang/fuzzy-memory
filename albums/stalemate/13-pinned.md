@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** The pin: a piece that can't move without exposing a more valuable piece behind it
 
 ## Story Concept
-Saturday night, the day after the fork, Agent Cole pulls Knight off the 42 bus on a bogus warrant check and sits him in Interview Room 4 at the federal building downtown. The song runs in real time from 11:52 PM to 1:14 AM with the wall clock ticking: Cole never raises his voice, he just lays photos down one by one like pieces on a board: Mama on her balcony in the Rooks, Hazel's black-and-white composition book with her lipstick blotted inside the cover, Tre in the yard upstate, and King Reese laughing at Earl's. Every person Knight loves is lined up behind him, so if he moves they fall; wear a wire on Reese and they're all spared. Knight says nothing, until Cole asks about the bar towel Reese gave him Friday, and Knight realizes only one other man could have known. He walks out at dawn pinned to his square, and a question he can't unhear sets up "Discovered Attack."
+Saturday night, the day after the fork, Agent Cole pulls Knight off the 42 bus on a bogus warrant check and sits him in Interview Room 4 at the federal building downtown. The song runs in real time from 11:52 PM to 1:14 AM with the wall clock ticking: Cole never raises his voice, he just lays photos down one by one like pieces on a board: Mama on her balcony in the Rooks, Hazel's black-and-white composition book with her lipstick blotted inside the cover, Tre in the yard upstate, and King Reese laughing at Earl's. Every person Knight loves is lined up behind him, so if he moves they fall; wear a wire on Reese and they're all spared. Knight says nothing, until Cole asks about the bar towel Reese gave him Friday, and Knight realizes only one other man could have known. He walks out at dawn pinned to his square, and a question he can't unhear sets up "Discovered Attack." Rook works out where Cole's photo of Mama came from: only his own ninth-floor window has that angle, and a "cable man" visited two weeks earlier, so even the lookout was being watched.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 140 BPM half-time snare with double-time energy, C minor, cold interrogation noir, wall-clock tick as the hi-hat, fluorescent light hum, detuned Wurlitzer stabs, low cello pedal, palm slap on a metal table as the snare, rolling 16th-note distorted 808 with glides and stutters, 1/32 hat rolls, photo slaps and piece clicks, gritty baritone male rap, energetic, hushed rapid inner-monologue flow, calm flat interrogator voice, whispered hook, ends on a door buzzer, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, 140 BPM half-time snare with double-time energy, C minor, cold interrogation noir, wall-clock tick as the hi-hat, fluorescent light hum, detuned Wurlitzer stabs, low cello pedal, palm slap on a metal table as the snare, rolling 16th-note distorted 808 with glides and stutters, 1/32 hat rolls, photo slaps and piece clicks, gritty baritone male rap, deep baritone male narrator, energetic, hushed rapid inner-monologue flow, calm flat interrogator voice, whispered hook, ends on a door buzzer, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,12 +22,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** Wurli detuned −20 cents through WOMP Dust (High Cut 6 kHz). Cello pedal on C. WOMP Whistle muted, Octave −1, on the hook's last line.
 - **Street Gospel layer:** No God in Room 4. One B3 swell on "got a pulpit and a phone," the first hint of Bishop.
 - **Arrangement map:** Intro 4 (hum, clock, Cole) → V1 16 ([11:52 PM]; hum and 808 only on bar 16) → Hook 8 → V2 16 ([12:31 AM], 808 out bars 1–2; [1:14 AM] bar 13) → Hook 8 → Outro 4 (buzzer, click, hum cuts).
-- **Vocal direction:** Hushed but fast inner monologue, close-mic. Cole dry, small room.
+- **Vocal direction:** Hushed but fast inner monologue, close-mic. Cole dry, small room. Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the fluorescent-hum intro and the room tone after the outro.
 - **Mix note:** Gate every reverb so silences are total. Master −8 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Weirdness 45%, Style Influence 70%. If it adds a bright full kit, add "minimal" before "palm slap."
 
 ## Lyrics
 ```
+[Intro - Rook (spoken)]
+Saturday night, the 42 stopped two blocks early. Unmarked car nosed in front of it.
+Didn't see the boy again till sunrise.
+
 [Intro]
 [Fluorescent hum, clock ticking]
 [Spoken, calm male voice]
@@ -95,4 +99,9 @@ Every move I got is a move against you.
 Tomorrow's Sunday, Knight. Go to church.
 [Piece click]
 [Fluorescent hum cuts out]
+
+[Outro - Rook (spoken)]
+That picture of his mama hangin' sheets on the 9C balcony?
+Only one window in the 64 get that angle. Ninth floor, across the lot. Mine.
+Two weeks before, a "cable man" asked to check my line.
 ```

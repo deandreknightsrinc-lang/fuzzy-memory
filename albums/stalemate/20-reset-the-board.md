@@ -2,11 +2,11 @@
 **Album:** STALEMATE by King Bishop Knight · **Chess concept:** Resetting the board: the pieces go back in the box and a new game begins
 
 ## Story Concept
-3 AM in late summer, in the small apartment past where the bus line ends, a few weeks after the courthouse wedding in Room 214. Hazel, now an RN at Mercy General and seven months along, sleeps in the next room, Mama Knight snores on the pullout couch since the eviction, and Knight, home from the overnight warehouse shift, paints the nursery a green called "Sage" and writes a letter to his unborn daughter. He tells her about the 64, the King, the Bishop, her Uncle Tre who witnessed the wedding by collect call, and Grandma's gold cross, which Mama took off her own neck at the courthouse and gave to the baby, the first time it has changed hands clean. Then he packs his old chess set into a shoebox for the closet. The turn closes the album: the lesson isn't to win the game but to learn the board so well that nobody can make you a piece, and the chess clock that ticked through every song is replaced by her heartbeat.
+3 AM in late summer, in the small apartment past where the bus line ends, a few weeks after the courthouse wedding in Room 214. Hazel, now an RN at Mercy General and seven months along, sleeps in the next room, Mama Knight snores on the pullout couch since the eviction, and Knight, home from the overnight warehouse shift, paints the nursery a green called "Sage" and writes a letter to his unborn daughter. He tells her about the 64, the King, the Bishop, her Uncle Tre who witnessed the wedding by collect call, and Grandma's gold cross, which Mama took off her own neck at the courthouse and gave to the baby, the first time it has changed hands clean. Then he packs his old chess set into a shoebox for the closet. The turn closes the album: the lesson isn't to win the game but to learn the board so well that nobody can make you a piece, and the chess clock that ticked through every song is replaced by her heartbeat. Rook closes the album by returning the white King as an anonymous wedding gift and turning the board around, handing the story to Hazel and hinting he was closer to that Friday on 9th than he has admitted.
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 95 BPM, E-flat major shadowed by C minor, bittersweet heavy hope, warm Rhodes and felt piano, music-box melody replaying the album theme, round distorted 808 carrying the bassline with warm slides and soft rolls, talkbox humming the hook, female soul harmonies, gospel choir swell on the final hook, clock fading into an ultrasound heartbeat, wooden box lid closing, gritty baritone male rap, energetic, intimate letter flow that still drives, 808-forward loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, dark minor key, tense orchestral strings, church organ, high portamento synth whistle lead, chess clock ticking and wooden piece clicks, full-time bounce at 95 BPM, E-flat major shadowed by C minor, bittersweet heavy hope, warm Rhodes and felt piano, music-box melody replaying the album theme, round distorted 808 carrying the bassline with warm slides and soft rolls, talkbox humming the hook, female soul harmonies, gospel choir swell on the final hook, clock fading into an ultrasound heartbeat, wooden box lid closing, gritty baritone male rap, deep baritone male narrator, energetic, intimate letter flow that still drives, 808-forward loud punchy master
 ```
 
 ### Exclude Styles
@@ -22,12 +22,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Samples & Keys:** A music box plays the track 01 motif (E–D#–C#–G# in C#m) as G–F–Eb–Bb in Eb. Vintage EP plus piano on WOMP Soul Chords (maj9/13). Talkbox hums the hook.
 - **Street Gospel layer:** Held until the end, then given fully: choir swell, tambourine and claps on the final hook with the major Amen.
 - **Arrangement map:** Intro 4 (clock fading; 808 enters bar 4) → V1 16 → Hook 8 → V2 16 (808 out bars 1–2, the cross) → Hook 8 → Bridge 8 (stripped: music box, heartbeat, Hazel) → Hook 4 (full slam, choir) → Outro 6 (clock stops, heartbeat, box lid).
-- **Vocal direction:** Intimate but driving, the letter read with purpose. Hazel a 3rd above on the hook.
+- **Vocal direction:** Intimate but driving, the letter read with purpose. Hazel a 3rd above on the hook. Rook: dry, close mic with a touch of room, low-passed around 9 kHz and sitting under Knight in level, narrating over the fading-clock intro and the heartbeat tail after the box closes.
 - **Mix note:** The box lid is the last transient, no reverb tail. Master −8.5 LUFS integrated, true peak −1 dBTP.
 - **Suno tips:** Knight Persona; tag harmonies [Female vocal]. Weirdness 35%, Style Influence 70%. If it goes soft, put "95 BPM" and "distorted 808" first.
 
 ## Lyrics
 ```
+[Intro - Rook (spoken)]
+Late summer, out past where the 42 stop runnin'. First window I ever watched outside the 64.
+Light on at three in the mornin'. Green paint on his hands.
+
 [Intro]
 [Chess clock ticking, slowly fading]
 [Spoken]
@@ -108,4 +112,13 @@ Learn the board, baby girl, just don't be a pawn.
 Checkmate was his. Stalemate was mine.
 This one's yours, baby. New game. Your move.
 [Wooden box lid closing]
+
+[Narration - Rook (sung)]
+Pieces in the box now, the Knight done laid his crown down low,
+But the Queen was on this board the whole time, movin' anywhere she wanna go...
+[Outro - Rook (spoken)]
+That white King from the park came back to him in a wedding card. No return address.
+That's the Knight's side of the board. Now turn it around.
+The Queen got her own story, and she tell it in her own voice.
+Ask her about that Friday on 9th. I was closer than I let on.
 ```
