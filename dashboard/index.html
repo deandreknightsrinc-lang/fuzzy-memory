@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Artist Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header><h1>Artist Dashboard</h1></header>
+  <main id="roster"></main>
+  <script src="artists.js"></script>
+  <script>
+    const roster = document.getElementById("roster");
+    for (const a of window.ARTISTS) {
+      const card = document.createElement("article");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="photo"><img alt="${a.name}" src="${a.image}"></div>
+        <div class="info">
+          <h2>${a.name}</h2>
+          <p class="tagline">${a.tagline}</p>
+          <p class="details">${a.details}</p>
+          <dl>
+            <dt>Genre</dt><dd>${a.genre}</dd>
+            <dt>Style</dt><dd>${a.style}</dd>
+          </dl>
+          <p class="bio">${a.bio}</p>
+        </div>`;
+      // Show initials until the photo is added.
+      card.querySelector("img").onerror = e => {
+        e.target.replaceWith(Object.assign(document.createElement("span"), {
+          className: "initials",
+          textContent: a.name.split(" ").map(w => w[0]).join("")
+        }));
+      };
+      roster.appendChild(card);
+    }
+  </script>
+</body>
+</html>
