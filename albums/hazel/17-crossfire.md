@@ -5,9 +5,9 @@
 Friday, 12:50 AM, the light at Diagonal Ave and 9th, five nights after STALEMATE's "Touch Move." Hazel asked for one thing, a ride at 12:45 so she wouldn't wait at the bus stop, and Knight was early. She remembers the good parts in full color: the seven-pound, two-ounce baby she was first to hold on her L&D rotation, the oldies station, her head on his shoulder, and one small wrong note, the Cutlass ashtray not rattling on the turn because her father's three bullets were gone. Then a gray Impala on the passenger side, a window coming down, and her memory breaks into pieces: glass in her hair like rice at a wedding, the light turning green, and then the ceiling tiles of Trauma Two at Mercy General, a room she stocked herself, where she's the only one on the gurney who understands what her own blood pressure means. Rook fills in what she can't remember (four shots, eleven red lights, her giving Knight orders the whole way), admits he wasn't at his window that night, and promises to square the arithmetic "at the end of the book." The turn is Hazel taking the story back: everybody keeps telling her how it went, but it's her name on the chart.
 
 ## Voice Map
-- **Hazel:** sung 26 lines / rap 16 lines (62% sung). The sung fragments float, high and reverb-soaked, sometimes stopping mid-phrase. The raps are breathless double-time, clipped at the ends of bars like she's losing the signal. On the final hook she comes back dry and close, in full chest voice.
+- **Hazel:** sung 32 lines / rap 16 lines (67% sung). The sung fragments float, high and reverb-soaked, sometimes stopping mid-phrase. The raps are breathless double-time, clipped at the ends of bars like she's losing the signal. On the final hook she comes back dry and close, in full chest voice.
 - **Guests:** Rook, 16 lines (8 spoken, 8 rap). His biggest moment before the finale: the hard, slow, verdict-heavy verse of what happened while she was gone, plus the intro and outro.
-- **Hazel share of all lines:** 72%
+- **Hazel share of all lines:** 75%
 
 ## Suno Style Prompt
 ```
@@ -21,15 +21,15 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** KNOCK lane, 160 BPM, Bb minor (808 root Bb0, 29.1 Hz). WOMP Pocket: Swing % 51, Swing Grid 16th, Snare/Clap Lay-back 4 ms, Velocity Humanize 14.
-- **Progression:** Fragments Bbm9 → Eb9 (i9 → IV9). Hook Gbmaj9 → F7#9 → Bbm9 → Bbm9/Ab. Bridge Ebm9 → Ab13 → Dbmaj9 → F7#9, unresolved. Final hook lands on Gb → Gbm → Bbm: an Amen that won't close.
-- **Drums:** Snare on 3; kick double-time under Hazel's raps, half-time under Rook. WOMP Rolls: Roll Target Hi-Hats, Trigger Velocity Threshold, Velocity Threshold 110, Roll Rate 1/32T, Roll Length 1/8, Velocity Shape Crescendo. Full stop (one bar of silence) after "curtain at a show."
-- **Bass:** 808 dives Bb1 → Bb0 on every fragment start. WOMP 808 Glide: Mode Retrigger + Slide, Glide Time 80 ms, Bend Range 12, Octave 0. Stutters: WOMP Rolls, Roll Target Single Note, Single Note 22 (Bb0), Roll Rate 1/64. WOMP Low End: Drive 70%, Tight 35%, Mono Below 120 Hz.
-- **Samples & Keys:** Rhodes through tape-stop plug-ins on each fragment end. Strings swell under Rook. WOMP Whistle detuned: Vibrato Rate 6.5 Hz, Vibrato Depth 40, Vibrato Delay 150 ms. WOMP Dust: Age 70%, Wow 35%, Flutter 30%.
-- **Street Gospel layer:** "Haaa-zel" choir reversed through the hooks; played forward only on the final hook.
-- **Arrangement map:** Intro 4 (monitor, Rook) → Frag 1 6 → Frag 2 8 → Silence 1 bar → Frag 3 4 (Rhodes only) → Hook 6 → Rook V 8 (strings, 808 half-time) → Frag 4 8 (double-time) → Hook 6 → Bridge 4 (monitor, choir) → Final Hook 6 → Outro 4 (Rook, monitor steadies).
-- **Vocal direction:** Hazel's fragments: 1/8-dotted delay, 40% wet, then bone-dry on the final hook. Rook: dry, close, low-passed at 9 kHz, slight room; the rap verse measured, every word a verdict.
-- **Mix note:** The cracks are distant thumps, low-passed at 2 kHz. Never sharp, never close. Master −8 LUFS integrated, −1 dBTP.
-- **Suno tips:** Lead Persona = Hazel. Tag Rook's verse explicitly; regenerate if his voice takes the hooks. Weirdness 42%, Style Influence 70%.
+- **Progression:** Fragments Bbm9 → Eb9. Hook Gbmaj9 → F7#9 → Bbm9. Bridge Ebm9 → Ab13 → Dbmaj9 → F7#9, unresolved. Final hook Gb → Gbm → Bbm: an Amen that won't close.
+- **Drums:** Snare on 3; double-time kick under Hazel, half-time under Rook. WOMP Rolls: Roll Target Hi-Hats, Velocity Threshold 110, Roll Rate 1/32T, Velocity Shape Crescendo. One bar of silence after "curtain at a show."
+- **Bass:** 808 dives on every fragment. WOMP 808 Glide: Mode Retrigger + Slide, Glide Time 80 ms. Stutters: Roll Target Single Note, Single Note 22 (Bb0), Roll Rate 1/64. WOMP Low End: Drive 70%, Tight 35%.
+- **Samples & Keys:** Rhodes tape-stops at fragment ends; strings under Rook. WOMP Whistle detuned: Vibrato Depth 40, Vibrato Delay 150 ms. WOMP Dust: Age 70%, Wow 35%.
+- **Street Gospel layer:** "Haaa-zel" choir reversed through the hooks, forward only on the final hook.
+- **Arrangement map:** Intro 4 → Frag 1 6 → Frag 2 8 → Silence → Frag 3 4 → Hook 6 → Rook 8 → Frag 4 8 → Hook 6 → Bridge 4 → Final Hook 6 → Outro 4 (monitor steadies).
+- **Vocal direction:** Hazel's fragments soaked in a 1/8-dotted delay, then bone-dry on the final hook. Rook: dry, close, low-passed at 9 kHz, slight room; every word a verdict.
+- **Mix note:** The cracks are distant thumps, low-passed at 2 kHz, never close. Master −8 LUFS integrated, −1 dBTP.
+- **Suno tips:** Lead Persona = Hazel. Tag Rook's verse; regenerate if he takes the hooks.
 
 ## Lyrics
 ```

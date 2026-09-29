@@ -5,7 +5,7 @@
 Kemp Street, second floor, ages nine to fifteen. Hazel's mother Lorraine is disappearing into the pipe behind a bathroom door with the fan on high, and nine-year-old Hazel learns to count a racing pulse with her thumb (years later a clinical instructor tells her the thumb has its own pulse, so all that time she was counting herself). Her father, Big Otis, is upstate on a twelve-year bid. She writes him every Sunday in pencil, crayon, and blue ink and hears nothing, until the week she borrows a green felt-tip and a letter comes back, so green becomes the only ink she'll use. At fifteen Lorraine is found on a mattress on Pine; Hazel writes Otis in green the same night, his answer arrives three weeks after the funeral, and she puts the pen down and picks up the idea of a stethoscope instead, because a heart always answers. The turn is the bridge, where she stops being the child and becomes the nurse she'll be, promising her mother the careful count she never got. Rook watches the hearse go up Diagonal and plants the pen for "Green Ink."
 
 ## Voice Map
-- **Hazel:** sung 36 lines / rap 28 lines (56% sung). Rap verses are flat, forensic and precise, like reading a chart aloud; the sung sections open into the ache, with a cracked falsetto on "Mama" in the bridge.
+- **Hazel:** sung 33 lines / rap 28 lines (54% sung). Rap verses are flat, forensic and precise, like reading a chart aloud; the sung sections open into the ache, with a cracked falsetto on "Mama" in the bridge.
 - **Guests:** Rook: 4 lines (spoken). A witness at the funeral who remembers the first gold.
 - **Hazel share of all lines:** 94%
 
@@ -20,15 +20,15 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 98 BPM Bounce, F minor. WOMP Pocket Swing % 56, Swing Grid 16th, Timing Humanize 8.
-- **Progression:** Verses: Fm9 – Bbm9 – Dbmaj9 – C7#9. Pre: Dbmaj9 – Eb13. Chorus: Bbm9 – Eb13 – Abmaj9 – Dbmaj9 – C7#9. Bridge: Dbmaj9 – Cm7 – Bbm9 – C7 (no drums).
-- **Drums:** Dry kick, clap and rimshot on 2 and 4. WOMP Pocket: Snare/Clap Lay-back 12 ms, Ghost Snare Chance 15%. WOMP Rolls: Roll Target "Hi-Hats," Roll Rate 1/32T, Roll Length 1/8, Velocity Shape "Decrescendo."
+- **BPM / Key / Swing:** 98 BPM Bounce, F minor. WOMP Pocket Swing % 56, Swing Grid 16th.
+- **Progression:** Verses: Fm9 – Bbm9 – Dbmaj9 – C7#9. Chorus: Bbm9 – Eb13 – Abmaj9 – Dbmaj9 – C7#9. Bridge: Dbmaj9 – Cm7 – Bbm9 – C7 (no drums).
+- **Drums:** Dry kick, clap on 2 and 4, Snare/Clap Lay-back 12 ms. WOMP Rolls: Roll Target "Hi-Hats," Roll Rate 1/32T, Roll Length 1/8, Velocity Shape "Decrescendo."
 - **Bass:** 808 on F1 (43.7 Hz), sliding to Db1. WOMP 808 Glide: Mode "Legato Slide," Glide Time 70 ms. WOMP Low End: Drive 50%, Sub Boost 3 dB, Mono Below 120 Hz.
-- **Samples & Keys:** Rhodes detuned 8 cents through WOMP Dust (Wow 30%, Crackle 30%). WOMP Soul Chords: Key "F," Scale "Minor (Aeolian)," Chord Style "Soul 9ths." Bathroom-fan hum under Verse 1.
+- **Samples & Keys:** Rhodes detuned 8 cents through WOMP Dust (Wow 30%, Crackle 30%). WOMP Soul Chords: Key "F," Scale "Minor (Aeolian)," Chord Style "Soul 9ths."
 - **Street Gospel layer:** Hummed three-voice pad on the final chorus only; B3 swell under the last line.
 - **Arrangement map:** Intro 4 → V1 16 → Pre 4 → Chorus 8 → V2 8 (sung; 808 whole notes) → V3 16 (drums out bars 15–16) → Chorus 8 → Bridge 4 (Rhodes only) → Chorus 8 (808 slams back) → Outro 4 (Rook).
-- **Vocal direction:** Hazel raps close and even, no ad-libs; sung chorus in chest voice, 3rd above on "waiting on a man." Falsetto crack on "Mama." Rook dry, low-passed at 9 kHz, slight room.
-- **Mix note:** Fan hum low-passed at 3 kHz. Side-chain the 808 −3 dB from the kick. Master −8.5 to −7.5 LUFS integrated, −1 dBTP.
+- **Vocal direction:** Hazel raps close and even, no ad-libs; sung chorus in chest voice; falsetto crack on "Mama." Rook dry, low-passed at 9 kHz, slight room.
+- **Mix note:** Side-chain the 808 −3 dB from the kick. Master −8.5 to −7.5 LUFS integrated, −1 dBTP.
 - **Suno tips:** Hazel Persona leads; the Rook tag drives the outro. Regenerate if a male voice takes the lead.
 
 ## Lyrics

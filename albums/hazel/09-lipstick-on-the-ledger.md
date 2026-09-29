@@ -1,101 +1,122 @@
 # 09. Lipstick on the Ledger
-**Album:** HAZEL · **Mode:** Dark R&B
+**Artist:** Hazel · **Featuring:** none · **Narrator:** Rook · **Lane:** Bounce · 100 BPM · C#m
 
 ## Story Concept
-Winter, 3 a.m., a desk lamp in Hazel's room at Mother Ruth's house. Hazel finds Knight's money stuffed in a Nike box with rubber bands, sees he's coming up short, and does what she does on a twelve-hour shift: she runs the math. She starts a black-and-white composition book in hospital code ("patients" for customers, "units" for product, "discharged" for paid, "code" for police) and catches four thousand two hundred dollars missing, including Smoke's count coming up light every Friday. She blots her red lipstick inside the cover like a signature and hides the ledger in her book bag under Anatomy & Physiology. Knight is too proud to burn it, and on Sunday Deacon Bishop eyes the heavy bag on the pew and asks if she's been doing some heavy reading. Love turns into complicity, and the book becomes evidence waiting for a raid.
+January, 3 a.m., one desk lamp on Mother Ruth's second floor. I find Knight's money in a Nike box under his passenger seat, facing every direction and held with rubber bands, and I do what I do on a twelve-hour shift: I chart it. A $1.19 black-and-white composition book, written in hospital code: "patients" are buyers, "units" are product, "discharged" means paid, "code" means police, "the chart" is the stash, and "chaplain" is Deacon Bishop's ten percent. Six weeks in, the columns go crooked on Fridays, $350 short every Friday for twelve Fridays, which is $4,200 and one name: Smoke, Knight's day-one (the setup for STALEMATE's "En Passant"). I blot my red lipstick inside the cover like a signature. That Sunday Deacon Bishop's smile runs a beat too long over the heavy bag at my feet. The turn: I'm good at this, I like the click of a column closing, and that scares me more than the Deacon does.
+
+## Voice Map
+- **Hazel:** sung 38 lines / rap 22 lines (63.3% sung). Her rap is quick and bookkeeper-precise, riding the swing with internal rhymes. The sung verse is a hushed church-pew story, and the chorus is a full-voice soul hook that turns darker on the last pass.
+- **Guests:** Rook — 5 lines — spoken intro and a fingerprint verdict.
+- **Hazel share of all lines:** 92.3%
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, bouncy full-time 100 BPM dark R&B, C-sharp minor Dorian, noir 3 a.m. desk-lamp mood, envelope-filter clavinet lead, minor-key Rhodes, deep distorted 808 sliding with the kick, adding-machine clicks and pen scratches rolling like hi-hats, ghostly 70s string replay, book snapping shut, sultry conflicted female soul lead for Hazel with whispered lines, smooth male R&B croon harmony, one hard male hardcore rap verse, choir Haaa-zel only on the bridge, 808-forward mix, loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, BOUNCE lane 100 BPM swung full-time groove, C-sharp minor, secretive late-night bookkeeping, dusty Rhodes lead, 808 locked to the kick with fast slides, adding machine clicks and pencil scratches as percussion, rubber band snaps, church organ on the Sunday verse, female lead vocalist, soulful alto R&B singing and sharp female rap verses, deep baritone male narrator, vocal-forward female lead, 808-forward, loud punchy master
 ```
 
 ### Exclude Styles
 ```
-pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, ambient
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, male lead vocal
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 100 BPM Bounce, C# minor (Dorian: A# natural). WOMP Pocket Swing % 57.
-- **Progression:** Verses: C#m9 – F#9 (i9–IV9). Hook: Amaj9 – G#7#9 – C#m9 – C#m9. Bridge: F#m9 – B13 – Emaj9 – G#7#9. Final tag: A – Am6 – C#m (minor plagal).
-- **Drums:** Heavy kick on 1, the "a" of 2 and the "and" of 3; rimshot + clap on 2 and 4; adding-machine clicks as swung 16th hats. WOMP Pocket: Snare/Clap Lay-back 10 ms, Ghost Snare Chance 30%. WOMP Rolls: Roll Target All Notes (click lane), Velocity Threshold 115, Roll Rate 1/32, Roll Length 1/16.
-- **Bass:** 808 on C#1 (34.6 Hz), locked to the kick, sliding to F#1 (46.2 Hz) in bar 2. WOMP 808 Glide: Mode Legato Slide, Glide Time 70 ms. WOMP Low End: Drive 55%, Harmonics Mix 40%, Sub Boost 3 dB, Mono Below 120 Hz. In Knight's verse, a 1/32 808 stutter ends each bar (WOMP Rolls: Roll Target Single Note, Single Note 25 (C#1)). No Moog.
-- **Samples & Keys:** Auto-Wah clav plays the lead riff (C#–E–F#–G#). Rhodes via WOMP Soul Chords: Key C#/Db, Scale Dorian (G-Funk), Chord Style Minor 11 Stack. Strings sigh through WOMP Dust (High Cut 7 kHz).
-- **Street Gospel layer:** Choir only on the bridge swell (6 voices, dark); B3 whisper into the last hook.
-- **Arrangement map:** Intro 4 (clicks, whisper; no 808) → V1 8 (Hazel) → Hook 8 → V2 16 (Knight; drums out bars 15–16) → Hook 8 (+clav) → V3 8 → Bridge 4 (kick, 808, choir) → Hook 8 (+strings) → Outro 2 ("Balanced.").
-- **Vocal direction:** Hazel low and sultry; whispers get an octave-up double. Knight's croon a 3rd below; his rap menacing, not loud.
-- **Mix note:** Pen scratches 30L, adding machine 30R. Side-chain the 808 −3 dB from the kick (60 ms release). Master −8.5 to −7.5 LUFS integrated, −1 dBTP true peak.
-- **Suno tips:** Hazel Persona; Extend V2 with Knight Persona. Weirdness 42%, Style Influence 70%. If it goes glossy, add "dusty 70s record."
+- **BPM / Key / Swing:** BOUNCE, 100 BPM, C# minor (808 root C#1). WOMP Pocket: Swing % 56, Swing Grid 16th, Swing Applies To All, Snare/Clap Lay-back +8 ms, Ghost Snare Chance 15%.
+- **Progression:** Verses C#m9 → F#9. Chorus Amaj9 → G#7#9 → C#m9 → C#m9. Sung verse (church) F#m9 → B13 → Emaj9 → G#7#9. Bridge Amaj7 → Am6 → E.
+- **Drums:** Kick on 1 and the "a" of 2, snare plus clap on 2 and 4, swung 16th hats. An adding-machine crank layered on the snare in the verses. WOMP Rolls: Roll Target Hi-Hats, Trigger Velocity Threshold, Velocity Threshold 112, Roll Rate 1/32, Roll Length 1/16.
+- **Bass:** 808 on C#1, sliding to E1 on the chorus. WOMP 808 Glide: Mode Legato Slide, Glide Time 50 ms. WOMP Low End: Drive 52%, Harmonics Mix 40%, Sub Boost 3 dB.
+- **Samples & Keys:** The Rhodes plays the signature lick with the Soul Chords voicing. WOMP Soul Chords: Key "C#/Db", Scale Dorian, Voicing Open. A small organ comes in for the Sunday verse only. WOMP Dust: Crackle 20%, Age 40%.
+- **Street Gospel layer:** Light. Organ plus a three-voice "hmm" under the church verse, and the choir swells on the bridge.
+- **Arrangement map:** Intro 4 → V1 12 → Pre 4 → Chorus 6 → V2 10 → Pre 4 → Chorus 6 → V3 8 (church) → Bridge 4 (drums out) → Final Chorus 6 → Outro 2.
+- **Vocal direction:** Hazel's rap is dry and close, like she's whispering numbers. Her chorus is full chest with a double. Rook is dry, low-passed at 9 kHz, with a slight room.
+- **Mix/Master:** −8 LUFS integrated, −1 dBTP.
+- **Suno tips:** Lead Persona = Hazel. Regenerate if a male voice takes the lead.
 
 ## Lyrics
 ```
-[Intro]
-[Adding machine clicks, pen scratching]
-[Whispered - Hazel]
-Units in... units out... carry the one...
+[Intro - Rook (spoken)]
+January. Three a.m. One desk lamp on Mother Ruth's second floor.
+Everybody on the board was sleepin'. The Queen was doin' inventory.
 
-[Verse 1 - Hazel, soulful female vocal]
-Found your money in a Nike box, rubber bands and loose bills
-Counting on your fingers like you never learned the drill
-You been coming up short and you don't even know it
-Somebody skimming off the top, and your pride won't show it
-I do dosage math at three a.m. on a twelve-hour shift
-Milligrams per kilo, one decimal wrong and they slip
-So I bought a composition book, black and white marble
-Wrote it all in hospital, clean hand, careful
+[Verse 1 - Hazel (rap)]
+Nike box under his passenger seat, rubber bands tight as a tourniquet,
+Twenties and ones in a fist, facin' every which way—he ain't never learned it yet,
+He count on his fingers, lose it at ninety, start over, his pride on his chest,
+I do milligrams-per-kilo at four in the morning—one decimal off and it's death,
+So I bought me a notebook, black-and-white marble, a dollar-nineteen at the Lucky,
+Ruled every page with the ruler Grandmama whipped me with—Lord, please don't judge me,
+Wrote it in hospital: "patients" the buyers, and "units" the product, "discharged" when they paid,
+"Readmit" when they owe, and a "code" when the blue lights come swingin' up Diagonal Ave,
+"The chart" is the stash, and the "chaplain" is Bishop—ten percent every Sunday, on time,
+Wrote it in pencil, then traced it in ink, 'cause a pencil's a maybe and ink is a sign,
+Six weeks of balancin', columns like vertebrae stacked in a line down the spine,
+Then the column went crooked on Fridays—three-fifty, three-fifty—the same little line.
 
-[Hook - Hazel, Knight croon harmony]
-Lipstick on the ledger, blot it on the line
-Every number that I write, now your crime is mine
-Seal it with a kiss so you know that it's true
-Lipstick on the ledger, I'm in the books with you
+[Pre-Chorus - Hazel (sung)]
+Twelve Fridays short, three-fifty a week,
+Forty-two hundred that nobody speaks,
+I didn't go looking for trouble to find,
+The numbers just told me, and now they're mine.
 
-[Verse 2 - Knight, hardcore rap]
-First time I saw it, didn't know whether to kiss her or cuss
-"Patients" meant the customers, "units" meant the dust
-"Discharged" meant they paid, "readmit" meant they owe
-"Code" meant the jakes, "the chart" meant the stash on the low
-Found forty-two hundred I ain't know I was losing
-Smoke's count light every Friday, and the dates wasn't confusing
-She knew before I knew, had it penciled in the pages
-I shoulda burned it in the sink with a Bic and some prayers
-But I was proud, and I was grown, and she was already there
-Rose-red print of her lips on the inside cover
-Like a signature, a stamp, like a vow from a lover
-That's evidence, baby, in a cop's gloved hand
-Her lip print, her handwriting, her grandmother's land
-She hid it in her book bag under Anatomy
-Right next to the heart. That's where the damage be
+[Chorus - Hazel (sung)]
+Lipstick on the ledger, I blot it on the cover,
+Cherry-red signature, like a letter to a lover,
+Seal it like a vial, label it and date it,
+If it's wrong I'll own it, if it's right, I made it,
+Every line I balance makes your crime a little mine,
+Lipstick on the ledger—my name's between the lines.
 
-[Hook - Hazel, Knight croon harmony]
-Lipstick on the ledger, blot it on the line
-Every number that I write, now your crime is mine
-Seal it with a kiss so you know that it's true
-Lipstick on the ledger, I'm in the books with you
+[Verse 2 - Hazel (rap)]
+Smoke runs the Friday pack, Smoke is his day-one, so the day-one's the leak,
+Three-fifty exact every Friday—not forty, not four—that's a habit, not a streak,
+Mistakes are messy, they wobble and scatter; a thief is consistent as rent,
+I circled it twice in the red of my mouth, and I knew where it went,
+Showed Knight at the counter. He laughed, then he didn't, then looked at me different,
+Like a gun he'd bought for protection, just now noticing the weight of it, the distance,
+And the part that I hate is I liked it—the click of a column that closes,
+The way that the truth sits up in the numbers like a pulse under two fingers, it knows us,
+I'm learnin' to measure what goes in a body and what comes out of a vein,
+And here I am doin' the same for a block, with the same steady hands, the same brain.
 
-[Verse 3 - Hazel, soulful female vocal]
-Grandmama asked me why I'm up so late
-I said, "Studying, Grandmama," kept my voice straight
-Sunday, Deacon Bishop saw my bag up on the pew
-Said, "Heavy reading, Sister Hazel?" and I swear he knew
-I ain't sold a gram, I ain't touched a thing
-I just made the numbers sing
-But a woman who can count know exactly what she did
-Adding up the years, and I'm carrying what I hid
+[Pre-Chorus - Hazel (sung)]
+Twelve Fridays short, three-fifty a week,
+Forty-two hundred that nobody speaks,
+I didn't go looking for trouble to find,
+The numbers just told me, and now they're mine.
 
-[Bridge - Hazel, whispered then sung]
-Green in the sun... brown in the dark...
-But tonight, under this lamp...
-I don't recognize my eyes
-[Choir swell] Haaa-zel...
+[Chorus - Hazel (sung)]
+Lipstick on the ledger, I blot it on the cover,
+Cherry-red signature, like a letter to a lover,
+Seal it like a vial, label it and date it,
+If it's wrong I'll own it, if it's right, I made it,
+Every line I balance makes your crime a little mine,
+Lipstick on the ledger—my name's between the lines.
 
-[Hook - Hazel, Knight croon harmony]
-Lipstick on the ledger, blot it on the line
-Every number that I write, now your crime is mine
-Seal it with a kiss so you know that it's true
-Lipstick on the ledger, I'm in the books with you
+[Verse 3 - Hazel (sung)]
+Sunday at Diagonal Baptist, the book in my bag on the pew,
+Under Anatomy, heavy as sin, when the Deacon walked through,
+Rings on his fingers, hand on my shoulder, his smile a beat too long,
+"Heavy reading, Sister Hazel?" He looked at the bag like he knew the song,
+I said, "Bones and blood, Deacon." He said, "Mind you don't carry too much,"
+Grandmama sang like the roof might lift, and I held that strap in a clutch,
+I've been counting for Knight all winter, every dollar and every dime,
+But that man was counting me the whole time.
 
-[Outro]
-[Pen scratch, book snaps shut]
-[Whispered - Hazel]
-Balanced.
+[Bridge - Hazel (sung)]
+Green in the sun, brown in the dark,
+Under this lamp I can't tell what they are,
+A chart keeps a record so somebody lives,
+A ledger's a record of what someone did.
+
+[Final Chorus - Hazel (sung)]
+Lipstick on the ledger, I blot it on the cover,
+Cherry-red signature, like a letter to a lover,
+Seal it like a vial, label it and date it,
+If it's wrong I'll own it, if it's right, I made it,
+Every line I balance makes your crime a little mine,
+Lipstick on the ledger—now my mouth is on the crime.
+
+[Outro - Rook (spoken)]
+Her lips. Her handwriting. Her grandmother's house.
+That ain't a signature, baby girl. That's a fingerprint.
+And one day somebody with a badge was gonna hold it up to the light.
 ```

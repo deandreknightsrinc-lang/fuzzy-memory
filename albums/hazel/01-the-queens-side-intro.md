@@ -6,8 +6,8 @@ Night, years after everything, in a dark room with one Rhodes chord hanging in t
 
 ## Voice Map
 - **Hazel:** sung 16 lines / rap 16 lines (50% sung). Out of the dark, a low, unhurried alto that sits almost on the Rhodes, a gospel lift only on "the Queen's side." Then a clipped, clinical rap that gets faster as the list gets heavier.
-- **Guests:** Rook: 11 lines (spoken). He sets the board, turns the chair, and makes the promise that pays off in the last song.
-- **Hazel share of all lines:** 74%
+- **Guests:** Rook: 10 lines (spoken). He sets the board, turns the chair, and makes the promise that pays off in the last song.
+- **Hazel share of all lines:** 76%
 
 ## Suno Style Prompt
 ```
@@ -20,16 +20,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 96 BPM Bounce, Eb minor (Dorian, C natural in the melody). WOMP Pocket: Swing % 56, Swing Grid 16th, Swing Applies To "Hats & Percussion." Intro in free time.
-- **Progression:** Intro: Ebm9 held under Rook. Sung verse: Cbmaj9 – Bbm7 – Abm9 – Db13. Chorus: Ebm9 – Ab13 – Cbmaj9 – Bb7#9. Rap: Ebm9 – Ab9 (i9–IV9). Last bar: Ab – Abm6 – Ebm.
-- **Drums:** None until the rap. Kick on 1 and the "a" of 2, clap on 2 and 4. WOMP Pocket Snare/Clap Lay-back 10 ms, Ghost Snare Chance 18%. WOMP Rolls: Roll Target "Hi-Hats," Trigger "Velocity Threshold," Roll Rate 1/32, Velocity Shape "Crescendo" into each chorus.
-- **Bass:** 808 on Eb1 (38.9 Hz), sliding to Ab1. WOMP 808 Glide: Mode "Legato Slide," Glide Time 55 ms, Glide Curve "808 (fast start)." WOMP Rolls second instance: Roll Target "Single Note," Single Note 27 (Eb1), Roll Chance 30%. WOMP Low End: Drive 55%, Harmonics Mix 35%, Mono Below 120 Hz.
-- **Samples & Keys:** Suitcase Rhodes plays the album lick (Bb4–Db5–Eb5–F5–Eb5–Db5–Bb4); save the MIDI for later tracks. WOMP Soul Chords: Key "D#/Eb," Scale "Dorian (G-Funk)," Chord Style "Soul 9ths," Voicing "Open (spread 3rd)." WOMP Dust: Crackle 35%, Age 40%.
-- **Street Gospel layer:** Talkbox and 8-voice "Haaa-zel" after each chorus, Concert Hall 2.8 s; B3 swell into the second chorus.
-- **Arrangement map:** Intro 8 (Rook, Rhodes only) → Verse 1 8 (Hazel sung, Rhodes and room tone) → Chorus 8 (choir pad, no drums) → beat drops → Verse 2 16 (rap; drums out bars 15–16) → Chorus 8 (full band + talkbox) → Outro 4 (Rook, beat cuts, crackle).
-- **Vocal direction:** Hazel sings the verse at conversation volume, chest voice; octave-up whisper double on "the Queen's side." Rap dry, punch-ins on the last word of every other bar. Rook dry and close, low-passed at 9 kHz, slight room, no delay.
-- **Mix note:** Rook and Hazel's first verse mono; widen the Rhodes to ±40 when drums land. Side-chain the 808 −3 dB from the kick. Master −8.5 to −7.5 LUFS integrated, −1 dBTP.
-- **Suno tips:** Save the **Hazel Persona** from this take and use it as the lead on every song. Tags drive Rook. Regenerate if a male voice sings the verse or takes the lead.
+- **BPM / Key / Swing:** 96 BPM Bounce, Eb minor (Dorian). WOMP Pocket Swing % 56, Swing Grid 16th. Intro in free time.
+- **Progression:** Sung verse: Cbmaj9 – Bbm7 – Abm9 – Db13. Chorus: Ebm9 – Ab13 – Cbmaj9 – Bb7#9. Rap: Ebm9 – Ab9.
+- **Drums:** None until the rap. Kick on 1 and the "a" of 2, clap on 2 and 4, Snare/Clap Lay-back 10 ms. WOMP Rolls: Roll Target "Hi-Hats," Roll Rate 1/32, Velocity Shape "Crescendo" into choruses.
+- **Bass:** 808 on Eb1 (38.9 Hz) sliding to Ab1. WOMP 808 Glide: Mode "Legato Slide," Glide Time 55 ms. WOMP Rolls: Roll Target "Single Note," Single Note 27 (Eb1). WOMP Low End: Drive 55%, Mono Below 120 Hz.
+- **Samples & Keys:** Suitcase Rhodes plays the album lick (Bb4–Db5–Eb5–F5–Eb5–Db5–Bb4); save the MIDI. WOMP Soul Chords: Key "D#/Eb," Scale "Dorian (G-Funk)," Chord Style "Soul 9ths."
+- **Street Gospel layer:** Talkbox and choir "Haaa-zel" after each chorus.
+- **Arrangement map:** Intro 8 (Rook, Rhodes only) → V1 sung 8 → Chorus 8 (choir pad, no drums) → drop → V2 rap 16 (drums out bars 15–16) → Chorus 8 (+talkbox) → Outro 4 (Rook, beat cuts).
+- **Vocal direction:** Hazel sings at conversation volume, whisper double on "the Queen's side"; raps dry with end-of-bar punch-ins. Rook dry, close, low-passed at 9 kHz, slight room.
+- **Mix note:** Intro mono; Rhodes to ±40 when drums land. Side-chain the 808 −3 dB. Master −8.5 to −7.5 LUFS integrated, −1 dBTP.
+- **Suno tips:** Save the **Hazel Persona** here as lead for the album; tags drive Rook. Regenerate if a male voice takes the lead.
 
 ## Lyrics
 ```

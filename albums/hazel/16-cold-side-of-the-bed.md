@@ -20,16 +20,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** BOUNCE lane, 94 BPM, Eb minor (808 root Eb1, 38.9 Hz). WOMP Pocket: Swing % 56, Swing Grid 16th, Snare/Clap Lay-back 14 ms, Timing Humanize 4 ms, Ghost Snare Chance 12%, Ghost Velocity 24.
-- **Progression:** Verses Ebm9 → Ab9 (i9 → IV9). Pre Cbmaj7 → Bbm7 → Abm9 → Db13. Chorus Cbmaj9 → Bb7#9 → Ebm9 → Ebm9/Db. Bridge Abm9 → Db13 → Gbmaj9 → Bb7#9, left hanging.
-- **Drums:** Soft kick on 1 and the "a" of 2; snare plus finger-snap on 2 and 4; swung hats. WOMP Rolls: Roll Target Hi-Hats, Trigger Random Chance, Roll Chance 8%, Roll Rate 1/32, Roll Length 1/16, Velocity Shape Decrescendo.
-- **Bass:** 808 carries the bassline, Eb1 → Ab0, a slow Gb1 → Eb1 slide at phrase ends. WOMP 808 Glide: Mode Legato Slide, Glide Time 70 ms, Glide Curve "808 (fast start)", Velocity Floor 85. WOMP Low End: Drive 50%, Harmonics Mix 40%, Sub Boost 3 dB, Mono Below 120 Hz.
-- **Samples & Keys:** Tremolo Rhodes on WOMP Soul Chords: Key "D#/Eb", Scale "Minor (Aeolian)", Chord Style "Minor 11 Stack", Voicing "Drop 2", Strum 18 ms, Strum Direction "Down". Wah guitar swells 30L. WOMP Dust: Wow 20%, Crackle 25%.
-- **Street Gospel layer:** Held back. One "Haaa-zel" choir breath under the final chorus, like a memory.
-- **Arrangement map:** Intro 2 (rain, lock, Rook) → V1 8 → Pre 4 → Chorus 8 → V2 12 (808 out bars 1–4) → Chorus 8 → V3 4 → Breakdown 4 (text chimes, drums out) → Bridge 6 (Rhodes only) → Final Chorus 8 (808 slams back) → Outro 2 (Rook, rain).
-- **Vocal direction:** Hazel close and breathy, stacked 3rd above on the chorus; texts spoken flat and dry. Rook: dry, close, low-passed at 9 kHz, slight room.
-- **Mix note:** Rain high-passed at 400 Hz under the whole song. Master −8.5 LUFS integrated, −1 dBTP.
-- **Suno tips:** Lead Persona = Hazel. Tag Rook only at the edges; regenerate if a male voice takes the lead. Weirdness 36%, Style Influence 70%.
+- **BPM / Key / Swing:** BOUNCE lane, 94 BPM, Eb minor (808 root Eb1, 38.9 Hz). WOMP Pocket: Swing % 56, Swing Grid 16th, Snare/Clap Lay-back 14 ms, Ghost Snare Chance 12%.
+- **Progression:** Verses Ebm9 → Ab9. Pre Cbmaj7 → Bbm7 → Abm9 → Db13. Chorus Cbmaj9 → Bb7#9 → Ebm9. Bridge Abm9 → Db13 → Gbmaj9 → Bb7#9, left hanging.
+- **Drums:** Soft kick; snare plus finger-snap on 2 and 4. WOMP Rolls: Roll Target Hi-Hats, Trigger Random Chance, Roll Chance 8%, Roll Rate 1/32, Velocity Shape Decrescendo.
+- **Bass:** 808 carries the bassline with a slow Gb1 → Eb1 slide at phrase ends. WOMP 808 Glide: Mode Legato Slide, Glide Time 70 ms, Velocity Floor 85. WOMP Low End: Drive 50%, Sub Boost 3 dB.
+- **Samples & Keys:** Tremolo Rhodes on WOMP Soul Chords: Key "D#/Eb", Scale "Minor (Aeolian)", Chord Style "Minor 11 Stack", Strum 18 ms. Wah swells 30L.
+- **Street Gospel layer:** Held back: one "Haaa-zel" breath under the final chorus.
+- **Arrangement map:** Intro 1 → V1 8 → Pre 4 → Chorus 8 → V2 12 (808 out bars 1–4) → Chorus 8 → V3 4 → Texts 3 (drums out) → Bridge 6 (Rhodes only) → Final Chorus 9 (808 slams back) → Outro 3.
+- **Vocal direction:** Hazel close and breathy, 3rd above on the chorus; texts spoken flat. Rook: dry, close, low-passed at 9 kHz, slight room.
+- **Mix note:** Rain high-passed at 400 Hz throughout. WOMP Dust Wow 20%, Crackle 25%. Master −8.5 LUFS integrated, −1 dBTP.
+- **Suno tips:** Lead Persona = Hazel. Regenerate if a male voice takes the lead.
 
 ## Lyrics
 ```

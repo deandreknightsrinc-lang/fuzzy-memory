@@ -20,16 +20,16 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** KNOCK lane, 152 BPM, C minor Dorian (808 root C1, 32.7 Hz). WOMP Pocket: Swing % 52, Swing Grid 16th, Swing Applies To "Hats & Percussion", Snare/Clap Lay-back 6 ms, Hat Accents "Offbeats Loud".
-- **Progression:** Verses Cm9 → F9 (i9 → IV9). Chorus Abmaj9 → G7#9 → Cm9 → F9. Bridge Ebmaj9 → Dm7b5 → G7#9. Final chorus ends on the Amen Ab → Abm → Cm(add9), a win that still costs.
-- **Drums:** Snare on 3, busy kick. WOMP Rolls: Roll Target Hi-Hats, Trigger Both, Velocity Threshold 112, Roll Chance 18%, Roll Rate 1/32T, Velocity Shape Crescendo into every chorus. A time-clock punch replaces the clap on bar 1 of each verse.
-- **Bass:** Rolling 16th 808 on C1 with octave jumps to C2. WOMP 808 Glide: Mode Retrigger + Slide, Glide Time 40 ms, Glide Curve "808 (fast start)". Stutters via WOMP Rolls: Roll Target Single Note, Single Note 24 (C1), Roll Rate 1/32. WOMP Low End: Drive 65%, Punch 60%, Mono Below 120 Hz.
-- **Samples & Keys:** Horn stabs on the "and" of 4. Clav through Auto-Wah. WOMP Soul Chords: Key "C", Scale "Dorian (G-Funk)", Chord Style "Soul 9ths", Strum 8 ms.
-- **Street Gospel layer:** Gang chant answers "held it"; choir stacks and fast-Leslie B3 on the final chorus only.
-- **Arrangement map:** Intro 4 (Rook, gate buzz) → V1 16 → Pre 4 → Chorus 6 → V2 12 → Interlude 2 (call tone, drums out) → Tre V 8 (808 only, phone-filtered) → Chorus 6 → Bridge 5 (Rhodes, 808 whole notes) → V3 4 (full slam) → Final Chorus 6 → Outro 2 (Rook, engine).
-- **Vocal direction:** Hazel dry and forward on raps, punch-in doubles on numbers. Chorus 3rd above, octave whisper on "on my own." Tre: 300 Hz–3 kHz bandpass. Rook: dry, close, low-passed at 9 kHz, slight room.
-- **Mix note:** WOMP Dust on horns: Age 40%, Crackle 15%. Master −8 LUFS integrated, −1 dBTP.
-- **Suno tips:** Lead Persona = Hazel. Tags drive Tre and Rook; regenerate if a male voice takes the lead. Weirdness 38%, Style Influence 72%.
+- **BPM / Key / Swing:** KNOCK lane, 152 BPM, C minor Dorian (808 root C1, 32.7 Hz). WOMP Pocket: Swing % 52, Swing Grid 16th, Snare/Clap Lay-back 6 ms, Hat Accents "Offbeats Loud".
+- **Progression:** Verses Cm9 → F9. Chorus Abmaj9 → G7#9 → Cm9 → F9. Final chorus ends Ab → Abm → Cm(add9): a win that still costs.
+- **Drums:** Snare on 3, busy kick; a time-clock punch on bar 1 of each verse. WOMP Rolls: Roll Target Hi-Hats, Trigger Both, Roll Chance 18%, Roll Rate 1/32T, Velocity Shape Crescendo.
+- **Bass:** Rolling 16th 808 with octave jumps. WOMP 808 Glide: Mode Retrigger + Slide, Glide Time 40 ms. Stutters: Roll Target Single Note, Single Note 24 (C1). WOMP Low End: Drive 65%, Punch 60%.
+- **Samples & Keys:** Horn stabs on the "and" of 4; wah clav. WOMP Soul Chords: Key "C", Scale "Dorian (G-Funk)", Chord Style "Soul 9ths".
+- **Street Gospel layer:** Gang chant answers "held it"; choir and fast-Leslie B3 on the final chorus only.
+- **Arrangement map:** Intro 4 → V1 16 → Pre 4 → Chorus 6 → V2 12 → Call 2 (drums out) → Tre 6 (808 only) → Chorus 6 → Bridge 5 → V4 4 (full slam) → Final Chorus 6 → Outro 3.
+- **Vocal direction:** Hazel dry and forward, punch-in doubles on the numbers; 3rd above on the chorus. Tre through a 300 Hz–3 kHz bandpass. Rook: dry, close, low-passed at 9 kHz, slight room.
+- **Mix note:** WOMP Dust on the horns (Age 40%, Crackle 15%). Master −8 LUFS integrated, −1 dBTP.
+- **Suno tips:** Lead Persona = Hazel; tags drive Tre and Rook. Regenerate if a male voice takes the lead.
 
 ## Lyrics
 ```

@@ -1,68 +1,92 @@
 # 10. Voicemail (Interlude)
-**Album:** HAZEL · **Mode:** Spoken soul
+**Artist:** Hazel · **Featuring:** Rook · **Narrator:** Rook · **Lane:** Bounce · 96 BPM · Ab
 
 ## Story Concept
-It's 11:52 p.m., the night the Rooks get raided (STALEMATE's "Check"). From Mother Ruth's window on the west side of Diagonal Ave, Hazel watches the east side turn blue and red and calls Knight's apartment, where the answering machine picks up. Her message comes out in pieces: Lil Tre called looking for Knight and sounded twelve years old, the ledger is safe but she catches herself before saying where, and Mother Ruth is in the kitchen praying Knight's name out loud for the first time. She tells him to call collect from anywhere, admits she's crying and that he would say her eyes are gold, and says "I love you" first, on a machine. It's the album's hinge: the love story runs straight into the war, and nobody picks up.
+It's a February dawn, the morning the Rooks get raided (STALEMATE's "Check"). Rook's walkie call goes out at 5:04, and the ram hits Tower B at 5:12. Across Diagonal Ave I'm up early ironing my whites for a 6 a.m. clinical when the east side turns blue and red in Grandmama's window. I call Knight's cell at 5:19, and it rings out to voicemail inside a federal evidence bag. I leave three messages. The first is spoken panic: Tre called the house whispering, sounding twelve. The second is sung, and it's where I say "I love you" first, on a machine. The third is rapped, steadied, charted like a shift note in the hospital code he taught me not to break: the chart is "under the bones" (the ledger, under my Anatomy book). The turn belongs to Rook: Knight won't hear these messages for eleven months, and somebody else hears them first.
+
+## Voice Map
+- **Hazel:** sung 14 lines / rap 8 lines (63.6% sung), plus 6 spoken voicemail lines. Spoken is breathy, close and phone-filtered. The sung message is cracked but melodic, alto sliding up into a break. The rap is steadied, clinical and even, barely above a whisper, then full voice on the last bar.
+- **Guests:** Rook — 8 lines — spoken intro (the sirens from the ninth floor) and outro (the evidence bag).
+- **Hazel share of all lines:** 77.8%
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, short spoken interlude over a bouncy 96 BPM 808 beat, A-flat major, lonely heartbreaking midnight, tremolo Rhodes loop over soft B3, muted kick and rim with swung hats, deep 808 sliding softly under the voicemail, answering-machine beep and cassette hiss, distant sirens and helicopter, rain on a window, emotional female spoken voice for Hazel through a telephone filter, brief male greeting, short soulful female sung tag, choir Haaa-zel swell into a single heartbeat kick, 808-forward mix, loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, BOUNCE lane 96 BPM interlude, A-flat major turning minor, dawn panic and confession, stripped Rhodes and distant sirens intro then 808 and drums slam in, phone ring and voicemail beep, telephone filter on voice, walkie static, single heartbeat kick outro, female lead vocalist, soulful alto R&B singing and sharp female rap verses, deep baritone male narrator, vocal-forward female lead, 808-forward, loud punchy master
 ```
 
 ### Exclude Styles
 ```
-pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, rap verse
+pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak bass, heavy autotune, modern pop R&B, male lead vocal
 ```
 
 ## W.O.M.P. Production Notes (Logic Pro)
-- **BPM / Key / Swing:** 96 BPM Bounce, Ab major, ~1:40. WOMP Pocket Swing % 58.
-- **Progression:** Voicemail loop: Abmaj9 – Fm9 – Bbm9 – Eb13 (I–vi–ii–V), 2 bars each. Sung tag: Bbm9 – Eb13 – Abmaj9 – C7#9, then Db – Dbm6 – Ab (IV–iv–I).
-- **Drums:** After the first beep: muted kick on 1 and the "a" of 2, rim + soft clap on 2 and 4, swung hats low. WOMP Pocket: Snare/Clap Lay-back 14 ms, Velocity Humanize 14. WOMP Rolls: Roll Target Hi-Hats, Velocity Threshold 120, Roll Rate 1/32, Roll Length 1/16, Velocity Shape Decrescendo. Last bar: one heartbeat kick.
-- **Bass:** 808 on Ab1 (51.9 Hz) following the loop roots (F1, Bb1, Eb1). WOMP 808 Glide: Mode Legato Slide, Glide Time 80 ms. WOMP Low End: Drive 45%, Harmonics Mix 35%, Sub Boost 3 dB, Mono Below 120 Hz. No Moog.
-- **Samples & Keys:** Rhodes (tremolo 30%) plays the signature lick in Ab (C5–Eb5–F5–G5–F5–Eb5–C5) over a soft B3. WOMP Dust on the voicemail: Hiss 35%, Wow 35%, Low Cut 300 Hz, High Cut 3.5 kHz.
-- **Street Gospel layer:** Only the closing "Haaa-zel" swell, 8 voices, decaying into the sirens.
-- **Arrangement map:** Intro 2 (hiss, greeting, beep; Rhodes only) → Voicemail 16 (beat + 808) → Beep + "End of messages" 2 (beat stops dead) → Sung tag 8 (beat back) → Choir 4 (drums out, 808 holds Ab) → Outro 2 (sirens, heartbeat kick).
-- **Vocal direction:** Hazel spoken, unrehearsed; keep the breaths and the "never mind." Telephone EQ, mono. Sung tag full-range with a 1/8 dotted delay.
-- **Mix note:** Beat −4 dB under the voicemail, full for the tag; sirens up on "They hit the Rooks." Master −8.5 to −7.5 LUFS integrated, −1 dBTP true peak.
-- **Suno tips:** Hazel Persona, Weirdness 45%, Style Influence 65%. If Suno raps, add "spoken word only." Or record the voicemail yourself and use Suno for the beat and tag.
+- **BPM / Key / Swing:** BOUNCE, 96 BPM, A-flat major that bends toward F minor (808 root Ab0 to F1). WOMP Pocket: Swing % 55, Swing Grid 16th, Timing Humanize 8%.
+- **Progression:** Message 1: Abmaj9 held, then Rhodes only. Message 2: Dbmaj9 → C7#9 → Fm9 → Fm9. Message 3: Fm9 → Bb9 (i9 → IV9). Tag: Db → Dbm6 → Ab, an Amen that sounds like a prayer left on hold.
+- **Drums:** Out for the intro and message 1. They slam in on message 2 with the kick on 1 and the "and" of 2 and a clap on 2 and 4. Message 3 goes full with 1/16 hats. WOMP Rolls: Roll Target Hi-Hats, Roll Chance 20%, Roll Rate 1/32. Outro: a single heartbeat kick.
+- **Bass:** The 808 enters on "I love you" as a long Db1 → Ab0 glide. WOMP 808 Glide: Mode Legato Slide, Glide Time 75 ms, Glide Curve Exponential. WOMP Low End: Drive 48%, Sub Boost 3 dB.
+- **Samples & Keys:** Rhodes with WOMP Soul Chords: Key "G#/Ab", Scale Major, Voicing Open, Strum 20 ms. Siren samples pitched to Eb. Walkie static at 5:04 in the intro.
+- **Street Gospel layer:** A three-voice choir "hmm" under message 2, then a single "Haaa-zel" at the end.
+- **Arrangement map:** Intro 4 (Rook, sirens) → Message 1 6 (phone filter) → Message 2 8 → Message 3 8 → Tag 4 → Outro 4 (Rook, heartbeat).
+- **Vocal direction:** Band-pass Hazel's spoken lines at 400 Hz–3.5 kHz. Take the filter off in message 2 on "I love you." Rook is dry and close, low-passed at 9 kHz, with a slight room.
+- **Mix/Master:** −8.5 LUFS integrated, −1 dBTP.
+- **Suno tips:** Lead Persona = Hazel. If the spoken lines get sung, tag them [Spoken word]. Regenerate if a male voice takes the lead.
 
 ## Lyrics
 ```
-[Intro]
-[Tape hiss, answering machine clicks on]
-[Spoken - Knight, recorded greeting]
-You reached Knight. Leave it at the beep.
-[Beep]
+[Intro - Rook (spoken)]
+Five-oh-four a.m. I keyed the walkie. Told the little one, "Wake up. They here."
+Five-twelve, the ram hit Tower B. Sound like a church door slammin' for good.
+From the ninth floor I could see clean across Diagonal.
+One window already lit on Mother Ruth's street.
+Nursing student. Six a.m. clinical. Ironin' her whites when the sky turned blue and red.
 
-[Voicemail - Hazel, spoken, phone filter]
-Knight. Knight, pick up... It's me. It's, um... it's 11:52.
-They hit the Rooks. All of 'em. I can see it from Grandmama's window.
-The whole east side is blue and red, like Christmas gone wrong.
-Tre called here. Tre called here looking for you.
-He sounded so young, baby. He sounded twelve.
-I got the book. It's... it's in the... never mind.
-Don't say nothing on the phone. That's what you told me, right?
-Grandmama's in the kitchen praying out loud.
-She said your name. She never said your name in a prayer before.
-Knight... if you're in the back of a car right now...
-if you're... if you're anywhere... just call. From anywhere.
-Collect. I don't care what it costs.
-I'm not crying. (breath) Okay. I'm crying.
-You'd say something about my eyes right now. You'd say they're gold.
-Call me. I love you.
-I never said it first. So that's... that's me saying it first.
-On a machine. Like a fool.
-[Beep]
-[Spoken - machine voice]
-End of messages.
+[Phone ringing]
+[Voicemail beep]
 
-[Sung tag - Hazel, soulful female vocal]
-Pick up, pick up, baby
-Gold in my eyes and the sirens won't stop
-Pick up, pick up, baby
-Don't let this be the last thing that you got
-[Choir] Haaa-zel...
+[Message One - Hazel (spoken)]
+Knight. Knight, pick up. It's me. It's five-nineteen.
+They're at the Rooks. All of 'em. I can see it from Grandmama's window.
+The whole east side is blinking like a monitor gone wrong.
+Tre called the house. He was whispering. He sounded twelve.
+I told him go back to bed. I don't know if that was right.
+Call me. Collect. From anywhere.
 
-[Outro]
-[Sirens fade, single heartbeat kick]
+[Voicemail beep]
+
+[Message Two - Hazel (sung)]
+Pick up, pick up, it's still dark on my side,
+The iron's still hot on the scrubs where I left it to cry,
+Grandmama's praying your name in the kitchen out loud,
+She never once said it in a prayer until now,
+If you're face-down on carpet, if you're cold in a car,
+If they got you in a room where they won't say where you are,
+Then hear me, hear me:
+I love you. I said it first.
+On a machine. Of all the places. Of all the worst.
+
+[Voicemail beep]
+
+[Message Three - Hazel (rap)]
+Okay. Breathe. Third message. I'm steady. I'm charting it now like a shift:
+Patient's unknown, vitals unknown, and the family's on hold with a fist,
+The chart's where I left it—it's under the bones. You know the one that I mean.
+I ain't sayin' the rest. You taught me a phone got more ears than a church choir on Easter evening,
+So I'll iron my whites, go to clinical, smile at the charge nurse and lie,
+Take pressures at seven, my own at one-sixty, and still get every number right,
+If they call you by your government name, don't you answer. Let 'em wait.
+You taught me the board, so I'm holding the squares. Just come home. I'll warm up your plate.
+
+[Tag - Hazel (sung)]
+Gold in my eyes and the sirens won't stop,
+Pick up, pick up,
+If this is the last thing I leave you, I hope
+It's the first thing you play when they give back your phone.
+
+[Choir]
+Haaa-zel...
+
+[Outro - Rook (spoken)]
+That phone was in a plastic bag on a fed's desk, buzzin' against the evidence tape.
+He wouldn't hear it for eleven months. Somebody else heard it first.
+But she said it first. That part's still hers.
 ```
