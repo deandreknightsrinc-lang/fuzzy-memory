@@ -6,7 +6,7 @@ Monday mornings at 8, a folding table in the fellowship hall at Diagonal Ave Bap
 
 ## Voice Map
 - **Hazel:** sung 30 lines / rap 22 lines (57.7% sung), plus 4 spoken lines (the page). Her rap is investigative double-time, cold and exact, the most technical flow on the album. She sings the church-girl grief with a gospel top, and the four lines of the page are spoken flat, like evidence read into the record.
-- **Guests:** Rook — 14 lines — spoken intro, an 8-bar hardcore verse (the page in the wallet, the plate on his wall, the collection plate) and the verdict outro.
+- **Guests:** Rook — 13 lines — spoken intro, a 7-line hardcore verse (the page in the wallet, the plate on his wall, the collection plate) and the verdict outro.
 - **Hazel share of all lines:** 81.6%
 
 ## Suno Style Prompt
@@ -35,14 +35,14 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 ```
 [Intro - Rook (spoken)]
 Sixty-four squares. I watched 'em all from the ninth floor.
-Never saw the Monday count, though. Fellowship hall. One adding machine. Two women.
+But the Monday count? One adding machine. Two women.
 One been countin' that plate thirty-one years.
 The other one counts everything.
 
 [Verse 1 - Hazel (rap)]
 Monday, eight sharp, folding table, the choir robes hung on the rack,
 Grandmama's knuckles too swollen to sort, so I crank the machine, clack-clack,
-Envelopes numbered in gold, crinkled fives, and a check from the funeral home,
+Gold-numbered envelopes, crinkled fives, a check from the funeral home,
 Number one is the Deacon's own tithe: forty dollars, two years, the same soft fold,
 Then the Sunday after they battered the Rooks, number one had a heft I could hold—
 Four hundred in twenties so new that they stuck to each other like pages in Psalms,
@@ -68,10 +68,10 @@ Carry the one (carry the one), carry it slow—
 Somebody's paying for the things you know.
 
 [Verse 2 - Hazel (rap)]
-Then I pulled every bulletin Grandmama saves in a Bible as thick as a brick,
+Pulled every bulletin Grandmama saves in a Bible as thick as a brick,
 "Saturday Prayer and Meditation, Private Counsel"—the Deacon's own trick,
 Lined 'em up next to my "code" column like a med pass: the date and the dose,
-Nine raids in two years, each one inside seventy-two hours of a Saturday Reese knelt close,
+Nine raids, two years—every one within three days of a Saturday Reese knelt close,
 My stats professor would call that a p-value you'd bet your whole license upon,
 Nine out of nine isn't Jesus, it's Judas—and patterns don't pray, they just run,
 Monday, eight-forty, gray sedan by the dumpster, the Deacon out there with no trash,
@@ -88,7 +88,7 @@ Carry the one (carry the one), carry it slow—
 Somebody's paying for the things you know.
 
 [Bridge - Hazel (sung)]
-Eleven months I kept it in a lockbox under the floor,
+Eleven months it sat in a lockbox under the floor,
 Couldn't write it to county, they read every letter at the door,
 So the night that you came home, I laid it out in green,
 One page, four lines, the cleanest proof you've ever seen,
@@ -100,18 +100,17 @@ They just wait in your pocket till you open your eyes."
 [The Page - Hazel (spoken)]
 One. Forty, forty, forty. Then four hundred, brand new, the Sunday after the Rooks.
 Two. Nine raids. Nine Saturdays. Seventy-two hours, every time.
-Three. Gray sedan, thumbprint dent. Church dumpster. Federal lot. Plate on the back.
+Three. Gray sedan, thumb dent. Church dumpster. Federal lot.
 Four. Carry the one.
 
 [Verse 3 - Rook (rap)]
 He kept that page in his wallet through the fork and the pin and the towel,
-Kept it through Ninth and Diagonal, the Impala, the glass, and the howl,
-Nine days by her bed in the ICU, monitor countin' the beats she had left,
-Till Cole slid a folder at three in the mornin'—"DEACON"—and the Knight caught his breath,
+Through Ninth and Diagonal, the Impala, nine days by her ICU bed,
+Till Cole slid a folder at three in the mornin'—"DEACON"—and the Knight read what she said,
 Night before church, he came up to my ninth floor. I peeled the plate off my wall,
 Penciled the night I first saw that sedan. Her plate and my plate: same call.
 Sunday, pew three, he laid page one in the velvet, face-up for the saints in the rows,
-And folded behind it, in green, her four lines—the page only the Deacon would know.
+Folded behind it, in green, her four lines, for the only eyes meant to know.
 
 [Final Chorus - Hazel (sung)]
 Add it up (add it up), Sunday into Monday,
