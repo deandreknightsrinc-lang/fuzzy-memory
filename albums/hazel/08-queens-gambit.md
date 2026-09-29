@@ -2,7 +2,7 @@
 **Artist:** Hazel · **Featuring:** Knight · **Narrator:** Rook · **Lane:** Knock · 150 BPM · C#m
 
 ## Story Concept
-April 30th, 11:48 p.m., at Mother Ruth's kitchen table, with the acceptance form from Whitfield State due in the mail by morning: a full ride to the honors nursing program four hundred miles from the 64. I do the math the way I do a dosage, slow and without rounding, and I think in chess, because Knight taught me the board on this same table: a gambit means you give up a pawn to own the center. Knight gave up one Friday for me in STALEMATE's "Queen's Gambit." I'm about to give up four years, and I check DECLINE with the green pen I haven't used since I was fifteen. Knight begs me not to, because he knows what standing near him costs. The turn comes at 9:01 a.m., when the mail truck passes the porch and doesn't slow down. Grandmama hums a psalm instead of yelling, and Knight "accepts" the Queen, which scares me more than anything. It's my first real move on the board, and I made it on purpose.
+April 30th, 11:48 p.m., at Mother Ruth's kitchen table, with the acceptance form from Whitfield State due in the mail by morning: a full-ride transfer into the honors nursing program four hundred miles from the 64. I'm already in the Mercy General program, and Grandmama paid my deposit out of her Folgers-can burial money. I do the math the way I do a dosage, slow and without rounding, and I think in chess, because Knight taught me the board on this same table: a gambit means you give up a pawn to own the center. Knight gave up one Friday for me in STALEMATE's "Queen's Gambit." I'm about to give up four years, and I check DECLINE with the green pen I haven't used since I was fifteen. Knight begs me not to, because he knows what standing near him costs. The turn comes at 9:01 a.m., when the mail truck passes the porch and doesn't slow down. Grandmama hums a psalm instead of yelling, and Knight "accepts" the Queen, which scares me more than anything. It's my first real move on the board, and I made it on purpose.
 
 ## Voice Map
 - **Hazel:** sung 34 lines / rap 22 lines (60.7% sung). She raps the strategy in V1 and V4, precise and clipped, with double-time runs on the chess and dosage lines. She sings the risk in a warm alto with a gospel lift on the chorus, and the bridge is sung straight to Mother Ruth.
@@ -21,14 +21,14 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 
 ## W.O.M.P. Production Notes (Logic Pro)
 - **BPM / Key / Swing:** KNOCK, 150 BPM, C# minor (808 root C#1, 34.6 Hz). WOMP Pocket: Swing % 52, Swing Grid 16th, Snare/Clap Lay-back +3 ms, Hat Accents on.
-- **Progression:** Verses C#m9 → F#9 (i9 → IV9 Dorian). Chorus Amaj9 → B13 → C#m9 → G#7#9. Bridge D#m7b5 → G#7 → C#m9. Final chorus ends on the Amen A → Am → E: the major lands on "accepted" and it's unsettling.
-- **Drums:** Busy kick, snare plus clap on 3, 1/16 hats. WOMP Rolls: Roll Target Hi-Hats, Trigger Both, Roll Chance 30%, Roll Rate 1/16T, Velocity Shape Crescendo. A chess click on every beat 4 of the chorus.
-- **Bass:** Rolling 16th 808 on C#1, gliding to E1 and G#0. WOMP 808 Glide: Mode Retrigger + Slide, Glide Time 40 ms, Bend Range 12. Stutters at 4-bar ends: WOMP Rolls, Roll Target Single Note, Single Note 25 (C#1), Roll Rate 1/32. WOMP Low End: Drive 60%, Harmonics Mix 45%, Mono Below 120 Hz.
-- **Samples & Keys:** Clavinet plays the gambit riff (C#–E–F#–G#–B). The Rhodes signature lick goes under the pre-chorus. Wah guitar answers the hook through WOMP Dust (Wow 10%, Crackle 15%, High Cut 10 kHz).
-- **Street Gospel layer:** Choir swell into the chorus. On the final "Lord, look after me," the choir holds and the drums drop.
+- **Progression:** Verses C#m9 → F#9 (i9 → IV9 Dorian). Chorus Amaj9 → B13 → C#m9 → G#7#9. Bridge D#m7b5 → G#7 → C#m9. Final chorus ends on the Amen A → Am → E.
+- **Drums:** Busy kick, snare plus clap on 3, 1/16 hats. WOMP Rolls: Roll Target Hi-Hats, Trigger Both, Roll Chance 30%, Roll Rate 1/16T, Velocity Shape Crescendo. Chess click on chorus beat 4.
+- **Bass:** Rolling 16th 808 on C#1. WOMP 808 Glide: Mode Retrigger + Slide, Glide Time 40 ms, Bend Range 12. Stutters at 4-bar ends: WOMP Rolls, Roll Target Single Note, Single Note 25 (C#1), Roll Rate 1/32. WOMP Low End: Drive 60%, Harmonics Mix 45%, Mono Below 120 Hz.
+- **Samples & Keys:** Clavinet plays the gambit riff (C#–E–F#–G#–B). Rhodes signature lick under the pre-chorus; wah answers the hook through WOMP Dust (Crackle 15%, High Cut 10 kHz).
+- **Street Gospel layer:** Choir swell into the chorus. Drums drop on the last line.
 - **Arrangement map:** Intro 4 (Rook, clock) → V1 16 → Pre 4 → Chorus 8 → V2 8 (Knight; 808 out bars 1–2) → V3 8 (sung) → Chorus 8 → Bridge 4 (hats out) → V4 8 → Final Chorus 8 → Outro 2.
-- **Vocal direction:** Hazel's rap is dry and centered with doubles on the last word of each bar. Her sung parts get a 3rd-above harmony on the chorus. Knight is gritty and pleading, panned slightly left. Rook is dry and close, low-passed at 9 kHz, with a slight room.
-- **Mix note:** Vocal on top, 808 right under it. Master −8 LUFS integrated, −1 dBTP.
+- **Vocal direction:** Hazel's rap is dry, with doubles on bar ends; 3rd-above harmony on the chorus. Knight is gritty, slightly left. Rook is dry and close, low-passed at 9 kHz, with a slight room.
+- **Mix note:** Master −8 LUFS integrated, −1 dBTP.
 - **Suno tips:** Lead Persona = Hazel. Tags drive Knight and Rook. Regenerate if a male voice takes the lead.
 
 ## Lyrics
@@ -49,8 +49,8 @@ Weight of the dream over weight of the man, carry the one, it won't come out,
 Take it, you lose your position—decline it, and I'm already in there,
 He gave up a Friday for sweet tea, a porch, and my grandmama's stare,
 I'm 'bout to give up four years and a dorm room I'd never have to share,
-Mercy General got a program—two buses, night classes, no quad,
-Clinicals up on the fourth floor, same hall where they lost Lorraine—God,
+Grandmama's burial money bought my seat at Mercy—Folgers can, BURIAL on the tape,
+Clinicals up on the fourth floor, two buses; you don't leave a debt like that to wait,
 I'd rather heal on the block that bled me than graduate far from the pain,
 Checked DECLINE in the green pen I quit at fifteen. It's a gambit, not a game.
 

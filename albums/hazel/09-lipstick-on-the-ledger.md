@@ -2,7 +2,7 @@
 **Artist:** Hazel · **Featuring:** none · **Narrator:** Rook · **Lane:** Bounce · 100 BPM · C#m
 
 ## Story Concept
-January, 3 a.m., one desk lamp on Mother Ruth's second floor. I find Knight's money in a Nike box under his passenger seat, facing every direction and held with rubber bands, and I do what I do on a twelve-hour shift: I chart it. A $1.19 black-and-white composition book, written in hospital code: "patients" are buyers, "units" are product, "discharged" means paid, "code" means police, "the chart" is the stash, and "chaplain" is Deacon Bishop's ten percent. Six weeks in, the columns go crooked on Fridays, $350 short every Friday for twelve Fridays, which is $4,200 and one name: Smoke, Knight's day-one (the setup for STALEMATE's "En Passant"). I blot my red lipstick inside the cover like a signature. That Sunday Deacon Bishop's smile runs a beat too long over the heavy bag at my feet. The turn: I'm good at this, I like the click of a column closing, and that scares me more than the Deacon does.
+Late September, 3 a.m., one desk lamp on Mother Ruth's second floor, a few weeks before STALEMATE's "En Passant." I find Knight's money in a Nike box under his passenger seat, facing every direction and held with rubber bands, and I do what I do on a twelve-hour shift: I chart it. A $1.19 black-and-white composition book, written in hospital code: "patients" are buyers, "units" are product, "discharged" means paid, "code" means police, "the chart" is the stash, and "chaplain" is Deacon Bishop's ten percent. Six weeks in, the columns go crooked on Fridays, $350 short every Friday for twelve Fridays, which is $4,200 and one name: Smoke, Knight's day-one (the setup for STALEMATE's "En Passant"). I blot my red lipstick inside the cover like a signature. That Sunday Deacon Bishop's smile runs a beat too long over the heavy bag at my feet. The turn: I'm good at this, I like the click of a column closing, and that scares me more than the Deacon does.
 
 ## Voice Map
 - **Hazel:** sung 38 lines / rap 22 lines (63.3% sung). Her rap is quick and bookkeeper-precise, riding the swing with internal rhymes. The sung verse is a hushed church-pew story, and the chorus is a full-voice soul hook that turns darker on the last pass.
@@ -34,7 +34,7 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 ## Lyrics
 ```
 [Intro - Rook (spoken)]
-January. Three a.m. One desk lamp on Mother Ruth's second floor.
+September. Three a.m. One desk lamp on Mother Ruth's second floor.
 Everybody on the board was sleepin'. The Queen was doin' inventory.
 
 [Verse 1 - Hazel (rap)]
@@ -98,7 +98,7 @@ Rings on his fingers, hand on my shoulder, his smile a beat too long,
 "Heavy reading, Sister Hazel?" He looked at the bag like he knew the song,
 I said, "Bones and blood, Deacon." He said, "Mind you don't carry too much,"
 Grandmama sang like the roof might lift, and I held that strap in a clutch,
-I've been counting for Knight all winter, every dollar and every dime,
+I've been counting for Knight all summer, every dollar and every dime,
 But that man was counting me the whole time.
 
 [Bridge - Hazel (sung)]

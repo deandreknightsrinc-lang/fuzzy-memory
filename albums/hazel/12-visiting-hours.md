@@ -2,7 +2,7 @@
 **Artist:** Hazel · **Featuring:** Knight · **Narrator:** Rook · **Lane:** Bounce · 95 BPM · Dm
 
 ## Story Concept
-A Saturday in Knight's eleven-month county bid. At 7:15 a.m. I turn the key in his '86 Cutlass, the car I keep running for him, and drive thirty-eight minutes up Route 9 in my yellow Sunday dress, because the guards don't allow scrubs or underwire. Big Otis's three bullets roll around the ashtray on every pothole, and I've never once moved them. Mama Knight's light bill sits on the passenger seat marked PAID in my handwriting, with my pharmacology final folded behind it: a 91. Then comes the pat-down, booth six, a bolted stool, and forty-five minutes on a greasy phone behind scratched plexiglass. I tell him the true things, he tells me the easy lies, and I chart his split knuckles like vitals. The turn is in the glass: under the fluorescent light my own reflection lies over his face, my eyes gone gold, and I realize I'm doing this bid too, from the other side. When the C.O. calls time, I count the bullets before I start the car. Still three.
+A Saturday in Knight's eleven-month county bid. At 7:15 a.m. I turn the key in his '86 Cutlass, the car I keep running for him, and drive thirty-eight minutes up Route 9 in my yellow Sunday dress, because the guards don't allow scrubs or underwire. Big Otis's three bullets roll around the ashtray on every pothole, and I've never once moved them. Mama Knight's light bill sits on the passenger seat marked PAID in my handwriting, with my pharmacology final folded behind it: a 91. Then comes the pat-down, booth six, a bolted stool, and forty-five minutes on a greasy phone behind scratched plexiglass. I tell him the true things, he tells me the easy lies, and I chart his split knuckles like vitals. The turn is in the glass: under the fluorescent light my own reflection lies over his face, my eyes gone gold, and I realize I'm doing this bid too, from the other side. When the C.O. calls time, I count the bullets before I start the car. Still three. Then it's back down Route 9, because Mama Knight's dialysis chair is at one.
 
 ## Voice Map
 - **Hazel:** sung 32 lines / rap 22 lines (59.3% sung). She raps the drive in a steady, rolling, road-rhythm flow and the last minute in a tighter, breaking one. She sings the forty-five minutes low and tender, lifting to gospel runs on "visiting hours."
@@ -107,7 +107,7 @@ His hand came up slow on the other side, two palms and a quarter-inch lie,
 His lifeline across from my heart line, the glass fogged up from the both of us tryin',
 Then he stood 'cause they made him, looked back at the door, and I held up four fingers: "Next week,"
 Out in the lot, the Cutlass hot as a fever, I sat with the key and I couldn't speak,
-Counted the bullets. Still three. Started her up. Thirty-eight minutes. Same road.
+Counted the bullets. Still three. Your mama's dialysis at one, so I rolled,
 I'm doin' this bid on the outside, baby—and nobody gave me a number to hold.
 
 [Final Chorus - Hazel (sung)]
@@ -117,6 +117,6 @@ Visiting hours, visiting hours,
 They took everything but forty-five—that's ours.
 
 [Outro - Rook (spoken)]
-Forty-seven Saturdays. She missed two: one for boards review, one for an ice storm.
+Forty-seven Saturdays. She missed two: one for a pharm midterm, one for an ice storm.
 Them three bullets never moved. Neither did she.
 ```

@@ -135,3 +135,24 @@ HAZEL is now **Hazel Monroe's album**. She is the lead artist, and the fans shou
     the only ink that ever got a man to write back. That ties both of the old green-ink reasons together.
   - **Her decision:** she passes her nursing boards after the shooting. The courthouse wedding happens on *her* terms:
     Knight is out of the game first.
+
+## Canon Added in HAZEL v2 (the key facts; full detail is in the song files)
+- **Green ink:** as a girl Hazel wrote to Otis 104 times in green felt-tip and got 26 answers ("Baby girl, that color's pretty").
+  She stopped at 15 after Lorraine's funeral. Letter #105 goes to Otis in "Green Ink" (H13); Knight answers every one of hers.
+- **Lorraine:** died on a Thursday in March, on a mattress on Pine. Hazel grew up on Kemp Street.
+- **Hazel's life:** she works the Pop's Market register 4 p.m. to midnight and does clinicals at Mercy General. Her friends are Tonya and Nita.
+  She turns down the Whitfield State full ride (H08).
+- **The ledger:** a $1.19 composition notebook. Its code words include "readmit" (owes) and "chaplain" (Bishop's cut). Smoke was short $4,200.
+- **The Bishop proof (H14):**
+  - Bishop's tithe envelope suddenly holds sequential new twenties.
+  - His ten percent totals $11,240 over two years.
+  - All 9 raids fell within 72 hours of Reese's Saturday "private counsel."
+  - The gray sedan with a thumb dent turns up in the federal parking row.
+  - Rook's penciled plate matches hers. Knight lays the proof in the collection plate.
+- **Crossfire (H17):** 12:50 that Friday on 9th. Four shots: one hit Hazel, and another hit Rook in the hip when he stepped into its path.
+  Hazel had a splenectomy, and her ICU bed was 3rd floor, bed 9.
+- **Rook and Hazel:** she once took his blood pressure at a church health fair and called him "sir." That's why he owed her.
+- **The ending (H19–H20):** Hazel passes her boards (RN). She circles a warehouse job listing in green ink as Knight's way out.
+  - The courthouse wedding is in Room 214. She's 24 weeks pregnant, with her RN pin on.
+  - Tre says "I do" on a collect call, and Big Otis sits in the back row.
+  - The unsigned card with the white King comes from Rook. For the first time in twenty years, Rook pulls his blinds.

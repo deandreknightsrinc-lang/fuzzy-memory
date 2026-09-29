@@ -2,7 +2,7 @@
 **Artist:** Hazel · **Featuring:** Big Otis (spoken) · **Narrator:** Rook · **Lane:** Bounce · 99 BPM · Eb
 
 ## Story Concept
-A Tuesday night during Knight's bid, at Mother Ruth's kitchen table after a twelve-hour clinical, my feet in an Epsom bucket and a chewed green pen in my hand. Every letter I send to county goes out in green, and this is the song where I explain why. At nine, with Lorraine "sick" and Big Otis upstate, I wrote Daddy in school-issue blue and black and got nothing back. Then Ms. Dot at the Lucky Mart gave me a green pen, I told him my eyes turn that color outside, and eleven days later a pencil letter came back. Green was the only ink that ever got a man to write back, so I kept using it. His letters thinned out, his chair sat empty at Mama's funeral, and at fifteen I capped the pen. Tonight there are two envelopes on the table: one to county, and one to Monroe Tire & Brake, nine blocks away, the first letter I've written my father in six years. The turn is that Otis answers in person and out loud, because the only pencil in his shop is a yellow grease pencil. Two letters, one ink, and both men write back.
+A Tuesday night during Knight's bid, at Mother Ruth's kitchen table after a twelve-hour clinical, my feet in an Epsom bucket and a chewed green pen in my hand. Every letter I send to county goes out in green, and this is the song where I explain why. At nine on Kemp Street I wrote Daddy in pencil, crayon and blue ink and got nothing back. Then came a green felt-tip from the junk drawer, and three weeks later: "Baby girl, that color's pretty." Green was the only ink that ever got a man to write back, one answer in four, 26 answers to 104 letters. At fifteen his reply to my funeral letter came too late from the hole, and I put the pen away. Now Knight answers every green letter from county, one for one. Tonight there are two envelopes on the table: one to county, and one to Monroe Tire & Brake, nine blocks away, the first letter I've written my father in six years. The turn is that Otis answers out loud and on time for once, because the only thing in his shop that writes is a yellow grease pencil. My letter is number 105, and it goes in the rubber band with the rest. Two letters, one ink, and both men write back.
 
 ## Voice Map
 - **Hazel:** sung 34 lines / rap 22 lines (60.7% sung). She sings V1 and the choruses warm and intimate with a dusty-alto grain, and raps the history in V2 with a storyteller's rolling triplet flow that hardens at fifteen. V3 is the letter itself, rapped conversationally.
@@ -62,20 +62,20 @@ Write back, write back—
 So I write in green and I wait for one.
 
 [Verse 2 - Hazel (rap)]
-Nine years old in a church-lace dress, and the school only gave us the blue,
-Lorraine wasn't home, she was "sick," and I knew what that "sick" was, I already knew,
-Grandmama said, "Write your daddy," so I wrote him in blue on a Monday. Nothin'.
-Wrote him in black on a Friday. Nothin'. Three weeks of a mailbox bluffin',
-Then Ms. Dot at the Lucky slid me a pen that was green as a dollar in spring,
-Wrote, "Dear Daddy, my eyes go this color outside," and eleven days later, the mailman'd bring
-An envelope stamped with a number for a name and a page in a pencil so soft,
-"Keep writin' in green, baby girl. It's the only thing in here that ain't gray." And I was off,
-Wrote him in green every Sunday: my braces, my science fair, "Grandmama's sick,"
-And his pencil came back every month, then every three, then a Christmas card thin as a stick,
-Fifteen: Mama's funeral, closed casket, a program laid on Daddy's empty chair,
-I wrote him one line in green—"Where were you?"—and the answer was air,
-So I capped that pen like a syringe you don't use and I put it away with the spoons,
-Six years in a drawer, till a Knight got a number, a bunk, and a room.
+You know the story: Kemp Street, second floor, pencil and crayon and blue—nothin',
+Green felt-tip from the junk drawer by the phone, and three weeks later the mailbox was somethin':
+"Baby girl, that color's pretty." Four words in a pencil so soft that I traced 'em,
+A hundred and four green letters, twenty-six answers—one in four, and I chased 'em,
+Found out this fall a stamp cost him two days of moppin' at eleven cents an hour,
+So the silence wasn't always a no—sometimes a man's just broke in a tower,
+Fifteen, a Thursday in March, I wrote "Service Saturday, noon," and he answered too late from the hole,
+I folded it in fourths, never finished, put the pen in the drawer where the dead things go,
+Six years I wrote nothin' in green—not a grocery list, not a birthday card, not a check,
+Then a Knight got a number, a bunk and a tier, and a county-blue shirt on his neck,
+First night I sat down to write him, the blue pen felt like a form at the jail,
+So I dug out the felt-tip. Dry. Ran it under hot water till it bled on my nail,
+"Dear Knight." And he wrote back in four days. Then again. Then again. Every time.
+Daddy's math was one in four. A man in a cell goes one for one, on the line.
 
 [Chorus - Hazel (sung)]
 Green ink, green ink,
@@ -91,15 +91,15 @@ And one to Monroe Tire & Brake, Seventh Street by the tracks, nine blocks from h
 I could walk it in twenty, stand by the air hose and say it with my mouth,
 But some things only fit on a page, so I'm payin' the stamp and I'm sendin' it out:
 "Dear Daddy. It's green 'cause you know why. I'm grown, and I'm tired of keepin' the tab
-On the funeral chair and the Christmas card and six years in a drawer. So here's what I have:
+On the funeral chair and the one-in-four and six years in a drawer. So here's what I have:
 A nurse in a year, and a man in a cell, and a question I never got answered in time—
 Was it you in the pencil or you in the pistol? Write back. In anything. Just write back this time."
 
 [Interlude - Big Otis (spoken)]
 Hazel. Baby girl. Got your letter at the shop. Read it in the tire bay with the air gun off.
-I kept 'em. Every one. Seventy-three. Tire box under the register.
+That's a hundred and five. Goin' in the rubber band with the rest.
 I ain't got green. Only thing in this shop that writes is a yellow grease pencil.
-So I'm writin' back the only way I got left.
+So I'm answerin' this one the only way I got left. Out loud. On time.
 Sunday. Tell Ruth to set a plate.
 
 [Bridge - Hazel (sung)]

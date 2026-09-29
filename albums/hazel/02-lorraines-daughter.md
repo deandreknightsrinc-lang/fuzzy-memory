@@ -11,7 +11,7 @@ Kemp Street, second floor, ages nine to fifteen. Hazel's mother Lorraine is disa
 
 ## Suno Style Prompt
 ```
-uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, bounce 98 BPM, F minor, aching childhood memory with a hard knock, detuned Rhodes lead, bathroom-fan hum, pen scratching paper, mailbox creak, stripped bridge then 808 returns harder, 808 locked to the kick sliding F to Db, VOICES: female lead vocalist, soulful alto R&B singing and sharp female rap verses, deep baritone male spoken narrator, mix: vocal-forward female lead, 808-forward, loud punchy master
+uptempo hard-hitting West Coast hip hop, heavy booming distorted 808 bass leading the beat, fast sliding 808 glides and 808 rolls, rhythm and gangster soul street gospel, 70s 80s funk and R&B sample chops, punchy knocking drums, crisp fast hi-hats with rolls, analog Moog synth bass, warm tape saturation, 70s soul, Rhodes and clavinet, talkbox, gospel choir swells, live wah guitar, vinyl crackle, bounce 98 BPM, F minor, aching childhood memory with a hard knock, detuned Rhodes lead, bathroom-fan hum, pen scratching paper, mailbox creak, stripped bridge then 808 returns harder, 808 locked to the kick sliding F to Db, female lead vocalist, soulful alto R&B singing and sharp female rap verses, deep baritone male spoken narrator, vocal-forward female lead, 808-forward, loud punchy master
 ```
 
 ### Exclude Styles

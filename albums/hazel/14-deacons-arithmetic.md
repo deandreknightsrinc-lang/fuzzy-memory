@@ -54,7 +54,7 @@ So he ain't spendin' ours, and somebody's payin' him new, and it lands when we b
 A man who gets paid by the board and the badge got two sets of tithes to be made.
 
 [Pre-Chorus - Hazel (sung)]
-I've been sitting in that pew since I was nine,
+Second pew, left side, never his side, since I was nine,
 Hymnal in my lap and Grandmama's hand in mine,
 Now I'm counting what the preacher left inside,
 And every total says the same thing: he lied.
@@ -91,7 +91,7 @@ Somebody's paying for the things you know.
 Eleven months it sat in a lockbox under the floor,
 Couldn't write it to county, they read every letter at the door,
 So the night that you came home, I laid it out in green,
-One page, four lines, the cleanest proof you've ever seen,
+One page, four lines, every decimal clean,
 You said, "Not the Deacon, Hazel. That man baptized Tre,"
 Folded it in your wallet and you looked the other way,
 I said, "Numbers don't kneel, and they don't take sides,
