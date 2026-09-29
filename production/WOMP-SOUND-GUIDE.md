@@ -30,6 +30,9 @@ switches, and the hook sounds like Sunday morning.
 | **BOUNCE** | 94–104 | Full-time: snare/clap on 2 and 4, swung 16th hats with occasional 1/32 rolls | Locked to the kick pattern, fast slides between chord roots |
 | **KNOCK** | 140–160 | Snare on 3 (half-time backbeat) with double-time energy: 1/16 hats with 1/32 and triplet rolls, busy kick | Rolling 16th-note patterns, fast glides, 808 stutters |
 
+| **K.I.S.S.** (hyphy) | 96–108 | Snap and/or clap on 2 and 4, no hi-hats: nothing but the jingle, the 808 and the snap | The 808 is the kick: simple 1-and-3 bounce patterns with short slides |
+
+- **K.I.S.S. lane:** 20 ready-made hyphy beats (ice-cream-truck jingle + 808 + snap/clap) live in `KISS-HYPHY-BEATS.md`.
 - **Emotional songs** keep their minor keys and their story, but ride BOUNCE at 94–98. Give them a stripped intro or breakdown,
   then bring the 808 back harder.
 - **Swing:** BOUNCE 55–57% on 16ths. KNOCK 51–54% (almost straight, so the rolls stay tight).
