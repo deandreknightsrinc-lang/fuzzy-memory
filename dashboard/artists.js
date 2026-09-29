@@ -1,12 +1,14 @@
 // Artist roster shown on the dashboard. Add an entry here to add an artist.
+// Lauren's details follow her character bible (character-bible.md in the project files).
 window.ARTISTS = [
   {
     id: "lauren-knight",
     name: "Lauren Knight",
-    tagline: "AI artist",
-    genre: "Alternative R&B / Neo-soul",
-    style: "Warm, late-night vocals over lush synths and live-feel drums; cinematic visuals in deep blues and gold.",
-    bio: "Lauren Knight is an AI recording artist blending classic soul phrasing with modern electronic production. Her songs are about ambition, love, and building something that lasts, told with a quiet confidence that lets the groove do the talking.",
+    tagline: "Soft heart, loud ink.",
+    details: "AI artist · 24 · Atlanta raised, LA based",
+    genre: "Alt-R&B / trap-soul with pop hooks",
+    style: "Airy layered harmonies, 808s, warm Rhodes keys and lo-fi guitar under a breathy mezzo-soprano. Visually: long black curls, a floral tattoo sleeve with \"SELF LOVE\" script, gold jewelry, white and blush pink with pops of cherry red.",
+    bio: "Lauren Knight is an AI-powered R&B artist blending trap-soul grooves with diary-honest lyrics about self-love, heartbreak and healing. She writes for the ones who had to learn to choose themselves.",
     image: "images/lauren-knight.jpg"
   }
 ];
