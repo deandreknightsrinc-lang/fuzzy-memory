@@ -66,12 +66,12 @@ hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cre
 - **Jingle (toy square-wave synth):** `G4 Bb4 D5 Bb4 C5 Bb4 A4 G4 | G4 Bb4 D5 F5 D5 - Bb4 -`
 - **808 root:** G1 (49 Hz), octave hop to G2 on the last 8th
 - **808 grid:** `x--- --x- x--- --x-`
-- **Snap/clap:** `---- x--- ---- x-x-` (clap on 2 and 4, extra snap on the and of 4)
+- **Snap/clap:** `---- x--- ---- x-x-` (clap on 2 and 4, extra snap before the downbeat)
 - **One extra:** a cash-register ding on bar 4
 - **Fits:** Pawn Shop, Promotion
 
 ```
-hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cream truck jingle melody, heavy booming 808 bass, simple finger snap and hand clap, sparse drums, lots of space, keep it simple, 98 BPM, G minor, cold winter hustle, toy square-wave synth jingle, deep 808 in G minor with slides, clap on 2 and 4, extra snap on the and of 4, cash register ding
+hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cream truck jingle melody, heavy booming 808 bass, simple finger snap and hand clap, sparse drums, lots of space, keep it simple, 98 BPM, G minor, cold winter hustle, toy square-wave synth jingle, deep 808 in G minor with slides, clap on 2 and 4, extra snap before the downbeat, cash register ding
 ```
 
 ### 03. Diagonal Whistle: 104 BPM, E minor
@@ -83,7 +83,7 @@ hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cre
 - **Fits:** Bishop's Blessing, Diagonal Ave
 
 ```
-hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cream truck jingle melody, heavy booming 808 bass, simple finger snap and hand clap, sparse drums, lots of space, keep it simple, 104 BPM, E minor, slick and bouncy, sine chime like a truck speaker jingle, deep 808 in E minor with slides, clap on 2 and 4
+hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cream truck jingle melody, heavy booming 808 bass, simple finger snap and hand clap, sparse drums, lots of space, keep it simple, 104 BPM, E minor, slick and bouncy, sine chime jingle through a tinny truck speaker, deep 808 in E minor with slides, clap on 2 and 4
 ```
 
 ### 04. Rook Rattle: 100 BPM, F minor
@@ -107,7 +107,7 @@ hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cre
 - **Fits:** The Clock, Pinned
 
 ```
-hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cream truck jingle melody, heavy booming 808 bass, simple finger snap and hand clap, sparse drums, lots of space, keep it simple, 96 BPM, D minor, time running out, music box plus woodblock tick jingle, deep 808 in D minor with slides, snap on 2 and 4, ticking woodblock as the hi-hat
+hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cream truck jingle melody, heavy booming 808 bass, simple finger snap and hand clap, sparse drums, lots of space, keep it simple, 96 BPM, D minor, time running out, music box jingle with a ticking woodblock, deep 808 in D minor with slides, snap on 2 and 4, ticking woodblock instead of hi-hats
 ```
 
 ### 06. Bishop's Bells: 100 BPM, Eb minor
@@ -131,7 +131,7 @@ hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cre
 - **Fits:** Stalemate, Sacrifice
 
 ```
-hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cream truck jingle melody, heavy booming 808 bass, simple finger snap and hand clap, sparse drums, lots of space, keep it simple, 98 BPM, B minor, sad but still bouncing, music box, slightly out of tune jingle, deep 808 in B minor with slides, snap on 2, clap on 4, wooden chess piece click
+hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cream truck jingle melody, heavy booming 808 bass, simple finger snap and hand clap, sparse drums, lots of space, keep it simple, 98 BPM, B minor, sad but still bouncing, slightly out-of-tune music box jingle, deep 808 in B minor with slides, snap on 2, clap on 4, wooden chess piece click
 ```
 
 ### 08. Knight Hop: 106 BPM, A minor
@@ -159,7 +159,7 @@ hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cre
 ```
 
 ### 10. King's Ride: 100 BPM, C# minor
-- **Jingle (toy horn (square wave, filter half-open)):** `C#5 E5 G#5 E5 F#5 E5 C#5 - | B4 C#5 E5 C#5 B4 G#4 C#5 -`
+- **Jingle (toy horn synth, square wave with the filter half-open):** `C#5 E5 G#5 E5 F#5 E5 C#5 - | B4 C#5 E5 C#5 B4 G#4 C#5 -`
 - **808 root:** C#1 (34.6 Hz), heavy hit on 1, slide to E1 on the and of 3
 - **808 grid:** `x--- ---- x-x- ----`
 - **Snap/clap:** `---- x--- ---- x---` (clap on 2 and 4)
@@ -167,7 +167,7 @@ hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cre
 - **Fits:** King of the 64, Checkmate
 
 ```
-hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cream truck jingle melody, heavy booming 808 bass, simple finger snap and hand clap, sparse drums, lots of space, keep it simple, 100 BPM, C# minor, royal lowrider swagger, toy horn (square wave, filter half-open) jingle, deep 808 in C# minor with slides, clap on 2 and 4
+hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cream truck jingle melody, heavy booming 808 bass, simple finger snap and hand clap, sparse drums, lots of space, keep it simple, 100 BPM, C# minor, royal lowrider swagger, toy horn synth jingle, deep 808 in C# minor with slides, clap on 2 and 4
 ```
 
 ## HAZEL Side: Sweet Jingles (11–20)
