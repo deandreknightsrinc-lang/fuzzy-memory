@@ -182,7 +182,7 @@ hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cre
 - **Fits:** Hazel (Intro), Green, Brown, Gold
 
 ```
-hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cream truck jingle melody, heavy booming 808 bass, simple finger snap and hand clap, sparse drums, lots of space, keep it simple, 100 BPM, Eb minor, sweet summer crush, music box playing the Hazel signature lick jingle, deep 808 in Eb minor with slides, snap on 2, clap on 4, talkbox singing Haaa-zel
+hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cream truck jingle melody, heavy booming 808 bass, simple finger snap and hand clap, sparse drums, lots of space, keep it simple, 100 BPM, Eb minor, sweet summer crush, simple music box jingle, deep 808 in Eb minor with slides, snap on 2, clap on 4, talkbox singing Haaa-zel
 ```
 
 ### 12. Honey Dip: 102 BPM, F major
@@ -266,7 +266,7 @@ hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cre
 - **Fits:** Glass House
 
 ```
-hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cream truck jingle melody, heavy booming 808 bass, simple finger snap and hand clap, sparse drums, lots of space, keep it simple, 104 BPM, B minor, argument energy, music box through a slight distortion jingle, deep 808 in B minor with slides, clap on 2 and 4, phone text ding
+hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cream truck jingle melody, heavy booming 808 bass, simple finger snap and hand clap, sparse drums, lots of space, keep it simple, 104 BPM, B minor, argument energy, slightly distorted music box jingle, deep 808 in B minor with slides, clap on 2 and 4, phone text ding
 ```
 
 ### 19. Letter Jingle: 98 BPM, C minor
@@ -285,12 +285,12 @@ hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cre
 - **Jingle (toy piano plus a small bell):** `C5 E5 G5 C6 B5 G5 A5 G5 | F5 A5 G5 E5 D5 - C5 -`
 - **808 root:** C1 (32.7 Hz), happy bounce, octave hop to C2 on the and of 4
 - **808 grid:** `x--- --x- x--- --x-`
-- **Snap/clap:** `---- x--- ---- x---` (clap on 2 and 4 with hand-claps on the last hook)
+- **Snap/clap:** `---- x--- ---- x---` (clap on 2 and 4, extra hand claps on the last hook)
 - **One extra:** wedding bell on bar 1 of the last hook
 - **Fits:** Forever Hazel (Outro)
 
 ```
-hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cream truck jingle melody, heavy booming 808 bass, simple finger snap and hand clap, sparse drums, lots of space, keep it simple, 102 BPM, C major, celebration, toy piano plus a small bell jingle, deep 808 in C major with slides, clap on 2 and 4 with hand-claps on the last hook, wedding bell
+hyphy Bay Area hip hop, minimalist bouncy West Coast beat, simple catchy ice cream truck jingle melody, heavy booming 808 bass, simple finger snap and hand clap, sparse drums, lots of space, keep it simple, 102 BPM, C major, celebration, toy piano and small bell jingle, deep 808 in C major with slides, clap on 2 and 4, extra hand claps on the last hook, wedding bell
 ```
 
 ---
