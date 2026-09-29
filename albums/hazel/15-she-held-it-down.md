@@ -5,9 +5,9 @@
 Eleven months, told as one long week. Knight is doing his county bid, Tre is four years deep upstate, and Hazel is the whole infrastructure: 7 AM clinicals, the register at night, Mama Knight's dialysis rides to the fourth floor at Mercy on Tuesdays, Thursdays and Saturdays, forty dollars on Tre's books every other Friday, the Cutlass oil changed by her own hands, and the ledger locked under Mother Ruth's floor with the Deacon's decimals already circled in it. King Reese sends soldiers with flowers and an envelope; she keeps the flowers and leaves the money on the mat. Halfway through, a collect call from upstate: Tre, with fifteen minutes and no pride left, thanks the only person who never missed a Friday. The turn is release day at the county gate: Knight comes out with a plastic bag and reaches for the keys, and she doesn't give them up, because she's been driving this whole time and she's starting to understand she can. It sets up "Cold Side of the Bed": a woman who can carry everything is about to learn what it costs to carry a man who won't set anything down.
 
 ## Voice Map
-- **Hazel:** sung 26 lines / rap 32 lines (45% sung). Her hardest rap on the album: clipped, double-time 16ths with triplet pockets on the numbers, chest voice, zero vibrato. The hooks go up into a gospel-belted alto, stacked on the last chorus.
-- **Guests:** Lil Tre, 8 lines (2 spoken, 6 rap), on the prison phone, grateful and cracking; Rook, 6 lines (spoken), intro and outro.
-- **Hazel share of all lines:** 81%
+- **Hazel:** sung 27 lines / rap 32 lines (46% sung). Her hardest rap on the album: clipped, double-time 16ths with triplet pockets on the numbers, chest voice, zero vibrato. The hooks go up into a gospel-belted alto, stacked on the last chorus.
+- **Guests:** Lil Tre, 8 lines (2 spoken, 6 rap), on the prison phone, grateful and cracking; Rook, 7 lines (spoken), intro and outro (Tre's letter to him).
+- **Hazel share of all lines:** 80%
 
 ## Suno Style Prompt
 ```
@@ -26,7 +26,7 @@ pop, EDM, rock, country, lo-fi, slow ballad, downtempo, chill, thin drums, weak 
 - **Bass:** Rolling 16th 808 on C1 with octave jumps to C2. WOMP 808 Glide: Mode Retrigger + Slide, Glide Time 40 ms, Glide Curve "808 (fast start)". Stutters via WOMP Rolls: Roll Target Single Note, Single Note 24 (C1), Roll Rate 1/32. WOMP Low End: Drive 65%, Punch 60%, Mono Below 120 Hz.
 - **Samples & Keys:** Horn stabs on the "and" of 4. Clav through Auto-Wah. WOMP Soul Chords: Key "C", Scale "Dorian (G-Funk)", Chord Style "Soul 9ths", Strum 8 ms.
 - **Street Gospel layer:** Gang chant answers "held it"; choir stacks and fast-Leslie B3 on the final chorus only.
-- **Arrangement map:** Intro 4 (Rook, gate buzz) → V1 16 → Pre 4 → Chorus 6 → V2 12 → Interlude 2 (call tone, drums out) → Tre V 8 (808 only, phone-filtered) → Chorus 6 → Bridge 4 (Rhodes, 808 whole notes) → V3 4 (full slam) → Final Chorus 6 → Outro 2 (Rook, engine).
+- **Arrangement map:** Intro 4 (Rook, gate buzz) → V1 16 → Pre 4 → Chorus 6 → V2 12 → Interlude 2 (call tone, drums out) → Tre V 8 (808 only, phone-filtered) → Chorus 6 → Bridge 5 (Rhodes, 808 whole notes) → V3 4 (full slam) → Final Chorus 6 → Outro 2 (Rook, engine).
 - **Vocal direction:** Hazel dry and forward on raps, punch-in doubles on numbers. Chorus 3rd above, octave whisper on "on my own." Tre: 300 Hz–3 kHz bandpass. Rook: dry, close, low-passed at 9 kHz, slight room.
 - **Mix note:** WOMP Dust on horns: Age 40%, Crackle 15%. Master −8 LUFS integrated, −1 dBTP.
 - **Suno tips:** Lead Persona = Hazel. Tags drive Tre and Rook; regenerate if a male voice takes the lead. Weirdness 38%, Style Influence 72%.
@@ -110,7 +110,8 @@ I held it down, and I held it alone.
 Release day, and the gate buzz like a monitor,
 He walk out with a plastic bag, two shirts and a Bible,
 He reach for my keys like the keys was always his,
-And for the first time in eleven months, I hesitate.
+And for the first time in eleven months, I hesitate,
+I jingle 'em once, and I shake my head slow.
 
 [Verse 4 - Hazel (rap)]
 Nah. Passenger side. You been gone, I been drivin',
