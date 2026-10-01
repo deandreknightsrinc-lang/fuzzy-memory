@@ -114,12 +114,13 @@ const synth = new Synth();
 synth.setMaster(settings.master);
 synth.sampleBase = 'samples/salamander/';
 
-// Auto: all 4 velocity layers (~245 MB decoded) on computers, 1 layer on phones and low-memory devices.
+// Auto: all 4 velocity layers (~360 MB decoded) on computers with 8 GB or more,
+// 1 layer (~90 MB) on phones and smaller machines.
 function resolvePianoQuality() {
   if (settings.pianoQuality !== 'auto') return settings.pianoQuality;
   const desktop = window.matchMedia?.('(pointer: fine)').matches;
   const memory = navigator.deviceMemory ?? 8;
-  return desktop && memory >= 4 ? 'high' : 'light';
+  return desktop && memory >= 8 ? 'high' : 'light';
 }
 synth.pianoQuality = resolvePianoQuality();
 
