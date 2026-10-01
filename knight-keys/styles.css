@@ -424,3 +424,4 @@ fieldset > label select { max-width: 60%; }
   .groove-grid { min-height: 150px; }
   .row-area.mid .panel[data-panel="drums"] { min-height: 420px; }
 }
+.hint a { color: var(--accent); }

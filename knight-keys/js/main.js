@@ -51,7 +51,7 @@ const DEFAULTS = {
   showWheels: true,
   showPedals: true,
   inputColor: '#4f8cff',
-  liveInstrument: 'piano',
+  liveInstrument: 'grand',
   liveMix: 1,
   split: {
     enabled: false,
@@ -100,12 +100,21 @@ const settings = {
   split: { ...DEFAULTS.split, ...(stored.split || {}) },
   groove: { ...DEFAULTS.groove, ...(stored.groove || {}) },
 };
+// Settings saved before the sampled grand existed: move "piano" players onto it.
+if (!stored.v || stored.v < 2) {
+  if (settings.liveInstrument === 'piano') settings.liveInstrument = 'grand';
+  settings.v = 2;
+}
 const saveSettings = () => save('kk.settings', settings);
 
 // ---- Core state ------------------------------------------------------------
 
 const synth = new Synth();
 synth.setMaster(settings.master);
+synth.sampleBase = 'samples/salamander/';
+synth.onSamplesState = (s) => {
+  if (s === 'failed') toast("Couldn't load the grand piano samples, so the synth piano is playing instead.");
+};
 const media = $('media');
 
 const state = {
