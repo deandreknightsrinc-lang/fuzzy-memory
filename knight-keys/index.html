@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Knight Keys</title>
+  <meta name="description" content="Knight Keys — a MIDI learning studio: see chords, notes and pedals as you play or as MIDI, audio and video lessons play back." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand" title="Knight Keys">
+      <span class="logo" aria-hidden="true">♞</span>
+      <span>Knight Keys</span>
+    </div>
+
+    <div class="group">
+      <button id="btnOpen" class="primary" title="Open MIDI, audio, video or lesson files (or drop them anywhere)">Open…</button>
+      <input id="fileInput" type="file" multiple hidden
+             accept=".mid,.midi,.kar,.rmi,.klesson,.json,audio/*,video/*" />
+      <button id="btnSaveLesson" title="Save MIDI + media + loops + settings as one .klesson file">Save lesson</button>
+      <span id="songTitle" class="song-title">No file loaded</span>
+    </div>
+
+    <div class="group">
+      <label class="field">Key
+        <select id="keySel"></select>
+      </label>
+      <label class="field">Spell
+        <select id="spellSel">
+          <option value="auto">By key</option>
+          <option value="sharps">Sharps ♯</option>
+          <option value="flats">Flats ♭</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="group right">
+      <details class="menu" id="viewMenu">
+        <summary>View</summary>
+        <div class="menu-body">
+          <div class="menu-title">Layouts</div>
+          <div class="row wrap">
+            <button data-layout="full">Everything</button>
+            <button data-layout="keys">Keyboard</button>
+            <button data-layout="score">Score + keys</button>
+            <button data-layout="video">Video lesson</button>
+            <button data-layout="drums">Play along</button>
+          </div>
+          <div class="menu-title">Panels</div>
+          <div id="panelToggles" class="checks"></div>
+          <div class="row">
+            <button id="btnResetLayout">Reset layout</button>
+            <button id="btnFullscreen">Fullscreen</button>
+          </div>
+        </div>
+      </details>
+      <button id="btnSettings">Settings</button>
+      <button id="btnPanic" class="danger" title="Stop all stuck notes">Panic</button>
+      <label class="field master" title="Master volume">🔊
+        <input id="master" type="range" min="0" max="1" step="0.01" value="0.8" />
+      </label>
+    </div>
+  </header>
+
+  <main id="workspace">
+    <div class="row-area top">
+      <section class="panel" data-panel="score" data-title="Score" style="flex:2">
+        <div class="panel-body"><canvas id="staffCanvas"></canvas></div>
+      </section>
+      <section class="panel" data-panel="chord" data-title="Chord" style="flex:1.2">
+        <div class="panel-body chord-body">
+          <div id="chordName" class="chord-name">—</div>
+          <div id="chordInversion" class="chord-sub"></div>
+          <div id="chordNotes" class="chord-notes"></div>
+          <div id="chordSolfege" class="chord-solfege"></div>
+          <div id="chordHistory" class="chord-history" title="Recent chords"></div>
+        </div>
+      </section>
+    </div>
+    <div class="row-area mid">
+      <section class="panel" data-panel="mixer" data-title="MIDI channels" style="flex:1.4">
+        <div class="panel-body scroll"><div id="mixer" class="mixer"></div></div>
+      </section>
+      <section class="panel" data-panel="drums" data-title="Drums &amp; grooves" style="flex:2">
+        <div class="panel-body drums-body">
+          <div class="groove-bar">
+            <select id="grooveSel" title="Groove"></select>
+            <button id="grooveStart" class="toggle" title="Start / stop the groove (G)">▶ Groove</button>
+            <button id="grooveFill" title="Play a fill in place of the next bar (F)">Fill</button>
+            <label class="field" title="Groove tempo">BPM <input id="grooveBpm" type="number" min="40" max="240" step="1" /></label>
+            <button id="grooveMatch" class="mini" title="Match the loaded song's tempo">= song</button>
+            <label class="field" title="Follow the loaded song's beat: tempo changes, the tempo slider, loops and seeking"><input id="grooveLock" type="checkbox" /> Lock to song</label>
+            <select id="grooveIntensity" title="How busy the drummer plays">
+              <option value="full">Full</option>
+              <option value="light">Light (no ghost notes)</option>
+            </select>
+            <select id="grooveAutoFill" title="Automatic fills">
+              <option value="0">No auto fills</option>
+              <option value="4">Fill every 4 bars</option>
+              <option value="8">Fill every 8 bars</option>
+            </select>
+            <label class="field" title="Groove volume">🔊 <input id="grooveVol" type="range" min="0" max="1.5" step="0.01" /></label>
+          </div>
+          <div class="drums-main">
+            <div id="pads" class="pads"></div>
+            <div class="groove-grid"><canvas id="grooveCanvas"></canvas></div>
+          </div>
+          <p id="grooveInfo" class="groove-info"></p>
+        </div>
+      </section>
+      <section class="panel" data-panel="media" data-title="Video / audio" style="flex:1.4">
+        <div class="panel-body media-body">
+          <video id="media" playsinline></video>
+          <div id="mediaEmpty" class="empty">Load an audio or video file to play it here. Load a MIDI file too and they play in sync as a lesson.</div>
+          <div id="mediaAudioLabel" class="audio-label" hidden></div>
+        </div>
+      </section>
+      <section class="panel" data-panel="loops" data-title="Loop points" style="flex:0.9">
+        <div class="panel-body scroll">
+          <div class="loops-tools">
+            <button id="btnAddLoop" title="Save the current A–B range">+ Save A–B loop</button>
+          </div>
+          <ol id="loopList" class="loop-list"></ol>
+          <p class="hint">Set A and B in the transport bar, then save. Click a loop to practice it. Double-click to rename.</p>
+        </div>
+      </section>
+    </div>
+    <div class="row-area bottom">
+      <section class="panel" data-panel="keyboard" data-title="Keyboard" style="flex:1">
+        <div class="panel-body"><canvas id="keysCanvas" class="keys-canvas"></canvas></div>
+      </section>
+      <section class="panel" data-panel="controls" data-title="Wheels & pedals" style="flex:0 0 260px">
+        <div class="panel-body"><canvas id="ctrlCanvas"></canvas></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="transport">
+    <div class="group">
+      <button id="btnRec" class="rec" title="Record your MIDI playing (synced to the media if one is loaded)">● Rec</button>
+      <button id="btnA" title="Set loop start (A) at the current time">A</button>
+      <button id="btnB" title="Set loop end (B) at the current time">B</button>
+      <button id="btnLoop" class="toggle" title="Loop between A and B">⟲ Loop</button>
+      <span id="loopLabel" class="mono small"></span>
+    </div>
+    <div class="group center">
+      <button id="btnBack" title="Back 5 s">⏪</button>
+      <button id="btnPlay" class="play" title="Play / pause (Space)">▶</button>
+      <button id="btnStop" title="Stop">■</button>
+      <button id="btnFwd" title="Forward 5 s">⏩</button>
+      <span id="timeNow" class="mono">0:00</span>
+      <input id="scrub" type="range" min="0" max="1000" value="0" step="1" />
+      <span id="timeTotal" class="mono">0:00</span>
+    </div>
+    <div class="group">
+      <label class="field" title="Playback speed">Tempo
+        <input id="tempo" type="range" min="25" max="200" value="100" step="1" />
+        <span id="tempoLabel" class="mono small">100%</span>
+      </label>
+      <span class="field" title="Transpose MIDI playback (semitones)">Pitch
+        <button id="trDown" class="mini">−</button>
+        <span id="transposeLabel" class="mono small">0</span>
+        <button id="trUp" class="mini">+</button>
+      </span>
+      <label class="field" title="Keep the original pitch of audio/video when slowing down">
+        <input id="keepPitch" type="checkbox" checked /> Keep pitch
+      </label>
+      <button id="btnSplit" class="toggle" title="Split the keyboard into left/right hands">Split</button>
+    </div>
+  </footer>
+
+  <dialog id="settingsDlg">
+    <form method="dialog" class="settings">
+      <header class="dlg-head">
+        <h2>Settings</h2>
+        <button value="close" class="mini" aria-label="Close">✕</button>
+      </header>
+      <div class="settings-grid">
+        <fieldset>
+          <legend>MIDI</legend>
+          <label>Input device <select id="midiIn"></select></label>
+          <label>Output device <select id="midiOut"></select></label>
+          <label class="check"><input type="checkbox" id="fwdInput" /> Send my playing to the output</label>
+          <label class="check"><input type="checkbox" id="fwdPlayback" /> Send file playback to the output</label>
+          <label class="check"><input type="checkbox" id="internalSynth" /> Use built-in sounds</label>
+          <label class="check"><input type="checkbox" id="lessonMidiSound" /> Sound MIDI during audio/video lessons</label>
+          <p id="midiStatus" class="hint"></p>
+          <p class="hint">Want your own plugins (Keyscape, Kontakt…)? Pick a virtual MIDI port (IAC Driver on Mac, loopMIDI on Windows) as the output and load the plugin in your DAW.</p>
+        </fieldset>
+        <fieldset>
+          <legend>Keyboard</legend>
+          <label>Size
+            <select id="kbRange">
+              <option value="88">88 keys</option>
+              <option value="76">76 keys</option>
+              <option value="61">61 keys</option>
+              <option value="49">49 keys</option>
+              <option value="37">37 keys</option>
+              <option value="25">25 keys</option>
+            </select>
+          </label>
+          <label>View octave shift <input type="number" id="kbShift" min="-3" max="3" step="1" /></label>
+          <label>Style
+            <select id="kbStyle">
+              <option value="vector">Vector (crisp at any size)</option>
+              <option value="real">Realistic</option>
+            </select>
+          </label>
+          <label>Key labels
+            <select id="kbLabels">
+              <option value="none">None</option>
+              <option value="names">Note names</option>
+              <option value="solfege">Solfège</option>
+            </select>
+          </label>
+          <label class="check"><input type="checkbox" id="cMarkers" /> Show C markers</label>
+          <label class="check"><input type="checkbox" id="sustainHold" /> Keep keys lit while sustain is held</label>
+          <label class="check"><input type="checkbox" id="showWheels" /> Show pitch & mod wheels</label>
+          <label class="check"><input type="checkbox" id="showPedals" /> Show pedals</label>
+          <label>My playing color <input type="color" id="inputColor" /></label>
+          <label>My sound
+            <select id="liveInstrument" class="preset-select"></select>
+          </label>
+        </fieldset>
+        <fieldset>
+          <legend>Split</legend>
+          <label>Split point
+            <select id="splitPoint"></select>
+          </label>
+          <label>Left color <input type="color" id="leftColor" /></label>
+          <label>Right color <input type="color" id="rightColor" /></label>
+          <label>Left octave <input type="number" id="leftOctave" min="-3" max="3" step="1" /></label>
+          <label>Right octave <input type="number" id="rightOctave" min="-3" max="3" step="1" /></label>
+          <label class="check"><input type="checkbox" id="splitSound" /> Different sound on the left</label>
+          <label>Left sound
+            <select id="leftInstrument" class="preset-select"></select>
+          </label>
+        </fieldset>
+        <fieldset>
+          <legend>Theory &amp; display</legend>
+          <label>Solfège
+            <select id="solfegeMode">
+              <option value="off">Off</option>
+              <option value="fixed">Fixed Do (Do = C, Si)</option>
+              <option value="movable">Movable Do (Do = key, Ti)</option>
+            </select>
+          </label>
+          <label>Chords from
+            <select id="chordSource">
+              <option value="all">Everything sounding</option>
+              <option value="input">My playing only</option>
+              <option value="playback">File playback only</option>
+            </select>
+          </label>
+          <label>Workspace background <input type="color" id="workspaceBg" /></label>
+          <p class="hint">Tip: set the background to pure green (#00ff00) to key it out in OBS for YouTube or Zoom lessons.</p>
+          <label>Lesson MIDI offset (s) <input type="number" id="lessonOffset" step="0.01" /></label>
+          <p class="hint">Computer keys: A W S E D F T G Y H U J K O L P ; ' play notes, Z / X change octave, Shift = sustain, Space = play/pause, G = groove on/off, F = fill.</p>
+        </fieldset>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+  <div id="dropOverlay" class="drop-overlay" hidden>Drop MIDI, audio, video or .klesson files</div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

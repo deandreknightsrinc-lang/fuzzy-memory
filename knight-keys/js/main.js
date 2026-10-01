@@ -1,0 +1,1959 @@
+// Knight Keys — app wiring: MIDI I/O, files, transport, panels and rendering.
+import { parseMidi, buildSong, writeMidi } from './midi-file.js';
+import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_CHANNEL } from './synth.js';
+import { Player } from './player.js';
+import { KeyboardView, drawStaff, drawControllers, drawGroove } from './render.js';
+import { detectChord, noteName, pcName, solfege, keyName } from './theory.js';
+import { createDemoMidi } from './demo.js';
+import { GROOVES, GroovePlayer } from './grooves.js';
+
+const $ = (id) => document.getElementById(id);
+
+const GM_NAMES = (
+  'Acoustic Grand Piano|Bright Acoustic Piano|Electric Grand Piano|Honky-tonk Piano|Electric Piano 1|Electric Piano 2|Harpsichord|Clavinet|' +
+  'Celesta|Glockenspiel|Music Box|Vibraphone|Marimba|Xylophone|Tubular Bells|Dulcimer|' +
+  'Drawbar Organ|Percussive Organ|Rock Organ|Church Organ|Reed Organ|Accordion|Harmonica|Tango Accordion|' +
+  'Nylon Guitar|Steel Guitar|Jazz Guitar|Clean Guitar|Muted Guitar|Overdriven Guitar|Distortion Guitar|Guitar Harmonics|' +
+  'Acoustic Bass|Fingered Bass|Picked Bass|Fretless Bass|Slap Bass 1|Slap Bass 2|Synth Bass 1|Synth Bass 2|' +
+  'Violin|Viola|Cello|Contrabass|Tremolo Strings|Pizzicato Strings|Orchestral Harp|Timpani|' +
+  'String Ensemble 1|String Ensemble 2|Synth Strings 1|Synth Strings 2|Choir Aahs|Voice Oohs|Synth Voice|Orchestra Hit|' +
+  'Trumpet|Trombone|Tuba|Muted Trumpet|French Horn|Brass Section|Synth Brass 1|Synth Brass 2|' +
+  'Soprano Sax|Alto Sax|Tenor Sax|Baritone Sax|Oboe|English Horn|Bassoon|Clarinet|' +
+  'Piccolo|Flute|Recorder|Pan Flute|Blown Bottle|Shakuhachi|Whistle|Ocarina|' +
+  'Square Lead|Saw Lead|Calliope Lead|Chiff Lead|Charang Lead|Voice Lead|Fifths Lead|Bass + Lead|' +
+  'New Age Pad|Warm Pad|Polysynth Pad|Choir Pad|Bowed Pad|Metallic Pad|Halo Pad|Sweep Pad|' +
+  'Rain FX|Soundtrack FX|Crystal FX|Atmosphere FX|Brightness FX|Goblins FX|Echoes FX|Sci-fi FX|' +
+  'Sitar|Banjo|Shamisen|Koto|Kalimba|Bagpipe|Fiddle|Shanai|' +
+  'Tinkle Bell|Agogo|Steel Drums|Woodblock|Taiko Drum|Melodic Tom|Synth Drum|Reverse Cymbal|' +
+  'Guitar Fret Noise|Breath Noise|Seashore|Bird Tweet|Telephone Ring|Helicopter|Applause|Gunshot'
+).split('|');
+
+const CHANNEL_COLORS = [
+  '#4f8cff', '#ff7a45', '#36cfc9', '#f759ab', '#9254de', '#fadb14', '#73d13d', '#ff4d4f',
+  '#40a9ff', '#ffa940', '#5cdbd3', '#ff85c0', '#b37feb', '#d3f261', '#95de64', '#ff9c6e',
+];
+
+const KB_RANGES = { 88: [21, 108], 76: [28, 103], 61: [36, 96], 49: [36, 84], 37: [48, 84], 25: [48, 72] };
+
+const DEFAULTS = {
+  inputId: 'all',
+  outputId: 'none',
+  fwdInput: false,
+  fwdPlayback: false,
+  internalSynth: true,
+  lessonMidiSound: false,
+  kbRange: '88',
+  kbShift: 0,
+  kbStyle: 'vector',
+  kbLabels: 'none',
+  cMarkers: true,
+  sustainHold: true,
+  showWheels: true,
+  showPedals: true,
+  inputColor: '#4f8cff',
+  liveInstrument: 'piano',
+  liveMix: 1,
+  split: {
+    enabled: false,
+    point: 60,
+    leftColor: '#ff7a45',
+    rightColor: '#36cfc9',
+    leftOctave: 0,
+    rightOctave: 0,
+    splitSound: false,
+    leftInstrument: 'bass',
+  },
+  solfege: 'off',
+  chordSource: 'all',
+  workspaceBg: '#0e0f13',
+  key: 'auto',
+  spelling: 'auto',
+  master: 0.8,
+  keepPitch: true,
+  lessonOffset: 0,
+  groove: { id: GROOVES[0].id, bpm: GROOVES[0].bpm, intensity: 'full', autoFill: 0, volume: 1, lock: true },
+};
+
+// ---- Persistence ---------------------------------------------------------
+
+function load(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function save(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* storage unavailable: settings just won't persist */
+  }
+}
+
+const stored = load('kk.settings', {});
+const settings = {
+  ...DEFAULTS,
+  ...stored,
+  split: { ...DEFAULTS.split, ...(stored.split || {}) },
+  groove: { ...DEFAULTS.groove, ...(stored.groove || {}) },
+};
+const saveSettings = () => save('kk.settings', settings);
+
+// ---- Core state ------------------------------------------------------------
+
+const synth = new Synth();
+synth.setMaster(settings.master);
+const media = $('media');
+
+const state = {
+  song: null,
+  midiBytes: null,
+  midiName: '',
+  mediaFile: null,
+  mediaUrl: null,
+  mediaReady: false,
+  lessonMode: false,
+  loop: { enabled: false, a: 0, b: 0 },
+  loops: [],
+  rate: 1,
+  transpose: 0,
+  chan: Array.from({ length: 16 }, (_, ch) => ({
+    mute: false,
+    solo: false,
+    color: CHANNEL_COLORS[ch],
+    mix: 1,
+    preset: '',
+    program: 0,
+  })),
+  recording: null,
+  lastRecording: null,
+};
+
+let dirty = true;
+const markDirty = () => (dirty = true);
+
+// ---- Display state (what is lit on screen) ------------------------------
+
+const sources = new Map(); // 'in' | channel number -> { down: Map(note->count), sustained: Set, sustain }
+const sourceOf = (id) => {
+  if (!sources.has(id)) sources.set(id, { down: new Map(), sustained: new Set(), sustain: false });
+  return sources.get(id);
+};
+const liveColor = new Map();
+const liveCtl = { bend: 0, mod: 0, sustain: false, sostenuto: false, soft: false };
+const playCtl = Array.from({ length: 16 }, () => ({ sustain: false, sostenuto: false, soft: false }));
+const lastWheel = { bend: 0, mod: 0 };
+
+function dNoteOn(id, note) {
+  const s = sourceOf(id);
+  s.down.set(note, (s.down.get(note) || 0) + 1);
+  s.sustained.delete(note);
+  markDirty();
+}
+
+function dNoteOff(id, note) {
+  const s = sourceOf(id);
+  const c = s.down.get(note);
+  if (!c) return;
+  if (c > 1) {
+    s.down.set(note, c - 1);
+  } else {
+    s.down.delete(note);
+    if (s.sustain) s.sustained.add(note);
+  }
+  markDirty();
+}
+
+function dSustain(id, on) {
+  const s = sourceOf(id);
+  s.sustain = on;
+  if (!on) s.sustained.clear();
+  markDirty();
+}
+
+function clearPlaybackDisplay() {
+  for (const [id, s] of sources) {
+    if (id === 'in') continue;
+    s.down.clear();
+    s.sustained.clear();
+    s.sustain = false;
+  }
+  playCtl.forEach((c) => Object.assign(c, { sustain: false, sostenuto: false, soft: false }));
+  markDirty();
+}
+
+function effectiveMute(ch) {
+  const anySolo = state.chan.some((c) => c.solo);
+  return state.chan[ch].mute || (anySolo && !state.chan[ch].solo);
+}
+
+function applyMutes() {
+  for (let ch = 0; ch < 16; ch++) synth.setMuted(ch, effectiveMute(ch));
+  markDirty();
+}
+
+function visibleChannels() {
+  const out = [];
+  for (let ch = 0; ch < 16; ch++) if (ch !== DRUM_CHANNEL && !effectiveMute(ch)) out.push(ch);
+  return out;
+}
+
+/** Color for a key, or null when unlit. */
+function keyState(note) {
+  const live = sourceOf('in');
+  if (live.down.has(note)) return { color: liveColor.get(note) || settings.inputColor };
+  const chans = visibleChannels();
+  for (const ch of chans) if (sources.get(ch)?.down.has(note)) return { color: state.chan[ch].color };
+  if (settings.sustainHold) {
+    if (live.sustained.has(note)) return { color: liveColor.get(note) || settings.inputColor, faded: true };
+    for (const ch of chans) if (sources.get(ch)?.sustained.has(note)) return { color: state.chan[ch].color, faded: true };
+  }
+  return null;
+}
+
+/** Notes for chord/staff display: [{ midi, color }]. */
+function soundingNotes(which = settings.chordSource) {
+  const out = new Map();
+  const take = (id, color) => {
+    const s = sources.get(id);
+    if (!s) return;
+    for (const n of s.down.keys()) if (!out.has(n)) out.set(n, typeof color === 'function' ? color(n) : color);
+    if (settings.sustainHold) for (const n of s.sustained) if (!out.has(n)) out.set(n, typeof color === 'function' ? color(n) : color);
+  };
+  if (which !== 'playback') take('in', (n) => liveColor.get(n) || settings.inputColor);
+  if (which !== 'input') for (const ch of visibleChannels()) take(ch, state.chan[ch].color);
+  return [...out].map(([midi, color]) => ({ midi, color })).sort((a, b) => a.midi - b.midi);
+}
+
+const keySf = () => (settings.key === 'auto' ? state.song?.keySig?.sf ?? 0 : Number(settings.key));
+const keyMinor = () => (settings.key === 'auto' ? !!state.song?.keySig?.minor : false);
+const solfegeMode = () => (settings.solfege === 'off' ? 'fixed' : settings.solfege);
+
+// ---- Visual event queue (keeps lights in sync with scheduled audio) ------
+
+// Kept sorted by time: the song player and the groove player both feed it.
+let visualQueue = [];
+function atTime(t, fn, groove = false) {
+  let i = visualQueue.length;
+  while (i > 0 && visualQueue[i - 1].t > t) i--;
+  visualQueue.splice(i, 0, { t, fn, groove });
+}
+
+// ---- MIDI output ---------------------------------------------------------
+
+let midiAccess = null;
+let midiOut = null;
+
+function sendOut(bytes, at) {
+  if (!midiOut) return;
+  try {
+    const delay = at === undefined || !synth.ctx ? 0 : Math.max(0, (at - synth.now) * 1000);
+    midiOut.send(bytes, performance.now() + delay);
+  } catch {
+    /* device went away */
+  }
+}
+
+function outputAllOff() {
+  if (!midiOut) return;
+  try {
+    midiOut.clear?.();
+  } catch {
+    /* not supported */
+  }
+  for (let ch = 0; ch < 16; ch++) {
+    sendOut([0xb0 | ch, 64, 0]);
+    sendOut([0xb0 | ch, 123, 0]);
+  }
+}
+
+// ---- Player --------------------------------------------------------------
+
+const playbackSound = () => settings.internalSynth && (!state.lessonMode || settings.lessonMidiSound);
+
+const player = new Player({
+  now: () => synth.now,
+  noteOn(ch, note, vel, at) {
+    if (playbackSound()) synth.noteOn(ch, note, vel, at);
+    if (settings.fwdPlayback) sendOut([0x90 | ch, note, vel], at);
+    atTime(at, () => {
+      dNoteOn(ch, note);
+      if (ch === DRUM_CHANNEL && !effectiveMute(ch)) flashPad(note, vel);
+    });
+  },
+  noteOff(ch, note, at) {
+    if (playbackSound()) synth.noteOff(ch, note, at);
+    if (settings.fwdPlayback) sendOut([0x80 | ch, note, 0], at);
+    atTime(at, () => dNoteOff(ch, note));
+  },
+  control(ch, cc, value, at) {
+    synth.control(ch, cc, value, at);
+    if (settings.fwdPlayback) sendOut([0xb0 | ch, cc, value], at);
+    if (cc === 64 || cc === 66 || cc === 67 || cc === 1) {
+      atTime(at, () => {
+        const on = value >= 64;
+        if (cc === 64) {
+          playCtl[ch].sustain = on;
+          dSustain(ch, on);
+        } else if (cc === 66) playCtl[ch].sostenuto = on;
+        else if (cc === 67) playCtl[ch].soft = on;
+        else lastWheel.mod = value / 127;
+        markDirty();
+      });
+    }
+  },
+  program(ch, program, at) {
+    synth.program(ch, program);
+    if (settings.fwdPlayback) sendOut([0xc0 | ch, program], at);
+    atTime(at, () => {
+      if (state.chan[ch].program !== program) {
+        state.chan[ch].program = program;
+        updateMixerNames();
+      }
+    });
+  },
+  pitch(ch, value, at) {
+    synth.pitchBend(ch, value, at);
+    if (settings.fwdPlayback) {
+      const v = value + 8192;
+      sendOut([0xe0 | ch, v & 0x7f, v >> 7], at);
+    }
+    atTime(at, () => {
+      lastWheel.bend = value / 8192;
+      markDirty();
+    });
+  },
+  allNotesOff(at) {
+    synth.allNotesOff(at);
+    if (settings.fwdPlayback) outputAllOff();
+    // A locked groove stops with the song; a free-running one keeps going.
+    if (groove.locked) synth.cancelOneShots(at, GROOVE_CHANNEL);
+    visualQueue = visualQueue.filter((e) => e.t < at || (e.groove && !groove.locked));
+    atTime(at, clearPlaybackDisplay);
+  },
+  span(from, to, ctxAt) {
+    if (groove.locked && state.song) groove.scheduleSpan(from, to, ctxAt, state.song);
+  },
+  onEnd() {
+    markDirty();
+  },
+});
+player.loop = state.loop;
+
+// ---- Live input ------------------------------------------------------------
+
+const liveMap = new Map(); // physical note -> { note, ch }
+
+function record(bytes, note) {
+  const r = state.recording;
+  if (!r) return;
+  const time = r.media ? media.currentTime + Number(settings.lessonOffset || 0) : (performance.now() - r.t0) / 1000;
+  const b = [...bytes];
+  if (note !== undefined) b[1] = note;
+  r.events.push({ time, bytes: b });
+}
+
+function handleLive(bytes) {
+  const st = bytes[0];
+  if (st >= 0xf0) return; // clock, active sensing, sysex
+  const type = st & 0xf0;
+  const d1 = bytes[1] ?? 0;
+  const d2 = bytes[2] ?? 0;
+  // Channel 10 is drums (pad controllers, e-kits): play the drum sounds and light the pads.
+  if ((st & 0x0f) === DRUM_CHANNEL && (type === 0x90 || type === 0x80)) {
+    if (type === 0x90 && d2 > 0) liveDrum(d1, d2);
+    return;
+  }
+  if (type === 0x90 && d2 > 0) liveOn(d1, d2);
+  else if (type === 0x80 || type === 0x90) liveOff(d1);
+  else if (type === 0xb0) liveCC(d1, d2);
+  else if (type === 0xe0) {
+    const v = ((d2 << 7) | d1) - 8192;
+    synth.pitchBend(LIVE_CHANNEL, v);
+    synth.pitchBend(LIVE_LEFT_CHANNEL, v);
+    liveCtl.bend = v / 8192;
+    lastWheel.bend = liveCtl.bend;
+    record(bytes);
+    if (settings.fwdInput) sendOut(bytes);
+    markDirty();
+  }
+}
+
+function liveOn(n, vel) {
+  synth.ensure();
+  if (liveMap.has(n)) liveOff(n);
+  const sp = settings.split;
+  const left = sp.enabled && n < sp.point;
+  const shift = sp.enabled ? 12 * (left ? sp.leftOctave : sp.rightOctave) : 0;
+  const note = Math.max(0, Math.min(127, n + shift));
+  const ch = left && sp.splitSound ? LIVE_LEFT_CHANNEL : LIVE_CHANNEL;
+  liveMap.set(n, { note, ch });
+  if (settings.internalSynth) synth.noteOn(ch, note, vel);
+  if (settings.fwdInput) sendOut([0x90, note, vel]);
+  record([0x90, note, vel]);
+  liveColor.set(note, sp.enabled ? (left ? sp.leftColor : sp.rightColor) : settings.inputColor);
+  dNoteOn('in', note);
+}
+
+function liveOff(n) {
+  const m = liveMap.get(n);
+  if (!m) return;
+  liveMap.delete(n);
+  synth.noteOff(m.ch, m.note);
+  if (settings.fwdInput) sendOut([0x80, m.note, 0]);
+  record([0x80, m.note, 0]);
+  dNoteOff('in', m.note);
+}
+
+function liveCC(cc, value) {
+  synth.ensure();
+  synth.control(LIVE_CHANNEL, cc, value);
+  synth.control(LIVE_LEFT_CHANNEL, cc, value);
+  if (settings.fwdInput) sendOut([0xb0, cc, value]);
+  record([0xb0, cc, value]);
+  const on = value >= 64;
+  if (cc === 64) {
+    liveCtl.sustain = on;
+    dSustain('in', on);
+  } else if (cc === 66) liveCtl.sostenuto = on;
+  else if (cc === 67) liveCtl.soft = on;
+  else if (cc === 1) {
+    liveCtl.mod = value / 127;
+    lastWheel.mod = liveCtl.mod;
+  } else if (cc === 120 || cc === 123) liveAllOff();
+  markDirty();
+}
+
+function liveAllOff() {
+  for (const n of [...liveMap.keys()]) liveOff(n);
+}
+
+// Web MIDI
+async function initMidi() {
+  const status = $('midiStatus');
+  if (!navigator.requestMIDIAccess) {
+    status.textContent = 'This browser has no Web MIDI. Use Chrome, Edge, Opera or Firefox to connect a keyboard. Mouse and computer keys still work.';
+    fillDeviceSelects();
+    return;
+  }
+  try {
+    midiAccess = await navigator.requestMIDIAccess({ sysex: false });
+    midiAccess.onstatechange = () => fillDeviceSelects();
+    fillDeviceSelects();
+  } catch (err) {
+    status.textContent = `MIDI access was blocked (${err.message || err.name}). Allow MIDI for this site to use a keyboard.`;
+    fillDeviceSelects();
+  }
+}
+
+function fillDeviceSelects() {
+  const inSel = $('midiIn');
+  const outSel = $('midiOut');
+  const inputs = midiAccess ? [...midiAccess.inputs.values()] : [];
+  const outputs = midiAccess ? [...midiAccess.outputs.values()] : [];
+  inSel.innerHTML = '';
+  inSel.append(new Option('All inputs', 'all'), new Option('None', 'none'));
+  for (const i of inputs) inSel.append(new Option(i.name, i.id));
+  inSel.value = [...inSel.options].some((o) => o.value === settings.inputId) ? settings.inputId : 'all';
+  outSel.innerHTML = '';
+  outSel.append(new Option('None', 'none'));
+  for (const o of outputs) outSel.append(new Option(o.name, o.id));
+  outSel.value = [...outSel.options].some((o) => o.value === settings.outputId) ? settings.outputId : 'none';
+
+  for (const i of inputs) {
+    i.onmidimessage = inSel.value === 'all' || inSel.value === i.id ? (e) => handleLive(e.data) : null;
+  }
+  midiOut = outSel.value === 'none' ? null : midiAccess.outputs.get(outSel.value) || null;
+  if (midiAccess) {
+    const names = inputs.map((i) => i.name).join(', ');
+    $('midiStatus').textContent = inputs.length ? `Connected: ${names}` : 'No MIDI keyboard found. Plug one in — it appears here automatically.';
+  }
+}
+
+// Computer keyboard
+const KEYMAP = {
+  KeyA: 0, KeyW: 1, KeyS: 2, KeyE: 3, KeyD: 4, KeyF: 5, KeyT: 6, KeyG: 7, KeyY: 8, KeyH: 9,
+  KeyU: 10, KeyJ: 11, KeyK: 12, KeyO: 13, KeyL: 14, KeyP: 15, Semicolon: 16, Quote: 17,
+};
+let kbOctave = 0;
+const kbDown = new Map();
+
+function typingTarget(e) {
+  const t = e.target;
+  return t instanceof HTMLInputElement || t instanceof HTMLSelectElement || t instanceof HTMLTextAreaElement || $('settingsDlg').open;
+}
+
+window.addEventListener('keydown', (e) => {
+  if (typingTarget(e) || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.code === 'Space' && e.target instanceof HTMLButtonElement) return; // native button activation
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (!e.repeat) togglePlay();
+    return;
+  }
+  if (e.repeat) return;
+  if (e.code === 'KeyG' && !e.shiftKey) {
+    toggleGroove();
+    return;
+  }
+  if (e.code === 'KeyF' && groove.playing) {
+    groove.fill();
+    toast('Fill coming up');
+    return;
+  }
+  if (e.code === 'KeyZ') {
+    kbOctave = Math.max(-4, kbOctave - 1);
+    toast(`Computer keys: C${4 + kbOctave}`);
+  } else if (e.code === 'KeyX') {
+    kbOctave = Math.min(4, kbOctave + 1);
+    toast(`Computer keys: C${4 + kbOctave}`);
+  } else if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
+    liveCC(64, 127);
+  } else if (e.code in KEYMAP) {
+    const n = 60 + kbOctave * 12 + KEYMAP[e.code];
+    kbDown.set(e.code, n);
+    liveOn(n, 96);
+  }
+});
+
+window.addEventListener('keyup', (e) => {
+  if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
+    if (liveCtl.sustain) liveCC(64, 0);
+  } else if (kbDown.has(e.code)) {
+    liveOff(kbDown.get(e.code));
+    kbDown.delete(e.code);
+  }
+});
+
+window.addEventListener('blur', () => {
+  for (const n of kbDown.values()) liveOff(n);
+  kbDown.clear();
+});
+
+// Mouse / touch on the keyboard
+const keyboard = new KeyboardView($('keysCanvas'));
+const pointerNotes = new Map();
+$('keysCanvas').addEventListener('pointerdown', (e) => {
+  const r = e.currentTarget.getBoundingClientRect();
+  const note = keyboard.noteAt(e.clientX - r.left, e.clientY - r.top);
+  if (note === null) return;
+  e.currentTarget.setPointerCapture(e.pointerId);
+  const vel = Math.round(50 + 70 * Math.min(1, (e.clientY - r.top) / r.height));
+  pointerNotes.set(e.pointerId, note);
+  liveOn(note, vel);
+});
+$('keysCanvas').addEventListener('pointermove', (e) => {
+  if (!pointerNotes.has(e.pointerId)) return;
+  const r = e.currentTarget.getBoundingClientRect();
+  const note = keyboard.noteAt(e.clientX - r.left, e.clientY - r.top);
+  const prev = pointerNotes.get(e.pointerId);
+  if (note !== null && note !== prev) {
+    liveOff(prev);
+    pointerNotes.set(e.pointerId, note);
+    liveOn(note, 90);
+  }
+});
+const pointerEnd = (e) => {
+  if (!pointerNotes.has(e.pointerId)) return;
+  liveOff(pointerNotes.get(e.pointerId));
+  pointerNotes.delete(e.pointerId);
+};
+$('keysCanvas').addEventListener('pointerup', pointerEnd);
+$('keysCanvas').addEventListener('pointercancel', pointerEnd);
+
+// ---- Files -------------------------------------------------------------------
+
+const MIDI_EXT = /\.(mid|midi|kar|rmi|smf)$/i;
+const LESSON_EXT = /\.(klesson|json)$/i;
+const MEDIA_EXT = /\.(mp3|wav|m4a|aac|ogg|oga|opus|flac|mp4|m4v|mov|webm|mkv)$/i;
+
+async function handleFiles(files) {
+  for (const file of files) {
+    try {
+      if (LESSON_EXT.test(file.name)) await loadLesson(JSON.parse(await file.text()));
+      else if (MIDI_EXT.test(file.name) || file.type === 'audio/midi' || file.type === 'audio/x-midi') {
+        loadMidiBytes(new Uint8Array(await file.arrayBuffer()), file.name);
+      } else if (file.type.startsWith('audio/') || file.type.startsWith('video/') || MEDIA_EXT.test(file.name)) {
+        loadMedia(file);
+      } else {
+        toast(`Can't open ${file.name} — use MIDI, audio, video or .klesson files.`);
+      }
+    } catch (err) {
+      console.error(err);
+      toast(`Couldn't open ${file.name}: ${err.message}`);
+    }
+  }
+}
+
+function resetChannels() {
+  for (let ch = 0; ch < 16; ch++) {
+    Object.assign(synth.channels[ch], { program: 0, volume: 100, expression: 127, pan: 64, bend: 0, sustain: false });
+    synth.updateChannelGain(ch);
+  }
+}
+
+function loadMidiBytes(bytes, name, { keepLoops = false } = {}) {
+  const song = buildSong(parseMidi(bytes));
+  synth.ensure();
+  player.load(null);
+  resetChannels();
+  clearPlaybackDisplay();
+  state.song = song;
+  state.midiBytes = bytes;
+  state.midiName = name.replace(/\.[^.]+$/, '');
+  for (let ch = 0; ch < 16; ch++) {
+    const p = Math.max(0, song.firstProgram[ch]);
+    state.chan[ch].program = p;
+    synth.program(ch, p);
+    synth.setPresetOverride(ch, state.chan[ch].preset);
+  }
+  if (!keepLoops) {
+    state.loops = [];
+    Object.assign(state.loop, { enabled: false, a: 0, b: 0 });
+  }
+  player.load(song);
+  player.transpose = state.transpose;
+  player.setRate(state.rate);
+  updateLessonMode();
+  buildMixer();
+  renderLoops();
+  updateTitle();
+  fillKeySelect();
+  updateGrooveLock();
+  markDirty();
+}
+
+function loadMedia(file) {
+  ejectMedia(false);
+  state.mediaFile = file;
+  state.mediaUrl = URL.createObjectURL(file);
+  state.mediaReady = false;
+  const isVideo = file.type.startsWith('video/') || /\.(mp4|m4v|mov|webm|mkv)$/i.test(file.name);
+  const body = media.parentElement;
+  body.classList.toggle('has-video', isVideo);
+  $('mediaEmpty').hidden = true;
+  $('mediaAudioLabel').hidden = isVideo;
+  $('mediaAudioLabel').textContent = `♪ ${file.name}`;
+  media.src = state.mediaUrl;
+  media.load();
+  applyRate();
+  showPanel('media', true);
+  updateTitle();
+}
+
+media.addEventListener('loadedmetadata', () => {
+  state.mediaReady = true;
+  if (media.videoWidth > 0) {
+    media.parentElement.classList.add('has-video');
+    $('mediaAudioLabel').hidden = true;
+  }
+  applyRate();
+  updateLessonMode();
+  markDirty();
+});
+media.addEventListener('error', () => {
+  if (state.mediaFile) toast(`This browser can't play ${state.mediaFile.name}.`);
+});
+
+function ejectMedia(update = true) {
+  media.pause();
+  media.removeAttribute('src');
+  media.load();
+  if (state.mediaUrl) URL.revokeObjectURL(state.mediaUrl);
+  Object.assign(state, { mediaFile: null, mediaUrl: null, mediaReady: false });
+  media.parentElement.classList.remove('has-video');
+  $('mediaEmpty').hidden = false;
+  $('mediaAudioLabel').hidden = true;
+  if (update) {
+    updateLessonMode();
+    updateTitle();
+  }
+}
+
+function ejectMidi() {
+  player.load(null);
+  clearPlaybackDisplay();
+  Object.assign(state, { song: null, midiBytes: null, midiName: '' });
+  updateLessonMode();
+  buildMixer();
+  updateTitle();
+  fillKeySelect();
+  updateGrooveLock();
+}
+
+function updateLessonMode() {
+  const lesson = !!state.song && !!state.mediaFile;
+  if (lesson !== state.lessonMode || player.follow !== lesson) {
+    state.lessonMode = lesson;
+    player.setFollow(lesson);
+    if (lesson) player.seek(media.currentTime + Number(settings.lessonOffset || 0));
+  }
+}
+
+function updateTitle() {
+  const el = $('songTitle');
+  el.innerHTML = '';
+  const chip = (icon, text, onEject) => {
+    const s = document.createElement('span');
+    s.textContent = `${icon} ${text} `;
+    const b = document.createElement('button');
+    b.className = 'mini';
+    b.textContent = '✕';
+    b.title = 'Close';
+    b.onclick = onEject;
+    s.append(b, ' ');
+    el.append(s);
+  };
+  if (state.song) chip('🎹', state.song.title || state.midiName, ejectMidi);
+  if (state.mediaFile) chip(state.mediaFile.type.startsWith('video') ? '🎬' : '🎧', state.mediaFile.name, () => ejectMedia());
+  if (!state.song && !state.mediaFile) {
+    el.textContent = 'No file loaded · ';
+    const demo = document.createElement('button');
+    demo.className = 'mini';
+    demo.textContent = 'Try the demo';
+    demo.onclick = () => loadMidiBytes(createDemoMidi(), 'Demo.mid');
+    el.append(demo);
+  }
+  el.title = el.textContent;
+}
+
+// Lessons (.klesson = MIDI + media + loops + settings in one file)
+function toB64(u8) {
+  let s = '';
+  for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+
+function fromB64(str) {
+  const bin = atob(str);
+  const u8 = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  return u8;
+}
+
+function download(data, filename, type) {
+  const url = URL.createObjectURL(new Blob([data], { type }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+async function saveLesson() {
+  if (!state.song && !state.mediaFile) {
+    toast('Load a MIDI and/or media file first.');
+    return;
+  }
+  const lesson = {
+    app: 'knight-keys',
+    version: 1,
+    title: state.song?.title || state.midiName || state.mediaFile?.name || 'Lesson',
+    midi: state.midiBytes ? toB64(state.midiBytes) : null,
+    midiName: state.midiName,
+    media: state.mediaFile
+      ? { name: state.mediaFile.name, type: state.mediaFile.type, data: toB64(new Uint8Array(await state.mediaFile.arrayBuffer())) }
+      : null,
+    loops: state.loops,
+    loop: { ...state.loop },
+    key: settings.key,
+    rate: state.rate,
+    transpose: state.transpose,
+    lessonOffset: Number(settings.lessonOffset || 0),
+    channels: state.chan.map(({ mute, solo, color, mix, preset }) => ({ mute, solo, color, mix, preset })),
+  };
+  const name = (state.midiName || state.mediaFile?.name || 'lesson').replace(/\.[^.]+$/, '');
+  download(JSON.stringify(lesson), `${name}.klesson`, 'application/json');
+}
+
+async function loadLesson(lesson) {
+  if (lesson.app !== 'knight-keys') throw new Error('not a Knight Keys lesson');
+  ejectMedia(false);
+  if (lesson.channels) lesson.channels.forEach((c, ch) => Object.assign(state.chan[ch], c));
+  if (lesson.media) {
+    const bytes = fromB64(lesson.media.data);
+    loadMedia(new File([bytes], lesson.media.name, { type: lesson.media.type }));
+  }
+  state.loops = lesson.loops || [];
+  Object.assign(state.loop, lesson.loop || { enabled: false, a: 0, b: 0 });
+  if (lesson.key !== undefined) settings.key = lesson.key;
+  settings.lessonOffset = lesson.lessonOffset || 0;
+  state.transpose = lesson.transpose || 0;
+  setRate(lesson.rate || 1);
+  if (lesson.midi) loadMidiBytes(fromB64(lesson.midi), lesson.midiName || lesson.title, { keepLoops: true });
+  else ejectMidi();
+  applyMutes();
+  syncSettingsUI();
+  renderLoops();
+  updateTransposeUI();
+  toast(`Lesson loaded: ${lesson.title}`);
+}
+
+// ---- Transport -----------------------------------------------------------
+
+const hasMedia = () => !!state.mediaFile;
+const tDuration = () => (hasMedia() ? (Number.isFinite(media.duration) ? media.duration : 0) : player.duration);
+const tTime = () => (hasMedia() ? media.currentTime : player.time);
+const isPlaying = () => (hasMedia() ? !media.paused : player.playing);
+
+function togglePlay() {
+  synth.ensure();
+  if (hasMedia()) {
+    if (media.paused) media.play().catch((err) => toast(`Can't play: ${err.message}`));
+    else media.pause();
+  } else if (state.song) {
+    if (player.playing) player.pause();
+    else player.play();
+  } else {
+    toast('Open a MIDI, audio or video file — or try the demo.');
+  }
+  markDirty();
+}
+
+function stopAll() {
+  const start = state.loop.enabled ? state.loop.a : 0;
+  if (hasMedia()) {
+    media.pause();
+    media.currentTime = start;
+  } else {
+    player.stop();
+  }
+  markDirty();
+}
+
+function seek(t) {
+  t = Math.max(0, Math.min(t, tDuration()));
+  if (hasMedia()) media.currentTime = t;
+  else player.seek(t);
+  markDirty();
+}
+
+function applyRate() {
+  media.playbackRate = state.rate;
+  const keep = settings.keepPitch;
+  if ('preservesPitch' in media) media.preservesPitch = keep;
+  if ('webkitPreservesPitch' in media) media.webkitPreservesPitch = keep;
+  if ('mozPreservesPitch' in media) media.mozPreservesPitch = keep;
+}
+
+function setRate(rate) {
+  state.rate = rate;
+  player.setRate(rate);
+  applyRate();
+  $('tempo').value = Math.round(rate * 100);
+  $('tempoLabel').textContent = `${Math.round(rate * 100)}%`;
+}
+
+function updateTransposeUI() {
+  player.transpose = state.transpose;
+  $('transposeLabel').textContent = state.transpose > 0 ? `+${state.transpose}` : `${state.transpose}`;
+}
+
+const fmt = (t) => {
+  if (!Number.isFinite(t)) t = 0;
+  const m = Math.floor(t / 60);
+  const s = t - m * 60;
+  return `${m}:${s < 10 ? '0' : ''}${s.toFixed(1)}`;
+};
+
+function updateLoopUI() {
+  const { a, b, enabled } = state.loop;
+  $('btnLoop').classList.toggle('on', enabled);
+  $('loopLabel').textContent = b > a ? `A ${fmt(a)} – B ${fmt(b)}` : a > 0 ? `A ${fmt(a)}` : '';
+  document.querySelectorAll('#loopList li').forEach((li, i) => {
+    const l = state.loops[i];
+    li.classList.toggle('active', enabled && l && Math.abs(l.a - a) < 0.01 && Math.abs(l.b - b) < 0.01);
+  });
+}
+
+$('btnPlay').onclick = togglePlay;
+$('btnStop').onclick = stopAll;
+$('btnBack').onclick = () => seek(tTime() - 5);
+$('btnFwd').onclick = () => seek(tTime() + 5);
+$('btnA').onclick = () => {
+  state.loop.a = tTime();
+  if (state.loop.b <= state.loop.a) {
+    state.loop.b = 0;
+    state.loop.enabled = false;
+  }
+  updateLoopUI();
+};
+$('btnB').onclick = () => {
+  const t = tTime();
+  if (t <= state.loop.a + 0.1) {
+    toast('Set B after A.');
+    return;
+  }
+  state.loop.b = t;
+  state.loop.enabled = true;
+  updateLoopUI();
+};
+$('btnLoop').onclick = () => {
+  if (state.loop.b <= state.loop.a) {
+    toast('Set A and B first (the A / B buttons mark the current time).');
+    return;
+  }
+  state.loop.enabled = !state.loop.enabled;
+  updateLoopUI();
+};
+
+let scrubbing = false;
+$('scrub').addEventListener('input', () => {
+  scrubbing = true;
+  $('timeNow').textContent = fmt(($('scrub').value / 1000) * tDuration());
+});
+$('scrub').addEventListener('change', () => {
+  scrubbing = false;
+  seek(($('scrub').value / 1000) * tDuration());
+});
+
+$('tempo').addEventListener('input', () => setRate($('tempo').value / 100));
+$('tempo').addEventListener('dblclick', () => setRate(1));
+$('trDown').onclick = (e) => {
+  e.preventDefault();
+  state.transpose = Math.max(-12, state.transpose - 1);
+  updateTransposeUI();
+};
+$('trUp').onclick = (e) => {
+  e.preventDefault();
+  state.transpose = Math.min(12, state.transpose + 1);
+  updateTransposeUI();
+};
+$('keepPitch').addEventListener('change', () => {
+  settings.keepPitch = $('keepPitch').checked;
+  applyRate();
+  saveSettings();
+});
+$('btnSplit').onclick = () => {
+  liveAllOff();
+  settings.split.enabled = !settings.split.enabled;
+  $('btnSplit').classList.toggle('on', settings.split.enabled);
+  saveSettings();
+  markDirty();
+};
+
+// Recording
+$('btnRec').onclick = () => {
+  synth.ensure();
+  if (!state.recording) {
+    state.recording = { events: [], t0: performance.now(), media: hasMedia() };
+    $('btnRec').classList.add('on');
+    if (hasMedia() && media.paused) media.play().catch(() => {});
+    toast(hasMedia() ? 'Recording — play along with the media. Your notes will be synced to it.' : 'Recording — play your keyboard.');
+    return;
+  }
+  const r = state.recording;
+  // Close any notes still held.
+  for (const m of liveMap.values()) record([0x80, m.note, 0]);
+  if (liveCtl.sustain) record([0xb0, 64, 0]);
+  state.recording = null;
+  $('btnRec').classList.remove('on');
+  if (!r.events.some((e) => (e.bytes[0] & 0xf0) === 0x90)) {
+    toast('Nothing was recorded.');
+    return;
+  }
+  // Start wall-clock recordings at the first note.
+  if (!r.media) {
+    const first = Math.min(...r.events.map((e) => e.time));
+    r.events.forEach((e) => (e.time -= Math.max(0, first - 0.2)));
+  }
+  const bytes = writeMidi(r.events);
+  state.lastRecording = bytes;
+  const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
+  toast('Recording ready.', [
+    ['Download .mid', () => download(bytes, `knight-keys-${stamp}.mid`, 'audio/midi')],
+    [r.media ? 'Use as lesson MIDI' : 'Open it', () => loadMidiBytes(bytes, `Recording ${stamp}.mid`)],
+  ], 15000);
+};
+
+// ---- Mixer ---------------------------------------------------------------
+
+function presetOptions(select, value, withAuto) {
+  select.innerHTML = '';
+  if (withAuto) select.append(new Option('Auto (GM)', ''));
+  for (const [key, p] of Object.entries(PRESETS)) select.append(new Option(p.label, key));
+  select.value = value || '';
+}
+
+function channelName(ch) {
+  if (ch === DRUM_CHANNEL) return 'Drums';
+  return GM_NAMES[state.chan[ch].program] || `Program ${state.chan[ch].program}`;
+}
+
+function buildMixer() {
+  const root = $('mixer');
+  root.innerHTML = '';
+
+  const live = document.createElement('div');
+  live.className = 'mix-row live';
+  const liveColorIn = Object.assign(document.createElement('input'), { type: 'color', value: settings.inputColor, title: 'My playing color' });
+  liveColorIn.oninput = () => {
+    settings.inputColor = liveColorIn.value;
+    $('inputColor').value = liveColorIn.value;
+    saveSettings();
+    markDirty();
+  };
+  const liveVol = Object.assign(document.createElement('input'), { type: 'range', min: 0, max: 1.5, step: 0.01, value: settings.liveMix, title: 'My volume' });
+  liveVol.oninput = () => {
+    settings.liveMix = Number(liveVol.value);
+    synth.setMix(LIVE_CHANNEL, settings.liveMix);
+    synth.setMix(LIVE_LEFT_CHANNEL, settings.liveMix);
+    saveSettings();
+  };
+  const liveSel = document.createElement('select');
+  presetOptions(liveSel, settings.liveInstrument, false);
+  liveSel.onchange = () => {
+    settings.liveInstrument = liveSel.value;
+    $('liveInstrument').value = liveSel.value;
+    applyLiveInstruments();
+    saveSettings();
+  };
+  const lbl = document.createElement('span');
+  lbl.className = 'ch';
+  lbl.textContent = 'IN';
+  const nm = document.createElement('span');
+  nm.className = 'name';
+  nm.textContent = 'My playing';
+  live.append(liveColorIn, lbl, nm, document.createElement('span'), document.createElement('span'), liveVol, liveSel);
+  root.append(live);
+
+  if (!state.song) {
+    const p = document.createElement('p');
+    p.className = 'hint';
+    p.textContent = 'Load a MIDI file to see its channels. Mute, solo, recolor or change the sound of each part.';
+    root.append(p);
+    return;
+  }
+
+  for (const ch of state.song.channels) {
+    const c = state.chan[ch];
+    const row = document.createElement('div');
+    row.className = 'mix-row';
+    row.dataset.ch = ch;
+    const color = Object.assign(document.createElement('input'), { type: 'color', value: c.color, title: 'Key color' });
+    color.oninput = () => {
+      c.color = color.value;
+      markDirty();
+    };
+    const num = document.createElement('span');
+    num.className = 'ch';
+    num.innerHTML = `<span class="meter"></span>${ch + 1}`;
+    num.style.display = 'flex';
+    num.style.gap = '4px';
+    num.style.alignItems = 'center';
+    num.style.justifyContent = 'flex-end';
+    const name = document.createElement('span');
+    name.className = 'name';
+    const tn = state.song.trackNames.filter(Boolean);
+    name.textContent = channelName(ch);
+    name.title = tn.join(', ');
+    const m = Object.assign(document.createElement('button'), { textContent: 'M', title: 'Mute', className: 'm' + (c.mute ? ' on' : '') });
+    m.onclick = () => {
+      c.mute = !c.mute;
+      m.classList.toggle('on', c.mute);
+      applyMutes();
+    };
+    const s = Object.assign(document.createElement('button'), { textContent: 'S', title: 'Solo', className: 's' + (c.solo ? ' on' : '') });
+    s.onclick = () => {
+      c.solo = !c.solo;
+      s.classList.toggle('on', c.solo);
+      applyMutes();
+    };
+    const vol = Object.assign(document.createElement('input'), { type: 'range', min: 0, max: 1.5, step: 0.01, value: c.mix, title: 'Volume' });
+    vol.oninput = () => {
+      c.mix = Number(vol.value);
+      synth.setMix(ch, c.mix);
+    };
+    synth.setMix(ch, c.mix);
+    const sel = document.createElement('select');
+    presetOptions(sel, c.preset, true);
+    sel.disabled = ch === DRUM_CHANNEL;
+    sel.title = 'Built-in sound';
+    sel.onchange = () => {
+      c.preset = sel.value;
+      synth.setPresetOverride(ch, c.preset);
+    };
+    row.append(color, num, name, m, s, vol, sel);
+    root.append(row);
+  }
+  applyMutes();
+}
+
+function updateMixerNames() {
+  document.querySelectorAll('.mix-row[data-ch]').forEach((row) => {
+    row.querySelector('.name').textContent = channelName(Number(row.dataset.ch));
+  });
+}
+
+function updateMeters() {
+  document.querySelectorAll('.mix-row[data-ch]').forEach((row) => {
+    const s = sources.get(Number(row.dataset.ch));
+    row.querySelector('.meter')?.classList.toggle('lit', !!s && s.down.size > 0);
+  });
+}
+
+function applyLiveInstruments() {
+  synth.setPresetOverride(LIVE_CHANNEL, settings.liveInstrument);
+  synth.setPresetOverride(LIVE_LEFT_CHANNEL, settings.split.leftInstrument);
+  synth.setMix(LIVE_CHANNEL, settings.liveMix);
+  synth.setMix(LIVE_LEFT_CHANNEL, settings.liveMix);
+}
+
+// ---- Loops panel ---------------------------------------------------------
+
+function renderLoops() {
+  const list = $('loopList');
+  list.innerHTML = '';
+  state.loops.forEach((l, i) => {
+    const li = document.createElement('li');
+    const name = document.createElement('span');
+    name.className = 'lname';
+    name.textContent = l.name;
+    const range = document.createElement('span');
+    range.className = 'mono small';
+    range.textContent = `${fmt(l.a)}–${fmt(l.b)}`;
+    const del = Object.assign(document.createElement('button'), { textContent: '✕', title: 'Delete loop', className: 'mini' });
+    del.onclick = (e) => {
+      e.stopPropagation();
+      state.loops.splice(i, 1);
+      renderLoops();
+    };
+    li.onclick = () => {
+      Object.assign(state.loop, { a: l.a, b: l.b, enabled: true });
+      seek(l.a);
+      updateLoopUI();
+    };
+    li.ondblclick = () => {
+      const n = prompt('Loop name', l.name);
+      if (n) {
+        l.name = n;
+        renderLoops();
+      }
+    };
+    li.append(name, range, del);
+    list.append(li);
+  });
+  updateLoopUI();
+}
+
+$('btnAddLoop').onclick = () => {
+  const { a, b } = state.loop;
+  if (b <= a) {
+    toast('Set A and B in the transport bar first.');
+    return;
+  }
+  state.loops.push({ name: `Loop ${state.loops.length + 1}`, a, b });
+  renderLoops();
+};
+
+// ---- Panels: detach, move, resize, recolor, hide -------------------------
+
+const workspace = $('workspace');
+const panels = [...document.querySelectorAll('.panel')];
+// Video/audio stays out of the way until a media file is opened.
+const defaultLayout = () => Object.fromEntries(panels.map((p) => [p.dataset.panel, { hidden: p.dataset.panel === 'media', floating: false }]));
+let layout = { ...defaultLayout(), ...load('kk.layout', {}) };
+const saveLayout = () => save('kk.layout', layout);
+
+panels.forEach((panel, order) => {
+  const id = panel.dataset.panel;
+  panel.dataset.order = order;
+  panel.homeRow = panel.parentElement;
+  const head = document.createElement('div');
+  head.className = 'panel-head';
+  head.innerHTML = `<span class="title">${panel.dataset.title}</span>
+    <button data-act="color" title="Colors">🎨</button>
+    <button data-act="top" title="Always on top" hidden>📌</button>
+    <button data-act="float" title="Detach / dock">⧉</button>
+    <button data-act="hide" title="Hide panel">✕</button>`;
+  panel.prepend(head);
+
+  head.addEventListener('click', (e) => {
+    const act = e.target.closest('button')?.dataset.act;
+    if (act === 'float') setFloating(panel, !panel.classList.contains('floating'));
+    else if (act === 'hide') showPanel(id, false);
+    else if (act === 'top') {
+      const on = !panel.classList.contains('on-top');
+      panel.classList.toggle('on-top', on);
+      e.target.classList.toggle('on', on);
+      layout[id].onTop = on;
+      saveLayout();
+    } else if (act === 'color') toggleColorPop(panel);
+  });
+
+  // Dragging floating panels by their header.
+  head.addEventListener('pointerdown', (e) => {
+    if (!panel.classList.contains('floating') || e.target.closest('button')) return;
+    const ws = workspace.getBoundingClientRect();
+    const start = { x: e.clientX, y: e.clientY, left: panel.offsetLeft, top: panel.offsetTop };
+    head.setPointerCapture(e.pointerId);
+    const move = (ev) => {
+      const left = Math.max(0, Math.min(ws.width - 60, start.left + ev.clientX - start.x));
+      const top = Math.max(0, Math.min(ws.height - 30, start.top + ev.clientY - start.y));
+      panel.style.left = `${left}px`;
+      panel.style.top = `${top}px`;
+    };
+    const up = () => {
+      head.removeEventListener('pointermove', move);
+      head.removeEventListener('pointerup', up);
+      rememberRect(panel);
+    };
+    head.addEventListener('pointermove', move);
+    head.addEventListener('pointerup', up);
+  });
+
+  // Double-click a panel body to hide its header (cleaner for streaming).
+  panel.addEventListener('dblclick', (e) => {
+    if (e.target.closest('.panel-head, button, input, select, .loop-list, video')) return;
+    if (!panel.classList.contains('floating')) return;
+    panel.classList.toggle('chromeless');
+  });
+});
+
+function rememberRect(panel) {
+  const l = layout[panel.dataset.panel];
+  Object.assign(l, { x: panel.offsetLeft, y: panel.offsetTop, w: panel.offsetWidth, h: panel.offsetHeight });
+  saveLayout();
+}
+
+function dock(panel) {
+  const row = panel.homeRow;
+  const order = Number(panel.dataset.order);
+  const next = [...row.children].find((c) => Number(c.dataset.order) > order);
+  row.insertBefore(panel, next || null);
+}
+
+function setFloating(panel, on, rect) {
+  const id = panel.dataset.panel;
+  const l = layout[id];
+  if (on) {
+    const ws = workspace.getBoundingClientRect();
+    const r = panel.getBoundingClientRect();
+    const box = rect || { x: r.left - ws.left + 20, y: r.top - ws.top + 20, w: r.width, h: r.height };
+    workspace.append(panel);
+    panel.classList.add('floating');
+    Object.assign(panel.style, {
+      left: `${box.x}px`,
+      top: `${box.y}px`,
+      width: `${Math.max(160, box.w)}px`,
+      height: `${Math.max(90, box.h)}px`,
+    });
+    clampFloating(panel);
+    panel.classList.toggle('on-top', !!l.onTop);
+  } else {
+    panel.classList.remove('floating', 'on-top', 'chromeless');
+    ['left', 'top', 'width', 'height'].forEach((k) => (panel.style[k] = ''));
+    dock(panel);
+  }
+  const topBtn = panel.querySelector('[data-act="top"]');
+  topBtn.hidden = !on;
+  topBtn.classList.toggle('on', !!l.onTop);
+  l.floating = on;
+  if (on) rememberRect(panel);
+  else saveLayout();
+  updateRows();
+  markDirty();
+}
+
+/** Keep a floating panel fully inside the workspace. */
+function clampFloating(panel) {
+  const ws = workspace.getBoundingClientRect();
+  const w = Math.min(panel.offsetWidth, ws.width);
+  const h = Math.min(panel.offsetHeight, ws.height);
+  if (w < panel.offsetWidth) panel.style.width = `${w}px`;
+  if (h < panel.offsetHeight) panel.style.height = `${h}px`;
+  panel.style.left = `${Math.max(0, Math.min(panel.offsetLeft, ws.width - w))}px`;
+  panel.style.top = `${Math.max(0, Math.min(panel.offsetTop, ws.height - h))}px`;
+}
+
+function showPanel(id, show) {
+  const panel = panels.find((p) => p.dataset.panel === id);
+  if (!panel) return;
+  panel.classList.toggle('hidden', !show);
+  layout[id].hidden = !show;
+  saveLayout();
+  const cb = document.querySelector(`#panelToggles input[data-id="${id}"]`);
+  if (cb) cb.checked = show;
+  updateRows();
+  markDirty();
+}
+
+function updateRows() {
+  // If only the keyboard row is docked, let it fill the workspace.
+  const docked = (row) => [...row.querySelectorAll(':scope > .panel')].some((p) => !p.classList.contains('hidden'));
+  const rows = [...workspace.querySelectorAll('.row-area')];
+  rows.forEach((r) => (r.style.display = docked(r) ? '' : 'none'));
+  const onlyBottom = !docked(rows[0]) && !docked(rows[1]);
+  rows[2].style.flex = onlyBottom ? '1' : '';
+}
+
+function toggleColorPop(panel) {
+  const existing = panel.querySelector('.color-pop');
+  if (existing) {
+    existing.remove();
+    return;
+  }
+  const id = panel.dataset.panel;
+  const cs = getComputedStyle(panel);
+  const toHex = (c) => {
+    c = c.trim();
+    if (/^#[0-9a-f]{6}$/i.test(c)) return c;
+    if (/^#[0-9a-f]{3}$/i.test(c)) return '#' + [...c.slice(1)].map((x) => x + x).join('');
+    const m = c.match(/\d+/g);
+    if (!m) return '#000000';
+    return '#' + m.slice(0, 3).map((x) => Number(x).toString(16).padStart(2, '0')).join('');
+  };
+  const pop = document.createElement('div');
+  pop.className = 'color-pop';
+  const bg = Object.assign(document.createElement('input'), { type: 'color', value: toHex(cs.getPropertyValue('--panel-bg') || cs.backgroundColor) });
+  const fg = Object.assign(document.createElement('input'), { type: 'color', value: toHex(cs.getPropertyValue('--panel-fg') || cs.color) });
+  const reset = Object.assign(document.createElement('button'), { textContent: 'Reset', className: 'mini' });
+  bg.oninput = () => applyPanelColors(panel, { bg: bg.value });
+  fg.oninput = () => applyPanelColors(panel, { fg: fg.value });
+  reset.onclick = () => {
+    delete layout[id].bg;
+    delete layout[id].fg;
+    panel.style.removeProperty('--panel-bg');
+    panel.style.removeProperty('--panel-fg');
+    saveLayout();
+    pop.remove();
+    markDirty();
+  };
+  pop.append('Background', bg, 'Text / notes', fg, reset);
+  panel.append(pop);
+}
+
+function applyPanelColors(panel, { bg, fg }) {
+  const l = layout[panel.dataset.panel];
+  if (bg) {
+    panel.style.setProperty('--panel-bg', bg);
+    l.bg = bg;
+  }
+  if (fg) {
+    panel.style.setProperty('--panel-fg', fg);
+    l.fg = fg;
+  }
+  saveLayout();
+  markDirty();
+}
+
+function applyLayout() {
+  for (const panel of panels) {
+    const id = panel.dataset.panel;
+    const l = (layout[id] = { hidden: false, floating: false, ...(layout[id] || {}) });
+    panel.classList.toggle('hidden', !!l.hidden);
+    if (l.bg || l.fg) applyPanelColors(panel, { bg: l.bg, fg: l.fg });
+    else {
+      panel.style.removeProperty('--panel-bg');
+      panel.style.removeProperty('--panel-fg');
+    }
+    if (l.floating) setFloating(panel, true, l.x !== undefined ? { x: l.x, y: l.y, w: l.w, h: l.h } : undefined);
+    else if (panel.classList.contains('floating')) setFloating(panel, false);
+  }
+  const toggles = $('panelToggles');
+  toggles.innerHTML = '';
+  for (const panel of panels) {
+    const id = panel.dataset.panel;
+    const label = document.createElement('label');
+    const cb = Object.assign(document.createElement('input'), { type: 'checkbox', checked: !layout[id].hidden });
+    cb.dataset.id = id;
+    cb.onchange = () => showPanel(id, cb.checked);
+    label.append(cb, panel.dataset.title);
+    toggles.append(label);
+  }
+  updateRows();
+  markDirty();
+}
+
+const LAYOUTS = {
+  full: ['score', 'chord', 'mixer', 'drums', 'media', 'loops', 'keyboard', 'controls'],
+  keys: ['keyboard', 'controls', 'chord'],
+  score: ['score', 'chord', 'keyboard', 'controls'],
+  video: ['media', 'chord', 'keyboard'],
+  drums: ['score', 'chord', 'drums', 'keyboard', 'controls'],
+};
+document.querySelectorAll('[data-layout]').forEach((btn) => {
+  btn.onclick = () => {
+    const show = LAYOUTS[btn.dataset.layout];
+    for (const panel of panels) {
+      if (panel.classList.contains('floating')) setFloating(panel, false);
+      showPanel(panel.dataset.panel, show.includes(panel.dataset.panel));
+    }
+    $('viewMenu').open = false;
+  };
+});
+$('btnResetLayout').onclick = () => {
+  layout = defaultLayout();
+  saveLayout();
+  applyLayout();
+};
+$('btnFullscreen').onclick = () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else document.documentElement.requestFullscreen?.();
+};
+
+// Panels resized by the user (CSS resize) → remember size and redraw.
+const ro = new ResizeObserver((entries) => {
+  markDirty();
+  for (const e of entries) {
+    if (e.target.classList?.contains('floating')) rememberRect(e.target);
+  }
+});
+panels.forEach((p) => ro.observe(p));
+
+// ---- Settings dialog -----------------------------------------------------
+
+function fillKeySelect() {
+  const sel = $('keySel');
+  sel.innerHTML = '';
+  const auto = state.song?.keySig ? `Auto (${keyName(state.song.keySig.sf, state.song.keySig.minor)})` : 'Auto (from file)';
+  sel.append(new Option(auto, 'auto'));
+  for (let sf = -7; sf <= 7; sf++) {
+    const count = sf === 0 ? '' : ` · ${Math.abs(sf)}${sf > 0 ? '♯' : '♭'}`;
+    sel.append(new Option(`${keyName(sf).replace(' major', '')} / ${keyName(sf, true)}${count}`, String(sf)));
+  }
+  sel.value = settings.key;
+}
+
+function syncSettingsUI() {
+  const s = settings;
+  fillKeySelect();
+  $('spellSel').value = s.spelling;
+  $('master').value = s.master;
+  $('fwdInput').checked = s.fwdInput;
+  $('fwdPlayback').checked = s.fwdPlayback;
+  $('internalSynth').checked = s.internalSynth;
+  $('lessonMidiSound').checked = s.lessonMidiSound;
+  $('kbRange').value = s.kbRange;
+  $('kbShift').value = s.kbShift;
+  $('kbStyle').value = s.kbStyle;
+  $('kbLabels').value = s.kbLabels;
+  $('cMarkers').checked = s.cMarkers;
+  $('sustainHold').checked = s.sustainHold;
+  $('showWheels').checked = s.showWheels;
+  $('showPedals').checked = s.showPedals;
+  $('inputColor').value = s.inputColor;
+  presetOptions($('liveInstrument'), s.liveInstrument, false);
+  presetOptions($('leftInstrument'), s.split.leftInstrument, false);
+  $('splitPoint').value = s.split.point;
+  $('leftColor').value = s.split.leftColor;
+  $('rightColor').value = s.split.rightColor;
+  $('leftOctave').value = s.split.leftOctave;
+  $('rightOctave').value = s.split.rightOctave;
+  $('splitSound').checked = s.split.splitSound;
+  $('solfegeMode').value = s.solfege;
+  $('chordSource').value = s.chordSource;
+  $('workspaceBg').value = s.workspaceBg;
+  $('lessonOffset').value = s.lessonOffset;
+  $('keepPitch').checked = s.keepPitch;
+  $('btnSplit').classList.toggle('on', s.split.enabled);
+  workspace.style.setProperty('--workspace-bg', s.workspaceBg);
+}
+
+const splitSel = $('splitPoint');
+for (let n = 36; n <= 84; n++) splitSel.append(new Option(`${noteName(n, 0)}${n === 60 ? ' (middle C)' : ''}`, n));
+
+function bind(id, apply, prop = 'value') {
+  const el = $(id);
+  el.addEventListener(el.type === 'checkbox' || el.tagName === 'SELECT' ? 'change' : 'input', () => {
+    let v = el[prop];
+    if (el.type === 'number') v = Number(v) || 0;
+    apply(v);
+    saveSettings();
+    markDirty();
+  });
+}
+
+bind('keySel', (v) => (settings.key = v));
+bind('spellSel', (v) => (settings.spelling = v));
+bind('master', (v) => {
+  settings.master = Number(v);
+  synth.setMaster(settings.master);
+});
+bind('midiIn', (v) => {
+  settings.inputId = v;
+  liveAllOff();
+  fillDeviceSelects();
+});
+bind('midiOut', (v) => {
+  outputAllOff();
+  settings.outputId = v;
+  fillDeviceSelects();
+});
+bind('fwdInput', (v) => (settings.fwdInput = v), 'checked');
+bind('fwdPlayback', (v) => (settings.fwdPlayback = v), 'checked');
+bind('internalSynth', (v) => (settings.internalSynth = v), 'checked');
+bind('lessonMidiSound', (v) => {
+  settings.lessonMidiSound = v;
+  if (!v) synth.allNotesOff();
+}, 'checked');
+bind('kbRange', (v) => (settings.kbRange = v));
+bind('kbShift', (v) => (settings.kbShift = Math.max(-3, Math.min(3, v))));
+bind('kbStyle', (v) => (settings.kbStyle = v));
+bind('kbLabels', (v) => (settings.kbLabels = v));
+bind('cMarkers', (v) => (settings.cMarkers = v), 'checked');
+bind('sustainHold', (v) => (settings.sustainHold = v), 'checked');
+bind('showWheels', (v) => (settings.showWheels = v), 'checked');
+bind('showPedals', (v) => (settings.showPedals = v), 'checked');
+bind('inputColor', (v) => {
+  settings.inputColor = v;
+  buildMixer();
+});
+bind('liveInstrument', (v) => {
+  settings.liveInstrument = v;
+  applyLiveInstruments();
+  buildMixer();
+});
+bind('leftInstrument', (v) => {
+  settings.split.leftInstrument = v;
+  applyLiveInstruments();
+});
+bind('splitPoint', (v) => {
+  liveAllOff();
+  settings.split.point = Number(v);
+});
+bind('leftColor', (v) => (settings.split.leftColor = v));
+bind('rightColor', (v) => (settings.split.rightColor = v));
+bind('leftOctave', (v) => {
+  liveAllOff();
+  settings.split.leftOctave = Math.max(-3, Math.min(3, v));
+});
+bind('rightOctave', (v) => {
+  liveAllOff();
+  settings.split.rightOctave = Math.max(-3, Math.min(3, v));
+});
+bind('splitSound', (v) => {
+  liveAllOff();
+  settings.split.splitSound = v;
+}, 'checked');
+bind('solfegeMode', (v) => (settings.solfege = v));
+bind('chordSource', (v) => (settings.chordSource = v));
+bind('workspaceBg', (v) => {
+  settings.workspaceBg = v;
+  workspace.style.setProperty('--workspace-bg', v);
+});
+bind('lessonOffset', (v) => (settings.lessonOffset = v));
+
+$('btnSettings').onclick = () => $('settingsDlg').showModal();
+$('btnPanic').onclick = panic;
+$('btnOpen').onclick = () => $('fileInput').click();
+$('fileInput').addEventListener('change', (e) => {
+  handleFiles([...e.target.files]);
+  e.target.value = '';
+});
+$('btnSaveLesson').onclick = () => saveLesson().catch((err) => toast(`Couldn't save: ${err.message}`));
+
+// Drag & drop anywhere
+let dragDepth = 0;
+window.addEventListener('dragenter', (e) => {
+  if (![...(e.dataTransfer?.types || [])].includes('Files')) return;
+  dragDepth++;
+  $('dropOverlay').hidden = false;
+});
+window.addEventListener('dragleave', () => {
+  dragDepth = Math.max(0, dragDepth - 1);
+  if (!dragDepth) $('dropOverlay').hidden = true;
+});
+window.addEventListener('dragover', (e) => e.preventDefault());
+window.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dragDepth = 0;
+  $('dropOverlay').hidden = true;
+  if (e.dataTransfer?.files?.length) handleFiles([...e.dataTransfer.files]);
+});
+
+function panic() {
+  stopGroove();
+  synth.panic();
+  player.active.clear();
+  visualQueue = [];
+  liveMap.clear();
+  kbDown.clear();
+  pointerNotes.clear();
+  for (const s of sources.values()) {
+    s.down.clear();
+    s.sustained.clear();
+    s.sustain = false;
+  }
+  Object.assign(liveCtl, { bend: 0, mod: 0, sustain: false, sostenuto: false, soft: false });
+  Object.assign(lastWheel, { bend: 0, mod: 0 });
+  playCtl.forEach((c) => Object.assign(c, { sustain: false, sostenuto: false, soft: false }));
+  outputAllOff();
+  if (midiOut) for (let ch = 0; ch < 16; ch++) sendOut([0xb0 | ch, 120, 0]);
+  markDirty();
+  toast('All notes off.');
+}
+
+// ---- Toasts --------------------------------------------------------------
+
+let toastTimer = null;
+function toast(message, actions = [], ms = 3500) {
+  const el = $('toast');
+  el.innerHTML = '';
+  el.append(message);
+  for (const [label, fn] of actions) {
+    const b = Object.assign(document.createElement('button'), { textContent: label });
+    b.onclick = () => {
+      fn();
+      el.hidden = true;
+    };
+    el.append(b);
+  }
+  el.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => (el.hidden = true), ms);
+}
+
+// ---- Drum pads & grooves --------------------------------------------------
+
+const PADS = [
+  [49, 'Crash'], [51, 'Ride'], [53, 'Ride bell'], [54, 'Tamb.'],
+  [46, 'Open hat'], [42, 'Hi-hat'], [44, 'Pedal hat'], [39, 'Clap'],
+  [50, 'High tom'], [47, 'Mid tom'], [45, 'Low tom'], [41, 'Floor tom'],
+  [36, 'Kick'], [38, 'Snare'], [37, 'Side stick'], [56, 'Cowbell'],
+];
+// Other General MIDI drum notes light up the nearest pad.
+const PAD_ALIAS = { 35: 36, 40: 38, 48: 47, 43: 41, 57: 49, 52: 49, 55: 49, 59: 51 };
+const PAD_COLORS = { 36: '#ff7a45', 38: '#4f8cff', 37: '#40a9ff', 39: '#5cdbd3', 42: '#fadb14', 44: '#d3f261', 46: '#ffa940', 49: '#f759ab', 51: '#b37feb', 53: '#9254de', 54: '#73d13d', 56: '#95de64', 50: '#36cfc9', 47: '#36cfc9', 45: '#13c2c2', 41: '#08979c' };
+const padColor = (note) => PAD_COLORS[PAD_ALIAS[note] ?? note] || '#8c8c8c';
+const padEls = new Map();
+
+const groove = new GroovePlayer({
+  now: () => synth.now,
+  hit(note, vel, at) {
+    synth.noteOn(GROOVE_CHANNEL, note, vel, at);
+    atTime(at, () => flashPad(note, vel), true);
+  },
+  step(step, inFill, at) {
+    atTime(at, () => {
+      grooveView.step = step;
+      grooveView.inFill = inFill;
+      markDirty();
+    }, true);
+  },
+});
+const grooveView = { step: -1, inFill: false };
+
+function flashPad(note, vel) {
+  const el = padEls.get(PAD_ALIAS[note] ?? note);
+  if (!el) return;
+  el.classList.remove('hit');
+  void el.offsetWidth; // restart the animation
+  el.classList.add('hit');
+}
+
+function liveDrum(note, vel) {
+  synth.ensure();
+  synth.noteOn(GROOVE_CHANNEL, note, vel);
+  record([0x99, note, vel]);
+  record([0x89, note, 0]);
+  if (settings.fwdInput) sendOut([0x99, note, vel]);
+  flashPad(note, vel);
+}
+
+function toggleGroove() {
+  if (groove.playing) stopGroove();
+  else {
+    synth.ensure();
+    groove.start();
+    $('grooveStart').classList.add('on');
+    $('grooveStart').textContent = '■ Stop';
+    if (groove.locked && !isPlaying()) toast('Groove is ready. It plays along when the song plays.');
+  }
+}
+
+/** Lock to the song only when a song is loaded; otherwise the groove free-runs. */
+function updateGrooveLock() {
+  const locked = !!settings.groove.lock && !!state.song;
+  groove.setLocked(locked);
+  if (!locked && groove.playing) {
+    synth.cancelOneShots(synth.now, GROOVE_CHANNEL);
+    visualQueue = visualQueue.filter((e) => !e.groove);
+  }
+  $('grooveBpm').disabled = locked;
+  $('grooveMatch').disabled = locked;
+  $('grooveBpm').title = locked ? "Following the song's tempo" : 'Groove tempo';
+  if (!locked) $('grooveBpm').value = groove.bpm;
+  updateGrooveInfo();
+}
+
+function stopGroove() {
+  groove.stop();
+  if (synth.ctx) synth.cancelOneShots(synth.now, GROOVE_CHANNEL);
+  visualQueue = visualQueue.filter((e) => !e.groove);
+  grooveView.step = -1;
+  grooveView.inFill = false;
+  $('grooveStart').classList.remove('on');
+  $('grooveStart').textContent = '▶ Groove';
+  updateGrooveInfo();
+  markDirty();
+}
+
+function updateGrooveInfo() {
+  const g = groove.pending || groove.groove;
+  const lock = groove.locked ? "🔗 Locked to the song's beat. " : '';
+  setText($('grooveInfo'), `${lock}${g.feel}. ${g.about}`);
+  $('grooveInfo').title = $('grooveInfo').textContent;
+}
+
+function saveGroove() {
+  Object.assign(settings.groove, {
+    id: (groove.pending || groove.groove).id,
+    bpm: groove.bpm,
+    intensity: groove.intensity,
+    autoFill: groove.autoFill,
+  });
+  saveSettings();
+}
+
+function initDrums() {
+  const pads = $('pads');
+  for (const [note, label] of PADS) {
+    const b = Object.assign(document.createElement('button'), { className: 'pad', textContent: label, title: `${label} (note ${note})` });
+    b.style.setProperty('--pad', padColor(note));
+    b.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      liveDrum(note, 70 + Math.round(50 * Math.min(1, e.pressure || 0.7)));
+    });
+    padEls.set(note, b);
+    pads.append(b);
+  }
+
+  const sel = $('grooveSel');
+  for (const g of GROOVES) sel.append(new Option(`${g.name} · ${g.bpm} bpm`, g.id));
+  const g = settings.groove;
+  sel.value = GROOVES.some((x) => x.id === g.id) ? g.id : GROOVES[0].id;
+  groove.setGroove(sel.value);
+  groove.bpm = g.bpm;
+  groove.intensity = g.intensity;
+  groove.autoFill = Number(g.autoFill) || 0;
+  $('grooveBpm').value = g.bpm;
+  $('grooveIntensity').value = g.intensity;
+  $('grooveAutoFill').value = String(groove.autoFill);
+  $('grooveVol').value = g.volume;
+  $('grooveLock').checked = !!g.lock;
+  $('grooveLock').onchange = () => {
+    settings.groove.lock = $('grooveLock').checked;
+    saveSettings();
+    updateGrooveLock();
+    if (settings.groove.lock && !state.song) toast('Lock is on: load a MIDI song and the groove will follow its beat.');
+  };
+  synth.setMix(GROOVE_CHANNEL, g.volume);
+  updateGrooveInfo();
+
+  sel.onchange = () => {
+    const compiled = groove.setGroove(sel.value);
+    groove.bpm = compiled.bpm;
+    $('grooveBpm').value = compiled.bpm;
+    updateGrooveInfo();
+    saveGroove();
+    markDirty();
+  };
+  $('grooveStart').onclick = toggleGroove;
+  $('grooveFill').onclick = () => {
+    if (!groove.playing) toggleGroove();
+    else groove.fill();
+  };
+  $('grooveBpm').addEventListener('change', () => {
+    groove.bpm = Math.max(40, Math.min(240, Number($('grooveBpm').value) || 90));
+    $('grooveBpm').value = groove.bpm;
+    saveGroove();
+  });
+  $('grooveMatch').onclick = () => {
+    if (!state.song) {
+      toast('Load a MIDI file first, then match its tempo.');
+      return;
+    }
+    groove.bpm = Math.round(state.song.bpm * state.rate);
+    $('grooveBpm').value = groove.bpm;
+    saveGroove();
+  };
+  $('grooveIntensity').onchange = () => {
+    groove.intensity = $('grooveIntensity').value;
+    saveGroove();
+  };
+  $('grooveAutoFill').onchange = () => {
+    groove.autoFill = Number($('grooveAutoFill').value);
+    saveGroove();
+  };
+  $('grooveVol').oninput = () => {
+    settings.groove.volume = Number($('grooveVol').value);
+    synth.setMix(GROOVE_CHANNEL, settings.groove.volume);
+    saveSettings();
+  };
+  updateGrooveLock();
+}
+
+function renderGroove() {
+  if (groove.locked && state.song) {
+    const bpm = String(Math.round(state.song.bpmAt(player.time) * state.rate / (groove.groove.beatUnit || 1)));
+    if ($('grooveBpm').value !== bpm) $('grooveBpm').value = bpm;
+  }
+  drawGroove(
+    $('grooveCanvas'),
+    groove.playing ? groove.groove : groove.pending || groove.groove,
+    { step: grooveView.step, inFill: grooveView.inFill, playing: groove.playing },
+    { fg: panelVar('drums', '--panel-fg', '#ccc'), accent: settings.inputColor, fill: '#f759ab', padColor },
+  );
+}
+
+// ---- Rendering -----------------------------------------------------------
+
+const chordEls = {
+  name: $('chordName'),
+  inv: $('chordInversion'),
+  notes: $('chordNotes'),
+  sol: $('chordSolfege'),
+  hist: $('chordHistory'),
+};
+const chordHistory = [];
+let pendingChord = { name: '', since: 0 };
+const setText = (el, text) => {
+  if (el.textContent !== text) el.textContent = text;
+};
+
+function panelVar(id, name, fallback) {
+  const p = panels.find((x) => x.dataset.panel === id);
+  return (p && getComputedStyle(p).getPropertyValue(name).trim()) || fallback;
+}
+
+function render() {
+  const sf = keySf();
+  const spelling = settings.spelling;
+
+  // Keyboard
+  const [lo, hi] = KB_RANGES[settings.kbRange] || KB_RANGES[88];
+  const shift = settings.kbShift * 12;
+  keyboard.setRange(Math.max(0, lo + shift), Math.min(127, hi + shift));
+  keyboard.style = settings.kbStyle;
+  keyboard.cMarkers = settings.cMarkers;
+  keyboard.labels = settings.kbLabels;
+  keyboard.label = (n) => (settings.kbLabels === 'solfege' ? solfege(n, sf, solfegeMode()) : pcName(n % 12, sf, spelling));
+  keyboard.split = settings.split.enabled ? settings.split : null;
+  keyboard.keyState = keyState;
+  if (!layout.keyboard?.hidden) keyboard.draw({ bed: panelVar('keyboard', '--panel-bg', '#111') });
+
+  // Staff + chord
+  const notes = soundingNotes();
+  if (!layout.score?.hidden) {
+    drawStaff($('staffCanvas'), notes, {
+      sf,
+      spelling,
+      splitPoint: settings.split.enabled ? settings.split.point : 60,
+      fg: panelVar('score', '--panel-fg', '#ddd'),
+    });
+  }
+
+  const midis = notes.map((n) => n.midi);
+  const chord = detectChord(midis, sf, spelling);
+  setText(chordEls.name, chord ? chord.name : midis.length ? '?' : '—');
+  let sub = '';
+  if (chord) sub = chord.kind === 'interval' ? `${chord.inversion} (${chord.interval})` : chord.inversion;
+  else if (midis.length) sub = 'not a named chord';
+  if (!midis.length) sub = `${keyName(sf, keyMinor())}`;
+  setText(chordEls.inv, sub);
+  setText(chordEls.notes, midis.map((n) => noteName(n, sf, spelling)).join('  '));
+  setText(chordEls.sol, settings.solfege === 'off' ? '' : midis.map((n) => solfege(n, sf, settings.solfege)).join('  '));
+  const stableName = chord && chord.kind === 'chord' ? chord.name : '';
+  if (stableName !== pendingChord.name) pendingChord = { name: stableName, since: performance.now() };
+
+  // Wheels & pedals
+  if (!layout.controls?.hidden) {
+    const vis = visibleChannels();
+    drawControllers(
+      $('ctrlCanvas'),
+      {
+        bend: liveCtl.bend || lastWheel.bend,
+        mod: liveCtl.mod || lastWheel.mod,
+        sustain: liveCtl.sustain || vis.some((ch) => playCtl[ch].sustain),
+        sostenuto: liveCtl.sostenuto || vis.some((ch) => playCtl[ch].sostenuto),
+        soft: liveCtl.soft || vis.some((ch) => playCtl[ch].soft),
+      },
+      { wheels: settings.showWheels, pedals: settings.showPedals },
+      settings.inputColor,
+      panelVar('controls', '--panel-fg', '#ccc'),
+    );
+  }
+  if (!layout.drums?.hidden) renderGroove();
+  updateMeters();
+}
+
+function updateChordHistory() {
+  const p = pendingChord;
+  if (!p.name || performance.now() - p.since < 250) return;
+  if (chordHistory[chordHistory.length - 1] === p.name) return;
+  chordHistory.push(p.name);
+  if (chordHistory.length > 8) chordHistory.shift();
+  chordEls.hist.innerHTML = '';
+  for (const name of chordHistory) {
+    const s = document.createElement('span');
+    s.textContent = name;
+    chordEls.hist.append(s);
+  }
+}
+
+let lastTimeText = '';
+function updateTransport() {
+  const dur = tDuration();
+  const t = tTime();
+  if (!scrubbing) {
+    const text = fmt(t);
+    if (text !== lastTimeText) {
+      $('timeNow').textContent = text;
+      lastTimeText = text;
+    }
+    $('scrub').value = dur ? Math.round((t / dur) * 1000) : 0;
+  }
+  setText($('timeTotal'), fmt(dur));
+  setText($('btnPlay'), isPlaying() ? '❚❚' : '▶');
+}
+
+function frame() {
+  const now = synth.now;
+  while (visualQueue.length && visualQueue[0].t <= now) visualQueue.shift().fn();
+
+  if (state.lessonMode && state.mediaReady) {
+    player.syncTo(media.currentTime + Number(settings.lessonOffset || 0), !media.paused);
+  }
+  // A/B looping for media (MIDI loops are sample-accurate inside the player).
+  if (hasMedia() && state.loop.enabled && !media.paused && state.loop.b > state.loop.a && media.currentTime >= state.loop.b) {
+    media.currentTime = state.loop.a;
+  }
+
+  updateTransport();
+  if (dirty) {
+    dirty = false;
+    render();
+  }
+  updateChordHistory();
+  requestAnimationFrame(frame);
+}
+
+// ---- Boot ----------------------------------------------------------------
+
+syncSettingsUI();
+initDrums();
+applyLayout();
+applyLiveInstruments();
+buildMixer();
+renderLoops();
+updateTitle();
+updateTransposeUI();
+setRate(1);
+initMidi();
+window.addEventListener('resize', () => {
+  panels.filter((p) => p.classList.contains('floating')).forEach(clampFloating);
+  markDirty();
+});
+// Mouse/touch clicks shouldn't leave buttons focused, so Space stays play/pause.
+document.addEventListener('pointerup', (e) => e.target.closest?.('button')?.blur());
+document.addEventListener('fullscreenchange', markDirty);
+// Unlock audio on the first interaction anywhere.
+window.addEventListener('pointerdown', () => synth.ensure(), { once: true });
+window.addEventListener('keydown', () => synth.ensure(), { once: true });
+requestAnimationFrame(frame);
