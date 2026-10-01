@@ -245,3 +245,56 @@ test('transcribed notes become a playable MIDI file', () => {
   assert.equal(song.firstProgram[0], 0);
   for (const p of Object.values(TRANSCRIBE_PRESETS)) assert.ok(p.lo < p.hi && p.onset > 0 && p.frame > 0);
 });
+
+import { SONGS, songToMidi, parseMelody, parseChords, chordNotes, parsePitch } from '../js/songs.js';
+
+test('library songs parse, line up and become MIDI', () => {
+  const total = (items) => Math.max(...items.map((i) => i.beat + i.beats));
+  for (const s of SONGS) {
+    const melody = parseMelody(s.melody);
+    const chords = parseChords(s.chords);
+    assert.ok(Math.abs(total(melody) - total(chords)) < 1e-9, `${s.id}: melody and chords end together`);
+    const song = buildSong(parseMidi(songToMidi(s)));
+    assert.equal(song.notes.filter((n) => n.ch === 0).length, melody.length, `${s.id}: every melody note`);
+    assert.deepEqual(song.keySig, { sf: s.key, minor: false });
+    assert.ok(Math.abs(song.bpm - s.bpm) < 0.01);
+  }
+  assert.equal(parsePitch('F#4'), 66);
+  assert.equal(parsePitch('Bb3'), 58);
+  assert.deepEqual(chordNotes('G'), [55, 59, 62]);
+  assert.deepEqual(chordNotes('Em'), [52, 55, 59]);
+  assert.deepEqual(chordNotes('C7'), [48, 52, 55, 58]);
+});
+
+test('learn mode waits for the target part and lets the rest play', () => {
+  const song = buildSong(parseMidi(songToMidi(SONGS.find((s) => s.id === 'mary'))));
+  let now = 0;
+  const sounded = [];
+  const waits = [];
+  const player = new Player({
+    now: () => now, noteOn: (ch, note) => sounded.push([ch, note]), noteOff() {}, control() {}, program() {}, pitch() {},
+    allNotesOff() {}, onEnd() {},
+    onWait: (notes) => waits.push(notes),
+  });
+  player.load(song);
+  player.learn = { isTarget: (e) => e.ch === 0 };
+  player.play();
+  clearInterval(player.timer);
+  for (let i = 0; i < 40; i++) {
+    now += 0.025;
+    player.tick();
+  }
+  assert.deepEqual(waits, [[64]], 'waits for the first melody note (E4) right away');
+  assert.ok(player.waiting && !player.playing);
+  assert.ok(sounded.every(([ch]) => ch !== 0), 'the melody you play is never sounded for you');
+  // Play the right note: it carries on, then waits for the next one (D4).
+  player.resumeWait();
+  clearInterval(player.timer);
+  for (let i = 0; i < 40; i++) {
+    now += 0.025;
+    player.tick();
+  }
+  assert.deepEqual(waits[1], [62]);
+  assert.ok(sounded.some(([ch]) => ch === 1), 'the left-hand chords played along');
+  assert.deepEqual(player.nextTargets(player.waiting.time), [60]);
+});

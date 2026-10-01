@@ -55,6 +55,7 @@
           </div>
         </div>
       </details>
+      <button id="btnSongs" title="Free songs to learn on keys or drums">Songs</button>
       <button id="btnConvert" title="Turn a recording into MIDI">Audio → MIDI</button>
       <button id="btnSettings">Settings</button>
       <button id="btnPanic" class="danger" title="Stop all stuck notes">Panic</button>
@@ -144,6 +145,9 @@
       <button id="btnB" title="Set loop end (B) at the current time">B</button>
       <button id="btnLoop" class="toggle" title="Loop between A and B">⟲ Loop</button>
       <span id="loopLabel" class="mono small"></span>
+      <button id="btnLearn" class="toggle" title="Wait for me: the song waits until you play the right notes">🎯 Learn</button>
+      <select id="learnPart" title="Which part you're learning"></select>
+      <span id="learnStats" class="mono small"></span>
     </div>
     <div class="group center">
       <button id="btnBack" title="Back 5 s">⏪</button>
@@ -270,6 +274,18 @@
         </fieldset>
       </div>
     </form>
+  </dialog>
+
+  <dialog id="songsDlg" class="tool-window" aria-labelledby="songsTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="songsTitle">Song library</h2>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="tool-body">
+      <p class="hint">Free to use: public-domain melodies, arranged for Knight Keys. <b>🎯 Learn</b> waits for you: the song pauses until you play the right note on your keyboard (or the right drum on your e-kit or the pads), while the other parts play along.</p>
+      <ol id="songList" class="song-list"></ol>
+      <p class="hint">Add your own songs: open any MIDI file with <b>Open…</b>, or turn a recording into MIDI with <b>Audio → MIDI</b>. Learn mode works with those too.</p>
+    </div>
   </dialog>
 
   <dialog id="convertDlg" class="tool-window" aria-labelledby="convertTitle">

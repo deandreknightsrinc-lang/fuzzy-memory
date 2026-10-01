@@ -4,12 +4,17 @@
 
 const LOOKAHEAD = 0.12; // seconds of audio scheduled ahead
 const INTERVAL = 25; // scheduler period, ms
+const CHORD_WINDOW = 0.06; // target notes this close together are one chord to wait for
 
 export class Player {
   /**
    * hooks: { now(), noteOn(ch, note, vel, at), noteOff(ch, note, at), control(ch, cc, v, at),
    *          program(ch, p, at), pitch(ch, v, at), allNotesOff(at), onEnd(),
    *          span?(fromSong, toSong, ctxAt) }
+   *
+   * Learn mode: set `learn = { isTarget(e) }`. Target notes are never sounded; the
+   * player stops at each one (with any target notes within CHORD_WINDOW, as a
+   * chord) and calls hooks.onWait(notes) until resumeWait() is called.
    *
    * `span` is called for each stretch of song time as it gets scheduled, with a
    * function mapping song seconds to AudioContext time. Spans arrive in playback
@@ -31,6 +36,9 @@ export class Player {
     this.follow = false;
     this.lastFollow = 0;
     this.scheduledTo = 0; // song time already handed to hooks.span
+    this.learn = null; // { isTarget(e) } while learning a part
+    this.waiting = null; // { time, notes } while waiting for the player
+    this.skipUntil = -1; // targets up to this time were already played
     this.timer = null;
   }
 
@@ -103,6 +111,8 @@ export class Player {
   }
 
   pause() {
+    this.waiting = null;
+    this.skipUntil = -1;
     if (!this.playing) return;
     this.position = this.time;
     this.playing = false;
@@ -126,6 +136,8 @@ export class Player {
       this.chase(t);
       this.play();
     } else {
+      this.waiting = null;
+      this.skipUntil = -1;
       this.silence(this.hooks.now());
       this.position = t;
       this.lastFollow = t;
@@ -151,6 +163,7 @@ export class Player {
 
   dispatch(e, at) {
     const h = this.hooks;
+    if (this.learn && (e.type === 'on' || e.type === 'off') && this.learn.isTarget(e)) return; // you play this part
     switch (e.type) {
       case 'on': {
         const note = e.ch === 9 ? e.note : e.note + this.transpose;
@@ -189,7 +202,12 @@ export class Player {
       const wraps = loopOn && songHorizon >= this.loop.b && this.anchor.song < this.loop.b;
       const limit = wraps ? this.loop.b : songHorizon;
       while (this.idx < this.events.length && this.events[this.idx].time < limit) {
-        const e = this.events[this.idx++];
+        const e = this.events[this.idx];
+        if (this.learn && e.type === 'on' && e.time > this.skipUntil && this.learn.isTarget(e)) {
+          this.waitAt(e.time);
+          return;
+        }
+        this.idx++;
         this.dispatch(e, Math.max(this.hooks.now(), this.ctxAt(e.time)));
       }
       if (limit > this.scheduledTo) {
@@ -205,6 +223,7 @@ export class Player {
         this.anchor = { ctx: atB, song: this.loop.a };
         this.idx = this.indexAt(this.loop.a);
         this.scheduledTo = this.loop.a;
+        this.skipUntil = -1;
         continue;
       }
       if (!loopOn && this.idx >= this.events.length && this.time >= this.duration) {
@@ -215,6 +234,47 @@ export class Player {
       }
       break;
     }
+  }
+
+  // ---- Learn mode ---------------------------------------------------------
+
+  /** Stop the clock at `time` and wait for the target notes there. Sounding notes ring on. */
+  waitAt(time) {
+    const notes = [];
+    for (let j = this.idx; j < this.events.length && this.events[j].time <= time + CHORD_WINDOW; j++) {
+      const e = this.events[j];
+      if (e.type === 'on' && this.learn.isTarget(e)) notes.push(e.ch === 9 ? e.note : e.note + this.transpose);
+    }
+    clearInterval(this.timer);
+    this.timer = null;
+    this.playing = false;
+    this.position = time;
+    this.scheduledTo = time;
+    this.waiting = { time, notes };
+    this.hooks.onWait?.(notes, time);
+  }
+
+  /** The player hit the right notes: carry on from where we stopped. */
+  resumeWait() {
+    if (!this.waiting) return;
+    this.skipUntil = this.waiting.time + CHORD_WINDOW;
+    this.waiting = null;
+    this.play();
+  }
+
+  /** Upcoming target notes after `time` (for a "next up" preview). */
+  nextTargets(time) {
+    if (!this.learn) return [];
+    let i = this.indexAt(time + CHORD_WINDOW + 1e-6);
+    while (i < this.events.length && !(this.events[i].type === 'on' && this.learn.isTarget(this.events[i]))) i++;
+    if (i >= this.events.length) return [];
+    const t = this.events[i].time;
+    const out = [];
+    for (; i < this.events.length && this.events[i].time <= t + CHORD_WINDOW; i++) {
+      const e = this.events[i];
+      if (e.type === 'on' && this.learn.isTarget(e)) out.push(e.ch === 9 ? e.note : e.note + this.transpose);
+    }
+    return out;
   }
 
   // ---- Follow mode: MIDI driven by an external media clock ---------------
