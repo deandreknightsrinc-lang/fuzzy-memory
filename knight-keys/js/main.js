@@ -2,10 +2,11 @@
 import { parseMidi, buildSong, writeMidi } from './midi-file.js';
 import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_CHANNEL } from './synth.js';
 import { Player } from './player.js';
-import { KeyboardView, drawStaff, drawControllers, drawGroove } from './render.js';
+import { KeyboardView, drawStaff, drawControllers, drawGroove, drawPianoRoll } from './render.js';
 import { detectChord, noteName, pcName, solfege, keyName } from './theory.js';
 import { createDemoMidi } from './demo.js';
 import { GROOVES, GroovePlayer } from './grooves.js';
+import { SONGS, songToMidi } from './songs.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -114,12 +115,13 @@ const synth = new Synth();
 synth.setMaster(settings.master);
 synth.sampleBase = 'samples/salamander/';
 
-// Auto: all 4 velocity layers (~245 MB decoded) on computers, 1 layer on phones and low-memory devices.
+// Auto: all 4 velocity layers (~360 MB decoded) on computers with 8 GB or more,
+// 1 layer (~90 MB) on phones and smaller machines.
 function resolvePianoQuality() {
   if (settings.pianoQuality !== 'auto') return settings.pianoQuality;
   const desktop = window.matchMedia?.('(pointer: fine)').matches;
   const memory = navigator.deviceMemory ?? 8;
-  return desktop && memory >= 4 ? 'high' : 'light';
+  return desktop && memory >= 8 ? 'high' : 'light';
 }
 synth.pianoQuality = resolvePianoQuality();
 
@@ -238,9 +240,15 @@ function visibleChannels() {
 }
 
 /** Color for a key, or null when unlit. */
+const LEARN_COLOR = '#ffd60a';
+
 function keyState(note) {
   const live = sourceOf('in');
   if (live.down.has(note)) return { color: liveColor.get(note) || settings.inputColor };
+  if (learn.enabled && !learn.drums) {
+    if (learn.expected.has(note)) return { color: LEARN_COLOR };
+    if (learn.next.includes(note)) return { color: LEARN_COLOR, faded: true };
+  }
   const chans = visibleChannels();
   for (const ch of chans) if (sources.get(ch)?.down.has(note)) return { color: state.chan[ch].color };
   if (settings.sustainHold) {
@@ -374,6 +382,16 @@ const player = new Player({
     if (groove.locked && state.song) groove.scheduleSpan(from, to, ctxAt, state.song);
   },
   onEnd() {
+    if (learn.enabled && learn.total) {
+      const pct = Math.round((100 * learn.correct) / Math.max(1, learn.correct + learn.wrong));
+      toast(`Song complete! ${learn.correct} notes, ${pct}% accuracy.`, [], 6000);
+    }
+    markDirty();
+  },
+  onWait(notes, time) {
+    learn.expected = new Set(notes);
+    learn.next = player.nextTargets(time);
+    learn.total += notes.length;
     markDirty();
   },
 });
@@ -432,6 +450,7 @@ function liveOn(n, vel) {
   record([0x90, note, vel]);
   liveColor.set(note, sp.enabled ? (left ? sp.leftColor : sp.rightColor) : settings.inputColor);
   dNoteOn('in', note);
+  learnCheck(note, false);
 }
 
 function liveOff(n) {
@@ -659,6 +678,8 @@ function loadMidiBytes(bytes, name, { keepLoops = false } = {}) {
   updateTitle();
   fillKeySelect();
   updateGrooveLock();
+  state.librarySong = null;
+  updateLearnParts();
   markDirty();
 }
 
@@ -718,12 +739,15 @@ function ejectMidi() {
   updateTitle();
   fillKeySelect();
   updateGrooveLock();
+  setLearn(false);
+  updateLearnParts();
 }
 
 function updateLessonMode() {
   const lesson = !!state.song && !!state.mediaFile;
   if (lesson !== state.lessonMode || player.follow !== lesson) {
     state.lessonMode = lesson;
+    if (lesson && learn.enabled) setLearn(false);
     player.setFollow(lesson);
     if (lesson) player.seek(media.currentTime + Number(settings.lessonOffset || 0));
   }
@@ -835,7 +859,7 @@ async function loadLesson(lesson) {
 const hasMedia = () => !!state.mediaFile;
 const tDuration = () => (hasMedia() ? (Number.isFinite(media.duration) ? media.duration : 0) : player.duration);
 const tTime = () => (hasMedia() ? media.currentTime : player.time);
-const isPlaying = () => (hasMedia() ? !media.paused : player.playing);
+const isPlaying = () => (hasMedia() ? !media.paused : player.playing || !!player.waiting);
 
 function togglePlay() {
   synth.ensure();
@@ -843,8 +867,10 @@ function togglePlay() {
     if (media.paused) media.play().catch((err) => toast(`Can't play: ${err.message}`));
     else media.pause();
   } else if (state.song) {
-    if (player.playing) player.pause();
-    else player.play();
+    if (player.playing || player.waiting) {
+      player.pause();
+      learn.expected.clear();
+    } else player.play();
   } else {
     toast('Open a MIDI, audio or video file — or try the demo.');
   }
@@ -1018,6 +1044,7 @@ function presetOptions(select, value, withAuto) {
 
 function channelName(ch) {
   if (ch === DRUM_CHANNEL) return 'Drums';
+  if (state.librarySong && ch <= 1) return ch === 0 ? 'Melody (right hand)' : 'Chords (left hand)';
   return GM_NAMES[state.chan[ch].program] || `Program ${state.chan[ch].program}`;
 }
 
@@ -1697,6 +1724,7 @@ function liveDrum(note, vel) {
   record([0x89, note, 0]);
   if (settings.fwdInput) sendOut([0x99, note, vel]);
   flashPad(note, vel);
+  learnCheck(note, true);
 }
 
 function toggleGroove() {
@@ -1845,6 +1873,302 @@ function renderGroove() {
   );
 }
 
+// ---- Learn mode ("wait for me") ----------------------------------------
+
+const learn = { enabled: false, channels: new Set(), drums: false, expected: new Set(), next: [], correct: 0, wrong: 0, total: 0 };
+
+function updateLearnParts() {
+  const sel = $('learnPart');
+  const prev = sel.value;
+  sel.innerHTML = '';
+  const song = state.song;
+  if (song) {
+    const melodic = song.channels.filter((ch) => ch !== DRUM_CHANNEL);
+    if (state.librarySong) {
+      sel.append(new Option('Right hand (melody)', '0'), new Option('Left hand (chords)', '1'), new Option('Both hands', '0,1'));
+    } else {
+      for (const ch of melodic) sel.append(new Option(`Ch ${ch + 1}: ${channelName(ch)}`, String(ch)));
+      if (melodic.length > 1) sel.append(new Option('All parts', melodic.join(',')));
+    }
+    if (song.channels.includes(DRUM_CHANNEL)) sel.append(new Option('Drums', String(DRUM_CHANNEL)));
+  }
+  if ([...sel.options].some((o) => o.value === prev)) sel.value = prev;
+  sel.disabled = !song;
+  $('btnLearn').disabled = !song;
+  if (learn.enabled) applyLearnPart();
+}
+
+function applyLearnPart() {
+  learn.channels = new Set($('learnPart').value.split(',').filter(Boolean).map(Number));
+  learn.drums = learn.channels.size === 1 && learn.channels.has(DRUM_CHANNEL);
+}
+
+function setLearn(on) {
+  if (on && !state.song) return toast('Open a song first (try the Songs button).');
+  if (on && state.lessonMode) return toast('Learn mode works with MIDI songs. Close the audio/video to use it.');
+  const wasPlaying = player.playing || !!player.waiting;
+  const at = player.time;
+  learn.enabled = on;
+  applyLearnPart();
+  Object.assign(learn, { expected: new Set(), next: [], correct: 0, wrong: 0, total: 0 });
+  player.learn = on ? { isTarget: (e) => learn.channels.has(e.ch) } : null;
+  $('btnLearn').classList.toggle('on', on);
+  // Restart from here so the new rules take effect right away.
+  if (wasPlaying) {
+    player.pause();
+    player.position = at;
+    player.play();
+  } else {
+    player.waiting = null;
+  }
+  if (on) toast(learn.drums ? 'Learn drums: play the highlighted pads (or hit your e-kit).' : 'Learn mode: play the yellow keys. The song waits for you.');
+  markDirty();
+}
+
+const DRUM_EQUIV = { 35: 36, 40: 38, 44: 42, 52: 49, 55: 49, 57: 49, 59: 51 };
+
+/** A note you played: is it what the song is waiting for? */
+function learnCheck(note, drum) {
+  if (!learn.enabled || !player.waiting) return;
+  if (drum !== learn.drums) return; // keys for melodic parts, pads/e-kit for drums
+  const norm = (n) => (drum ? DRUM_EQUIV[n] ?? n : n);
+  const match = [...learn.expected].find((n) => norm(n) === norm(note));
+  if (match === undefined) {
+    learn.wrong++;
+  } else {
+    learn.expected.delete(match);
+    learn.correct++;
+    if (!learn.expected.size) {
+      learn.next = [];
+      player.resumeWait();
+    }
+  }
+  markDirty();
+}
+
+function renderLearn(sf, spelling) {
+  const el = $('learnStats');
+  if (!learn.enabled) {
+    setText(el, '');
+    padEls.forEach((p) => p.classList.remove('want'));
+    return;
+  }
+  const want = [...learn.expected];
+  const names = learn.drums
+    ? want.map((n) => PADS.find(([p]) => p === (PAD_ALIAS[n] ?? n))?.[1] || `#${n}`)
+    : want.sort((a, b) => a - b).map((n) => noteName(n, sf, spelling));
+  const status = player.waiting ? `Play ${names.join(' + ')}` : player.playing ? 'Listening…' : 'Press ▶ to start';
+  setText(el, `${status} · ✓${learn.correct} ✗${learn.wrong}`);
+  const wantPads = new Set(learn.drums ? want.map((n) => PAD_ALIAS[n] ?? n) : []);
+  padEls.forEach((p, note) => p.classList.toggle('want', wantPads.has(note)));
+}
+
+// ---- Song library (tool window) ------------------------------------------
+
+function openLibrarySong(song, part) {
+  synth.ensure();
+  if (state.mediaFile) ejectMedia();
+  loadMidiBytes(songToMidi(song), `${song.title}.mid`);
+  state.librarySong = song.id;
+  updateMixerNames();
+  updateLearnParts();
+  if (part) {
+    $('learnPart').value = part;
+    setLearn(true);
+  } else if (learn.enabled) setLearn(false);
+  player.play();
+  markDirty();
+}
+
+function initSongs() {
+  const list = $('songList');
+  for (const song of SONGS) {
+    const li = document.createElement('li');
+    const top = document.createElement('div');
+    top.className = 'song-top';
+    const title = Object.assign(document.createElement('span'), { className: 'song-name', textContent: song.title });
+    const level = Object.assign(document.createElement('span'), { className: `level ${song.level.toLowerCase()}`, textContent: song.level });
+    const meta = Object.assign(document.createElement('span'), {
+      className: 'meta',
+      textContent: `${keyName(song.key)} · ${song.time[0]}/${song.time[1]} · ${song.bpm} bpm`,
+    });
+    top.append(title, level, meta);
+    const about = Object.assign(document.createElement('p'), { className: 'about', textContent: song.about });
+    const row = document.createElement('div');
+    row.className = 'row wrap';
+    const button = (label, fn, titleText) => {
+      const b = Object.assign(document.createElement('button'), { textContent: label, title: titleText || '' });
+      b.onclick = fn;
+      row.append(b);
+    };
+    button('▶ Listen', () => openLibrarySong(song), 'Hear the whole song');
+    button('🎯 Right hand', () => openLibrarySong(song, '0'), 'Learn the melody');
+    button('🎯 Left hand', () => openLibrarySong(song, '1'), 'Learn the chords');
+    button('🎯 Both hands', () => openLibrarySong(song, '0,1'));
+    if (song.drums) button('🥁 Drums', () => openLibrarySong(song, String(DRUM_CHANNEL)), 'Learn the drum part on the pads or your e-kit');
+    li.append(top, about, row);
+    list.append(li);
+  }
+  $('btnSongs').onclick = () => $('songsDlg').open || $('songsDlg').show();
+  $('songsDlg').querySelector('[data-close]').onclick = () => $('songsDlg').close();
+  makeDraggable($('songsDlg'));
+
+  $('btnLearn').onclick = () => setLearn(!learn.enabled);
+  $('learnPart').onchange = () => {
+    if (learn.enabled) setLearn(true);
+  };
+  updateLearnParts();
+}
+
+/** Floating tool windows move by their title bar. */
+function makeDraggable(dlg) {
+  const head = dlg.querySelector('.tool-head');
+  head.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('button')) return;
+    const r = dlg.getBoundingClientRect();
+    const dx = e.clientX - r.left;
+    const dy = e.clientY - r.top;
+    head.setPointerCapture(e.pointerId);
+    const move = (ev) => {
+      dlg.style.left = `${Math.max(0, Math.min(innerWidth - 120, ev.clientX - dx))}px`;
+      dlg.style.top = `${Math.max(0, Math.min(innerHeight - 40, ev.clientY - dy))}px`;
+    };
+    const up = () => {
+      head.removeEventListener('pointermove', move);
+      head.removeEventListener('pointerup', up);
+    };
+    head.addEventListener('pointermove', move);
+    head.addEventListener('pointerup', up);
+  });
+}
+
+// ---- Audio → MIDI converter (tool window) --------------------------------
+
+const cv = { file: null, buffer: null, analysis: null, notes: [], bytes: null, transcribe: null, loading: null };
+
+function cvOptions() {
+  const preset = cv.transcribe.TRANSCRIBE_PRESETS[$('cvPreset').value];
+  // Sensitivity 0–100 around the preset: higher lowers the thresholds.
+  const shift = (50 - Number($('cvSens').value)) / 100;
+  const clamp = (v) => Math.max(0.05, Math.min(0.9, v));
+  return {
+    lo: preset.lo,
+    hi: preset.hi,
+    onset: clamp(preset.onset + shift * 0.5),
+    frame: clamp(preset.frame + shift * 0.4),
+    minMs: Math.max(20, Number($('cvMinMs').value) || preset.minMs),
+  };
+}
+
+function cvDraw() {
+  drawPianoRoll($('cvRoll'), cv.notes, cv.analysis?.duration || 1, {
+    bg: '#101217',
+    fg: '#cfd3dc',
+    note: settings.inputColor,
+    empty: cv.analysis ? 'No notes found. Try raising the sensitivity.' : 'Choose a recording, then convert.',
+  });
+}
+
+function cvSetSource(file, label) {
+  cv.file = file;
+  cv.buffer = null;
+  cv.analysis = null;
+  cv.notes = [];
+  cv.bytes = null;
+  $('cvSource').textContent = label || file.name;
+  $('cvRun').disabled = false;
+  ['cvOpen', 'cvOpenMidi', 'cvDownload'].forEach((id) => ($(id).disabled = true));
+  setText($('cvStatus'), '');
+  cvDraw();
+}
+
+function cvRederive() {
+  if (!cv.analysis) return;
+  cv.notes = cv.transcribe.notesFrom(cv.analysis, cvOptions());
+  cv.bytes = writeMidi(cv.transcribe.notesToMidiEvents(cv.notes), { name: `${cv.file.name} (transcribed)` });
+  setText($('cvStatus'), `${cv.notes.length} notes from ${fmt(cv.analysis.duration)} of audio.`);
+  ['cvOpen', 'cvOpenMidi', 'cvDownload'].forEach((id) => ($(id).disabled = !cv.notes.length));
+  cvDraw();
+}
+
+/** Load the transcriber code once; every converter action waits on this. */
+async function loadTranscriber() {
+  if (!cv.transcribe) {
+    cv.loading ??= import('./transcribe.js');
+    cv.transcribe = await cv.loading;
+    const sel = $('cvPreset');
+    if (!sel.options.length) {
+      for (const [key, p] of Object.entries(cv.transcribe.TRANSCRIBE_PRESETS)) sel.append(new Option(p.label, key));
+      $('cvMinMs').value = cv.transcribe.TRANSCRIBE_PRESETS.piano.minMs;
+    }
+  }
+  return cv.transcribe;
+}
+
+async function cvRun() {
+  if (!cv.file) return;
+  await loadTranscriber();
+  $('cvRun').disabled = true;
+  $('cvProg').hidden = false;
+  $('cvProg').value = 0;
+  try {
+    if (!cv.buffer) {
+      setText($('cvStatus'), 'Decoding audio…');
+      cv.buffer = await synth.ensure().decodeAudioData(await cv.file.arrayBuffer());
+    }
+    setText($('cvStatus'), 'Loading the transcription model…');
+    const started = performance.now();
+    cv.analysis = await cv.transcribe.analyze(cv.buffer, (p) => {
+      $('cvProg').value = p;
+      setText($('cvStatus'), `Listening… ${Math.round(p * 100)}%`);
+    });
+    cvRederive();
+    setText($('cvStatus'), `${$('cvStatus').textContent} Took ${((performance.now() - started) / 1000).toFixed(1)} s.`);
+  } catch (err) {
+    console.error(err);
+    setText($('cvStatus'), `Couldn't convert: ${err.message || err}. Try a WAV or MP3.`);
+  } finally {
+    $('cvRun').disabled = false;
+    $('cvProg').hidden = true;
+  }
+}
+
+async function openConverter() {
+  const dlg = $('convertDlg');
+  if (!dlg.open) dlg.show();
+  await loadTranscriber();
+  $('cvUseMedia').disabled = !state.mediaFile;
+  cvDraw();
+}
+
+function initConverter() {
+  const dlg = $('convertDlg');
+  $('btnConvert').onclick = openConverter;
+  $('cvClose').onclick = () => dlg.close();
+  $('cvPick').onclick = () => $('cvFile').click();
+  $('cvFile').addEventListener('change', (e) => {
+    if (e.target.files[0]) cvSetSource(e.target.files[0]);
+    e.target.value = '';
+  });
+  $('cvUseMedia').onclick = () => state.mediaFile && cvSetSource(state.mediaFile, `${state.mediaFile.name} (loaded)`);
+  $('cvRun').onclick = cvRun;
+  $('cvPreset').onchange = () => {
+    $('cvMinMs').value = cv.transcribe.TRANSCRIBE_PRESETS[$('cvPreset').value].minMs;
+    cvRederive();
+  };
+  $('cvSens').addEventListener('input', cvRederive);
+  $('cvMinMs').addEventListener('change', cvRederive);
+  $('cvDownload').onclick = () => download(cv.bytes, cv.file.name.replace(/\.[^.]+$/, '') + '.mid', 'audio/midi');
+  $('cvOpenMidi').onclick = () => loadMidiBytes(cv.bytes, cv.file.name.replace(/\.[^.]+$/, '') + ' (transcribed).mid');
+  $('cvOpen').onclick = () => {
+    if (state.mediaFile !== cv.file) loadMedia(cv.file);
+    loadMidiBytes(cv.bytes, cv.file.name.replace(/\.[^.]+$/, '') + ' (transcribed).mid');
+    toast('Lesson ready: press play and the keys follow the recording.');
+  };
+
+  makeDraggable(dlg);
+}
+
 // ---- Rendering -----------------------------------------------------------
 
 const chordEls = {
@@ -1883,8 +2207,13 @@ function render() {
 
   // Staff + chord
   const notes = soundingNotes();
+  // In learn mode the score also shows the notes you need to play.
+  const staffNotes = [...notes];
+  if (learn.enabled && !learn.drums) {
+    for (const n of learn.expected) if (!staffNotes.some((x) => x.midi === n)) staffNotes.push({ midi: n, color: LEARN_COLOR });
+  }
   if (!layout.score?.hidden) {
-    drawStaff($('staffCanvas'), notes, {
+    drawStaff($('staffCanvas'), staffNotes, {
       sf,
       spelling,
       splitPoint: settings.split.enabled ? settings.split.point : 60,
@@ -1924,6 +2253,7 @@ function render() {
   }
   if (!layout.drums?.hidden) renderGroove();
   updateMeters();
+  renderLearn(sf, spelling);
 }
 
 function updateChordHistory() {
@@ -1981,6 +2311,8 @@ function frame() {
 
 syncSettingsUI();
 initDrums();
+initConverter();
+initSongs();
 applyLayout();
 applyLiveInstruments();
 buildMixer();

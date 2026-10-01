@@ -55,6 +55,8 @@
           </div>
         </div>
       </details>
+      <button id="btnSongs" title="Free songs to learn on keys or drums">Songs</button>
+      <button id="btnConvert" title="Turn a recording into MIDI">Audio → MIDI</button>
       <button id="btnSettings">Settings</button>
       <button id="btnPanic" class="danger" title="Stop all stuck notes">Panic</button>
       <label class="field master" title="Master volume">🔊
@@ -143,6 +145,9 @@
       <button id="btnB" title="Set loop end (B) at the current time">B</button>
       <button id="btnLoop" class="toggle" title="Loop between A and B">⟲ Loop</button>
       <span id="loopLabel" class="mono small"></span>
+      <button id="btnLearn" class="toggle" title="Wait for me: the song waits until you play the right notes">🎯 Learn</button>
+      <select id="learnPart" title="Which part you're learning"></select>
+      <span id="learnStats" class="mono small"></span>
     </div>
     <div class="group center">
       <button id="btnBack" title="Back 5 s">⏪</button>
@@ -225,8 +230,8 @@
           <label>Piano quality
             <select id="pianoQuality">
               <option value="auto">Auto</option>
-              <option value="high">High: 4 velocity layers (9 MB)</option>
-              <option value="light">Light: 1 layer (2 MB)</option>
+              <option value="high">High: 4 velocity layers (13 MB)</option>
+              <option value="light">Light: 1 layer (3 MB)</option>
             </select>
           </label>
           <p id="pianoStatus" class="hint"></p>
@@ -269,6 +274,56 @@
         </fieldset>
       </div>
     </form>
+  </dialog>
+
+  <dialog id="songsDlg" class="tool-window" aria-labelledby="songsTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="songsTitle">Song library</h2>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="tool-body">
+      <p class="hint">Free to use: public-domain melodies, arranged for Knight Keys. <b>🎯 Learn</b> waits for you: the song pauses until you play the right note on your keyboard (or the right drum on your e-kit or the pads), while the other parts play along.</p>
+      <ol id="songList" class="song-list"></ol>
+      <p class="hint">Add your own songs: open any MIDI file with <b>Open…</b>, or turn a recording into MIDI with <b>Audio → MIDI</b>. Learn mode works with those too.</p>
+    </div>
+  </dialog>
+
+  <dialog id="convertDlg" class="tool-window" aria-labelledby="convertTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="convertTitle">Audio → MIDI</h2>
+      <button class="mini" id="cvClose" aria-label="Close">✕</button>
+    </header>
+    <div class="tool-body">
+      <div class="row wrap">
+        <button id="cvPick">Choose audio or video…</button>
+        <input id="cvFile" type="file" hidden accept="audio/*,video/*,.wav,.mp3,.m4a,.aac,.flac,.ogg,.mp4,.mov,.webm" />
+        <button id="cvUseMedia" title="Convert the audio or video already open in Knight Keys">Use loaded audio/video</button>
+        <span id="cvSource" class="small"></span>
+      </div>
+      <div class="row wrap">
+        <label class="field">Source
+          <select id="cvPreset"></select>
+        </label>
+        <label class="field" title="Higher finds quieter notes but also more mistakes">Sensitivity
+          <input id="cvSens" type="range" min="0" max="100" value="50" />
+        </label>
+        <label class="field">Shortest note
+          <input id="cvMinMs" type="number" min="20" max="500" step="10" /> ms
+        </label>
+      </div>
+      <div class="row">
+        <button id="cvRun" class="primary" disabled>Convert to MIDI</button>
+        <progress id="cvProg" max="1" value="0" hidden></progress>
+        <span id="cvStatus" class="small"></span>
+      </div>
+      <div class="cv-roll"><canvas id="cvRoll"></canvas></div>
+      <div class="row wrap">
+        <button id="cvOpen" disabled title="Open the MIDI with the original audio/video, synced">Open as lesson with the audio</button>
+        <button id="cvOpenMidi" disabled>Open MIDI only</button>
+        <button id="cvDownload" disabled>Download .mid</button>
+      </div>
+      <p class="hint">Runs on your computer; nothing is uploaded. Solo piano works best. On full songs it catches the strongest parts, so expect to clean up. Sensitivity and shortest note update the result instantly after converting.</p>
+    </div>
   </dialog>
 
   <div id="toast" class="toast" role="status" hidden></div>
