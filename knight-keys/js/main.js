@@ -7,7 +7,7 @@ import { detectChord, noteName, pcName, solfege, keyName } from './theory.js';
 import { createDemoMidi } from './demo.js';
 import { GROOVES, GroovePlayer } from './grooves.js';
 import { SONGS, songToMidi } from './songs.js';
-import { HostSynth, IN_HOST, onHostMidi, hostSave } from './host.js';
+import { HostSynth, HostTransport, IN_HOST, onHostMidi, onHostTransport, hostSave } from './host.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -75,6 +75,7 @@ const DEFAULTS = {
   keepPitch: true,
   lessonOffset: 0,
   groove: { id: GROOVES[0].id, bpm: GROOVES[0].bpm, intensity: 'full', autoFill: 0, volume: 1, lock: true },
+  followHost: true, // plug-in: play songs and grooves in time with Logic's transport
 };
 
 // ---- Persistence ---------------------------------------------------------
@@ -156,6 +157,7 @@ const state = {
   mediaUrl: null,
   mediaReady: false,
   lessonMode: false,
+  hostDriven: false, // Logic is playing the song (plug-in, "Follow Logic")
   loop: { enabled: false, a: 0, b: 0 },
   loops: [],
   rate: 1,
@@ -878,9 +880,17 @@ async function loadLesson(lesson) {
 const hasMedia = () => !!state.mediaFile;
 const tDuration = () => (hasMedia() ? (Number.isFinite(media.duration) ? media.duration : 0) : player.duration);
 const tTime = () => (hasMedia() ? media.currentTime : player.time);
-const isPlaying = () => (hasMedia() ? !media.paused : player.playing || !!player.waiting);
+const isPlaying = () => (hasMedia() ? !media.paused : player.playing || !!player.waiting || state.hostDriven);
+
+/** Logic is playing the song: the in-app transport stays out of its way. */
+function hostBusy() {
+  if (!state.hostDriven) return false;
+  toast('Logic is playing the song. Use Logic\'s transport, or untick "Follow Logic" on the Groove panel.');
+  return true;
+}
 
 function togglePlay() {
+  if (hostBusy()) return;
   synth.ensure();
   if (hasMedia()) {
     if (media.paused) media.play().catch((err) => toast(`Can't play: ${err.message}`));
@@ -897,6 +907,7 @@ function togglePlay() {
 }
 
 function stopAll() {
+  if (hostBusy()) return;
   const start = state.loop.enabled ? state.loop.a : 0;
   if (hasMedia()) {
     media.pause();
@@ -908,6 +919,7 @@ function stopAll() {
 }
 
 function seek(t) {
+  if (hostBusy()) return;
   t = Math.max(0, Math.min(t, tDuration()));
   if (hasMedia()) media.currentTime = t;
   else player.seek(t);
@@ -1753,13 +1765,15 @@ function toggleGroove() {
     groove.start();
     $('grooveStart').classList.add('on');
     $('grooveStart').textContent = '■ Stop';
-    if (groove.locked && !isPlaying()) toast('Groove is ready. It plays along when the song plays.');
+    if (groove.locked && !isPlaying()) {
+      toast(state.song || !hostSync() ? 'Groove is ready. It plays along when the song plays.' : 'Groove is ready. It plays when you press Play in Logic.');
+    }
   }
 }
 
-/** Lock to the song only when a song is loaded; otherwise the groove free-runs. */
+/** Lock to the song when one is loaded (or to Logic's beat in the plug-in); otherwise the groove free-runs. */
 function updateGrooveLock() {
-  const locked = !!settings.groove.lock && !!state.song;
+  const locked = !!settings.groove.lock && (!!state.song || hostSync());
   groove.setLocked(locked);
   if (!locked && groove.playing) {
     synth.cancelOneShots(synth.now, GROOVE_CHANNEL);
@@ -1767,7 +1781,7 @@ function updateGrooveLock() {
   }
   $('grooveBpm').disabled = locked;
   $('grooveMatch').disabled = locked;
-  $('grooveBpm').title = locked ? "Following the song's tempo" : 'Groove tempo';
+  $('grooveBpm').title = locked ? (state.song ? "Following the song's tempo" : "Following Logic's tempo") : 'Groove tempo';
   if (!locked) $('grooveBpm').value = groove.bpm;
   updateGrooveInfo();
 }
@@ -1786,7 +1800,7 @@ function stopGroove() {
 
 function updateGrooveInfo() {
   const g = groove.pending || groove.groove;
-  const lock = groove.locked ? "🔗 Locked to the song's beat. " : '';
+  const lock = !groove.locked ? '' : state.song ? `🔗 Locked to the song's beat${hostSync() ? ' (in time with Logic)' : ''}. ` : "🔗 Locked to Logic's beat. ";
   setText($('grooveInfo'), `${lock}${g.feel}. ${g.about}`);
   $('grooveInfo').title = $('grooveInfo').textContent;
 }
@@ -1836,6 +1850,15 @@ function initDrums() {
   synth.setMix(GROOVE_CHANNEL, g.volume);
   updateGrooveInfo();
 
+  $('followHostWrap').hidden = !IN_HOST;
+  $('followHost').checked = !!settings.followHost;
+  $('followHost').onchange = () => {
+    settings.followHost = $('followHost').checked;
+    saveSettings();
+    followHost();
+    updateGrooveLock();
+  };
+
   sel.onchange = () => {
     const compiled = groove.setGroove(sel.value);
     groove.bpm = compiled.bpm;
@@ -1880,8 +1903,10 @@ function initDrums() {
 }
 
 function renderGroove() {
-  if (groove.locked && state.song) {
-    const bpm = String(Math.round(state.song.bpmAt(player.time) * state.rate / (groove.groove.beatUnit || 1)));
+  if (groove.locked) {
+    const hostTempo = hostSync() && (state.hostDriven || !state.song);
+    const quarterBpm = hostTempo ? hostClock.bpm : state.song ? state.song.bpmAt(player.time) * state.rate : groove.bpm;
+    const bpm = String(Math.round(quarterBpm / (groove.groove.beatUnit || 1)));
     if ($('grooveBpm').value !== bpm) $('grooveBpm').value = bpm;
   }
   drawGroove(
@@ -2303,6 +2328,84 @@ function updateTransport() {
   }
   setText($('timeTotal'), fmt(dur));
   setText($('btnPlay'), isPlaying() ? '❚❚' : '▶');
+}
+
+// ---- Logic tempo sync (plug-in) --------------------------------------------
+//
+// With "Follow Logic" on, pressing Play in Logic plays the loaded song (song beat 1
+// = Logic's bar 1) and the groove at Logic's tempo; Stop, locate and cycle follow.
+
+const HOST_LOOKAHEAD = 0.12;
+const hostClock = new HostTransport(() => synth.now);
+const hostFollow = { epoch: -1, song: null, grooveTo: null, grooveEpoch: -1 };
+const BEAT_CLOCK = { beatAt: (b) => b, secAt: (b) => b }; // groove spans in quarter notes
+const hostSync = () => IN_HOST && !!settings.followHost && hostClock.known;
+
+function followHost() {
+  const tr = hostClock;
+  const now = synth.now;
+  const song = state.song;
+  if (hostSync() && tr.playing && song && !state.lessonMode) {
+    let jump = tr.epoch !== hostFollow.epoch || hostFollow.song !== song;
+    if (!player.follow) {
+      player.pause();
+      player.setFollow(true);
+      jump = true;
+    }
+    if (!state.hostDriven) {
+      state.hostDriven = true;
+      markDirty();
+    }
+    hostFollow.epoch = tr.epoch;
+    hostFollow.song = song;
+    const bpm0 = song.bpmAt(0);
+    const secAt = (ppq) => (ppq <= 0 ? (ppq * 60) / bpm0 : song.secAt(ppq));
+    const beatAt = (sec) => (sec <= 0 ? (sec * bpm0) / 60 : song.beatAt(sec));
+    player.syncTo(secAt(tr.ppqAt(now)), true, {
+      ahead: secAt(tr.ppqAt(now + HOST_LOOKAHEAD)),
+      ctxAt: (sec) => tr.timeAt(beatAt(sec)),
+      jump,
+    });
+  } else if (state.hostDriven) {
+    state.hostDriven = false;
+    if (player.follow && !state.lessonMode) {
+      player.syncTo(player.position, false);
+      player.setFollow(false);
+    }
+    markDirty();
+  }
+
+  // No song: the groove alone plays on Logic's beat (bar 1 of the groove = Logic's bar 1).
+  if (hostSync() && !song && groove.playing && groove.locked && tr.playing) {
+    if (hostFollow.grooveTo === null || hostFollow.grooveEpoch !== tr.epoch) {
+      if (hostFollow.grooveTo !== null) cancelGrooveFrom(now);
+      hostFollow.grooveTo = tr.ppqAt(now);
+      hostFollow.grooveEpoch = tr.epoch;
+    }
+    const to = tr.ppqAt(now + HOST_LOOKAHEAD);
+    if (to > hostFollow.grooveTo) {
+      groove.scheduleSpan(hostFollow.grooveTo, to, (b) => tr.timeAt(b), BEAT_CLOCK);
+      hostFollow.grooveTo = to;
+    }
+  } else if (hostFollow.grooveTo !== null) {
+    hostFollow.grooveTo = null;
+    if (!state.song) cancelGrooveFrom(now);
+  }
+}
+
+function cancelGrooveFrom(at) {
+  synth.cancelOneShots(at, GROOVE_CHANNEL);
+  visualQueue = visualQueue.filter((e) => e.t < at || !e.groove);
+}
+
+if (IN_HOST) {
+  onHostTransport((pos) => {
+    const first = !hostClock.known;
+    hostClock.update(pos);
+    if (first) updateGrooveLock();
+    followHost();
+  });
+  setInterval(followHost, 25);
 }
 
 function frame() {

@@ -1,5 +1,7 @@
 #include "SoundEngine.h"
 
+#include <thread>
+
 namespace knightlyfe
 {
 
@@ -94,6 +96,42 @@ int SoundEngine::drainHostMidi (std::vector<HostMessage>& out)
     for (int i = 0; i < scope.blockSize1; ++i) out.push_back (hostSlots[(size_t) (scope.startIndex1 + i)]);
     for (int i = 0; i < scope.blockSize2; ++i) out.push_back (hostSlots[(size_t) (scope.startIndex2 + i)]);
     return scope.blockSize1 + scope.blockSize2;
+}
+
+void SoundEngine::setHostPosition (const HostPosition& p) noexcept
+{
+    positionSeq.fetch_add (1, std::memory_order_acq_rel); // odd: writing
+    posValid.store (p.valid, std::memory_order_relaxed);
+    posPlaying.store (p.playing, std::memory_order_relaxed);
+    posBpm.store (p.bpm, std::memory_order_relaxed);
+    posPpq.store (p.ppq, std::memory_order_relaxed);
+    posNum.store (p.num, std::memory_order_relaxed);
+    posDen.store (p.den, std::memory_order_relaxed);
+    posWallMs.store (p.wallMs, std::memory_order_relaxed);
+    positionSeq.fetch_add (1, std::memory_order_release); // even: done
+}
+
+SoundEngine::HostPosition SoundEngine::getHostPosition() const noexcept
+{
+    HostPosition p;
+    for (int attempt = 1;; ++attempt)
+    {
+        if (attempt % 64 == 0)
+            std::this_thread::yield(); // the audio thread is mid-write; it only takes a moment
+        const auto before = positionSeq.load (std::memory_order_acquire);
+        if ((before & 1u) != 0)
+            continue;
+        p.valid = posValid.load (std::memory_order_relaxed);
+        p.playing = posPlaying.load (std::memory_order_relaxed);
+        p.bpm = posBpm.load (std::memory_order_relaxed);
+        p.ppq = posPpq.load (std::memory_order_relaxed);
+        p.num = posNum.load (std::memory_order_relaxed);
+        p.den = posDen.load (std::memory_order_relaxed);
+        p.wallMs = posWallMs.load (std::memory_order_relaxed);
+        std::atomic_thread_fence (std::memory_order_acquire);
+        if (positionSeq.load (std::memory_order_relaxed) == before)
+            return p;
+    }
 }
 
 //==============================================================================

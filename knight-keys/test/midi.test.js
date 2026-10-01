@@ -298,3 +298,78 @@ test('learn mode waits for the target part and lets the rest play', () => {
   assert.ok(sounded.some(([ch]) => ch === 1), 'the left-hand chords played along');
   assert.deepEqual(player.nextTargets(player.waiting.time), [60]);
 });
+
+import { HostTransport } from '../js/host.js';
+
+test("host transport: position, tempo, jitter and jumps", () => {
+  let now = 10;
+  const tr = new HostTransport(() => now);
+  assert.equal(tr.known, false);
+  tr.update({ playing: true, bpm: 120, ppq: 4, age: 0 });
+  assert.equal(tr.epoch, 1);
+  now += 1;
+  assert.ok(Math.abs(tr.ppqAt(now) - 6) < 1e-9, 'two beats a second at 120 bpm');
+  assert.ok(Math.abs(tr.timeAt(8) - 12) < 1e-9);
+  tr.update({ playing: true, bpm: 120, ppq: 6.004, age: 0 }); // a few ms of jitter
+  assert.ok(Math.abs(tr.ppqAt(now) - 6) < 1e-9, 'jitter keeps the anchor');
+  assert.equal(tr.epoch, 1);
+  tr.update({ playing: true, bpm: 120, ppq: 5.85, age: 100 }); // measured 100 ms ago, 50 ms ahead
+  assert.ok(Math.abs(tr.ppqAt(now) - 6.05) < 1e-9, 'age places the report on our clock');
+  assert.equal(tr.epoch, 1, 'a small correction is not a jump');
+  tr.update({ playing: true, bpm: 120, ppq: 0, age: 0 }); // cycle back to bar 1
+  assert.equal(tr.epoch, 2);
+  tr.update({ playing: false, bpm: 120, ppq: 0.5 });
+  assert.equal(tr.epoch, 3);
+  now += 1;
+  assert.equal(tr.ppqAt(now), 0.5, 'stopped: the position holds');
+});
+
+test('player follows Logic: song beats on Logic beats, ahead of time, and cycles', () => {
+  // Song at 120 bpm: beat 2 (1 s) and beat 3 (1.5 s). Logic plays at 60 bpm.
+  const song = buildSong(parseMidi(writeMidi([
+    { time: 1, bytes: [0x90, 60, 100] }, { time: 1.2, bytes: [0x80, 60, 0] },
+    { time: 1.5, bytes: [0x90, 62, 100] }, { time: 1.7, bytes: [0x80, 62, 0] },
+  ])));
+  const { hooks, log, advance } = fakeClock();
+  const p = new Player(hooks);
+  p.load(song);
+  p.setFollow(true);
+  const tr = new HostTransport(() => hooks.now());
+  const start = hooks.now();
+  tr.update({ playing: true, bpm: 60, ppq: 0 });
+  let epoch = -1;
+  const frame = () => {
+    const t = hooks.now();
+    const jump = tr.epoch !== epoch;
+    epoch = tr.epoch;
+    p.syncTo(song.secAt(tr.ppqAt(t)), tr.playing, {
+      ahead: song.secAt(tr.ppqAt(t + 0.12)),
+      ctxAt: (sec) => tr.timeAt(song.beatAt(sec)),
+      jump,
+    });
+  };
+  for (let i = 0; i < 200; i++) {
+    frame();
+    advance(0.016);
+  }
+  const ons = log.filter((e) => e[0] === 'on');
+  assert.deepEqual(ons.map((e) => e[1]), [60, 62]);
+  assert.ok(Math.abs(ons[0][2] - (start + 2)) < 1e-6, `beat 2 at 60 bpm is 2 s in, got ${ons[0][2] - start}`);
+  assert.ok(Math.abs(ons[1][2] - (start + 3)) < 1e-6, 'beat 3 is 3 s in');
+
+  // Logic's cycle jumps back to beat 1: everything stops and the song replays from there.
+  log.length = 0;
+  tr.update({ playing: true, bpm: 60, ppq: 1 });
+  for (let i = 0; i < 100; i++) {
+    frame();
+    advance(0.016);
+  }
+  assert.equal(log[0][0], 'alloff', 'jump silences what was playing');
+  assert.equal(log.filter((e) => e[0] === 'on')[0][1], 60, 'the first note plays again');
+
+  // Stop in Logic: silence.
+  log.length = 0;
+  tr.update({ playing: false, bpm: 60, ppq: 2.5 });
+  frame();
+  assert.equal(log[0][0], 'alloff');
+});

@@ -78,6 +78,17 @@ jobs:
           ditto -c -k --keepParent "VST3/Knight Lyfe Ultimate.vst3" "$GITHUB_WORKSPACE/dist/Knight Lyfe Ultimate (VST3).zip"
           ditto -c -k --keepParent "Standalone/Knight Lyfe Ultimate.app" "$GITHUB_WORKSPACE/dist/Knight Lyfe Ultimate (App).zip"
           cp "$GITHUB_WORKSPACE/knight-lyfe-ultimate/INSTALL-MAC.txt" "$GITHUB_WORKSPACE/dist/"
+          cp "$GITHUB_WORKSPACE/knight-lyfe-ultimate/install.sh" "$GITHUB_WORKSPACE/dist/"
+
+      - name: Test the installer the way a user runs it
+        run: |
+          rm -rf ~/Library/Audio/Plug-Ins/Components/"Knight Lyfe Ultimate.component"
+          bash dist/install.sh
+          test -d "/Library/Audio/Plug-Ins/Components/Knight Lyfe Ultimate.component"
+          test -d "/Library/Audio/Plug-Ins/VST3/Knight Lyfe Ultimate.vst3"
+          test -d "/Applications/Knight Lyfe Ultimate.app"
+          codesign --verify --deep "/Library/Audio/Plug-Ins/Components/Knight Lyfe Ultimate.component"
+          auval -v aumu Kkey Klyf | grep "AU VALIDATION SUCCEEDED"
 
       - uses: actions/upload-artifact@v4
         with:
