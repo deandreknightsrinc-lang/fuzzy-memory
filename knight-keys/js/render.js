@@ -443,3 +443,87 @@ export function drawControllers(canvas, state, show, accent, fg) {
     pedal('Sustain', state.sustain);
   }
 }
+
+// ---- Groove step grid --------------------------------------------------------
+
+/**
+ * groove: compiled groove (see grooves.js). state: { step, inFill, playing }.
+ * colors: { fg, accent, fill, padColor(note) }
+ */
+export function drawGroove(canvas, groove, state, colors) {
+  const { ctx, w, h } = fitCanvas(canvas);
+  ctx.clearRect(0, 0, w, h);
+  const pattern = state.inFill ? groove.fill : groove.main;
+  // Show every drum used by either pattern so rows don't jump around.
+  const all = new Map();
+  for (const r of [...groove.main.rows, ...groove.fill.rows]) if (!all.has(r.drum)) all.set(r.drum, r);
+  const rows = [...all.values()].map((r) => pattern.rows.find((p) => p.drum === r.drum) || { ...r, cells: [] });
+  const labelW = Math.min(78, w * 0.28);
+  const headH = 14;
+  const rowH = Math.max(8, (h - headH) / rows.length);
+  const cellW = (w - labelW) / groove.steps;
+
+  ctx.font = `${Math.min(11, rowH * 0.7)}px system-ui, sans-serif`;
+  ctx.textBaseline = 'middle';
+
+  // Beat numbers
+  ctx.fillStyle = colors.fg;
+  ctx.globalAlpha = 0.6;
+  ctx.textAlign = 'center';
+  for (let b = 0; b < groove.beatsPerBar; b++) {
+    ctx.fillText(String(b + 1), labelW + (b * groove.stepsPerBeat + 0.5) * cellW, headH / 2);
+  }
+  ctx.globalAlpha = 1;
+
+  // Playhead column
+  if (state.playing && state.step >= 0) {
+    ctx.fillStyle = state.inFill ? colors.fill : colors.accent;
+    ctx.globalAlpha = 0.18;
+    ctx.fillRect(labelW + state.step * cellW, headH, cellW, h - headH);
+    ctx.globalAlpha = 1;
+  }
+
+  rows.forEach((row, r) => {
+    const y = headH + r * rowH;
+    ctx.fillStyle = colors.fg;
+    ctx.textAlign = 'right';
+    ctx.globalAlpha = 0.85;
+    ctx.fillText(row.label, labelW - 6, y + rowH / 2);
+    ctx.globalAlpha = 1;
+    for (let s = 0; s < groove.steps; s++) {
+      const x = labelW + s * cellW;
+      const vel = row.cells[s] || 0;
+      const onBeat = s % groove.stepsPerBeat === 0;
+      ctx.fillStyle = onBeat ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.035)';
+      roundRect(ctx, x + 1, y + 1, cellW - 2, rowH - 2, 2);
+      ctx.fill();
+      if (vel) {
+        const color = colors.padColor(row.note);
+        const active = state.playing && s === state.step;
+        ctx.fillStyle = color;
+        ctx.globalAlpha = active ? 1 : 0.35 + 0.65 * (vel / 127);
+        const inset = vel < 60 ? Math.min(cellW, rowH) * 0.28 : 1.5;
+        roundRect(ctx, x + inset, y + inset, cellW - inset * 2, rowH - inset * 2, 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+    }
+  });
+
+  // Beat separators
+  ctx.strokeStyle = colors.fg;
+  ctx.globalAlpha = 0.25;
+  for (let b = 1; b < groove.beatsPerBar; b++) {
+    const x = Math.round(labelW + b * groove.stepsPerBeat * cellW) + 0.5;
+    ctx.beginPath();
+    ctx.moveTo(x, headH);
+    ctx.lineTo(x, h);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  if (state.inFill) {
+    ctx.fillStyle = colors.fill;
+    ctx.textAlign = 'left';
+    ctx.fillText('FILL', 4, headH / 2);
+  }
+}

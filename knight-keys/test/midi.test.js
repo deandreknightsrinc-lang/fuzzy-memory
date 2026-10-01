@@ -113,3 +113,60 @@ test('player rate scales timing', () => {
   const on = log.find((e) => e[0] === 'on');
   assert.ok(Math.abs(on[2] - (0.05 + 2)) < 1e-6, `note at half speed lands at 2.05s, got ${on[2]}`);
 });
+
+import { GROOVES, compileGroove, GroovePlayer } from '../js/grooves.js';
+
+test('every groove pattern row has the right number of steps', () => {
+  for (const g of GROOVES) {
+    const c = compileGroove(g); // throws on a bad row length
+    assert.equal(c.main.hits.length, g.beatsPerBar * g.stepsPerBeat, g.id);
+    assert.ok(c.main.hits.some((h) => h.length), `${g.id} has hits`);
+    assert.ok(c.fill.hits.some((h) => h.length), `${g.id} has a fill`);
+  }
+});
+
+test('groove player keeps time, plays a fill and crashes after it', () => {
+  let now = 0;
+  const hits = [];
+  const steps = [];
+  const gp = new GroovePlayer({
+    now: () => now,
+    hit: (note, vel, at) => hits.push({ note, vel, at }),
+    step: (step, inFill, at) => steps.push({ step, inFill, at }),
+  });
+  gp.setGroove('halftime');
+  gp.bpm = 60; // 16th = 0.25s, bar = 4s
+  gp.start();
+  clearInterval(gp.timer);
+  gp.fill();
+  for (let i = 0; i < 560; i++) {
+    now += 0.025;
+    gp.tick();
+  }
+  gp.stop();
+  // Bar 1 was already scheduled by start(), so the fill takes bar 2.
+  const bar = (n) => steps.filter((s) => s.at >= 0.06 + 4 * (n - 1) - 1e-9 && s.at < 0.06 + 4 * n - 1e-9);
+  assert.equal(bar(1).length, 16);
+  assert.ok(bar(1).every((s) => !s.inFill));
+  assert.ok(bar(2).length === 16 && bar(2).every((s) => s.inFill), 'the queued fill replaces the next bar');
+  assert.ok(bar(3).length === 16 && bar(3).every((s) => !s.inFill));
+  assert.ok(Math.abs(steps[1].at - steps[0].at - 0.25) < 1e-9);
+  const crash = hits.find((h) => h.note === 49);
+  assert.ok(crash && Math.abs(crash.at - (0.06 + 8)) < 1e-9, 'crash on the downbeat after the fill');
+});
+
+test('light intensity drops ghost notes', () => {
+  let now = 0;
+  const vels = [];
+  const gp = new GroovePlayer({ now: () => now, hit: (n, v) => vels.push(v), step() {} });
+  gp.setGroove('neosoul');
+  gp.intensity = 'light';
+  gp.start();
+  clearInterval(gp.timer);
+  for (let i = 0; i < 100; i++) {
+    now += 0.025;
+    gp.tick();
+  }
+  gp.stop();
+  assert.ok(vels.length > 0 && vels.every((v) => v >= 60 * 0.72));
+});

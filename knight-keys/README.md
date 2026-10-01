@@ -25,6 +25,7 @@ It's published with GitHub Pages by `.github/workflows/pages.yml` on every push 
 | **Keyboard** | 25 to 88 keys, vector or realistic style, resizable. Shows C markers, note names or solfège on lit keys. Click or touch to play. |
 | **Chords** | Names the chord live (triads, 7ths, 9/11/13, altered, sus, slash chords) and says which inversion it is. Also shows the note names, solfège and a strip of recent chords. |
 | **Score** | Grand staff with the key signature. Accidentals and naturals are spelled correctly for the key. |
+| **Drums & grooves** | 16 drum pads you can tap; they also light up for MIDI file drums and for pad controllers or e-kits on channel 10. A play-along groove player with 8 gospel styles: Gospel Shuffle, Praise Break, 6/8 Worship Ballad, Half-Time Worship, Neo-Soul Pocket, Church Swing, Contemporary 16ths, Gospel Two-Step. Each has its own fill. Set the BPM or match the song, choose full or light (no ghost notes), and turn on auto fills every 4 or 8 bars. A step grid shows exactly what the drummer plays as it plays. |
 | **Wheels & pedals** | Animated pitch and mod wheels, plus sustain, sostenuto and soft pedals. |
 | **MIDI files** | Plays .mid/.midi/.kar files with tempo maps, key signatures and program changes. GM-style built-in sounds and drums. |
 | **Audio / video** | Plays mp3/wav/m4a/mp4/webm. You can slow it down with or without keeping the original pitch. |
@@ -39,7 +40,7 @@ It's published with GitHub Pages by `.github/workflows/pages.yml` on every push 
 ### Computer keyboard
 
 `A W S E D F T G Y H U J K O L P ; '` play notes, starting at C4.
-`Z` / `X` move down or up an octave. `Shift` is the sustain pedal and `Space` is play/pause.
+`Z` / `X` move down or up an octave. `Shift` is the sustain pedal and `Space` is play/pause. `G` starts or stops the groove and `F` plays a fill.
 
 ## Code layout
 
@@ -51,7 +52,8 @@ js/player.js      MIDI playback scheduler (tempo, transpose, A/B loop, follow-me
 js/synth.js       WebAudio synth: GM instrument families, drums, pedals, pitch bend
 js/midi-file.js   Standard MIDI File reader and writer
 js/theory.js      note spelling, key signatures, chord detection, solfège
-js/render.js      canvas drawing for the keyboard, grand staff, wheels and pedals
+js/render.js      canvas drawing for the keyboard, grand staff, wheels/pedals and groove grid
+js/grooves.js     gospel groove patterns and the groove step sequencer
 js/demo.js        built-in demo song
 test/             node unit tests (npm test)
 ```

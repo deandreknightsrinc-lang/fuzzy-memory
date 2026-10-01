@@ -97,7 +97,9 @@ export function presetForProgram(p) {
 export const DRUM_CHANNEL = 9;
 export const LIVE_CHANNEL = 16; // live input (right side / whole keyboard)
 export const LIVE_LEFT_CHANNEL = 17; // live input, left side of a split
-const CHANNEL_COUNT = 18;
+export const GROOVE_CHANNEL = 18; // groove player and drum pads
+const CHANNEL_COUNT = 19;
+export const isDrumChannel = (ch) => ch === DRUM_CHANNEL || ch === GROOVE_CHANNEL;
 const MAX_VOICES = 96;
 
 class Voice {
@@ -321,8 +323,8 @@ export class Synth {
     if (!this.ctx) return;
     const c = this.channels[ch];
     if (c.soft) vel = Math.max(1, Math.round(vel * 0.65));
-    if (ch === DRUM_CHANNEL) {
-      this.drum(note, vel, time);
+    if (isDrumChannel(ch)) {
+      this.drum(note, vel, time, ch);
       return;
     }
     // Re-striking a sustained note: release the old one first.
@@ -343,7 +345,7 @@ export class Synth {
   }
 
   noteOff(ch, note, time = this.now) {
-    if (!this.ctx || ch === DRUM_CHANNEL) return;
+    if (!this.ctx || isDrumChannel(ch)) return;
     const c = this.channels[ch];
     const voice = this.voices.find((v) => v.ch === ch && v.note === note && !v.released && !c.held.has(v));
     if (!voice) return;
@@ -433,10 +435,10 @@ export class Synth {
       if (hard) v.kill(time);
       else v.release(time);
     }
-    if (ch === DRUM_CHANNEL) this.cancelOneShots(time);
+    if (isDrumChannel(ch)) this.cancelOneShots(time, ch);
   }
 
-  /** Stop everything scheduled at or after `time` (used by stop / seek / loop). */
+  /** Stop song playback scheduled at or after `time` (stop / seek / loop). The groove keeps going. */
   allNotesOff(time = this.now, { resetControllers = false } = {}) {
     for (let ch = 0; ch < CHANNEL_COUNT; ch++) {
       const c = this.channels[ch];
@@ -450,7 +452,7 @@ export class Synth {
       }
     }
     for (const v of this.voices) v.release(time);
-    this.cancelOneShots(time);
+    this.cancelOneShots(time, DRUM_CHANNEL);
   }
 
   /** Panic: hard stop and controller reset. */
@@ -469,9 +471,10 @@ export class Synth {
     }
   }
 
-  cancelOneShots(time) {
+  /** Silence drum hits scheduled at or after `time`, optionally only on one channel. */
+  cancelOneShots(time, ch) {
     for (const s of this.oneShots) {
-      if (s.start >= time) {
+      if (s.start >= time && (ch === undefined || s.ch === ch)) {
         s.gain.gain.cancelScheduledValues(0);
         s.gain.gain.setValueAtTime(0, s.start);
       }
@@ -486,12 +489,12 @@ export class Synth {
 
   // ---- Drums (GM channel 10) -------------------------------------------------
 
-  drum(note, vel, time) {
+  drum(note, vel, time, ch = DRUM_CHANNEL) {
     const ctx = this.ctx;
     const v = (vel / 127) ** 1.2;
     const out = ctx.createGain();
-    out.connect(this.channelInput(DRUM_CHANNEL));
-    const shot = { start: time, end: time + 2.5, gain: out };
+    out.connect(this.channelInput(ch));
+    const shot = { start: time, end: time + 2.5, gain: out, ch };
     this.oneShots.push(shot);
     out.gain.setValueAtTime(v, time);
 
@@ -538,10 +541,10 @@ export class Synth {
         g.gain.setValueAtTime(0.9, time + i * 0.01);
       }
     } else if (note === 42 || note === 44) {
-      if (this.openHat) this.openHat.gain.setTargetAtTime(0, time, 0.01);
+      this.openHat?.[ch]?.gain.setTargetAtTime(0, time, 0.01); // closed hat chokes the open hat
       noise(0.08, 'highpass', 7500, 1, 0.5, 0.015);
     } else if (note === 46) {
-      this.openHat = noise(0.6, 'highpass', 7000, 1, 0.45, 0.12);
+      this.openHat = { ...this.openHat, [ch]: noise(0.6, 'highpass', 7000, 1, 0.45, 0.12) };
     } else if (toms[note]) {
       tone(toms[note] * 1.6, toms[note], 0.5, 'sine', 1, 0.12);
     } else if (note === 49 || note === 57 || note === 52 || note === 55) {

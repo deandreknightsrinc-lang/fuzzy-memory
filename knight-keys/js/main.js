@@ -1,10 +1,11 @@
 // Knight Keys — app wiring: MIDI I/O, files, transport, panels and rendering.
 import { parseMidi, buildSong, writeMidi } from './midi-file.js';
-import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL } from './synth.js';
+import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_CHANNEL } from './synth.js';
 import { Player } from './player.js';
-import { KeyboardView, drawStaff, drawControllers } from './render.js';
+import { KeyboardView, drawStaff, drawControllers, drawGroove } from './render.js';
 import { detectChord, noteName, pcName, solfege, keyName } from './theory.js';
 import { createDemoMidi } from './demo.js';
+import { GROOVES, GroovePlayer } from './grooves.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -70,6 +71,7 @@ const DEFAULTS = {
   master: 0.8,
   keepPitch: true,
   lessonOffset: 0,
+  groove: { id: GROOVES[0].id, bpm: GROOVES[0].bpm, intensity: 'full', autoFill: 0, volume: 1 },
 };
 
 // ---- Persistence ---------------------------------------------------------
@@ -92,7 +94,12 @@ function save(key, value) {
 }
 
 const stored = load('kk.settings', {});
-const settings = { ...DEFAULTS, ...stored, split: { ...DEFAULTS.split, ...(stored.split || {}) } };
+const settings = {
+  ...DEFAULTS,
+  ...stored,
+  split: { ...DEFAULTS.split, ...(stored.split || {}) },
+  groove: { ...DEFAULTS.groove, ...(stored.groove || {}) },
+};
 const saveSettings = () => save('kk.settings', settings);
 
 // ---- Core state ------------------------------------------------------------
@@ -227,8 +234,13 @@ const solfegeMode = () => (settings.solfege === 'off' ? 'fixed' : settings.solfe
 
 // ---- Visual event queue (keeps lights in sync with scheduled audio) ------
 
+// Kept sorted by time: the song player and the groove player both feed it.
 let visualQueue = [];
-const atTime = (t, fn) => visualQueue.push({ t, fn });
+function atTime(t, fn, groove = false) {
+  let i = visualQueue.length;
+  while (i > 0 && visualQueue[i - 1].t > t) i--;
+  visualQueue.splice(i, 0, { t, fn, groove });
+}
 
 // ---- MIDI output ---------------------------------------------------------
 
@@ -267,7 +279,10 @@ const player = new Player({
   noteOn(ch, note, vel, at) {
     if (playbackSound()) synth.noteOn(ch, note, vel, at);
     if (settings.fwdPlayback) sendOut([0x90 | ch, note, vel], at);
-    atTime(at, () => dNoteOn(ch, note));
+    atTime(at, () => {
+      dNoteOn(ch, note);
+      if (ch === DRUM_CHANNEL && !effectiveMute(ch)) flashPad(note, vel);
+    });
   },
   noteOff(ch, note, at) {
     if (playbackSound()) synth.noteOff(ch, note, at);
@@ -314,7 +329,7 @@ const player = new Player({
   allNotesOff(at) {
     synth.allNotesOff(at);
     if (settings.fwdPlayback) outputAllOff();
-    visualQueue = visualQueue.filter((e) => e.t < at);
+    visualQueue = visualQueue.filter((e) => e.t < at || e.groove);
     atTime(at, clearPlaybackDisplay);
   },
   onEnd() {
@@ -342,6 +357,11 @@ function handleLive(bytes) {
   const type = st & 0xf0;
   const d1 = bytes[1] ?? 0;
   const d2 = bytes[2] ?? 0;
+  // Channel 10 is drums (pad controllers, e-kits): play the drum sounds and light the pads.
+  if ((st & 0x0f) === DRUM_CHANNEL && (type === 0x90 || type === 0x80)) {
+    if (type === 0x90 && d2 > 0) liveDrum(d1, d2);
+    return;
+  }
   if (type === 0x90 && d2 > 0) liveOn(d1, d2);
   else if (type === 0x80 || type === 0x90) liveOff(d1);
   else if (type === 0xb0) liveCC(d1, d2);
@@ -470,6 +490,15 @@ window.addEventListener('keydown', (e) => {
     return;
   }
   if (e.repeat) return;
+  if (e.code === 'KeyG' && !e.shiftKey) {
+    toggleGroove();
+    return;
+  }
+  if (e.code === 'KeyF' && groove.playing) {
+    groove.fill();
+    toast('Fill coming up');
+    return;
+  }
   if (e.code === 'KeyZ') {
     kbOctave = Math.max(-4, kbOctave - 1);
     toast(`Computer keys: C${4 + kbOctave}`);
@@ -1119,7 +1148,8 @@ $('btnAddLoop').onclick = () => {
 
 const workspace = $('workspace');
 const panels = [...document.querySelectorAll('.panel')];
-const defaultLayout = () => Object.fromEntries(panels.map((p) => [p.dataset.panel, { hidden: false, floating: false }]));
+// Video/audio stays out of the way until a media file is opened.
+const defaultLayout = () => Object.fromEntries(panels.map((p) => [p.dataset.panel, { hidden: p.dataset.panel === 'media', floating: false }]));
 let layout = { ...defaultLayout(), ...load('kk.layout', {}) };
 const saveLayout = () => save('kk.layout', layout);
 
@@ -1334,10 +1364,11 @@ function applyLayout() {
 }
 
 const LAYOUTS = {
-  full: ['score', 'chord', 'mixer', 'media', 'loops', 'keyboard', 'controls'],
+  full: ['score', 'chord', 'mixer', 'drums', 'media', 'loops', 'keyboard', 'controls'],
   keys: ['keyboard', 'controls', 'chord'],
   score: ['score', 'chord', 'keyboard', 'controls'],
   video: ['media', 'chord', 'keyboard'],
+  drums: ['score', 'chord', 'drums', 'keyboard', 'controls'],
 };
 document.querySelectorAll('[data-layout]').forEach((btn) => {
   btn.onclick = () => {
@@ -1530,6 +1561,7 @@ window.addEventListener('drop', (e) => {
 });
 
 function panic() {
+  stopGroove();
   synth.panic();
   player.active.clear();
   visualQueue = [];
@@ -1568,6 +1600,170 @@ function toast(message, actions = [], ms = 3500) {
   el.hidden = false;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => (el.hidden = true), ms);
+}
+
+// ---- Drum pads & grooves --------------------------------------------------
+
+const PADS = [
+  [49, 'Crash'], [51, 'Ride'], [53, 'Ride bell'], [54, 'Tamb.'],
+  [46, 'Open hat'], [42, 'Hi-hat'], [44, 'Pedal hat'], [39, 'Clap'],
+  [50, 'High tom'], [47, 'Mid tom'], [45, 'Low tom'], [41, 'Floor tom'],
+  [36, 'Kick'], [38, 'Snare'], [37, 'Side stick'], [56, 'Cowbell'],
+];
+// Other General MIDI drum notes light up the nearest pad.
+const PAD_ALIAS = { 35: 36, 40: 38, 48: 47, 43: 41, 57: 49, 52: 49, 55: 49, 59: 51 };
+const PAD_COLORS = { 36: '#ff7a45', 38: '#4f8cff', 37: '#40a9ff', 39: '#5cdbd3', 42: '#fadb14', 44: '#d3f261', 46: '#ffa940', 49: '#f759ab', 51: '#b37feb', 53: '#9254de', 54: '#73d13d', 56: '#95de64', 50: '#36cfc9', 47: '#36cfc9', 45: '#13c2c2', 41: '#08979c' };
+const padColor = (note) => PAD_COLORS[PAD_ALIAS[note] ?? note] || '#8c8c8c';
+const padEls = new Map();
+
+const groove = new GroovePlayer({
+  now: () => synth.now,
+  hit(note, vel, at) {
+    synth.noteOn(GROOVE_CHANNEL, note, vel, at);
+    atTime(at, () => flashPad(note, vel), true);
+  },
+  step(step, inFill, at) {
+    atTime(at, () => {
+      grooveView.step = step;
+      grooveView.inFill = inFill;
+      markDirty();
+    }, true);
+  },
+});
+const grooveView = { step: -1, inFill: false };
+
+function flashPad(note, vel) {
+  const el = padEls.get(PAD_ALIAS[note] ?? note);
+  if (!el) return;
+  el.classList.remove('hit');
+  void el.offsetWidth; // restart the animation
+  el.classList.add('hit');
+}
+
+function liveDrum(note, vel) {
+  synth.ensure();
+  synth.noteOn(GROOVE_CHANNEL, note, vel);
+  record([0x99, note, vel]);
+  record([0x89, note, 0]);
+  if (settings.fwdInput) sendOut([0x99, note, vel]);
+  flashPad(note, vel);
+}
+
+function toggleGroove() {
+  if (groove.playing) stopGroove();
+  else {
+    synth.ensure();
+    groove.start();
+    $('grooveStart').classList.add('on');
+    $('grooveStart').textContent = '■ Stop';
+  }
+}
+
+function stopGroove() {
+  groove.stop();
+  if (synth.ctx) synth.cancelOneShots(synth.now, GROOVE_CHANNEL);
+  visualQueue = visualQueue.filter((e) => !e.groove);
+  grooveView.step = -1;
+  grooveView.inFill = false;
+  $('grooveStart').classList.remove('on');
+  $('grooveStart').textContent = '▶ Groove';
+  updateGrooveInfo();
+  markDirty();
+}
+
+function updateGrooveInfo() {
+  const g = groove.pending || groove.groove;
+  setText($('grooveInfo'), `${g.feel}. ${g.about}`);
+  $('grooveInfo').title = $('grooveInfo').textContent;
+}
+
+function saveGroove() {
+  Object.assign(settings.groove, {
+    id: (groove.pending || groove.groove).id,
+    bpm: groove.bpm,
+    intensity: groove.intensity,
+    autoFill: groove.autoFill,
+  });
+  saveSettings();
+}
+
+function initDrums() {
+  const pads = $('pads');
+  for (const [note, label] of PADS) {
+    const b = Object.assign(document.createElement('button'), { className: 'pad', textContent: label, title: `${label} (note ${note})` });
+    b.style.setProperty('--pad', padColor(note));
+    b.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      liveDrum(note, 70 + Math.round(50 * Math.min(1, e.pressure || 0.7)));
+    });
+    padEls.set(note, b);
+    pads.append(b);
+  }
+
+  const sel = $('grooveSel');
+  for (const g of GROOVES) sel.append(new Option(`${g.name} · ${g.bpm} bpm`, g.id));
+  const g = settings.groove;
+  sel.value = GROOVES.some((x) => x.id === g.id) ? g.id : GROOVES[0].id;
+  groove.setGroove(sel.value);
+  groove.bpm = g.bpm;
+  groove.intensity = g.intensity;
+  groove.autoFill = Number(g.autoFill) || 0;
+  $('grooveBpm').value = g.bpm;
+  $('grooveIntensity').value = g.intensity;
+  $('grooveAutoFill').value = String(groove.autoFill);
+  $('grooveVol').value = g.volume;
+  synth.setMix(GROOVE_CHANNEL, g.volume);
+  updateGrooveInfo();
+
+  sel.onchange = () => {
+    const compiled = groove.setGroove(sel.value);
+    groove.bpm = compiled.bpm;
+    $('grooveBpm').value = compiled.bpm;
+    updateGrooveInfo();
+    saveGroove();
+    markDirty();
+  };
+  $('grooveStart').onclick = toggleGroove;
+  $('grooveFill').onclick = () => {
+    if (!groove.playing) toggleGroove();
+    else groove.fill();
+  };
+  $('grooveBpm').addEventListener('change', () => {
+    groove.bpm = Math.max(40, Math.min(240, Number($('grooveBpm').value) || 90));
+    $('grooveBpm').value = groove.bpm;
+    saveGroove();
+  });
+  $('grooveMatch').onclick = () => {
+    if (!state.song) {
+      toast('Load a MIDI file first, then match its tempo.');
+      return;
+    }
+    groove.bpm = Math.round(state.song.bpm * state.rate);
+    $('grooveBpm').value = groove.bpm;
+    saveGroove();
+  };
+  $('grooveIntensity').onchange = () => {
+    groove.intensity = $('grooveIntensity').value;
+    saveGroove();
+  };
+  $('grooveAutoFill').onchange = () => {
+    groove.autoFill = Number($('grooveAutoFill').value);
+    saveGroove();
+  };
+  $('grooveVol').oninput = () => {
+    settings.groove.volume = Number($('grooveVol').value);
+    synth.setMix(GROOVE_CHANNEL, settings.groove.volume);
+    saveSettings();
+  };
+}
+
+function renderGroove() {
+  drawGroove(
+    $('grooveCanvas'),
+    groove.playing ? groove.groove : groove.pending || groove.groove,
+    { step: grooveView.step, inFill: grooveView.inFill, playing: groove.playing },
+    { fg: panelVar('drums', '--panel-fg', '#ccc'), accent: settings.inputColor, fill: '#f759ab', padColor },
+  );
 }
 
 // ---- Rendering -----------------------------------------------------------
@@ -1647,6 +1843,7 @@ function render() {
       panelVar('controls', '--panel-fg', '#ccc'),
     );
   }
+  if (!layout.drums?.hidden) renderGroove();
   updateMeters();
 }
 
@@ -1704,6 +1901,7 @@ function frame() {
 // ---- Boot ----------------------------------------------------------------
 
 syncSettingsUI();
+initDrums();
 applyLayout();
 applyLiveInstruments();
 buildMixer();

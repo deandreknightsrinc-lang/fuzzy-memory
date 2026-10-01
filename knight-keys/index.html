@@ -45,6 +45,7 @@
             <button data-layout="keys">Keyboard</button>
             <button data-layout="score">Score + keys</button>
             <button data-layout="video">Video lesson</button>
+            <button data-layout="drums">Play along</button>
           </div>
           <div class="menu-title">Panels</div>
           <div id="panelToggles" class="checks"></div>
@@ -80,6 +81,32 @@
     <div class="row-area mid">
       <section class="panel" data-panel="mixer" data-title="MIDI channels" style="flex:1.4">
         <div class="panel-body scroll"><div id="mixer" class="mixer"></div></div>
+      </section>
+      <section class="panel" data-panel="drums" data-title="Drums &amp; grooves" style="flex:2">
+        <div class="panel-body drums-body">
+          <div class="groove-bar">
+            <select id="grooveSel" title="Groove"></select>
+            <button id="grooveStart" class="toggle" title="Start / stop the groove (G)">▶ Groove</button>
+            <button id="grooveFill" title="Play a fill in place of the next bar (F)">Fill</button>
+            <label class="field" title="Groove tempo">BPM <input id="grooveBpm" type="number" min="40" max="240" step="1" /></label>
+            <button id="grooveMatch" class="mini" title="Match the loaded song's tempo">= song</button>
+            <select id="grooveIntensity" title="How busy the drummer plays">
+              <option value="full">Full</option>
+              <option value="light">Light (no ghost notes)</option>
+            </select>
+            <select id="grooveAutoFill" title="Automatic fills">
+              <option value="0">No auto fills</option>
+              <option value="4">Fill every 4 bars</option>
+              <option value="8">Fill every 8 bars</option>
+            </select>
+            <label class="field" title="Groove volume">🔊 <input id="grooveVol" type="range" min="0" max="1.5" step="0.01" /></label>
+          </div>
+          <div class="drums-main">
+            <div id="pads" class="pads"></div>
+            <div class="groove-grid"><canvas id="grooveCanvas"></canvas></div>
+          </div>
+          <p id="grooveInfo" class="groove-info"></p>
+        </div>
       </section>
       <section class="panel" data-panel="media" data-title="Video / audio" style="flex:1.4">
         <div class="panel-body media-body">
@@ -228,7 +255,7 @@
           <label>Workspace background <input type="color" id="workspaceBg" /></label>
           <p class="hint">Tip: set the background to pure green (#00ff00) to key it out in OBS for YouTube or Zoom lessons.</p>
           <label>Lesson MIDI offset (s) <input type="number" id="lessonOffset" step="0.01" /></label>
-          <p class="hint">Computer keys: A W S E D F T G Y H U J K O L P ; ' play notes, Z / X change octave, Shift = sustain, Space = play/pause.</p>
+          <p class="hint">Computer keys: A W S E D F T G Y H U J K O L P ; ' play notes, Z / X change octave, Shift = sustain, Space = play/pause, G = groove on/off, F = fill.</p>
         </fieldset>
       </div>
     </form>
