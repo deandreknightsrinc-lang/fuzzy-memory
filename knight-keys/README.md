@@ -16,7 +16,7 @@ python3 -m http.server 5173      # or: npm start
 
 Use **Chrome, Edge or Opera** to connect a MIDI keyboard over Web MIDI. Firefox works after you allow MIDI for the site. Safari has no Web MIDI, but everything else works there with the mouse or computer keys.
 
-To host it for free, turn on GitHub Pages for this repo. The app will then be at `/knight-keys/`.
+It's published with GitHub Pages by `.github/workflows/pages.yml` on every push to `main`, at `https://deandreknightsrinc-lang.github.io/fuzzy-memory/knight-keys/`.
 
 ## Features
 
