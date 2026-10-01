@@ -8,7 +8,12 @@ const INTERVAL = 25; // scheduler period, ms
 export class Player {
   /**
    * hooks: { now(), noteOn(ch, note, vel, at), noteOff(ch, note, at), control(ch, cc, v, at),
-   *          program(ch, p, at), pitch(ch, v, at), allNotesOff(at), onEnd() }
+   *          program(ch, p, at), pitch(ch, v, at), allNotesOff(at), onEnd(),
+   *          span?(fromSong, toSong, ctxAt) }
+   *
+   * `span` is called for each stretch of song time as it gets scheduled, with a
+   * function mapping song seconds to AudioContext time. Spans arrive in playback
+   * order, and a loop wrap or seek starts a new run of spans.
    */
   constructor(hooks) {
     this.hooks = hooks;
@@ -25,6 +30,7 @@ export class Player {
     this.active = new Map(); // `${ch}:${note}` -> sounding (transposed) note
     this.follow = false;
     this.lastFollow = 0;
+    this.scheduledTo = 0; // song time already handed to hooks.span
     this.timer = null;
   }
 
@@ -89,6 +95,7 @@ export class Player {
     this.anchor = { ctx: now + 0.05, song: this.position };
     this.prevAnchor = null;
     this.idx = this.indexAt(this.position);
+    this.scheduledTo = this.position;
     if (!this.follow) {
       this.tick();
       this.timer = setInterval(() => this.tick(), INTERVAL);
@@ -185,12 +192,19 @@ export class Player {
         const e = this.events[this.idx++];
         this.dispatch(e, Math.max(this.hooks.now(), this.ctxAt(e.time)));
       }
+      if (limit > this.scheduledTo) {
+        const anchor = this.anchor;
+        const rate = this.rate;
+        this.hooks.span?.(this.scheduledTo, limit, (t) => anchor.ctx + (t - anchor.song) / rate);
+        this.scheduledTo = limit;
+      }
       if (wraps) {
         const atB = this.ctxAt(this.loop.b);
         this.silence(atB);
         this.prevAnchor = this.anchor;
         this.anchor = { ctx: atB, song: this.loop.a };
         this.idx = this.indexAt(this.loop.a);
+        this.scheduledTo = this.loop.a;
         continue;
       }
       if (!loopOn && this.idx >= this.events.length && this.time >= this.duration) {
@@ -214,22 +228,33 @@ export class Player {
   syncTo(t, playing) {
     if (!this.follow || !this.song) return;
     const now = this.hooks.now();
+    const wasPlaying = this.followPlaying;
+    this.followPlaying = playing;
     if (!playing) {
-      if (Math.abs(t - this.lastFollow) > 0.001) {
+      if (wasPlaying || Math.abs(t - this.lastFollow) > 0.001) {
         this.silence(now);
         this.idx = this.indexAt(t);
       }
       this.lastFollow = t;
       this.position = t;
+      this.scheduledTo = t;
       return;
     }
     if (t < this.lastFollow - 0.05 || t > this.lastFollow + 1) {
       this.silence(now);
       this.idx = this.indexAt(t);
       this.chase(t);
+      this.scheduledTo = t;
     }
     while (this.idx < this.events.length && this.events[this.idx].time <= t) {
       this.dispatch(this.events[this.idx++], now);
+    }
+    // Look a little ahead of the media clock so locked grooves stay tight.
+    const ahead = t + LOOKAHEAD * this.rate;
+    if (ahead > this.scheduledTo) {
+      const rate = this.rate;
+      this.hooks.span?.(Math.max(this.scheduledTo, t), ahead, (sec) => now + (sec - t) / rate);
+      this.scheduledTo = ahead;
     }
     this.lastFollow = t;
     this.position = t;

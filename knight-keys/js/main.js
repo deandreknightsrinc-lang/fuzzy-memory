@@ -71,7 +71,7 @@ const DEFAULTS = {
   master: 0.8,
   keepPitch: true,
   lessonOffset: 0,
-  groove: { id: GROOVES[0].id, bpm: GROOVES[0].bpm, intensity: 'full', autoFill: 0, volume: 1 },
+  groove: { id: GROOVES[0].id, bpm: GROOVES[0].bpm, intensity: 'full', autoFill: 0, volume: 1, lock: true },
 };
 
 // ---- Persistence ---------------------------------------------------------
@@ -329,8 +329,13 @@ const player = new Player({
   allNotesOff(at) {
     synth.allNotesOff(at);
     if (settings.fwdPlayback) outputAllOff();
-    visualQueue = visualQueue.filter((e) => e.t < at || e.groove);
+    // A locked groove stops with the song; a free-running one keeps going.
+    if (groove.locked) synth.cancelOneShots(at, GROOVE_CHANNEL);
+    visualQueue = visualQueue.filter((e) => e.t < at || (e.groove && !groove.locked));
     atTime(at, clearPlaybackDisplay);
+  },
+  span(from, to, ctxAt) {
+    if (groove.locked && state.song) groove.scheduleSpan(from, to, ctxAt, state.song);
   },
   onEnd() {
     markDirty();
@@ -617,6 +622,7 @@ function loadMidiBytes(bytes, name, { keepLoops = false } = {}) {
   renderLoops();
   updateTitle();
   fillKeySelect();
+  updateGrooveLock();
   markDirty();
 }
 
@@ -675,6 +681,7 @@ function ejectMidi() {
   buildMixer();
   updateTitle();
   fillKeySelect();
+  updateGrooveLock();
 }
 
 function updateLessonMode() {
@@ -1656,7 +1663,23 @@ function toggleGroove() {
     groove.start();
     $('grooveStart').classList.add('on');
     $('grooveStart').textContent = '■ Stop';
+    if (groove.locked && !isPlaying()) toast('Groove is ready. It plays along when the song plays.');
   }
+}
+
+/** Lock to the song only when a song is loaded; otherwise the groove free-runs. */
+function updateGrooveLock() {
+  const locked = !!settings.groove.lock && !!state.song;
+  groove.setLocked(locked);
+  if (!locked && groove.playing) {
+    synth.cancelOneShots(synth.now, GROOVE_CHANNEL);
+    visualQueue = visualQueue.filter((e) => !e.groove);
+  }
+  $('grooveBpm').disabled = locked;
+  $('grooveMatch').disabled = locked;
+  $('grooveBpm').title = locked ? "Following the song's tempo" : 'Groove tempo';
+  if (!locked) $('grooveBpm').value = groove.bpm;
+  updateGrooveInfo();
 }
 
 function stopGroove() {
@@ -1673,7 +1696,8 @@ function stopGroove() {
 
 function updateGrooveInfo() {
   const g = groove.pending || groove.groove;
-  setText($('grooveInfo'), `${g.feel}. ${g.about}`);
+  const lock = groove.locked ? "🔗 Locked to the song's beat. " : '';
+  setText($('grooveInfo'), `${lock}${g.feel}. ${g.about}`);
   $('grooveInfo').title = $('grooveInfo').textContent;
 }
 
@@ -1712,6 +1736,13 @@ function initDrums() {
   $('grooveIntensity').value = g.intensity;
   $('grooveAutoFill').value = String(groove.autoFill);
   $('grooveVol').value = g.volume;
+  $('grooveLock').checked = !!g.lock;
+  $('grooveLock').onchange = () => {
+    settings.groove.lock = $('grooveLock').checked;
+    saveSettings();
+    updateGrooveLock();
+    if (settings.groove.lock && !state.song) toast('Lock is on: load a MIDI song and the groove will follow its beat.');
+  };
   synth.setMix(GROOVE_CHANNEL, g.volume);
   updateGrooveInfo();
 
@@ -1755,9 +1786,14 @@ function initDrums() {
     synth.setMix(GROOVE_CHANNEL, settings.groove.volume);
     saveSettings();
   };
+  updateGrooveLock();
 }
 
 function renderGroove() {
+  if (groove.locked && state.song) {
+    const bpm = String(Math.round(state.song.bpmAt(player.time) * state.rate / (groove.groove.beatUnit || 1)));
+    if ($('grooveBpm').value !== bpm) $('grooveBpm').value = bpm;
+  }
   drawGroove(
     $('grooveCanvas'),
     groove.playing ? groove.groove : groove.pending || groove.groove,

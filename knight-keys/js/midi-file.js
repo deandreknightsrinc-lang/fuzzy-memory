@@ -171,6 +171,25 @@ export function buildSong(parsed) {
     return s.sec + ((tick - s.tick) * s.us) / 1e6 / ppq;
   };
 
+  // Beat clock (quarter-note beats ↔ seconds), used to lock grooves to the song.
+  const segmentAt = (sec) => {
+    let lo = 0;
+    let hi = segments.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1;
+      if (segments[mid].sec <= sec) lo = mid;
+      else hi = mid - 1;
+    }
+    return segments[lo];
+  };
+  const beatAt = (sec) => {
+    if (smpte) return (sec * 120) / 60;
+    const seg = segmentAt(sec);
+    return seg.tick / ppq + ((sec - seg.sec) * 1e6) / seg.us;
+  };
+  const secAt = (beat) => (smpte ? beat / 2 : tickToSec(beat * ppq));
+  const bpmAt = (sec) => (smpte ? 120 : 60e6 / segmentAt(sec).us);
+
   const notes = [];
   const events = [];
   const usedChannels = new Set();
@@ -232,6 +251,9 @@ export function buildSong(parsed) {
     trackNames,
     channels: [...usedChannels].sort((a, b) => a - b),
     firstProgram,
+    beatAt,
+    secAt,
+    bpmAt,
   };
 }
 

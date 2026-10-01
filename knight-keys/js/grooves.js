@@ -2,6 +2,10 @@
 //
 // Patterns are strings, one character per step (spaces are ignored):
 //   X = accent   x = normal hit   o = ghost note   . = rest
+//
+// `bpm` counts the groove's own beat. `beatUnit` is that beat's length in
+// quarter notes (1.5 for a dotted-quarter 6/8 beat); it matters when the
+// groove is locked to a song, whose clock is in quarter notes.
 
 export const DRUMS = {
   kick: { note: 36, label: 'Kick' },
@@ -68,6 +72,7 @@ export const GROOVES = [
     feel: '6/8, two big beats per bar',
     about: 'Slow and wide: kick on 1, snare on 4, eighth notes on the hat. Count it "1-2-3-4-5-6".',
     bpm: 50,
+    beatUnit: 1.5,
     beatsPerBar: 2,
     stepsPerBeat: 6,
     main: {
@@ -206,13 +211,15 @@ export function compilePattern(pattern, steps) {
 
 export function compileGroove(g) {
   const steps = g.beatsPerBar * g.stepsPerBeat;
-  return { ...g, steps, main: compilePattern(g.main, steps), fill: compilePattern(g.fill, steps) };
+  const stepBeats = (g.beatUnit || 1) / g.stepsPerBeat; // step length in quarter notes
+  return { ...g, steps, stepBeats, main: compilePattern(g.main, steps), fill: compilePattern(g.fill, steps) };
 }
 
 const LOOKAHEAD = 0.12;
 
 /**
- * Plays a groove in a loop against the AudioContext clock.
+ * Plays a groove in a loop, either free-running on the AudioContext clock or
+ * locked to a song (see scheduleSpan).
  * hooks: { now(), hit(note, vel, at), step(step, isFill, at) }
  */
 export class GroovePlayer {
@@ -223,6 +230,7 @@ export class GroovePlayer {
     this.bpm = this.groove.bpm;
     this.intensity = 'full'; // 'full' | 'light'
     this.autoFill = 0; // fill every N bars (0 = off)
+    this.locked = false; // follow a song's beat instead of free-running
     this.playing = false;
     this.timer = null;
   }
@@ -237,6 +245,16 @@ export class GroovePlayer {
 
   get stepDur() {
     return 60 / this.bpm / this.groove.stepsPerBeat;
+  }
+
+  /** Switch between locked and free-running; a free groove restarts on beat 1. */
+  setLocked(on) {
+    if (on === this.locked) return;
+    this.locked = on;
+    if (!on && this.playing) {
+      this.step = 0;
+      this.nextTime = this.hooks.now() + 0.05;
+    }
   }
 
   start() {
@@ -268,31 +286,68 @@ export class GroovePlayer {
   }
 
   tick() {
-    if (!this.playing) return;
+    if (!this.playing || this.locked) return;
     const horizon = this.hooks.now() + LOOKAHEAD;
     while (this.nextTime < horizon) {
       if (this.step === 0) this.startBar();
       const g = this.groove;
-      const pattern = this.inFill ? g.fill : g.main;
       let at = this.nextTime;
-      if (g.swing && g.stepsPerBeat === 4 && this.step % 2 === 1) at += g.swing * this.stepDur * 0.5;
-      for (const h of pattern.hits[this.step]) {
-        let vel = h.vel;
-        if (this.intensity === 'light') {
-          if (vel < 60) continue;
-          vel = Math.round(vel * 0.72);
-        }
-        this.hooks.hit(h.note, vel, at);
-      }
-      if (this.step === 0 && this.crashNext) {
-        this.hooks.hit(DRUMS.crash.note, this.intensity === 'light' ? 80 : 110, at);
-        this.crashNext = false;
-      }
-      this.hooks.step(this.step, this.inFill, at);
+      if (this.swung(this.step)) at += g.swing * this.stepDur * 0.5;
+      this.emitStep(this.step, at);
       this.nextTime += this.stepDur;
       this.step = (this.step + 1) % g.steps;
       if (this.step === 0) this.bar++;
     }
+  }
+
+  /**
+   * Locked mode: schedule every groove step that falls in the song-time span
+   * [from, to). `ctxAt` maps song seconds to AudioContext time; `clock` is the
+   * song's beat clock ({ beatAt(sec), secAt(beat) }). Bar 1 of the groove sits
+   * on beat 0 of the song, so auto fills land at the end of 4/8-bar phrases.
+   */
+  scheduleSpan(from, to, ctxAt, clock) {
+    if (!this.playing || !this.locked) return;
+    if (this.pending) {
+      this.groove = this.pending;
+      this.pending = null;
+    }
+    const g = this.groove;
+    const b0 = clock.beatAt(from);
+    const b1 = clock.beatAt(to);
+    const now = this.hooks.now();
+    for (let k = Math.ceil(b0 / g.stepBeats - 1e-6); k * g.stepBeats < b1 - 1e-6; k++) {
+      const step = ((k % g.steps) + g.steps) % g.steps;
+      if (step === 0) {
+        this.bar = Math.floor(k / g.steps);
+        this.startBar();
+      }
+      let beat = k * g.stepBeats;
+      if (this.swung(step)) beat += g.swing * g.stepBeats * 0.5;
+      this.emitStep(step, Math.max(now, ctxAt(clock.secAt(beat))));
+    }
+  }
+
+  swung(step) {
+    const g = this.groove;
+    return !!g.swing && g.stepsPerBeat === 4 && step % 2 === 1;
+  }
+
+  emitStep(step, at) {
+    const pattern = this.inFill ? this.groove.fill : this.groove.main;
+    for (const h of pattern.hits[step]) {
+      let vel = h.vel;
+      if (this.intensity === 'light') {
+        if (vel < 60) continue;
+        vel = Math.round(vel * 0.72);
+      }
+      this.hooks.hit(h.note, vel, at);
+    }
+    if (step === 0 && this.crashNext) {
+      this.hooks.hit(DRUMS.crash.note, this.intensity === 'light' ? 80 : 110, at);
+      this.crashNext = false;
+    }
+    this.hooks.step(step, this.inFill, at);
   }
 
   startBar() {

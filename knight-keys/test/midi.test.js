@@ -170,3 +170,64 @@ test('light intensity drops ghost notes', () => {
   gp.stop();
   assert.ok(vels.length > 0 && vels.every((v) => v >= 60 * 0.72));
 });
+
+test('song beat clock follows tempo changes', () => {
+  // 120 bpm for 2 beats (1s), then 60 bpm.
+  const track = [
+    0x00, 0xff, 0x51, 0x03, 0x07, 0xa1, 0x20,
+    0x00, 0x90, 60, 100,
+    0x81, 0x40, 0xff, 0x51, 0x03, 0x0f, 0x42, 0x40, // tick 192 (2 beats at ppq 96)
+    0x60, 0x80, 60, 0,
+    0x00, 0xff, 0x2f, 0x00,
+  ];
+  const bytes = new Uint8Array([
+    0x4d, 0x54, 0x68, 0x64, 0, 0, 0, 6, 0, 0, 0, 1, 0, 96,
+    0x4d, 0x54, 0x72, 0x6b, 0, 0, 0, track.length, ...track,
+  ]);
+  const song = buildSong(parseMidi(bytes));
+  assert.ok(Math.abs(song.beatAt(0.5) - 1) < 1e-9);
+  assert.ok(Math.abs(song.beatAt(1) - 2) < 1e-9);
+  assert.ok(Math.abs(song.beatAt(2) - 3) < 1e-9);
+  assert.ok(Math.abs(song.secAt(3) - 2) < 1e-9);
+  assert.equal(Math.round(song.bpmAt(1.5)), 60);
+});
+
+test('locked groove lands on song beats through tempo, rate and loops', () => {
+  // One-bar song at 120 bpm (bar = 2s) with notes so it has a duration.
+  const song = buildSong(parseMidi(writeMidi([
+    { time: 0, bytes: [0x90, 60, 100] }, { time: 7.9, bytes: [0x80, 60, 0] },
+  ], { bpm: 120 })));
+  let now = 0;
+  const kicks = [];
+  const gp = new GroovePlayer({
+    now: () => now,
+    hit: (note, vel, at) => note === 36 && kicks.push(at),
+    step() {},
+  });
+  gp.setGroove('praise'); // kick on every beat
+  gp.setLocked(true);
+  gp.start();
+  clearInterval(gp.timer);
+  const player = new Player({
+    now: () => now, noteOn() {}, noteOff() {}, control() {}, program() {}, pitch() {},
+    allNotesOff() {}, onEnd() {},
+    span: (from, to, ctxAt) => gp.scheduleSpan(from, to, ctxAt, song),
+  });
+  player.load(song);
+  player.setRate(0.5); // half speed: beats every 1s instead of 0.5s
+  player.loop = { enabled: true, a: 1, b: 2 }; // beats 2–4
+  player.seek(1);
+  player.play();
+  clearInterval(player.timer);
+  for (let i = 0; i < 200; i++) {
+    now += 0.025;
+    player.tick();
+  }
+  player.pause();
+  gp.stop();
+  // Song starts at ctx 0.05 on beat 2; at half speed a beat is 1s; the loop is 2 beats long.
+  const expected = [];
+  for (let n = 0; n < 5; n++) expected.push(0.05 + n * 1);
+  for (const e of expected) assert.ok(kicks.some((k) => Math.abs(k - e) < 1e-6), `kick near ${e}: ${kicks.join(', ')}`);
+  for (let i = 1; i < kicks.length; i++) assert.ok(Math.abs(kicks[i] - kicks[i - 1] - 1) < 1e-6, 'kicks stay one beat apart across the loop');
+});
