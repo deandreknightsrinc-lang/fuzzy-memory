@@ -1,15 +1,14 @@
 cmake_minimum_required(VERSION 3.22)
 
+# Universal binary on Mac (Apple Silicon + Intel), macOS 11 and later.
+# These must be set before project() to take effect.
+set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "Mac architectures")
+set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "Minimum macOS version")
+
 project(KnightLyfeUltimate VERSION 0.1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Universal binary on Mac (Apple Silicon + Intel), macOS 11 and later.
-if(APPLE)
-    set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "")
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "")
-endif()
 
 # JUCE: use a local checkout with -DJUCE_DIR=/path/to/JUCE, otherwise download it.
 set(JUCE_DIR "" CACHE PATH "Path to a JUCE checkout (optional)")

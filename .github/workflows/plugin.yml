@@ -46,6 +46,14 @@ jobs:
       - name: Engine tests
         run: build/KnightLyfeEngineTests_artefacts/Release/KnightLyfeEngineTests
 
+      - name: Check it is universal and runs on macOS 11+
+        run: |
+          BIN="build/KnightLyfeUltimate_artefacts/Release/AU/Knight Lyfe Ultimate.component/Contents/MacOS/Knight Lyfe Ultimate"
+          archs=$(lipo -archs "$BIN"); echo "Architectures: $archs"
+          minos=$(otool -l "$BIN" | awk '/LC_BUILD_VERSION/{f=1} f&&/minos/{print $2; exit}'); echo "Minimum macOS: $minos"
+          [[ "$archs" == *arm64* && "$archs" == *x86_64* ]] || { echo "::error::not a universal binary"; exit 1; }
+          [[ "$minos" == "11.0" ]] || { echo "::error::minimum macOS is $minos, expected 11.0"; exit 1; }
+
       - name: Sign (ad hoc) so Apple Silicon Macs can load it
         run: |
           cd "build/KnightLyfeUltimate_artefacts/Release"
