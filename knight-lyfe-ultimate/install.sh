@@ -26,14 +26,13 @@ if [[ "$(uname)" != "Darwin" ]]; then
     echo "This installer is for macOS."; exit 1
 fi
 
-# Find a bundle (.component / .vst3 / .app): already unzipped next to this script,
-# or inside one of the zips next to it. Prints its path, or nothing.
+# Find a bundle (.component / .vst3 / .app) next to this script. The zips come
+# first: a copy unzipped by Finder (or copied between drives) can lose the
+# permissions the plug-in needs. Prints its path, or nothing.
 find_bundle() {
     local ext="$1" place found zip
     for place in "$HERE" "$HOME/Downloads/Knight-Lyfe-Ultimate-macOS" "$HOME/Downloads"; do
         [[ -d "$place" ]] || continue
-        found="$(find "$place" -maxdepth 3 -name "$NAME.$ext" -type d -not -path "*/$NAME.*/*" 2>/dev/null | head -n 1)"
-        [[ -n "$found" ]] && { echo "$found"; return; }
         for zip in "$place"/*.zip "$place"/*/*.zip; do
             [[ -f "$zip" ]] || continue
             unzip -l "$zip" 2>/dev/null | grep -q "$NAME.$ext/" || continue
@@ -43,6 +42,8 @@ find_bundle() {
             found="$(find "$out" -maxdepth 3 -name "$NAME.$ext" -type d | head -n 1)"
             [[ -n "$found" ]] && { echo "$found"; return; }
         done
+        found="$(find -H "$place" -maxdepth 3 -name "$NAME.$ext" -type d -not -path "*/$NAME.*/*" 2>/dev/null | head -n 1)"
+        [[ -n "$found" ]] && { echo "$found"; return; }
     done
 }
 
@@ -55,6 +56,8 @@ install_bundle() {
     if ! sudo ditto "$src" "$dest"; then
         warn "Could not copy the $label to $dest_dir"; return 1
     fi
+    sudo chmod -R a+rX "$dest"
+    sudo find "$dest" -path "*/Contents/MacOS/*" -type f -exec chmod 755 {} + 2>/dev/null
     sudo xattr -dr com.apple.quarantine "$dest" 2>/dev/null
     sudo xattr -cr "$dest" 2>/dev/null
     sudo codesign --force --deep --sign - "$dest" >/dev/null 2>&1 || warn "Could not re-sign the $label (it may still work)"
