@@ -56,13 +56,25 @@ test('solfege', () => {
   assert.equal(solfege(63, -3, 'movable'), 'Do');
 });
 
-import { sampleFile, nearestSample } from '../js/synth.js';
+import { sampleFile, nearestSample, layerFor } from '../js/synth.js';
 
 test('piano sample mapping covers A0–C8 within a semitone and a half', () => {
-  assert.equal(sampleFile(21), 'A0.mp3');
-  assert.equal(sampleFile(60), 'C4.mp3');
-  assert.equal(sampleFile(63), 'Ds4.mp3');
-  assert.equal(sampleFile(66), 'Fs4.mp3');
-  assert.equal(sampleFile(108), 'C8.mp3');
+  assert.equal(sampleFile(21, 4), 'A0v4.mp3');
+  assert.equal(sampleFile(60, 8), 'C4v8.mp3');
+  assert.equal(sampleFile(63, 12), 'Ds4v12.mp3');
+  assert.equal(sampleFile(66, 16), 'Fs4v16.mp3');
+  assert.equal(sampleFile(108, 8), 'C8v8.mp3');
   for (let n = 21; n <= 108; n++) assert.ok(Math.abs(nearestSample(n) - n) <= 1, `note ${n}`);
+});
+
+test('velocity picks a layer, falling back to the nearest loaded one', () => {
+  const all = new Set([4, 8, 12, 16]);
+  assert.equal(layerFor(20, all), 4);
+  assert.equal(layerFor(44, all), 4);
+  assert.equal(layerFor(60, all), 8);
+  assert.equal(layerFor(90, all), 12);
+  assert.equal(layerFor(127, all), 16);
+  assert.equal(layerFor(127, new Set([8])), 8);
+  assert.equal(layerFor(110, new Set([8, 4])), 8);
+  assert.equal(layerFor(20, new Set([8, 12])), 8);
 });
