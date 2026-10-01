@@ -107,13 +107,23 @@ const CHANNEL_COUNT = 19;
 export const isDrumChannel = (ch) => ch === DRUM_CHANNEL || ch === GROOVE_CHANNEL;
 const MAX_VOICES = 96;
 
-// Salamander samples are recorded every minor third from A0 to C8.
+// Salamander samples are recorded every minor third from A0 to C8, in 4 of the
+// original 16 velocity layers. Layer 8 loads first and is the only one in "light" quality.
 const SAMPLE_NAMES = ['C', 'Ds', 'Fs', 'A'];
 const SAMPLE_NOTES = [];
 for (let n = 21; n <= 108; n += 3) SAMPLE_NOTES.push(n);
-export const sampleFile = (note) => `${SAMPLE_NAMES[(note % 12) / 3]}${Math.floor(note / 12) - 1}.mp3`;
+export const SAMPLE_LAYERS = [4, 8, 12, 16];
+const LAYER_TOP_VELOCITY = { 4: 44, 8: 76, 12: 104, 16: 127 };
+export const sampleFile = (note, layer) => `${SAMPLE_NAMES[(note % 12) / 3]}${Math.floor(note / 12) - 1}v${layer}.mp3`;
 export const nearestSample = (note) =>
   SAMPLE_NOTES.reduce((best, n) => (Math.abs(n - note) < Math.abs(best - note) ? n : best), SAMPLE_NOTES[0]);
+
+/** The velocity layer that should play `vel`, picked from the layers loaded so far. */
+export function layerFor(vel, loaded) {
+  const wanted = SAMPLE_LAYERS.find((l) => vel <= LAYER_TOP_VELOCITY[l]);
+  if (loaded.has(wanted)) return wanted;
+  return [...loaded].reduce((best, l) => (Math.abs(l - wanted) < Math.abs(best - wanted) ? l : best));
+}
 
 /** A note played from a recorded piano sample, pitch-shifted from the nearest sample. */
 class SampleVoice {
@@ -127,18 +137,25 @@ class SampleVoice {
     this.preset = preset;
 
     const base = nearestSample(note);
-    const buffer = synth.samples.get(base);
+    const layer = layerFor(vel, synth.loadedLayers);
+    const buffer = synth.samples.get(`${base}:${layer}`);
     const v = vel / 127;
     this.src = ctx.createBufferSource();
     this.src.buffer = buffer;
     this.src.playbackRate.value = 2 ** ((note - base) / 12);
     this.src.detune.value = bendCents;
-    // One velocity layer: shape soft notes with level and a gentler, darker tone.
     const tone = ctx.createBiquadFilter();
     tone.type = 'lowpass';
-    tone.frequency.value = Math.min(20000, 900 + 19000 * v ** 1.8);
     this.env = ctx.createGain();
-    this.env.gain.value = 0.9 * (0.08 + 0.92 * v ** 1.7);
+    if (synth.loadedLayers.size > 1) {
+      // The recorded layers already carry the change in tone; add a gentler level curve on top.
+      tone.frequency.value = 20000;
+      this.env.gain.value = 0.85 * (0.3 + 0.7 * v ** 1.3);
+    } else {
+      // One layer: fake the dynamics with level and a darker tone for soft notes.
+      tone.frequency.value = Math.min(20000, 900 + 19000 * v ** 1.8);
+      this.env.gain.value = 0.9 * (0.08 + 0.92 * v ** 1.7);
+    }
     this.src.connect(tone).connect(this.env).connect(synth.channelInput(ch));
     this.src.start(time);
     this.end = time + buffer.duration / this.src.playbackRate.value + 0.05;
@@ -314,31 +331,70 @@ export class Synth {
     }
     this.channels[LIVE_LEFT_CHANNEL].program = 32;
     this.masterLevel = 0.8;
-    this.samples = new Map(); // MIDI note -> AudioBuffer
+    this.samples = new Map(); // `${note}:${layer}` -> AudioBuffer
+    this.loadedLayers = new Set();
     this.sampleBase = null; // URL folder of the piano samples; set before ensure()
+    this.pianoQuality = 'high'; // 'high' = 4 velocity layers, 'light' = 1
     this.samplesState = 'idle'; // idle | loading | ready | failed
     this.onSamplesState = () => {};
+    this.loading = null;
   }
 
-  /** Fetch and decode the piano samples once (called from ensure()). */
-  async loadSamples() {
-    if (!this.sampleBase || this.samplesState !== 'idle') return;
-    this.samplesState = 'loading';
-    this.onSamplesState(this.samplesState);
-    try {
-      await Promise.all(
-        SAMPLE_NOTES.map(async (n) => {
-          const res = await fetch(this.sampleBase + sampleFile(n));
-          if (!res.ok) throw new Error(`${sampleFile(n)}: HTTP ${res.status}`);
-          this.samples.set(n, await this.ctx.decodeAudioData(await res.arrayBuffer()));
-        }),
-      );
-      this.samplesState = 'ready';
-    } catch (err) {
-      console.warn('Piano samples failed to load; using the synth piano.', err);
-      this.samplesState = 'failed';
+  wantedLayers() {
+    return this.pianoQuality === 'light' ? [8] : [8, 4, 12, 16];
+  }
+
+  /** Switch piano quality; loads missing layers or frees unneeded ones. */
+  setPianoQuality(q) {
+    this.pianoQuality = q;
+    const wanted = this.wantedLayers();
+    for (const layer of [...this.loadedLayers]) {
+      if (wanted.includes(layer)) continue;
+      this.loadedLayers.delete(layer);
+      for (const n of SAMPLE_NOTES) this.samples.delete(`${n}:${layer}`);
     }
-    this.onSamplesState(this.samplesState);
+    if (this.ctx && this.samplesState !== 'failed') this.loadSamples();
+    else this.onSamplesState(this.samplesState);
+  }
+
+  /**
+   * Fetch and decode the piano samples (called from ensure()). The medium layer
+   * comes first so the piano is playable quickly; other layers follow.
+   */
+  async loadSamples() {
+    if (!this.sampleBase || this.loading) return this.loading;
+    this.loading = (async () => {
+      for (const layer of this.wantedLayers()) {
+        if (this.loadedLayers.has(layer)) continue;
+        if (!this.loadedLayers.size) {
+          this.samplesState = 'loading';
+          this.onSamplesState(this.samplesState);
+        }
+        try {
+          const buffers = await Promise.all(
+            SAMPLE_NOTES.map(async (n) => {
+              const file = sampleFile(n, layer);
+              const res = await fetch(this.sampleBase + file);
+              if (!res.ok) throw new Error(`${file}: HTTP ${res.status}`);
+              return [n, await this.ctx.decodeAudioData(await res.arrayBuffer())];
+            }),
+          );
+          if (!this.wantedLayers().includes(layer)) continue; // quality changed while loading
+          for (const [n, buf] of buffers) this.samples.set(`${n}:${layer}`, buf);
+          this.loadedLayers.add(layer);
+          this.samplesState = 'ready';
+        } catch (err) {
+          console.warn(`Piano layer ${layer} failed to load.`, err);
+          if (!this.loadedLayers.size) this.samplesState = 'failed';
+          break;
+        }
+        this.onSamplesState(this.samplesState);
+      }
+      this.loading = null;
+      // Quality may have been raised while this pass ran.
+      if (this.samplesState === 'ready' && this.wantedLayers().some((l) => !this.loadedLayers.has(l))) this.loadSamples();
+    })();
+    return this.loading;
   }
 
   /** Create the AudioContext (must happen after a user gesture). */

@@ -52,6 +52,7 @@ const DEFAULTS = {
   showPedals: true,
   inputColor: '#4f8cff',
   liveInstrument: 'grand',
+  pianoQuality: 'auto',
   liveMix: 1,
   split: {
     enabled: false,
@@ -112,8 +113,34 @@ const saveSettings = () => save('kk.settings', settings);
 const synth = new Synth();
 synth.setMaster(settings.master);
 synth.sampleBase = 'samples/salamander/';
+
+// Auto: all 4 velocity layers (~245 MB decoded) on computers, 1 layer on phones and low-memory devices.
+function resolvePianoQuality() {
+  if (settings.pianoQuality !== 'auto') return settings.pianoQuality;
+  const desktop = window.matchMedia?.('(pointer: fine)').matches;
+  const memory = navigator.deviceMemory ?? 8;
+  return desktop && memory >= 4 ? 'high' : 'light';
+}
+synth.pianoQuality = resolvePianoQuality();
+
+function updatePianoStatus() {
+  const el = document.getElementById('pianoStatus');
+  if (!el) return;
+  const want = synth.wantedLayers().length;
+  const have = synth.loadedLayers.size;
+  const s = synth.samplesState;
+  el.textContent =
+    s === 'failed'
+      ? "Samples couldn't load, so the synth piano is playing."
+      : s === 'idle'
+        ? `Using ${synth.pianoQuality} quality. Samples load the first time you play.`
+        : have < want
+          ? `Loading velocity layers: ${have} of ${want} ready…`
+          : `${have} velocity layer${have > 1 ? 's' : ''} loaded (${synth.pianoQuality} quality).`;
+}
 synth.onSamplesState = (s) => {
   if (s === 'failed') toast("Couldn't load the grand piano samples, so the synth piano is playing instead.");
+  updatePianoStatus();
 };
 const media = $('media');
 
@@ -1449,6 +1476,8 @@ function syncSettingsUI() {
   $('inputColor').value = s.inputColor;
   presetOptions($('liveInstrument'), s.liveInstrument, false);
   presetOptions($('leftInstrument'), s.split.leftInstrument, false);
+  $('pianoQuality').value = s.pianoQuality;
+  updatePianoStatus();
   $('splitPoint').value = s.split.point;
   $('leftColor').value = s.split.leftColor;
   $('rightColor').value = s.split.rightColor;
@@ -1517,6 +1546,11 @@ bind('liveInstrument', (v) => {
   settings.liveInstrument = v;
   applyLiveInstruments();
   buildMixer();
+});
+bind('pianoQuality', (v) => {
+  settings.pianoQuality = v;
+  synth.setPianoQuality(resolvePianoQuality());
+  updatePianoStatus();
 });
 bind('leftInstrument', (v) => {
   settings.split.leftInstrument = v;
