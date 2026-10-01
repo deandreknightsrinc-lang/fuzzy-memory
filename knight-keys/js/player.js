@@ -284,14 +284,20 @@ export class Player {
     this.follow = on;
   }
 
-  /** Call every animation frame with the media element's current time. */
-  syncTo(t, playing) {
+  /**
+   * Call every animation frame with the external clock's song time t.
+   * Options for a clock that knows the future (Logic's transport):
+   *   ahead  - song time to schedule up to (default: dispatch only what is due)
+   *   ctxAt  - maps song seconds to synth time, so notes ahead land exactly
+   *   jump   - the clock jumped (locate / cycle / start): reschedule from t
+   */
+  syncTo(t, playing, { ahead, ctxAt, jump = false } = {}) {
     if (!this.follow || !this.song) return;
     const now = this.hooks.now();
     const wasPlaying = this.followPlaying;
     this.followPlaying = playing;
     if (!playing) {
-      if (wasPlaying || Math.abs(t - this.lastFollow) > 0.001) {
+      if (wasPlaying || jump || Math.abs(t - this.lastFollow) > 0.001) {
         this.silence(now);
         this.idx = this.indexAt(t);
       }
@@ -300,21 +306,24 @@ export class Player {
       this.scheduledTo = t;
       return;
     }
-    if (t < this.lastFollow - 0.05 || t > this.lastFollow + 1) {
-      this.silence(now);
+    if (jump || !wasPlaying || t < this.lastFollow - 0.05 || t > this.lastFollow + 1) {
+      if (wasPlaying || jump) this.silence(now);
       this.idx = this.indexAt(t);
       this.chase(t);
       this.scheduledTo = t;
     }
-    while (this.idx < this.events.length && this.events[this.idx].time <= t) {
-      this.dispatch(this.events[this.idx++], now);
+    const rate = this.rate;
+    const map = ctxAt ?? ((sec) => now + (sec - t) / rate);
+    const due = ahead ?? t;
+    while (this.idx < this.events.length && this.events[this.idx].time <= due) {
+      const e = this.events[this.idx++];
+      this.dispatch(e, ctxAt ? Math.max(now, ctxAt(e.time)) : now);
     }
-    // Look a little ahead of the media clock so locked grooves stay tight.
-    const ahead = t + LOOKAHEAD * this.rate;
-    if (ahead > this.scheduledTo) {
-      const rate = this.rate;
-      this.hooks.span?.(Math.max(this.scheduledTo, t), ahead, (sec) => now + (sec - t) / rate);
-      this.scheduledTo = ahead;
+    // Look a little ahead of the clock so locked grooves stay tight.
+    const spanTo = ahead ?? t + LOOKAHEAD * rate;
+    if (spanTo > this.scheduledTo) {
+      this.hooks.span?.(Math.max(this.scheduledTo, t), spanTo, map);
+      this.scheduledTo = spanTo;
     }
     this.lastFollow = t;
     this.position = t;

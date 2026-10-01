@@ -47,6 +47,8 @@ void KnightLyfeEditor::resized()
 
 void KnightLyfeEditor::timerCallback()
 {
+    sendTransport();
+
     // Forward MIDI the host received so the keyboard, chords and learn mode follow it.
     hostMessages.clear();
     if (processor.getEngine().drainHostMidi (hostMessages) == 0)
@@ -56,6 +58,34 @@ void KnightLyfeEditor::timerCallback()
     for (const auto& m : hostMessages)
         list.add (juce::Array<juce::var> { (int) m.status, (int) m.data1, (int) m.data2 });
     browser.emitEventIfBrowserIsVisible ("hostMidi", list);
+}
+
+void KnightLyfeEditor::sendTransport()
+{
+    // Logic's tempo and playhead: every frame while it plays, and on any change
+    // (or twice a second) while it is stopped. "age" is how long ago (ms) the
+    // position was measured, so the page can place it on its own clock.
+    auto& engine = processor.getEngine();
+    const auto pos = engine.getHostPosition();
+    if (! pos.valid)
+        return;
+
+    const bool changed = pos.playing != lastTransport.playing || ! juce::exactlyEqual (pos.bpm, lastTransport.bpm)
+                         || pos.num != lastTransport.num || pos.den != lastTransport.den
+                         || (! pos.playing && ! juce::exactlyEqual (pos.ppq, lastTransport.ppq));
+    if (! pos.playing && ! changed && ++idleTransportTicks < 30)
+        return;
+    idleTransportTicks = 0;
+    lastTransport = pos;
+
+    auto* obj = new juce::DynamicObject();
+    obj->setProperty ("playing", pos.playing);
+    obj->setProperty ("bpm", pos.bpm);
+    obj->setProperty ("ppq", pos.ppq);
+    obj->setProperty ("num", pos.num);
+    obj->setProperty ("den", pos.den);
+    obj->setProperty ("age", juce::jmax (0.0, engine.clockMs() - pos.wallMs));
+    browser.emitEventIfBrowserIsVisible ("hostTransport", juce::var (obj));
 }
 
 void KnightLyfeEditor::saveFile (const juce::var& request)

@@ -1,6 +1,26 @@
 KNIGHT LYFE ULTIMATE - INSTALLING ON A MAC
 ===========================================
 
+EASY WAY (recommended) - one command does everything
+-----------------------------------------------------
+1. Open Terminal (Applications > Utilities > Terminal).
+2. Type  bash  and a space. Then drag the file "install.sh" from this folder
+   into the Terminal window (that types its location for you). Press Return.
+
+   If this folder is in Downloads you can instead paste exactly:
+
+       bash ~/Downloads/Knight-Lyfe-Ultimate-macOS/install.sh
+
+3. Type your Mac password when asked (nothing shows while you type - that is
+   normal) and press Return.
+
+The installer unzips the plug-ins, puts the Logic plug-in, the VST3 and the
+app where they belong, removes macOS's "downloaded from the internet" block,
+signs them for your Mac and checks that Logic will accept the Audio Unit.
+Skip to step 5.
+
+BY HAND (if you prefer)
+-----------------------
 Unzip the files first (double-click each .zip).
 
 1. LOGIC PRO PLUG-IN (Audio Unit)
@@ -17,12 +37,18 @@ Unzip the files first (double-click each .zip).
 
 4. LET MACOS OPEN IT
    These builds are not notarized by Apple yet, so macOS will block them at
-   first. Open Terminal (Applications > Utilities) and paste:
+   first. Open Terminal (Applications > Utilities) and paste these lines
+   (each starts with sudo; copy them exactly, including the quotes):
 
        sudo xattr -dr com.apple.quarantine "/Library/Audio/Plug-Ins/Components/Knight Lyfe Ultimate.component"
        sudo xattr -dr com.apple.quarantine "/Applications/Knight Lyfe Ultimate.app"
+       killall -9 AudioComponentRegistrar
 
    Type your Mac password when asked (nothing shows while you type).
+
+   "No such file or directory" means the file isn't in that folder yet - do
+   steps 1 and 2 first. For the app you can also right-click it > Open > Open,
+   or go to System Settings > Privacy & Security and click "Open Anyway".
 
 5. USE IT IN LOGIC
    Restart Logic Pro. Logic checks new plug-ins at start-up; if it says the
@@ -33,7 +59,11 @@ Unzip the files first (double-click each .zip).
    AU Instruments > Knight Lyfe > Knight Lyfe Ultimate
 
    Play your keyboard: you hear the grand piano through Logic, and the
-   keyboard, chords, score and learn mode follow along. Songs, Audio -> MIDI,
+   keyboard, chords, score and learn mode follow along.
+
+   TEMPO SYNC: with "Follow Logic" ticked (on the Groove panel), pressing
+   Play in Logic starts the loaded song and the drum groove in time with
+   Logic's tempo and bar position, and they stop when Logic stops. Songs, Audio -> MIDI,
    grooves and everything else from Knight Keys are inside.
 
 6. THE STANDALONE APP

@@ -8,6 +8,7 @@ The Knight Keys learning studio as a **Logic Pro plug-in (Audio Unit)**, a **VST
   - the Knight Keys drum kit
   - room reverb, a volume control and an output limiter
 - MIDI from Logic (or from your keyboard and e-kit in the standalone app) plays instantly and lights up the interface. Learn mode, recording and chord names all follow it.
+- **Tempo sync:** with **Follow Logic** ticked (Groove panel), pressing Play in Logic plays the loaded song and the groove at Logic's tempo, lined up with Logic's bar 1. Stop, moving the playhead and cycle all follow. With no song loaded, a started groove waits for Logic's Play button.
 
 ## Get it
 
@@ -15,7 +16,7 @@ Every push builds the Mac plug-in and app on GitHub, so you don't need Xcode:
 
 1. Open the repository's **Actions** tab → **Build Knight Lyfe Ultimate** → the latest green run.
 2. Under **Artifacts**, download **Knight-Lyfe-Ultimate-macOS**.
-3. Follow `INSTALL-MAC.txt` inside it.
+3. In Terminal run `bash ~/Downloads/Knight-Lyfe-Ultimate-macOS/install.sh` (or type `bash `, drag `install.sh` in, press Return). It installs the AU, VST3 and app, clears macOS's download block, signs them for your Mac and checks Logic can load the AU. `INSTALL-MAC.txt` has the details and the by-hand steps.
 
 The Mac build is universal (Apple Silicon and Intel), runs on macOS 11 or later, and is checked with Apple's `auval` Audio Unit validator on every build.
 
@@ -39,10 +40,12 @@ knight-keys/  (web app)           Source/  (C++)
   HostSynth: notes + delay          SoundEngine    timed interface notes + host MIDI
               ◀── "hostMidi" ───      PianoEngine  Salamander samples, 4 layers (shared by all instances)
   handleLive(): lights, learn         DrumSynth    synthesized GM kit
+  HostTransport ◀── "hostTransport"  (Logic's tempo, playhead, play/stop)
                                     PluginProcessor  reverb, volume, limiter, Logic state
 ```
 
 - Notes from the interface arrive with a delay in milliseconds, so song playback and grooves stay in time despite the hop between the interface and the engine. Notes you play in Logic are sample-accurate.
+- Logic's playhead is read at the start of every audio block and sent to the interface with how long ago it was measured. The interface places it on its own clock, schedules song notes and groove hits ahead of time at Logic's tempo, and reschedules when the playhead jumps.
 - The build zips `../knight-keys` (without its MP3 samples) and the piano samples into the binary, so it's a single self-contained file.
 
 ## Tests
@@ -53,12 +56,13 @@ knight-keys/  (web app)           Source/  (C++)
   - host MIDI plays and is forwarded to the interface
   - sustain pedal, drums, mixer gains, cancel, stop and panic
   - the exact JSON messages the interface sends
-- `../knight-keys/test/host.test.js` checks the interface side of the bridge.
+  - Logic's transport position is passed on without torn reads
+- `../knight-keys/test/host.test.js` checks the interface side of the bridge; `midi.test.js` checks songs following Logic's tempo, cycle and stop.
+- The Mac CI job runs `install.sh` exactly as a user would and checks the result.
 
 ## Status
 
 This is the first version of the plug-in. Planned next:
-- follow Logic's tempo and transport so grooves and songs play in sync with the project
 - notarized installer
 - Windows build
 - the AI production tools

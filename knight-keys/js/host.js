@@ -125,3 +125,58 @@ export function hostSave(bytes, filename) {
   for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
   juce.backend.emitEvent('kkSave', { name: filename, data: btoa(s) });
 }
+
+/**
+ * Logic's transport (tempo, playhead, play/stop) placed on the page's clock, so
+ * songs and grooves can play in time with it. Fed by "hostTransport" events:
+ * { playing, bpm, ppq, num, den, age } where ppq is quarter notes from bar 1 and
+ * age is how many ms ago the host measured it.
+ *
+ * Between updates the position is extrapolated from the tempo. `epoch` goes up
+ * whenever the playhead jumps (start, stop, locate, cycle) rather than moving on
+ * smoothly, so followers know to reschedule.
+ */
+export class HostTransport {
+  constructor(now = () => performance.now() / 1000) {
+    this.now = now;
+    this.known = false;
+    this.playing = false;
+    this.bpm = 120;
+    this.num = 4;
+    this.den = 4;
+    this.ppq0 = 0;
+    this.t0 = 0;
+    this.epoch = 0;
+  }
+
+  update({ playing = false, bpm = 120, ppq = 0, num = 4, den = 4, age = 0 } = {}) {
+    const t = this.now() - Math.max(0, age) / 1000;
+    playing = !!playing;
+    bpm = Math.max(20, Math.min(999, Number(bpm) || 120));
+    ppq = Number(ppq) || 0;
+    const expected = this.ppqAt(t);
+    const jumped = !this.known || playing !== this.playing || (playing ? Math.abs(ppq - expected) > 0.1 : Math.abs(ppq - this.ppq0) > 1e-6);
+    // Small differences are clock jitter: keep the anchor so the beat stays smooth.
+    if (jumped || bpm !== this.bpm || Math.abs(ppq - expected) > 0.01) {
+      this.ppq0 = ppq;
+      this.t0 = t;
+    }
+    if (jumped) this.epoch++;
+    Object.assign(this, { known: true, playing, bpm, num: num || 4, den: den || 4 });
+  }
+
+  /** Host position (quarter notes) at page time t. */
+  ppqAt(t) {
+    return this.playing ? this.ppq0 + ((t - this.t0) * this.bpm) / 60 : this.ppq0;
+  }
+
+  /** Page time when the host reaches position ppq (while playing). */
+  timeAt(ppq) {
+    return this.t0 + ((ppq - this.ppq0) * 60) / this.bpm;
+  }
+}
+
+/** Listen for Logic's transport. */
+export function onHostTransport(fn) {
+  juce?.backend.addEventListener('hostTransport', (pos) => fn(pos));
+}

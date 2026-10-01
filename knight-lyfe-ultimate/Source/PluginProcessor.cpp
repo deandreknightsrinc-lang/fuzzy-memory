@@ -51,6 +51,25 @@ void KnightLyfeProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
         target = &stereo;
     }
 
+    // Logic's tempo and playhead, so songs and grooves can play in time with it.
+    if (wrapperType != wrapperType_Standalone)
+        if (auto* hostPlayHead = getPlayHead())
+            if (const auto pos = hostPlayHead->getPosition())
+            {
+                knightlyfe::SoundEngine::HostPosition hp;
+                hp.valid = true;
+                hp.playing = pos->getIsPlaying();
+                hp.bpm = juce::jlimit (20.0, 999.0, pos->getBpm().orFallback (120.0));
+                hp.ppq = pos->getPpqPosition().orFallback (0.0);
+                if (const auto sig = pos->getTimeSignature())
+                {
+                    hp.num = sig->numerator;
+                    hp.den = sig->denominator;
+                }
+                hp.wallMs = engine.clockMs();
+                engine.setHostPosition (hp);
+            }
+
     engine.process (*target, midi);
 
     const float room = reverbParam->load();

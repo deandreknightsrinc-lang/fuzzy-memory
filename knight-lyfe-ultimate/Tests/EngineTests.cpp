@@ -2,6 +2,7 @@
 #include "Engine/SoundEngine.h"
 
 #include <cstdio>
+#include <thread>
 
 using namespace knightlyfe;
 
@@ -160,6 +161,42 @@ int main()
     r.engine.handleInterfaceBatch (juce::JSON::parse (R"({"batch":[{"m":[16,144,60,100,0]},{"panic":1}]})"));
     r.run (0.05);
     CHECK (peak (r.run (0.2)) < 0.001f, "panic message works");
+
+    std::printf ("Host transport\n");
+    {
+        SoundEngine e;
+        CHECK (! e.getHostPosition().valid, "no position until the host reports one");
+        SoundEngine::HostPosition hp;
+        hp.valid = true; hp.playing = true; hp.bpm = 92.5; hp.ppq = 17.25; hp.num = 6; hp.den = 8; hp.wallMs = 4321.0;
+        e.setHostPosition (hp);
+        const auto got = e.getHostPosition();
+        CHECK (got.valid && got.playing && juce::exactlyEqual (got.bpm, 92.5) && juce::exactlyEqual (got.ppq, 17.25)
+                   && got.num == 6 && got.den == 8 && juce::exactlyEqual (got.wallMs, 4321.0),
+               "tempo, position and time signature round-trip");
+
+        // A reader racing a writer never sees a half-written position.
+        hp.bpm = 60.0; hp.ppq = 120.0; hp.wallMs = 180.0;
+        e.setHostPosition (hp);
+        std::atomic<bool> stop { false };
+        std::thread writer ([&] {
+            for (int i = 0; ! stop; ++i)
+            {
+                SoundEngine::HostPosition w;
+                w.valid = true; w.bpm = 60.0 + (i % 100); w.ppq = w.bpm * 2.0; w.wallMs = w.bpm * 3.0;
+                e.setHostPosition (w);
+            }
+        });
+        bool consistent = true;
+        for (int i = 0; i < 200000; ++i)
+        {
+            const auto r2 = e.getHostPosition();
+            if (! juce::exactlyEqual (r2.ppq, r2.bpm * 2.0) || ! juce::exactlyEqual (r2.wallMs, r2.bpm * 3.0))
+                consistent = false;
+        }
+        stop = true;
+        writer.join();
+        CHECK (consistent, "position reads are never torn");
+    }
 
     std::printf (failures == 0 ? "\nAll engine tests passed\n" : "\n%d engine test(s) FAILED\n", failures);
     return failures == 0 ? 0 : 1;

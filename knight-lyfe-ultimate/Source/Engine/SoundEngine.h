@@ -3,6 +3,7 @@
 #include "PianoEngine.h"
 #include "DrumSynth.h"
 
+#include <atomic>
 #include <functional>
 #include <vector>
 
@@ -56,6 +57,22 @@ public:
     struct HostMessage { juce::uint8 status, data1, data2; };
     int drainHostMidi (std::vector<HostMessage>& out);
 
+    // ---- Host transport (Logic's tempo and position) ---------------------------
+    struct HostPosition
+    {
+        bool valid = false;    // the host reported a position
+        bool playing = false;
+        double bpm = 120.0;
+        double ppq = 0.0;      // quarter notes from the start of the project (bar 1)
+        int num = 4, den = 4;  // time signature
+        double wallMs = 0.0;   // clockMs() at the start of the block
+    };
+
+    /** Audio thread: remember where the host's playhead is at the start of this block. */
+    void setHostPosition (const HostPosition&) noexcept;
+    /** Any thread: the latest position (lock-free; never torn). */
+    HostPosition getHostPosition() const noexcept;
+
     bool isPianoReady() const { return samples->isReady(); }
     const PianoSamples& getSamples() const { return *samples; }
 
@@ -97,6 +114,12 @@ private:
     // Audio thread -> interface
     juce::AbstractFifo hostFifo { 2048 };
     std::vector<HostMessage> hostSlots = std::vector<HostMessage> (2048);
+
+    // Host position, published by the audio thread with a sequence lock.
+    std::atomic<juce::uint32> positionSeq { 0 };
+    std::atomic<bool> posValid { false }, posPlaying { false };
+    std::atomic<double> posBpm { 120.0 }, posPpq { 0.0 }, posWallMs { 0.0 };
+    std::atomic<int> posNum { 4 }, posDen { 4 };
 
     double sampleRate = 44100.0;
 };
