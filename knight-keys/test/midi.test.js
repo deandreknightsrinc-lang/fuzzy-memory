@@ -231,3 +231,17 @@ test('locked groove lands on song beats through tempo, rate and loops', () => {
   for (const e of expected) assert.ok(kicks.some((k) => Math.abs(k - e) < 1e-6), `kick near ${e}: ${kicks.join(', ')}`);
   for (let i = 1; i < kicks.length; i++) assert.ok(Math.abs(kicks[i] - kicks[i - 1] - 1) < 1e-6, 'kicks stay one beat apart across the loop');
 });
+
+import { notesToMidiEvents, TRANSCRIBE_PRESETS } from '../js/transcribe.js';
+
+test('transcribed notes become a playable MIDI file', () => {
+  const notes = [
+    { time: 0, dur: 0.9, note: 60, vel: 98 },
+    { time: 1, dur: 0.9, note: 63, vel: 101 },
+  ];
+  const song = buildSong(parseMidi(writeMidi(notesToMidiEvents(notes))));
+  assert.deepEqual(song.notes.map((n) => [n.note, n.vel]), [[60, 98], [63, 101]]);
+  assert.ok(Math.abs(song.notes[1].time - 1) < 0.002 && Math.abs(song.notes[1].dur - 0.9) < 0.002);
+  assert.equal(song.firstProgram[0], 0);
+  for (const p of Object.values(TRANSCRIBE_PRESETS)) assert.ok(p.lo < p.hi && p.onset > 0 && p.frame > 0);
+});

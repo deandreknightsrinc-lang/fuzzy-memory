@@ -2,7 +2,7 @@
 import { parseMidi, buildSong, writeMidi } from './midi-file.js';
 import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_CHANNEL } from './synth.js';
 import { Player } from './player.js';
-import { KeyboardView, drawStaff, drawControllers, drawGroove } from './render.js';
+import { KeyboardView, drawStaff, drawControllers, drawGroove, drawPianoRoll } from './render.js';
 import { detectChord, noteName, pcName, solfege, keyName } from './theory.js';
 import { createDemoMidi } from './demo.js';
 import { GROOVES, GroovePlayer } from './grooves.js';
@@ -1846,6 +1846,151 @@ function renderGroove() {
   );
 }
 
+// ---- Audio → MIDI converter (tool window) --------------------------------
+
+const cv = { file: null, buffer: null, analysis: null, notes: [], bytes: null, transcribe: null, loading: null };
+
+function cvOptions() {
+  const preset = cv.transcribe.TRANSCRIBE_PRESETS[$('cvPreset').value];
+  // Sensitivity 0–100 around the preset: higher lowers the thresholds.
+  const shift = (50 - Number($('cvSens').value)) / 100;
+  const clamp = (v) => Math.max(0.05, Math.min(0.9, v));
+  return {
+    lo: preset.lo,
+    hi: preset.hi,
+    onset: clamp(preset.onset + shift * 0.5),
+    frame: clamp(preset.frame + shift * 0.4),
+    minMs: Math.max(20, Number($('cvMinMs').value) || preset.minMs),
+  };
+}
+
+function cvDraw() {
+  drawPianoRoll($('cvRoll'), cv.notes, cv.analysis?.duration || 1, {
+    bg: '#101217',
+    fg: '#cfd3dc',
+    note: settings.inputColor,
+    empty: cv.analysis ? 'No notes found. Try raising the sensitivity.' : 'Choose a recording, then convert.',
+  });
+}
+
+function cvSetSource(file, label) {
+  cv.file = file;
+  cv.buffer = null;
+  cv.analysis = null;
+  cv.notes = [];
+  cv.bytes = null;
+  $('cvSource').textContent = label || file.name;
+  $('cvRun').disabled = false;
+  ['cvOpen', 'cvOpenMidi', 'cvDownload'].forEach((id) => ($(id).disabled = true));
+  setText($('cvStatus'), '');
+  cvDraw();
+}
+
+function cvRederive() {
+  if (!cv.analysis) return;
+  cv.notes = cv.transcribe.notesFrom(cv.analysis, cvOptions());
+  cv.bytes = writeMidi(cv.transcribe.notesToMidiEvents(cv.notes), { name: `${cv.file.name} (transcribed)` });
+  setText($('cvStatus'), `${cv.notes.length} notes from ${fmt(cv.analysis.duration)} of audio.`);
+  ['cvOpen', 'cvOpenMidi', 'cvDownload'].forEach((id) => ($(id).disabled = !cv.notes.length));
+  cvDraw();
+}
+
+/** Load the transcriber code once; every converter action waits on this. */
+async function loadTranscriber() {
+  if (!cv.transcribe) {
+    cv.loading ??= import('./transcribe.js');
+    cv.transcribe = await cv.loading;
+    const sel = $('cvPreset');
+    if (!sel.options.length) {
+      for (const [key, p] of Object.entries(cv.transcribe.TRANSCRIBE_PRESETS)) sel.append(new Option(p.label, key));
+      $('cvMinMs').value = cv.transcribe.TRANSCRIBE_PRESETS.piano.minMs;
+    }
+  }
+  return cv.transcribe;
+}
+
+async function cvRun() {
+  if (!cv.file) return;
+  await loadTranscriber();
+  $('cvRun').disabled = true;
+  $('cvProg').hidden = false;
+  $('cvProg').value = 0;
+  try {
+    if (!cv.buffer) {
+      setText($('cvStatus'), 'Decoding audio…');
+      cv.buffer = await synth.ensure().decodeAudioData(await cv.file.arrayBuffer());
+    }
+    setText($('cvStatus'), 'Loading the transcription model…');
+    const started = performance.now();
+    cv.analysis = await cv.transcribe.analyze(cv.buffer, (p) => {
+      $('cvProg').value = p;
+      setText($('cvStatus'), `Listening… ${Math.round(p * 100)}%`);
+    });
+    cvRederive();
+    setText($('cvStatus'), `${$('cvStatus').textContent} Took ${((performance.now() - started) / 1000).toFixed(1)} s.`);
+  } catch (err) {
+    console.error(err);
+    setText($('cvStatus'), `Couldn't convert: ${err.message || err}. Try a WAV or MP3.`);
+  } finally {
+    $('cvRun').disabled = false;
+    $('cvProg').hidden = true;
+  }
+}
+
+async function openConverter() {
+  const dlg = $('convertDlg');
+  if (!dlg.open) dlg.show();
+  await loadTranscriber();
+  $('cvUseMedia').disabled = !state.mediaFile;
+  cvDraw();
+}
+
+function initConverter() {
+  const dlg = $('convertDlg');
+  $('btnConvert').onclick = openConverter;
+  $('cvClose').onclick = () => dlg.close();
+  $('cvPick').onclick = () => $('cvFile').click();
+  $('cvFile').addEventListener('change', (e) => {
+    if (e.target.files[0]) cvSetSource(e.target.files[0]);
+    e.target.value = '';
+  });
+  $('cvUseMedia').onclick = () => state.mediaFile && cvSetSource(state.mediaFile, `${state.mediaFile.name} (loaded)`);
+  $('cvRun').onclick = cvRun;
+  $('cvPreset').onchange = () => {
+    $('cvMinMs').value = cv.transcribe.TRANSCRIBE_PRESETS[$('cvPreset').value].minMs;
+    cvRederive();
+  };
+  $('cvSens').addEventListener('input', cvRederive);
+  $('cvMinMs').addEventListener('change', cvRederive);
+  $('cvDownload').onclick = () => download(cv.bytes, cv.file.name.replace(/\.[^.]+$/, '') + '.mid', 'audio/midi');
+  $('cvOpenMidi').onclick = () => loadMidiBytes(cv.bytes, cv.file.name.replace(/\.[^.]+$/, '') + ' (transcribed).mid');
+  $('cvOpen').onclick = () => {
+    if (state.mediaFile !== cv.file) loadMedia(cv.file);
+    loadMidiBytes(cv.bytes, cv.file.name.replace(/\.[^.]+$/, '') + ' (transcribed).mid');
+    toast('Lesson ready: press play and the keys follow the recording.');
+  };
+
+  // Drag the window by its title bar.
+  const head = dlg.querySelector('.tool-head');
+  head.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('button')) return;
+    const r = dlg.getBoundingClientRect();
+    const dx = e.clientX - r.left;
+    const dy = e.clientY - r.top;
+    head.setPointerCapture(e.pointerId);
+    const move = (ev) => {
+      dlg.style.left = `${Math.max(0, Math.min(innerWidth - 120, ev.clientX - dx))}px`;
+      dlg.style.top = `${Math.max(0, Math.min(innerHeight - 40, ev.clientY - dy))}px`;
+    };
+    const up = () => {
+      head.removeEventListener('pointermove', move);
+      head.removeEventListener('pointerup', up);
+    };
+    head.addEventListener('pointermove', move);
+    head.addEventListener('pointerup', up);
+  });
+}
+
 // ---- Rendering -----------------------------------------------------------
 
 const chordEls = {
@@ -1982,6 +2127,7 @@ function frame() {
 
 syncSettingsUI();
 initDrums();
+initConverter();
 applyLayout();
 applyLiveInstruments();
 buildMixer();

@@ -527,3 +527,58 @@ export function drawGroove(canvas, groove, state, colors) {
     ctx.fillText('FILL', 4, headH / 2);
   }
 }
+
+// ---- Piano roll (transcription preview) ---------------------------------------
+
+/** notes: [{ time, dur, note, vel }] */
+export function drawPianoRoll(canvas, notes, duration, colors) {
+  const { ctx, w, h } = fitCanvas(canvas);
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = colors.bg;
+  ctx.fillRect(0, 0, w, h);
+  if (!notes.length) {
+    ctx.fillStyle = colors.fg;
+    ctx.globalAlpha = 0.5;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '13px system-ui, sans-serif';
+    ctx.fillText(colors.empty || 'No notes yet', w / 2, h / 2);
+    ctx.globalAlpha = 1;
+    return;
+  }
+  let lo = Math.min(...notes.map((n) => n.note)) - 2;
+  let hi = Math.max(...notes.map((n) => n.note)) + 2;
+  if (hi - lo < 24) {
+    const mid = (lo + hi) / 2;
+    lo = Math.floor(mid - 12);
+    hi = Math.ceil(mid + 12);
+  }
+  const rowH = h / (hi - lo + 1);
+  const xs = w / Math.max(1, duration);
+  // Black-key rows and C lines for orientation.
+  for (let n = lo; n <= hi; n++) {
+    const y = h - (n - lo + 1) * rowH;
+    if (isBlack(n)) {
+      ctx.fillStyle = 'rgba(255,255,255,0.03)';
+      ctx.fillRect(0, y, w, rowH);
+    }
+    if (n % 12 === 0) {
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      ctx.fillRect(0, y + rowH - 1, w, 1);
+      if (rowH > 3) {
+        ctx.fillStyle = colors.fg;
+        ctx.globalAlpha = 0.5;
+        ctx.font = '10px system-ui, sans-serif';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText('C' + (Math.floor(n / 12) - 1), 3, y + rowH - 1);
+        ctx.globalAlpha = 1;
+      }
+    }
+  }
+  for (const n of notes) {
+    ctx.fillStyle = colors.note;
+    ctx.globalAlpha = 0.35 + 0.65 * (n.vel / 127);
+    ctx.fillRect(n.time * xs, h - (n.note - lo + 1) * rowH, Math.max(1.5, n.dur * xs), Math.max(1.5, rowH - 0.5));
+  }
+  ctx.globalAlpha = 1;
+}

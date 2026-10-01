@@ -27,6 +27,7 @@ It's published with GitHub Pages by `.github/workflows/pages.yml` on every push 
 | **Score** | Grand staff with the key signature. Accidentals and naturals are spelled correctly for the key. |
 | **Drums & grooves** | 16 drum pads you can tap; they also light up for MIDI file drums and for pad controllers or e-kits on channel 10. A play-along groove player with 8 gospel styles: Gospel Shuffle, Praise Break, 6/8 Worship Ballad, Half-Time Worship, Neo-Soul Pocket, Church Swing, Contemporary 16ths, Gospel Two-Step. Each has its own fill. **Lock to song** (on by default) puts the groove on the song's own beat. It follows tempo changes in the file, the tempo slider, A/B loops, seeking and audio/video lessons, and plays only while the song plays. Auto fills then land at the end of the song's 4- or 8-bar phrases. With lock off, or no song loaded, the groove runs on its own BPM. You can also choose full or light (no ghost notes) and turn on auto fills every 4 or 8 bars. A step grid shows exactly what the drummer plays as it plays. |
 | **Sounds** | A sampled grand piano (Salamander Grand Piano) with 4 velocity layers, so harder playing sounds brighter as well as louder. It plays your notes and the piano parts in MIDI files. *Piano quality* in Settings chooses High (4 layers, used by default on computers) or Light (1 layer, used by default on phones). Also synthesized EP, organ, strings, bass, guitar, brass, pads and GM drums. |
+| **Audio → MIDI** | A converter window that turns a WAV, MP3, M4A or MP4 into MIDI using Spotify's Basic Pitch model, running on your computer (nothing is uploaded). Presets for piano, full songs, vocal/lead melody and bass. Sensitivity and shortest-note controls update the result instantly, with a piano-roll preview. Download the `.mid`, open it alone, or open it as a synced lesson with the original recording. |
 | **Wheels & pedals** | Animated pitch and mod wheels, plus sustain, sostenuto and soft pedals. |
 | **MIDI files** | Plays .mid/.midi/.kar files with tempo maps, key signatures and program changes. GM-style built-in sounds and drums. |
 | **Audio / video** | Plays mp3/wav/m4a/mp4/webm. You can slow it down with or without keeping the original pitch. |
@@ -55,11 +56,15 @@ js/midi-file.js   Standard MIDI File reader and writer
 js/theory.js      note spelling, key signatures, chord detection, solfège
 js/render.js      canvas drawing for the keyboard, grand staff, wheels/pedals and groove grid
 js/grooves.js     gospel groove patterns and the groove step sequencer
+js/transcribe.js  audio → MIDI with Basic Pitch
 js/demo.js        built-in demo song
 samples/          Salamander Grand Piano samples (see credits below)
+vendor/           Basic Pitch transcription model and bundled TensorFlow.js
 test/             node unit tests (npm test)
 ```
 
 ## Credits
 
 Grand piano samples: **Salamander Grand Piano** by Alexander Holm, licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). Velocity layers 4, 8, 12 and 16 of the original 16 were converted from the [sfzinstruments FLAC release](https://github.com/sfzinstruments/SalamanderGrandPiano) to MP3 and trimmed. Details are in `samples/salamander/SOURCE.txt`, and the author's original notes are in `samples/salamander/README.txt`.
+
+Audio → MIDI: [Basic Pitch](https://github.com/spotify/basic-pitch-ts) by Spotify and [TensorFlow.js](https://github.com/tensorflow/tfjs), both under the Apache License 2.0. See `vendor/basic-pitch/README.txt`.
