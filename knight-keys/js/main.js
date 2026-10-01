@@ -7,6 +7,7 @@ import { detectChord, noteName, pcName, solfege, keyName } from './theory.js';
 import { createDemoMidi } from './demo.js';
 import { GROOVES, GroovePlayer } from './grooves.js';
 import { SONGS, songToMidi } from './songs.js';
+import { HostSynth, IN_HOST, onHostMidi, hostSave } from './host.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -111,7 +112,8 @@ const saveSettings = () => save('kk.settings', settings);
 
 // ---- Core state ------------------------------------------------------------
 
-const synth = new Synth();
+// Inside the Knight Lyfe Ultimate plug-in/app, the C++ engine makes the sound.
+const synth = IN_HOST ? new HostSynth() : new Synth();
 synth.setMaster(settings.master);
 synth.sampleBase = 'samples/salamander/';
 
@@ -489,6 +491,19 @@ function liveAllOff() {
 // Web MIDI
 async function initMidi() {
   const status = $('midiStatus');
+  if (IN_HOST) {
+    status.textContent = "MIDI comes from Logic (or from Audio/MIDI Settings in the standalone app). Sound is played by the Knight Lyfe engine.";
+    onHostMidi((msgs) => {
+      synth.fromHost = true; // the engine already played these
+      try {
+        for (const m of msgs) handleLive(m);
+      } finally {
+        synth.fromHost = false;
+      }
+    });
+    fillDeviceSelects();
+    return;
+  }
   if (!navigator.requestMIDIAccess) {
     status.textContent = 'This browser has no Web MIDI. Use Chrome, Edge, Opera or Firefox to connect a keyboard. Mouse and computer keys still work.';
     fillDeviceSelects();
@@ -795,6 +810,10 @@ function fromB64(str) {
 }
 
 function download(data, filename, type) {
+  if (IN_HOST) {
+    hostSave(typeof data === 'string' ? new TextEncoder().encode(data) : data, filename);
+    return;
+  }
   const url = URL.createObjectURL(new Blob([data], { type }));
   const a = document.createElement('a');
   a.href = url;
@@ -1755,7 +1774,7 @@ function updateGrooveLock() {
 
 function stopGroove() {
   groove.stop();
-  if (synth.ctx) synth.cancelOneShots(synth.now, GROOVE_CHANNEL);
+  if (synth.ctx || IN_HOST) synth.cancelOneShots(synth.now, GROOVE_CHANNEL);
   visualQueue = visualQueue.filter((e) => !e.groove);
   grooveView.step = -1;
   grooveView.inFill = false;

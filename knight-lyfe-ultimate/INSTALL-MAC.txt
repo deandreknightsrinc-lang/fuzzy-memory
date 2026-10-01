@@ -1,0 +1,41 @@
+KNIGHT LYFE ULTIMATE - INSTALLING ON A MAC
+===========================================
+
+Unzip the files first (double-click each .zip).
+
+1. LOGIC PRO PLUG-IN (Audio Unit)
+   Copy "Knight Lyfe Ultimate.component" to:
+       /Library/Audio/Plug-Ins/Components
+   (In Finder: Go > Go to Folder..., paste the path, press Return.)
+
+2. STANDALONE APP (optional)
+   Drag "Knight Lyfe Ultimate.app" into Applications.
+
+3. VST3 (optional, for other DAWs)
+   Copy "Knight Lyfe Ultimate.vst3" to:
+       /Library/Audio/Plug-Ins/VST3
+
+4. LET MACOS OPEN IT
+   These builds are not notarized by Apple yet, so macOS will block them at
+   first. Open Terminal (Applications > Utilities) and paste:
+
+       sudo xattr -dr com.apple.quarantine "/Library/Audio/Plug-Ins/Components/Knight Lyfe Ultimate.component"
+       sudo xattr -dr com.apple.quarantine "/Applications/Knight Lyfe Ultimate.app"
+
+   Type your Mac password when asked (nothing shows while you type).
+
+5. USE IT IN LOGIC
+   Restart Logic Pro. Logic checks new plug-ins at start-up; if it says the
+   plug-in failed validation, open Logic Pro > Settings > Plug-in Manager,
+   select Knight Lyfe Ultimate and click "Reset & Rescan Selection".
+
+   New track > Software Instrument > Instrument slot >
+   AU Instruments > Knight Lyfe > Knight Lyfe Ultimate
+
+   Play your keyboard: you hear the grand piano through Logic, and the
+   keyboard, chords, score and learn mode follow along. Songs, Audio -> MIDI,
+   grooves and everything else from Knight Keys are inside.
+
+6. THE STANDALONE APP
+   Click "Options" (top-left) > Audio/MIDI Settings to choose your audio
+   output and turn on your MIDI keyboard and electronic drum kit.
