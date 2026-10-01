@@ -55,3 +55,14 @@ test('solfege', () => {
   assert.equal(solfege(63, 0, 'movable'), 'Ri');
   assert.equal(solfege(63, -3, 'movable'), 'Do');
 });
+
+import { sampleFile, nearestSample } from '../js/synth.js';
+
+test('piano sample mapping covers A0–C8 within a semitone and a half', () => {
+  assert.equal(sampleFile(21), 'A0.mp3');
+  assert.equal(sampleFile(60), 'C4.mp3');
+  assert.equal(sampleFile(63), 'Ds4.mp3');
+  assert.equal(sampleFile(66), 'Fs4.mp3');
+  assert.equal(sampleFile(108), 'C8.mp3');
+  for (let n = 21; n <= 108; n++) assert.ok(Math.abs(nearestSample(n) - n) <= 1, `note ${n}`);
+});

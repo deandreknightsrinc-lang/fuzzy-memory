@@ -1,8 +1,13 @@
 // Small polyphonic WebAudio synth with GM-style instrument families and drums.
 
 export const PRESETS = {
+  grand: {
+    label: 'Grand Piano (sampled)',
+    sampled: true, // Salamander Grand Piano samples; falls back to `piano` until loaded
+    rel: 0.25,
+  },
   piano: {
-    label: 'Grand Piano',
+    label: 'Synth Piano',
     waves: [{ harm: [1, 0.55, 0.32, 0.22, 0.12, 0.09, 0.05, 0.04, 0.025, 0.02] }, { type: 'sine', gain: 0.35, detune: 3 }],
     att: 0.003, dec: 1.6, sus: 0, rel: 0.3, level: 0.5,
     filter: { base: 900, vel: 5000, keytrack: 1, env: 0.6 },
@@ -77,7 +82,7 @@ export const PRESETS = {
 
 /** Map a General MIDI program number to one of the presets above. */
 export function presetForProgram(p) {
-  if (p <= 3) return 'piano';
+  if (p <= 3) return 'grand';
   if (p <= 7) return 'epiano';
   if (p <= 15) return 'bell';
   if (p <= 23) return 'organ';
@@ -101,6 +106,78 @@ export const GROOVE_CHANNEL = 18; // groove player and drum pads
 const CHANNEL_COUNT = 19;
 export const isDrumChannel = (ch) => ch === DRUM_CHANNEL || ch === GROOVE_CHANNEL;
 const MAX_VOICES = 96;
+
+// Salamander samples are recorded every minor third from A0 to C8.
+const SAMPLE_NAMES = ['C', 'Ds', 'Fs', 'A'];
+const SAMPLE_NOTES = [];
+for (let n = 21; n <= 108; n += 3) SAMPLE_NOTES.push(n);
+export const sampleFile = (note) => `${SAMPLE_NAMES[(note % 12) / 3]}${Math.floor(note / 12) - 1}.mp3`;
+export const nearestSample = (note) =>
+  SAMPLE_NOTES.reduce((best, n) => (Math.abs(n - note) < Math.abs(best - note) ? n : best), SAMPLE_NOTES[0]);
+
+/** A note played from a recorded piano sample, pitch-shifted from the nearest sample. */
+class SampleVoice {
+  constructor(synth, ch, note, vel, time, preset, bendCents) {
+    const ctx = synth.ctx;
+    this.ch = ch;
+    this.note = note;
+    this.start = time;
+    this.attackEnd = time + 0.005;
+    this.released = false;
+    this.preset = preset;
+
+    const base = nearestSample(note);
+    const buffer = synth.samples.get(base);
+    const v = vel / 127;
+    this.src = ctx.createBufferSource();
+    this.src.buffer = buffer;
+    this.src.playbackRate.value = 2 ** ((note - base) / 12);
+    this.src.detune.value = bendCents;
+    // One velocity layer: shape soft notes with level and a gentler, darker tone.
+    const tone = ctx.createBiquadFilter();
+    tone.type = 'lowpass';
+    tone.frequency.value = Math.min(20000, 900 + 19000 * v ** 1.8);
+    this.env = ctx.createGain();
+    this.env.gain.value = 0.9 * (0.08 + 0.92 * v ** 1.7);
+    this.src.connect(tone).connect(this.env).connect(synth.channelInput(ch));
+    this.src.start(time);
+    this.end = time + buffer.duration / this.src.playbackRate.value + 0.05;
+    this.src.onended = () => this.env.disconnect();
+  }
+
+  release(time) {
+    if (this.released) return;
+    this.released = true;
+    const t = Math.max(time, this.start);
+    // Dampers: bass strings ring a little longer after release.
+    const rel = this.preset.rel * Math.min(2.5, Math.max(0.5, 2 ** ((60 - this.note) / 24)));
+    this.env.gain.cancelScheduledValues(t);
+    this.env.gain.setTargetAtTime(0, t, rel / 4);
+    this.end = Math.min(this.end, t + rel * 2 + 0.05);
+    try {
+      this.src.stop(this.end);
+    } catch {
+      /* already stopped */
+    }
+  }
+
+  kill(time) {
+    this.released = true;
+    const t = Math.max(time, this.start);
+    this.env.gain.cancelScheduledValues(t);
+    this.env.gain.setTargetAtTime(0, t, 0.005);
+    this.end = t + 0.05;
+    try {
+      this.src.stop(this.end);
+    } catch {
+      /* already stopped */
+    }
+  }
+
+  bend(cents, time) {
+    this.src.detune.setTargetAtTime(cents, time, 0.01);
+  }
+}
 
 class Voice {
   constructor(synth, ch, note, vel, time, preset, bendCents) {
@@ -237,6 +314,31 @@ export class Synth {
     }
     this.channels[LIVE_LEFT_CHANNEL].program = 32;
     this.masterLevel = 0.8;
+    this.samples = new Map(); // MIDI note -> AudioBuffer
+    this.sampleBase = null; // URL folder of the piano samples; set before ensure()
+    this.samplesState = 'idle'; // idle | loading | ready | failed
+    this.onSamplesState = () => {};
+  }
+
+  /** Fetch and decode the piano samples once (called from ensure()). */
+  async loadSamples() {
+    if (!this.sampleBase || this.samplesState !== 'idle') return;
+    this.samplesState = 'loading';
+    this.onSamplesState(this.samplesState);
+    try {
+      await Promise.all(
+        SAMPLE_NOTES.map(async (n) => {
+          const res = await fetch(this.sampleBase + sampleFile(n));
+          if (!res.ok) throw new Error(`${sampleFile(n)}: HTTP ${res.status}`);
+          this.samples.set(n, await this.ctx.decodeAudioData(await res.arrayBuffer()));
+        }),
+      );
+      this.samplesState = 'ready';
+    } catch (err) {
+      console.warn('Piano samples failed to load; using the synth piano.', err);
+      this.samplesState = 'failed';
+    }
+    this.onSamplesState(this.samplesState);
   }
 
   /** Create the AudioContext (must happen after a user gesture). */
@@ -256,6 +358,7 @@ export class Synth {
       for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
     }
     if (this.ctx.state === 'suspended') this.ctx.resume();
+    this.loadSamples();
     return this.ctx;
   }
 
@@ -339,7 +442,11 @@ export class Synth {
       victim.kill(time);
       this.voices.splice(this.voices.indexOf(victim), 1);
     }
-    const voice = new Voice(this, ch, note, vel, time, this.presetFor(ch), c.bend * c.bendRange * 100);
+    const preset = this.presetFor(ch);
+    const bendCents = c.bend * c.bendRange * 100;
+    let voice;
+    if (preset.sampled && this.samplesState === 'ready') voice = new SampleVoice(this, ch, note, vel, time, preset, bendCents);
+    else voice = new Voice(this, ch, note, vel, time, preset.sampled ? PRESETS.piano : preset, bendCents);
     this.voices.push(voice);
     this.prune();
   }
