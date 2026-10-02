@@ -129,6 +129,13 @@ Unzip the files first (double-click each .zip).
    Sampler instrument menu, channel strip settings and project templates.
    Drop new sounds into its Inbox folder and run organize-samples.sh to sort
    them by name. See README.md in that folder.
+   FREE SOUND PACKS: the setup also installs the Knight Lyfe Sound Packs
+   from "Sound Library Tools/Sound Packs": Knight Lyfe Drums Vol 1 (kicks,
+   snares, claps, hats, cymbals, toms, percussion, 808s in every key) and
+   Knight Lyfe Gospel MIDI (drum grooves and chord progressions in every
+   key). Look for the pack's name inside Drums/Kicks, Drums/808s, MIDI/...
+   If your Downloads are on another drive, drag setup-library.sh from the
+   download into Terminal instead of typing the path.
 
 11. MULTI-OUTPUT DRUMS (each drum on its own mixer channel)
    - New Software Instrument track > Instrument slot > AU Instruments >

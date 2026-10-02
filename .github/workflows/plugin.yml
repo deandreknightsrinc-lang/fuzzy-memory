@@ -32,6 +32,9 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
       - name: Cache JUCE download
         uses: actions/cache@v4
@@ -61,6 +64,19 @@ jobs:
           test -f "$L/Drums/Hi-Hats/Hat Open.aif"
           test -f "$L/Inbox (drop new sounds here)/Unsorted/Custom Thing.wav"
           test -L "$HOME/Music/Audio Music Apps/Patches/Instrument/Knight Lyfe"
+          # Sound packs: made, tested, and installed by the setup when they sit next to it
+          node --test sound-library/packs/packs.test.mjs
+          mkdir -p "$T/tools" && cp sound-library/*.sh "$T/tools/"
+          node sound-library/packs/make-packs.mjs "$T/tools/Sound Packs"
+          bash "$T/tools/setup-library.sh" "$T/drive"
+          bash "$T/tools/setup-library.sh" "$T/drive" # again: nothing is copied twice
+          test -f "$L/Drums/Kicks/Knight Lyfe Drums Vol 1/KL Kick 01 Punch.wav"
+          test -f "$L/Drums/808s/Knight Lyfe Drums Vol 1/KL 808 Dirty C.wav"
+          test -f "$L/MIDI/Drum Grooves/Knight Lyfe Gospel MIDI/KL Drum Groove - Gospel Shuffle (88 bpm).mid"
+          test -f "$L/MIDI/Chord Progressions/Knight Lyfe Gospel MIDI/KL Chords - Gospel 2-5-1 in C (76 bpm).mid"
+          test -f "$L/Licenses/Knight Lyfe Drums Vol 1.txt"
+          test "$(find "$L" -name '* (2).*' | wc -l)" -eq 0
+          test "$(find "$L/Inbox (drop new sounds here)/Unsorted" -type f | wc -l)" -eq 1 # only the test's "Custom Thing.wav"
 
       - name: Check it is universal and runs on macOS 11+
         run: |
@@ -97,6 +113,7 @@ jobs:
           cp "$GITHUB_WORKSPACE/knight-lyfe-ultimate/install.sh" "$GITHUB_WORKSPACE/dist/"
           mkdir -p "$GITHUB_WORKSPACE/dist/Sound Library Tools"
           cp "$GITHUB_WORKSPACE"/sound-library/*.sh "$GITHUB_WORKSPACE"/sound-library/README.md "$GITHUB_WORKSPACE/dist/Sound Library Tools/"
+          node "$GITHUB_WORKSPACE/sound-library/packs/make-packs.mjs" "$GITHUB_WORKSPACE/dist/Sound Library Tools/Sound Packs"
 
       - name: Test the installer the way a user runs it
         run: |
