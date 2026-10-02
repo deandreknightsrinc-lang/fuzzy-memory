@@ -55,6 +55,7 @@
           </div>
         </div>
       </details>
+      <button id="btnStage" class="stage-btn" title="Stage: play songs like a game, earn crowns, unlock songs, beat the family high score">🎸 Stage</button>
       <button id="btnSongs" title="Free songs to learn on keys or drums">Songs</button>
       <button id="btnConvert" title="Turn a recording into MIDI">Audio → MIDI</button>
       <button id="btnSettings">Settings</button>
@@ -104,10 +105,13 @@
               <option value="8">Fill every 8 bars</option>
             </select>
             <label class="field" title="Groove volume">🔊 <input id="grooveVol" type="range" min="0" max="1.5" step="0.01" /></label>
+            <button id="btnKit" class="mini" title="Kit Rack: choose a drum kit, tune each drum, or load your own samples">🎛 Kit Rack</button>
+            <button id="drumView" class="mini" title="Switch between the groove grid and the drum highway (falling notes to play along with on your kit)">🥁 Highway</button>
           </div>
           <div class="drums-main">
             <div id="pads" class="pads"></div>
             <div class="groove-grid"><canvas id="grooveCanvas"></canvas></div>
+            <div class="drum-highway" hidden><canvas id="highwayCanvas"></canvas></div>
           </div>
           <p id="grooveInfo" class="groove-info"></p>
         </div>
@@ -324,6 +328,161 @@
         <button id="cvDownload" disabled>Download .mid</button>
       </div>
       <p class="hint">Runs on your computer; nothing is uploaded. Solo piano works best. On full songs it catches the strongest parts, so expect to clean up. Sensitivity and shortest note update the result instantly after converting.</p>
+    </div>
+  </dialog>
+
+
+  <dialog id="kitDlg" class="tool-window kit-window" aria-labelledby="kitTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="kitTitle">Kit Rack</h2>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="kit-rack">
+      <aside class="kit-library">
+        <div class="kit-tabs"><span class="on">Kits</span><span id="kitMyCount" class="kit-count"></span></div>
+        <div id="kitList" class="kit-list"></div>
+        <p class="kit-lib-foot">Build your own kit: pick a drum, then <b>Load sample…</b> or drop an audio file (WAV, AIFF, MP3) onto it. Your samples are saved on this computer and play through Logic in the plug-in.</p>
+      </aside>
+      <section class="kit-instrument">
+        <div class="kit-head">
+          <span class="kit-power" aria-hidden="true">⏻</span>
+          <div class="kit-titles">
+            <div id="kitName" class="kit-name"></div>
+            <div id="kitAbout" class="kit-about"></div>
+          </div>
+          <button id="kitResetAll" class="mini" title="Undo your changes to this kit (keeps your samples)">Reset kit</button>
+        </div>
+        <div class="kit-stage" id="kitStage">
+          <svg viewBox="0 0 600 380" role="img" aria-label="Drum kit: click a drum to hear and edit it">
+            <defs>
+              <radialGradient id="kgRug" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="#7a1f1a"/><stop offset="0.7" stop-color="#4a1210"/><stop offset="1" stop-color="#1c0807"/></radialGradient>
+              <radialGradient id="kgCym" cx="45%" cy="35%" r="70%"><stop offset="0" stop-color="#fff3b8"/><stop offset="0.45" stop-color="#e2b84a"/><stop offset="1" stop-color="#8a6416"/></radialGradient>
+              <radialGradient id="kgHead" cx="45%" cy="35%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9c4bb"/></radialGradient>
+              <linearGradient id="kgShell" x1="0" x2="1"><stop offset="0" stop-color="#2a0a0a"/><stop offset="0.5" stop-color="#7d1d1d"/><stop offset="1" stop-color="#2a0a0a"/></linearGradient>
+            </defs>
+            <ellipse cx="300" cy="300" rx="285" ry="80" fill="url(#kgRug)"/>
+            <ellipse cx="300" cy="300" rx="255" ry="66" fill="none" stroke="#c9a14a" stroke-opacity="0.35" stroke-width="3" stroke-dasharray="10 6"/>
+            <g stroke="#9aa0aa" stroke-width="3" opacity="0.8">
+              <line x1="95" y1="175" x2="95" y2="320"/><line x1="165" y1="95" x2="150" y2="320"/><line x1="470" y1="125" x2="490" y2="320"/>
+              <line x1="175" y1="262" x2="160" y2="322"/><line x1="175" y1="262" x2="195" y2="322"/>
+            </g>
+            <g class="kp" data-piece="crash"><ellipse cx="165" cy="92" rx="78" ry="14" fill="url(#kgCym)" transform="rotate(-8 165 92)"/><circle cx="165" cy="92" r="5" fill="#6b4c10"/></g>
+            <g class="kp" data-piece="ride"><ellipse cx="470" cy="122" rx="88" ry="15" fill="url(#kgCym)" transform="rotate(6 470 122)"/></g>
+            <g class="kp" data-piece="bell"><ellipse cx="470" cy="119" rx="16" ry="6" fill="#f6d77a" stroke="#8a6416"/></g>
+            <g class="kp" data-piece="hho"><ellipse cx="95" cy="165" rx="52" ry="9" fill="url(#kgCym)"/></g>
+            <g class="kp" data-piece="hhc"><ellipse cx="95" cy="177" rx="52" ry="9" fill="url(#kgCym)"/></g>
+            <g class="kp" data-piece="hhp"><rect x="70" y="318" width="50" height="12" rx="4" fill="#3a3d45" stroke="#9aa0aa"/></g>
+            <g class="kp" data-piece="kick"><circle cx="300" cy="262" r="88" fill="url(#kgShell)"/><circle cx="300" cy="262" r="76" fill="url(#kgHead)"/><text x="300" y="258" text-anchor="middle" font-size="17" font-weight="700" fill="#7d1d1d" font-family="system-ui">KNIGHT</text><text x="300" y="280" text-anchor="middle" font-size="13" fill="#7d1d1d" font-family="system-ui" letter-spacing="3">LYFE</text></g>
+            <g class="kp" data-piece="tom1"><rect x="207" y="160" width="76" height="40" fill="url(#kgShell)"/><ellipse cx="245" cy="160" rx="38" ry="13" fill="url(#kgHead)"/></g>
+            <g class="kp" data-piece="tom2"><rect x="317" y="160" width="80" height="44" fill="url(#kgShell)"/><ellipse cx="357" cy="160" rx="40" ry="14" fill="url(#kgHead)"/></g>
+            <g class="kp" data-piece="tom3"><rect x="390" y="240" width="112" height="70" fill="url(#kgShell)"/><ellipse cx="446" cy="240" rx="56" ry="19" fill="url(#kgHead)"/></g>
+            <g class="kp" data-piece="snare"><rect x="122" y="248" width="106" height="30" fill="#c8ccd4"/><rect x="122" y="248" width="106" height="30" fill="none" stroke="#7a808c" stroke-dasharray="3 9"/><ellipse cx="175" cy="248" rx="53" ry="17" fill="url(#kgHead)"/></g>
+            <g class="kp" data-piece="stick"><rect x="118" y="244" width="114" height="6" rx="3" fill="none" stroke="#e6e9ef" stroke-width="2"/></g>
+            <g class="kp" data-piece="clap"><circle cx="540" cy="300" r="20" fill="#2b2f3a" stroke="#5cdbd3"/><text x="540" y="305" text-anchor="middle" font-size="16">👏</text></g>
+            <g class="kp" data-piece="tamb"><circle cx="40" cy="250" r="20" fill="#2b2f3a" stroke="#73d13d"/><text x="40" y="255" text-anchor="middle" font-size="14">🪘</text></g>
+            <g class="kp" data-piece="cowbell"><path d="M520 200 l30 0 l8 34 l-46 0 z" fill="#b8bec8" stroke="#6b717c"/></g>
+          </svg>
+        </div>
+        <div class="kit-controls">
+          <div class="kit-piece">
+            <div id="kitPieceName" class="kit-piece-name">Snare</div>
+            <div id="kitPieceNotes" class="kit-piece-notes small"></div>
+          </div>
+          <div class="kit-knobs">
+            <div class="knob-wrap"><div class="knob" id="knobTune" data-min="-12" data-max="12" data-step="0.5" data-unit=" st" tabindex="0" role="slider" aria-label="Tune"></div><span>Tune</span></div>
+            <div class="knob-wrap"><div class="knob" id="knobDecay" data-min="0.2" data-max="4" data-step="0.05" data-unit="×" tabindex="0" role="slider" aria-label="Decay"></div><span>Decay</span></div>
+            <div class="knob-wrap"><div class="knob" id="knobLevel" data-min="0" data-max="2" data-step="0.05" data-unit="×" tabindex="0" role="slider" aria-label="Level"></div><span>Level</span></div>
+          </div>
+          <div class="kit-sample">
+            <button id="kitLoad">Load sample…</button>
+            <button id="kitClear" class="mini" title="Go back to the built-in sound">Use built-in</button>
+            <input id="kitFile" type="file" hidden accept="audio/*,.wav,.aif,.aiff,.mp3,.flac,.ogg,.m4a" />
+            <div id="kitSampleName" class="small"></div>
+          </div>
+        </div>
+        <div id="kitKeys" class="kit-keys" title="The notes each drum answers to (your e-kit and pad controller send these)"></div>
+      </section>
+    </div>
+  </dialog>
+
+
+  <dialog id="stageDlg" class="tool-window stage-window" aria-labelledby="stageTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="stageTitle">🎸 Stage</h2>
+      <span id="stagePlayerChip" class="stage-chip"></span>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="stage-body">
+      <section id="stageMenu" class="stage-menu">
+        <div class="stage-row">
+          <span class="stage-label">Who's playing?</span>
+          <div id="stagePlayers" class="stage-players"></div>
+          <button id="stageAddPlayer" class="mini" title="Add a player">＋ Player</button>
+        </div>
+        <div class="stage-row">
+          <span class="stage-label">Instrument</span>
+          <div id="stageParts" class="stage-seg">
+            <button data-part="0">🎹 Right hand</button>
+            <button data-part="1">🎹 Left hand</button>
+            <button data-part="0,1">🎹 Both hands</button>
+            <button data-part="9">🥁 Drums</button>
+          </div>
+        </div>
+        <div class="stage-row">
+          <span class="stage-label">Mode</span>
+          <div id="stageModes" class="stage-seg">
+            <button data-mode="perform" title="Play along in real time and get scored">🎮 Perform</button>
+            <button data-mode="practice" title="The song waits for you at every note (no score)">🧘 Practice</button>
+          </div>
+          <label class="field" title="Slow the song down while you learn it">Speed
+            <select id="stageSpeed"><option value="0.5">50%</option><option value="0.75">75%</option><option value="1" selected>100%</option></select>
+          </label>
+          <label class="field" title="If your hits always land early or late (Bluetooth, slow audio), shift them here">Timing
+            <input id="stageCalib" type="number" min="-200" max="300" step="10" /> ms
+          </label>
+        </div>
+        <ol id="stageCourse" class="stage-course"></ol>
+        <div class="stage-row">
+          <button id="stageCurrent" title="Play the MIDI song that's open in Knight Keys (yours, or one made with Audio → MIDI)">🎵 Play the song that's open</button>
+          <span class="small">Earn 👑 on a song to unlock the next one. Every player has their own progress.</span>
+        </div>
+      </section>
+
+      <section id="stagePlay" class="stage-play" hidden>
+        <div class="stage-hud">
+          <div class="hud-block"><div class="hud-label">Score</div><div id="hudScore" class="hud-big">0</div></div>
+          <div class="hud-block"><div class="hud-label">Streak</div><div id="hudCombo" class="hud-big">0</div></div>
+          <div class="hud-block"><div id="hudMult" class="hud-mult">×1</div></div>
+          <div class="hud-block"><div class="hud-label">Accuracy</div><div id="hudAcc" class="hud-big">100%</div></div>
+          <div class="hud-block"><div id="hudCrowns" class="hud-crowns"></div></div>
+          <div class="hud-block grow"><div id="hudSong" class="hud-song"></div><div class="hud-progress"><div id="hudProgress"></div></div></div>
+        </div>
+        <div class="stage-road"><canvas id="stageCanvas"></canvas><div id="stageCount" class="stage-count"></div></div>
+        <div id="stageTaps" class="stage-taps" title="No instrument handy? Tap here (or with your fingers on a touch screen)"></div>
+        <div class="stage-row stage-actions">
+          <button id="stageStop">■ Stop</button>
+          <button id="stageRestart">↺ Restart</button>
+          <span id="stageHint" class="small"></span>
+        </div>
+      </section>
+
+      <section id="stageResults" class="stage-results" hidden>
+        <div id="resTitle" class="res-title"></div>
+        <div id="resCrowns" class="res-crowns"></div>
+        <div class="res-stats">
+          <div><span class="hud-label">Score</span><b id="resScore"></b></div>
+          <div><span class="hud-label">Accuracy</span><b id="resAcc"></b></div>
+          <div><span class="hud-label">Best streak</span><b id="resCombo"></b></div>
+        </div>
+        <div id="resCounts" class="res-counts"></div>
+        <div id="resBest" class="res-best"></div>
+        <ol id="resBoard" class="res-board"></ol>
+        <div class="stage-row res-actions">
+          <button id="resRetry" class="primary">↺ Play again</button>
+          <button id="resNext">Next song ▶</button>
+          <button id="resMenu">Songs</button>
+        </div>
+      </section>
     </div>
   </dialog>
 

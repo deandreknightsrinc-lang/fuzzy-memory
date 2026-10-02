@@ -112,6 +112,48 @@ export class HostSynth extends Synth {
   }
 
   prune() {}
+
+  // Kit Rack: the C++ engine makes the drum sounds, so settings and samples go there.
+  setKit(rows) {
+    super.setKit(rows);
+    this.post({ kit: rows });
+  }
+
+  async loadDrumSample(notes, bytes, name = 'sample') {
+    const data = toBase64(new Uint8Array(bytes));
+    const replies = notes.map((note) => waitForSampleReply(note));
+    for (const note of notes) juce.backend.emitEvent('kkSample', { note, data, name });
+    const results = await Promise.all(replies);
+    return results.every(Boolean);
+  }
+
+  clearDrumSample(notes) {
+    super.clearDrumSample(notes);
+    for (const note of notes) juce.backend.emitEvent('kkSample', { note, clear: true });
+  }
+}
+
+function toBase64(bytes) {
+  let s = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+
+// The engine answers each "kkSample" with "kkSampleLoaded" { note, ok }.
+const sampleWaiters = new Map();
+juce?.backend.addEventListener('kkSampleLoaded', (r) => {
+  const waiters = sampleWaiters.get(r?.note) || [];
+  sampleWaiters.delete(r?.note);
+  waiters.forEach((fn) => fn(!!r?.ok));
+});
+
+function waitForSampleReply(note) {
+  return new Promise((resolve) => {
+    const list = sampleWaiters.get(note) || [];
+    list.push(resolve);
+    sampleWaiters.set(note, list);
+    setTimeout(() => resolve(false), 10000);
+  });
 }
 
 /** Listen for MIDI the host received: [[status, d1, d2], ...]. */
@@ -121,9 +163,7 @@ export function onHostMidi(fn) {
 
 /** Save a file through the app's native save dialog. */
 export function hostSave(bytes, filename) {
-  let s = '';
-  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
-  juce.backend.emitEvent('kkSave', { name: filename, data: btoa(s) });
+  juce.backend.emitEvent('kkSave', { name: filename, data: toBase64(bytes) });
 }
 
 /**
@@ -174,6 +214,13 @@ export class HostTransport {
   timeAt(ppq) {
     return this.t0 + ((ppq - this.ppq0) * 60) / this.bpm;
   }
+}
+
+/** Ask the plug-in which drum notes play your samples: fn({ "<note>": "<file name>" }). */
+export function queryHostKit(fn) {
+  if (!juce) return;
+  juce.backend.addEventListener('kkKitState', (state) => fn(state?.samples || {}));
+  juce.backend.emitEvent('kkKitQuery', {});
 }
 
 /** Listen for Logic's transport. */

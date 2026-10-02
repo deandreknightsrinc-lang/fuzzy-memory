@@ -63,9 +63,50 @@ Unzip the files first (double-click each .zip).
 
    TEMPO SYNC: with "Follow Logic" ticked (on the Groove panel), pressing
    Play in Logic starts the loaded song and the drum groove in time with
-   Logic's tempo and bar position, and they stop when Logic stops. Songs, Audio -> MIDI,
-   grooves and everything else from Knight Keys are inside.
+   Logic's tempo and bar position, and they stop when Logic stops.
+
+   Songs, Audio -> MIDI, grooves, the Kit Rack and everything else from
+   Knight Keys are inside.
 
 6. THE STANDALONE APP
    Click "Options" (top-left) > Audio/MIDI Settings to choose your audio
    output and turn on your MIDI keyboard and electronic drum kit.
+
+7. YOUR KEYBOARD AND ELECTRONIC DRUMS
+   Both are "class compliant": plug them into the Mac with USB, no driver
+   needed. In Logic they work right away on the Knight Lyfe track. In the
+   standalone app tick them in Options > Audio/MIDI Settings.
+
+   AKAI MPK MINI PLUS (keyboard)
+   - Plug in the USB-C cable. The keys play the grand piano, light up the
+     keyboard and score, and drive Learn mode (Songs > Right hand / Left
+     hand / Both hands).
+   - The 8 pads play the drums (they send drum notes on channel 10).
+
+   ALESIS NITRO MAX (drum kit)
+   - Connect the module's USB port to the Mac with the USB cable from the
+     box. It sends on channel 10, which Knight Lyfe plays as drums.
+   - Hit the kit: the pads, the Kit Rack and the drum highway light up.
+     Rim shots, hi-hat and cymbal edges and the hi-hat pedal are all
+     understood.
+   - To learn a song: Songs > Drums on any song. Open the Drums panel and
+     click Highway: the notes fall toward the line, a white box shows what
+     to hit, and the song waits for you.
+   - If you hear the module's own sounds as well, turn the module's volume
+     down and listen through the Mac (or your Quantum interface).
+
+   KIT RACK (Drums panel > Kit Rack)
+   - Pick a kit on the left, click a drum to hear it, turn Tune / Decay /
+     Level. Drop your own WAV, AIFF or MP3 onto a drum to make your own kit.
+   - Your kit is saved in ~/Library/Application Support/Knight Lyfe/Kit and
+     plays in every Logic project, even with the plug-in window closed.
+
+8. STAGE (THE GAME)
+   Click "Stage" at the top. Choose who's playing (rename players by
+   double-clicking), the instrument and a song:
+   - Perform: play along in real time. Every note is scored Perfect,
+     Great, Good or Miss; keep a streak for x2, x3, x4 points; earn up to
+     5 crowns. Each song has a family leaderboard.
+   - Practice: the song waits for you at every note.
+   One crown on a song unlocks the next one. If your hits always land a
+   bit late, raise "Timing" (in ms) in the Stage menu.

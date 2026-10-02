@@ -37,6 +37,7 @@ export class Player {
     this.lastFollow = 0;
     this.scheduledTo = 0; // song time already handed to hooks.span
     this.learn = null; // { isTarget(e) } while learning a part
+    this.silent = null; // { isTarget(e) }: leave these notes out but don't wait (Stage perform mode)
     this.waiting = null; // { time, notes } while waiting for the player
     this.skipUntil = -1; // targets up to this time were already played
     this.timer = null;
@@ -163,7 +164,8 @@ export class Player {
 
   dispatch(e, at) {
     const h = this.hooks;
-    if (this.learn && (e.type === 'on' || e.type === 'off') && this.learn.isTarget(e)) return; // you play this part
+    const yours = this.learn || this.silent; // learn: waits for you; silent: plays on without your part
+    if (yours && (e.type === 'on' || e.type === 'off') && yours.isTarget(e)) return; // you play this part
     switch (e.type) {
       case 'on': {
         const note = e.ch === 9 ? e.note : e.note + this.transpose;

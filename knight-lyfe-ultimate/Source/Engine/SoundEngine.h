@@ -50,8 +50,28 @@ public:
 
     /** Applies a batch the interface sent with emitEvent("kk", { batch: [...] }).
         Items: { m: [ch, status, d1, d2, delayMs] }, { g: [ch, gain] }, { off: delayMs },
-        { cancel: ch, at: delayMs }, { panic: 1 }, { v: volume }. See knight-keys/js/host.js. */
+        { cancel: ch, at: delayMs }, { panic: 1 }, { v: volume },
+        { kit: [[note, tuneSemitones, decay, level], ...] }. See knight-keys/js/host.js. */
     void handleInterfaceBatch (const juce::var& batch);
+
+    // ---- Kit Rack: custom drum sounds (message thread) ---------------------------
+    void setDrumPiece (int note, float tuneSemitones, float decay, float level) { drums.setPiece (note, tuneSemitones, decay, level); }
+    /** Decodes an audio file (WAV, AIFF, MP3, FLAC...) and plays it for `note` from now on. */
+    bool loadDrumSample (int note, const void* fileData, size_t size);
+    /** Back to the synthesized sound for `note`. */
+    void clearDrumSample (int note);
+    /** Handles emitEvent("kkSample", { note, data: base64 file } or { note, clear: true }). */
+    bool handleDrumSample (const juce::var& request);
+    /** Keeps the Kit Rack (tuning and your samples) in this folder, so it is there in
+        every project and plays even while the plug-in window is closed. Loads what
+        is saved there now. */
+    void setKitFolder (const juce::File& folder);
+    /** { samples: { "<note>": "<file name>", ... } } for the interface. */
+    juce::var getKitState() const;
+
+    /** Standard base64 (what the browser's btoa() makes) to bytes. */
+    static bool decodeBase64 (const juce::String& text, juce::MemoryBlock& out);
+    bool hasDrumSample (int note) const { return note >= 0 && note < 128 && activeSamples[(size_t) note] != nullptr; }
 
     // ---- To the interface (message thread) ------------------------------------
     struct HostMessage { juce::uint8 status, data1, data2; };
@@ -94,7 +114,18 @@ private:
     void routeToEngines (const Command&, int offset);
     void routeHostMessage (const juce::MidiMessage&, int offset);
 
+    void retireSample (int note);
+
     juce::SharedResourcePointer<PianoSamples> samples;
+
+    // Kit Rack samples. Replaced ones are kept a while in case a hit is still ringing.
+    struct StoredSample { std::unique_ptr<DrumSynth::Sample> sample; double retiredMs = -1.0; };
+    std::vector<StoredSample> sampleStore;
+    std::array<const DrumSynth::Sample*, 128> activeSamples {};
+    std::array<juce::String, 128> sampleNames;
+    std::array<std::array<float, 3>, 128> kitValues {}; // tune, decay, level per note
+    juce::File kitFolder;
+    void saveKitValues() const;
 
     ChannelGains songGains, liveGains;
     std::array<std::atomic<float>, ui::numChannels> uiGains;
