@@ -8,6 +8,7 @@ The Knight Keys learning studio as a **Logic Pro plug-in (Audio Unit)**, a **VST
   - the Knight Keys drum kit
   - room reverb, a volume control and an output limiter
 - MIDI from Logic (or from your keyboard and e-kit in the standalone app) plays instantly and lights up the interface. Learn mode, recording and chord names all follow it.
+- **Stage:** the game mode: real-time scoring (Perfect/Great/Good/Miss), streak multipliers, 1–5 crowns, family profiles, leaderboards and unlockable song courses, for keys and drums.
 - **Kit Rack:** a drum sampler window with a kit library, Tune/Decay/Level per drum, and your own samples on any drum. The C++ engine plays them through Logic and keeps your kit in `~/Library/Application Support/Knight Lyfe/Kit`, so it plays even with the window closed.
 - **Drum highway + e-kit learning:** falling notes per drum lane; the Alesis Nitro Max's rims and edges count as the right drum in Learn mode.
 - **Tempo sync:** with **Follow Logic** ticked (Groove panel), pressing Play in Logic plays the loaded song and the groove at Logic's tempo, lined up with Logic's bar 1. Stop, moving the playhead and cycle all follow. With no song loaded, a started groove waits for Logic's Play button.

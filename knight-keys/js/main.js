@@ -3,6 +3,7 @@ import { parseMidi, buildSong, writeMidi } from './midi-file.js';
 import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_CHANNEL } from './synth.js';
 import { Player } from './player.js';
 import { KeyboardView, drawStaff, drawControllers, drawGroove, drawPianoRoll, drawDrumHighway } from './render.js';
+import { GameSession, crownsFor, loadStage, saveStage, recordScore, courseState, scoreKey, PLAYER_COLORS } from './game.js';
 import { LANES, laneOf, sameDrum, PIECES, KITS, kitById, resolveKit, kitNoteParams, loadSavedSamples, saveSample, deleteSample } from './drumkit.js';
 import { detectChord, noteName, pcName, solfege, keyName } from './theory.js';
 import { createDemoMidi } from './demo.js';
@@ -390,6 +391,7 @@ const player = new Player({
     if (groove.locked && state.song) groove.scheduleSpan(from, to, ctxAt, state.song);
   },
   onEnd() {
+    if (stageRun.phase === 'play') return finishStage();
     if (learn.enabled && learn.total) {
       const pct = Math.round((100 * learn.correct) / Math.max(1, learn.correct + learn.wrong));
       toast(`Song complete! ${learn.correct} notes, ${pct}% accuracy.`, [], 6000);
@@ -459,6 +461,7 @@ function liveOn(n, vel) {
   liveColor.set(note, sp.enabled ? (left ? sp.leftColor : sp.rightColor) : settings.inputColor);
   dNoteOn('in', note);
   learnCheck(note, false);
+  stageHit(note, false);
 }
 
 function liveOff(n) {
@@ -1764,6 +1767,7 @@ function liveDrum(note, vel) {
   const lane = laneOf(note);
   if (lane >= 0) highwayHits[lane] = performance.now() / 1000;
   learnCheck(note, true);
+  stageHit(note, true);
 }
 
 function toggleGroove() {
@@ -2242,6 +2246,436 @@ function initKitRack() {
       if (dlg.open) renderKitRack();
     });
   });
+}
+
+// ---- Stage (game mode) ---------------------------------------------------
+//
+// Play a part in real time and get judged on every note, Guitar Hero style.
+// Perform mode scores you; Practice mode is Learn (the song waits) on the big
+// highway. Family profiles, crowns, unlockable courses and a leaderboard.
+
+const stage = loadStage();
+const stageRun = {
+  phase: 'menu', // menu | count | play | results
+  part: '0',
+  mode: 'perform',
+  speed: 1,
+  song: null, // library song, or null for the song that's open
+  key: '', // score key for the song
+  session: null,
+  lanes: [],
+  laneFor: null, // note -> lane index (or -1 for the kick bar)
+  drums: false,
+  countStart: 0,
+  leadIn: 3,
+  pops: [],
+  seenEvents: 0,
+  savedLoop: null,
+  lastCount: -1,
+};
+const STAGE_DRUM_LANES = LANES.filter((l) => l.id !== 'kick');
+const POP = { perfect: ['PERFECT', '#73d13d'], great: ['GREAT', '#36cfc9'], good: ['GOOD', '#fadb14'], miss: ['MISS', '#ff4d4f'], extra: ['✕', '#ff4d4f'] };
+const crownsHtml = (n) => Array.from({ length: 5 }, (_, i) => `<span class="${i < n ? '' : 'crown-off'}">👑</span>`).join('');
+const stagePlayer = () => stage.players.find((p) => p.id === stage.current) || stage.players[0];
+const partName = (part) => ({ 0: 'Right hand', 1: 'Left hand', '0,1': 'Both hands', 9: 'Drums' })[part] || `Part ${part}`;
+
+function stageSongs(part) {
+  return SONGS.filter((s) => part !== String(DRUM_CHANNEL) || s.drums);
+}
+
+function renderStageMenu() {
+  const me = stagePlayer();
+  const chip = $('stagePlayerChip');
+  chip.textContent = `🎮 ${me.name}`;
+  chip.style.setProperty('--chip', me.color);
+  const players = $('stagePlayers');
+  players.innerHTML = '';
+  for (const p of stage.players) {
+    const b = Object.assign(document.createElement('button'), { className: `stage-player${p.id === me.id ? ' on' : ''}`, textContent: p.name, title: 'Double-click to rename' });
+    b.style.setProperty('--pc', p.color);
+    b.onclick = () => {
+      stage.current = p.id;
+      saveStage(stage);
+      renderStageMenu();
+    };
+    b.ondblclick = () => {
+      const name = prompt('Player name', p.name);
+      if (name && name.trim()) {
+        p.name = name.trim().slice(0, 20);
+        saveStage(stage);
+        renderStageMenu();
+      }
+    };
+    players.append(b);
+  }
+  document.querySelectorAll('#stageParts button').forEach((b) => b.classList.toggle('on', b.dataset.part === stageRun.part));
+  document.querySelectorAll('#stageModes button').forEach((b) => b.classList.toggle('on', b.dataset.mode === stageRun.mode));
+  const list = $('stageCourse');
+  list.innerHTML = '';
+  courseState(stage, stageSongs(stageRun.part), stageRun.part, me.id).forEach(({ song, crowns, unlocked }, i) => {
+    const li = document.createElement('li');
+    li.className = `stage-song${unlocked ? '' : ' locked'}`;
+    const board = stage.scores[scoreKey(song.id, stageRun.part)] || [];
+    const best = Math.max(0, ...board.filter((r) => r.player === me.id).map((r) => r.score));
+    li.innerHTML = `<div class="ss-num"></div><div class="ss-title"></div><div class="ss-crowns">${crownsHtml(crowns)}</div><div class="ss-best"></div>${unlocked ? '' : '<span class="ss-lock">🔒</span>'}`;
+    li.querySelector('.ss-num').textContent = `Song ${i + 1} · ${song.level}`;
+    li.querySelector('.ss-title').textContent = song.title;
+    li.querySelector('.ss-best').textContent = best ? `Best ${best.toLocaleString()}` : unlocked ? 'Not played yet' : 'Earn a 👑 on the song before to unlock';
+    li.onclick = () => (unlocked ? startStage(song) : toast('Earn at least one 👑 on the song before this one to unlock it.'));
+    list.append(li);
+  });
+}
+
+function showStage(section) {
+  stageRun.phase = section === 'play' ? stageRun.phase : section;
+  $('stageMenu').hidden = section !== 'menu';
+  $('stagePlay').hidden = section !== 'play';
+  $('stageResults').hidden = section !== 'results';
+}
+
+/** Targets and lanes for the part being played. */
+function buildStageTargets(part) {
+  const channels = new Set(part.split(',').map(Number));
+  const drums = channels.size === 1 && channels.has(DRUM_CHANNEL);
+  const targets = [];
+  for (const e of state.song.events) {
+    if (e.type === 'on' && channels.has(e.ch)) targets.push({ t: e.time, note: drums ? e.note : e.note + state.transpose, ch: e.ch });
+  }
+  let lanes;
+  let laneFor;
+  let dark = new Set();
+  if (drums) {
+    lanes = STAGE_DRUM_LANES;
+    laneFor = (n) => (LANES[laneOf(n)]?.id === 'kick' ? -1 : STAGE_DRUM_LANES.findIndex((l) => l.notes.includes(n)));
+  } else {
+    let lo = Math.min(...targets.map((t) => t.note));
+    let hi = Math.max(...targets.map((t) => t.note));
+    while (hi - lo < 7) (hi - lo) % 2 ? lo-- : hi++;
+    const sf = keySf();
+    lanes = [];
+    for (let n = lo; n <= hi; n++) {
+      const black = [1, 3, 6, 8, 10].includes(n % 12);
+      if (black) dark.add(n - lo);
+      lanes.push({ short: noteName(n, sf, settings.spelling).replace(/-?\d+$/, '') + (n % 12 === 0 ? Math.floor(n / 12) - 1 : ''), color: black ? '#8fb3ff' : '#4f8cff', note: n });
+    }
+    laneFor = (n) => (n >= lo && n <= hi ? n - lo : -2);
+  }
+  return { targets, drums, lanes, laneFor, dark };
+}
+
+function startStage(song) {
+  synth.ensure();
+  if (song) {
+    if (state.mediaFile) ejectMedia();
+    loadMidiBytes(songToMidi(song), `${song.title}.mid`);
+    state.librarySong = song.id;
+    updateMixerNames();
+    updateLearnParts();
+  } else if (!state.song) {
+    return toast('Open a MIDI song first (Open… or Audio → MIDI), or pick one of the songs here.');
+  }
+  let part = stageRun.part;
+  if (!song) {
+    // Your own song: use the part picked next to the Learn button.
+    part = $('learnPart').value || part;
+  }
+  const channels = part.split(',').map(Number);
+  if (!channels.some((c) => state.song.channels.includes(c))) return toast(`This song has no ${partName(part).toLowerCase()} part.`);
+  stageRun.song = song;
+  stageRun.key = song ? song.id : `file:${state.midiName}`;
+  stageRun.playPart = part;
+  if (learn.enabled) setLearn(false);
+  player.pause();
+  player.silent = null;
+  setRate(stageRun.speed);
+  stageRun.savedLoop = player.loop;
+  player.loop = { ...player.loop, enabled: false };
+  const built = buildStageTargets(part);
+  Object.assign(stageRun, built, { pops: [], seenEvents: 0, lastCount: -1 });
+  setText($('hudSong'), `${state.song.title || state.midiName} · ${partName(part)} · ${stageRun.mode === 'perform' ? 'Perform' : 'Practice'}${stageRun.speed < 1 ? ` · ${Math.round(stageRun.speed * 100)}%` : ''}`);
+  setText($('stageHint'), built.drums ? 'Hit your e-kit, the pads, or tap the drum pads on screen.' : 'Play your keyboard, click the keys, or use the computer keys (A W S E D…).');
+  buildStageTaps();
+  if (stageRun.mode === 'practice') {
+    $('learnPart').value = part;
+    setLearn(true);
+    stageRun.session = null;
+  } else {
+    player.silent = { isTarget: (e) => channels.includes(e.ch) };
+    stageRun.session = new GameSession(built.targets, { drums: built.drums, rate: stageRun.speed });
+  }
+  player.seek(0);
+  stageRun.phase = 'count';
+  stageRun.countStart = performance.now() / 1000;
+  showStage('play');
+}
+
+/** On-screen buttons for the lanes, for playing without an instrument. */
+function buildStageTaps() {
+  const bar = $('stageTaps');
+  bar.innerHTML = '';
+  const add = (label, color, down, up, cls = '') => {
+    const b = Object.assign(document.createElement('button'), { textContent: label, className: cls });
+    b.style.setProperty('--tc', color);
+    b.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      b.classList.add('down');
+      down();
+    });
+    const release = () => {
+      if (!b.classList.contains('down')) return;
+      b.classList.remove('down');
+      up?.();
+    };
+    b.addEventListener('pointerup', release);
+    b.addEventListener('pointerleave', release);
+    bar.append(b);
+  };
+  if (stageRun.drums) {
+    for (const lane of STAGE_DRUM_LANES) add(lane.short, lane.color, () => liveDrum(lane.notes[0], 110));
+    add('KICK', LANES.find((l) => l.id === 'kick').color, () => liveDrum(36, 115), null, 'kick');
+  } else {
+    stageRun.lanes.forEach((lane, i) => add(lane.short, lane.color, () => liveOn(lane.note, 100), () => liveOff(lane.note), stageRun.dark.has(i) ? 'black' : ''));
+  }
+}
+
+function stopStage(toMenu = true) {
+  player.pause();
+  player.silent = null;
+  if (stageRun.savedLoop) player.loop = stageRun.savedLoop;
+  stageRun.savedLoop = null;
+  if (stageRun.mode === 'practice' && learn.enabled) setLearn(false);
+  stageRun.phase = 'menu';
+  $('stageCount').textContent = '';
+  if (toMenu) {
+    showStage('menu');
+    renderStageMenu();
+  }
+}
+
+function stageHit(note, drum) {
+  if (stageRun.phase !== 'play' || !stageRun.session || drum !== stageRun.drums) return;
+  const t = player.time + (stage.calibration || 0) * stageRun.speed;
+  stageRun.session.hit(note, t, performance.now() / 1000);
+}
+
+function stageTime() {
+  const now = performance.now() / 1000;
+  if (stageRun.phase === 'count') return (now - stageRun.countStart - stageRun.leadIn) * stageRun.speed;
+  return player.time;
+}
+
+function updateStage() {
+  const now = performance.now() / 1000;
+  if (stageRun.phase === 'count') {
+    const left = stageRun.leadIn - (now - stageRun.countStart);
+    const n = Math.ceil(left);
+    if (n !== stageRun.lastCount && n > 0) {
+      stageRun.lastCount = n;
+      synth.noteOn(GROOVE_CHANNEL, 37, 90); // count-in click
+    }
+    $('stageCount').textContent = left > 0 ? String(n) : '';
+    if (left <= 0) {
+      stageRun.phase = 'play';
+      $('stageCount').textContent = '';
+      player.play();
+    }
+  }
+  const s = stageRun.session;
+  const t = stageTime();
+  if (s && stageRun.phase === 'play') s.update(t, now);
+  // New judgements become pop-ups.
+  if (s) {
+    for (; stageRun.seenEvents < s.events.length; stageRun.seenEvents++) {
+      const ev = s.events[stageRun.seenEvents];
+      const lane = ev.target ? stageRun.laneFor(ev.target.note) : stageRun.laneFor(ev.note);
+      const [text, color] = POP[ev.result];
+      stageRun.pops.push({ lane: lane < 0 ? -1 : lane, text, color, born: now });
+    }
+    stageRun.pops = stageRun.pops.filter((p) => now - p.born < 0.6);
+    setText($('hudScore'), s.score.toLocaleString());
+    setText($('hudCombo'), String(s.combo));
+    const m = s.multiplier;
+    setText($('hudMult'), `×${m}`);
+    $('hudMult').className = `hud-mult m${m}`;
+    setText($('hudAcc'), `${Math.round(s.accuracy)}%`);
+    const crowns = crownsFor(s.accuracy);
+    if ($('hudCrowns').dataset.n !== String(crowns)) {
+      $('hudCrowns').dataset.n = String(crowns);
+      $('hudCrowns').innerHTML = crownsHtml(crowns);
+    }
+  } else {
+    setText($('hudScore'), '—');
+    setText($('hudCombo'), String(learn.correct));
+    setText($('hudMult'), '🧘');
+    $('hudMult').className = 'hud-mult';
+    setText($('hudAcc'), `${Math.round((100 * learn.correct) / Math.max(1, learn.correct + learn.wrong))}%`);
+    $('hudCrowns').innerHTML = '';
+    $('hudCrowns').dataset.n = '';
+  }
+  $('hudProgress').style.width = `${Math.max(0, Math.min(100, (100 * Math.max(0, t)) / Math.max(1, player.duration)))}%`;
+
+  // The highway.
+  const ahead = 2.2 / Math.max(0.6, stageRun.speed);
+  const notes = [];
+  const barNotes = [];
+  const targets = s ? s.targets : buildStageTargetsCache();
+  for (const x of targets) {
+    if (x.t < t - 0.4) continue;
+    if (x.t > t + ahead) break;
+    const lane = stageRun.laneFor(x.note);
+    const hidden = x.result && x.result !== 'miss';
+    if (lane === -1) {
+      if (!hidden) barNotes.push({ t: x.t });
+    } else if (lane >= 0) {
+      const color = x.result === 'miss' ? '#555' : stageRun.drums ? undefined : state.chan[x.ch]?.color;
+      notes.push({ t: x.t, lane, vel: 100, hidden, color });
+    }
+  }
+  const beats = [];
+  for (let b = Math.ceil(state.song.beatAt(Math.max(0, t - 0.4))); beats.length < 64; b++) {
+    const bt = state.song.secAt(b);
+    if (bt > t + ahead) break;
+    beats.push(bt);
+  }
+  const want = new Set(!s && learn.enabled ? [...learn.expected].map((n) => stageRun.laneFor(n)).filter((l) => l >= 0) : []);
+  drawDrumHighway($('stageCanvas'), {
+    lanes: stageRun.lanes,
+    dark: stageRun.dark,
+    notes,
+    barNotes,
+    barColor: '#ff7a45',
+    time: t,
+    ahead,
+    beats,
+    want,
+    pops: stageRun.pops.map((p) => ({ ...p, age: now - p.born })),
+    flash: stageRun.drums ? STAGE_DRUM_LANES.map((l) => now - highwayHits[LANES.indexOf(l)]) : stageRun.lanes.map((l) => (liveNotesDown().has(l.note) ? 0 : 99)),
+    fg: '#e8e9ee',
+    bg: '#0b0c12',
+  });
+}
+
+let stageTargetsCache = { song: null, part: '', list: [] };
+function buildStageTargetsCache() {
+  if (stageTargetsCache.song !== state.song || stageTargetsCache.part !== stageRun.playPart) {
+    stageTargetsCache = { song: state.song, part: stageRun.playPart, list: buildStageTargets(stageRun.playPart).targets };
+  }
+  return stageTargetsCache.list;
+}
+
+function liveNotesDown() {
+  return new Set([...liveMap.values()].map((m) => m.note));
+}
+
+function finishStage() {
+  const me = stagePlayer();
+  player.pause();
+  player.silent = null;
+  if (stageRun.savedLoop) player.loop = stageRun.savedLoop;
+  stageRun.savedLoop = null;
+  stageRun.phase = 'results';
+  let summary;
+  if (stageRun.session) {
+    summary = stageRun.session.finish();
+  } else {
+    const acc = Math.round((1000 * learn.correct) / Math.max(1, learn.correct + learn.wrong)) / 10;
+    summary = { score: 0, accuracy: acc, crowns: 0, maxCombo: 0, counts: { perfect: learn.correct, great: 0, good: 0, miss: learn.wrong, extra: 0 }, practice: true };
+    setLearn(false);
+  }
+  setText($('resTitle'), summary.practice ? `Practice done, ${me.name}! 🧘` : summary.crowns ? `${['', 'You passed', 'Nice', 'Great job', 'Amazing', 'PERFECT'][summary.crowns]}, ${me.name}!` : `So close, ${me.name}. Try again!`);
+  $('resCrowns').innerHTML = summary.practice ? '' : Array.from({ length: 5 }, (_, i) => `<span class="${i < summary.crowns ? '' : 'crown-off'}" style="animation-delay:${i * 0.12}s">👑</span>`).join('');
+  setText($('resScore'), summary.practice ? '—' : summary.score.toLocaleString());
+  setText($('resAcc'), `${summary.accuracy}%`);
+  setText($('resCombo'), summary.practice ? '—' : String(summary.maxCombo));
+  const c = summary.counts;
+  $('resCounts').textContent = summary.practice
+    ? `✓ ${c.perfect} right · ✗ ${c.miss} wrong`
+    : `Perfect ${c.perfect} · Great ${c.great} · Good ${c.good} · Missed ${c.miss}${c.extra ? ` · Extra hits ${c.extra}` : ''}`;
+  const board = $('resBoard');
+  board.innerHTML = '';
+  setText($('resBest'), '');
+  if (!summary.practice) {
+    const { rank, best } = recordScore(stage, stageRun.key, stageRun.playPart, me.id, summary);
+    saveStage(stage);
+    setText($('resBest'), best && rank === 1 ? '🏆 New family high score!' : best ? '⭐ New personal best!' : '');
+    (stage.scores[scoreKey(stageRun.key, stageRun.playPart)] || []).slice(0, 5).forEach((r, i) => {
+      const p = stage.players.find((x) => x.id === r.player);
+      const li = document.createElement('li');
+      if (i === rank - 1) li.className = 'me';
+      li.innerHTML = '<span class="rb-rank"></span><span class="rb-name"></span><span class="rb-crowns"></span><span class="rb-score"></span>';
+      li.querySelector('.rb-rank').textContent = `${i + 1}.`;
+      li.querySelector('.rb-name').textContent = p ? p.name : 'Player';
+      li.querySelector('.rb-name').style.color = p?.color || '';
+      li.querySelector('.rb-crowns').textContent = '👑'.repeat(r.crowns);
+      li.querySelector('.rb-score').textContent = r.score.toLocaleString();
+      board.append(li);
+    });
+    if (summary.crowns) {
+      // A little fanfare.
+      [60, 64, 67, 72].forEach((n, i) => {
+        synth.noteOn(LIVE_CHANNEL, n, 90, synth.now + 0.12 * i + 0.05);
+        synth.noteOff(LIVE_CHANNEL, n, synth.now + 1.4);
+      });
+    }
+  }
+  const songs = stageSongs(stageRun.part);
+  const idx = stageRun.song ? songs.findIndex((x) => x.id === stageRun.song.id) : -1;
+  const next = idx >= 0 ? songs[idx + 1] : null;
+  const nextOpen = next && courseState(stage, songs, stageRun.part, me.id)[idx + 1].unlocked;
+  $('resNext').hidden = !nextOpen;
+  $('resNext').onclick = () => startStage(next);
+  showStage('results');
+}
+
+function initStage() {
+  const dlg = $('stageDlg');
+  $('btnStage').onclick = () => {
+    if (!dlg.open) dlg.show();
+    if (stageRun.phase === 'menu') {
+      showStage('menu');
+      renderStageMenu();
+    }
+  };
+  dlg.querySelector('[data-close]').onclick = () => {
+    if (stageRun.phase === 'count' || stageRun.phase === 'play') stopStage();
+    dlg.close();
+  };
+  makeDraggable(dlg);
+  $('stageAddPlayer').onclick = () => {
+    const name = prompt('New player name');
+    if (!name || !name.trim()) return;
+    const id = `p${Date.now()}`;
+    stage.players.push({ id, name: name.trim().slice(0, 20), color: PLAYER_COLORS[stage.players.length % PLAYER_COLORS.length] });
+    stage.current = id;
+    saveStage(stage);
+    renderStageMenu();
+  };
+  document.querySelectorAll('#stageParts button').forEach((b) => (b.onclick = () => {
+    stageRun.part = b.dataset.part;
+    renderStageMenu();
+  }));
+  document.querySelectorAll('#stageModes button').forEach((b) => (b.onclick = () => {
+    stageRun.mode = b.dataset.mode;
+    renderStageMenu();
+  }));
+  $('stageSpeed').onchange = () => (stageRun.speed = Number($('stageSpeed').value));
+  $('stageCalib').value = String(Math.round((stage.calibration || 0) * 1000));
+  $('stageCalib').onchange = () => {
+    stage.calibration = Math.max(-0.2, Math.min(0.3, Number($('stageCalib').value) / 1000 || 0));
+    saveStage(stage);
+  };
+  $('stageCurrent').onclick = () => startStage(null);
+  $('stageStop').onclick = () => stopStage();
+  $('stageRestart').onclick = () => {
+    stopStage(false);
+    startStage(stageRun.song);
+  };
+  $('resRetry').onclick = () => startStage(stageRun.song);
+  $('resMenu').onclick = () => {
+    showStage('menu');
+    stageRun.phase = 'menu';
+    renderStageMenu();
+  };
 }
 
 // ---- Learn mode ("wait for me") ----------------------------------------
@@ -2748,6 +3182,7 @@ function frame() {
 
   updateTransport();
   if (settings.drumView === 'highway' && !layout.drums?.hidden) renderHighway();
+  if ((stageRun.phase === 'count' || stageRun.phase === 'play') && $('stageDlg').open && state.song) updateStage();
   if (dirty) {
     dirty = false;
     render();
@@ -2761,6 +3196,7 @@ function frame() {
 syncSettingsUI();
 initDrums();
 initKitRack();
+initStage();
 initConverter();
 initSongs();
 applyLayout();

@@ -602,9 +602,9 @@ export function drawDrumHighway(canvas, view) {
   const laneW = w / lanes.length;
   const yAt = (t) => hitY - (t - time) * pxPerSec;
 
-  // Lane backgrounds, beat lines, hit line.
+  // Lane backgrounds (black-key lanes darker), beat lines, hit line.
   lanes.forEach((lane, i) => {
-    ctx.fillStyle = i % 2 ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.06)';
+    ctx.fillStyle = view.dark?.has(i) ? 'rgba(0,0,0,0.35)' : i % 2 ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.06)';
     ctx.fillRect(i * laneW, 0, laneW, hitY);
   });
   ctx.strokeStyle = 'rgba(255,255,255,0.12)';
@@ -620,15 +620,27 @@ export function drawDrumHighway(canvas, view) {
   ctx.fillStyle = 'rgba(255,255,255,0.7)';
   ctx.fillRect(0, hitY - 1, w, 2);
 
+  // Kick drum as one wide bar across every lane (Guitar Hero style).
+  const gemH = Math.max(5, Math.min(16, laneW * 0.25 + 6, pxPerSec * 0.07));
+  for (const n of view.barNotes || []) {
+    const y = yAt(n.t);
+    if (y < -gemH || y > hitY + gemH * 2) continue;
+    ctx.globalAlpha = n.t < time - 0.03 ? 0.2 : 0.75;
+    ctx.fillStyle = view.barColor || '#ff7a45';
+    roundRect(ctx, 2, y - gemH * 0.3, w - 4, gemH * 0.6, 3);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
   // Notes.
-  const gemH = Math.max(5, Math.min(16, laneW * 0.25, pxPerSec * 0.07));
   for (const n of notes) {
     const y = yAt(n.t);
     if (y < -gemH || y > hitY + gemH * 2) continue;
     const lane = lanes[n.lane];
+    if (!lane || n.hidden) continue;
     const past = n.t < time - 0.03;
-    ctx.globalAlpha = past ? 0.25 : 0.55 + 0.45 * Math.min(1, n.vel / 110);
-    ctx.fillStyle = lane.color;
+    ctx.globalAlpha = past ? 0.25 : 0.55 + 0.45 * Math.min(1, (n.vel ?? 100) / 110);
+    ctx.fillStyle = n.color || lane.color;
     roundRect(ctx, n.lane * laneW + 4, y - gemH / 2, laneW - 8, gemH, 4);
     ctx.fill();
   }
@@ -659,6 +671,19 @@ export function drawDrumHighway(canvas, view) {
     ctx.textBaseline = 'middle';
     ctx.fillText(lane.short, x + laneW / 2, h - labelH / 2 + 2);
   });
+
+  // Judgement pop-ups ("PERFECT", "GOOD", "MISS") rising from the hit line.
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (const p of view.pops || []) {
+    if (p.age > 0.6) continue;
+    const x = p.lane < 0 ? w / 2 : (p.lane + 0.5) * laneW;
+    ctx.globalAlpha = 1 - p.age / 0.6;
+    ctx.fillStyle = p.color;
+    ctx.font = `bold ${Math.round(Math.max(12, Math.min(20, laneW * 0.5)))}px system-ui, sans-serif`;
+    ctx.fillText(p.text, x, hitY - gemH * 1.6 - p.age * 50);
+  }
+  ctx.globalAlpha = 1;
 
   if (!notes.length && view.empty) {
     ctx.fillStyle = view.fg;

@@ -100,3 +100,13 @@ Unzip the files first (double-click each .zip).
      Level. Drop your own WAV, AIFF or MP3 onto a drum to make your own kit.
    - Your kit is saved in ~/Library/Application Support/Knight Lyfe/Kit and
      plays in every Logic project, even with the plug-in window closed.
+
+8. STAGE (THE GAME)
+   Click "Stage" at the top. Choose who's playing (rename players by
+   double-clicking), the instrument and a song:
+   - Perform: play along in real time. Every note is scored Perfect,
+     Great, Good or Miss; keep a streak for x2, x3, x4 points; earn up to
+     5 crowns. Each song has a family leaderboard.
+   - Practice: the song waits for you at every note.
+   One crown on a song unlocks the next one. If your hits always land a
+   bit late, raise "Timing" (in ms) in the Stage menu.

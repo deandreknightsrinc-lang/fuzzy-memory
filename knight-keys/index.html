@@ -55,6 +55,7 @@
           </div>
         </div>
       </details>
+      <button id="btnStage" class="stage-btn" title="Stage: play songs like a game, earn crowns, unlock songs, beat the family high score">🎸 Stage</button>
       <button id="btnSongs" title="Free songs to learn on keys or drums">Songs</button>
       <button id="btnConvert" title="Turn a recording into MIDI">Audio → MIDI</button>
       <button id="btnSettings">Settings</button>
@@ -400,6 +401,87 @@
           </div>
         </div>
         <div id="kitKeys" class="kit-keys" title="The notes each drum answers to (your e-kit and pad controller send these)"></div>
+      </section>
+    </div>
+  </dialog>
+
+
+  <dialog id="stageDlg" class="tool-window stage-window" aria-labelledby="stageTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="stageTitle">🎸 Stage</h2>
+      <span id="stagePlayerChip" class="stage-chip"></span>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="stage-body">
+      <section id="stageMenu" class="stage-menu">
+        <div class="stage-row">
+          <span class="stage-label">Who's playing?</span>
+          <div id="stagePlayers" class="stage-players"></div>
+          <button id="stageAddPlayer" class="mini" title="Add a player">＋ Player</button>
+        </div>
+        <div class="stage-row">
+          <span class="stage-label">Instrument</span>
+          <div id="stageParts" class="stage-seg">
+            <button data-part="0">🎹 Right hand</button>
+            <button data-part="1">🎹 Left hand</button>
+            <button data-part="0,1">🎹 Both hands</button>
+            <button data-part="9">🥁 Drums</button>
+          </div>
+        </div>
+        <div class="stage-row">
+          <span class="stage-label">Mode</span>
+          <div id="stageModes" class="stage-seg">
+            <button data-mode="perform" title="Play along in real time and get scored">🎮 Perform</button>
+            <button data-mode="practice" title="The song waits for you at every note (no score)">🧘 Practice</button>
+          </div>
+          <label class="field" title="Slow the song down while you learn it">Speed
+            <select id="stageSpeed"><option value="0.5">50%</option><option value="0.75">75%</option><option value="1" selected>100%</option></select>
+          </label>
+          <label class="field" title="If your hits always land early or late (Bluetooth, slow audio), shift them here">Timing
+            <input id="stageCalib" type="number" min="-200" max="300" step="10" /> ms
+          </label>
+        </div>
+        <ol id="stageCourse" class="stage-course"></ol>
+        <div class="stage-row">
+          <button id="stageCurrent" title="Play the MIDI song that's open in Knight Keys (yours, or one made with Audio → MIDI)">🎵 Play the song that's open</button>
+          <span class="small">Earn 👑 on a song to unlock the next one. Every player has their own progress.</span>
+        </div>
+      </section>
+
+      <section id="stagePlay" class="stage-play" hidden>
+        <div class="stage-hud">
+          <div class="hud-block"><div class="hud-label">Score</div><div id="hudScore" class="hud-big">0</div></div>
+          <div class="hud-block"><div class="hud-label">Streak</div><div id="hudCombo" class="hud-big">0</div></div>
+          <div class="hud-block"><div id="hudMult" class="hud-mult">×1</div></div>
+          <div class="hud-block"><div class="hud-label">Accuracy</div><div id="hudAcc" class="hud-big">100%</div></div>
+          <div class="hud-block"><div id="hudCrowns" class="hud-crowns"></div></div>
+          <div class="hud-block grow"><div id="hudSong" class="hud-song"></div><div class="hud-progress"><div id="hudProgress"></div></div></div>
+        </div>
+        <div class="stage-road"><canvas id="stageCanvas"></canvas><div id="stageCount" class="stage-count"></div></div>
+        <div id="stageTaps" class="stage-taps" title="No instrument handy? Tap here (or with your fingers on a touch screen)"></div>
+        <div class="stage-row stage-actions">
+          <button id="stageStop">■ Stop</button>
+          <button id="stageRestart">↺ Restart</button>
+          <span id="stageHint" class="small"></span>
+        </div>
+      </section>
+
+      <section id="stageResults" class="stage-results" hidden>
+        <div id="resTitle" class="res-title"></div>
+        <div id="resCrowns" class="res-crowns"></div>
+        <div class="res-stats">
+          <div><span class="hud-label">Score</span><b id="resScore"></b></div>
+          <div><span class="hud-label">Accuracy</span><b id="resAcc"></b></div>
+          <div><span class="hud-label">Best streak</span><b id="resCombo"></b></div>
+        </div>
+        <div id="resCounts" class="res-counts"></div>
+        <div id="resBest" class="res-best"></div>
+        <ol id="resBoard" class="res-board"></ol>
+        <div class="stage-row res-actions">
+          <button id="resRetry" class="primary">↺ Play again</button>
+          <button id="resNext">Next song ▶</button>
+          <button id="resMenu">Songs</button>
+        </div>
       </section>
     </div>
   </dialog>
