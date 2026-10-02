@@ -143,3 +143,11 @@ Unzip the files first (double-click each .zip).
      click "+" again (or pick the Stereo version of the plug-in).
    - Drums on their own outputs skip the plug-in's built-in Room reverb;
      use Logic's effects on those channels instead.
+
+12. LESSONS (PIANO PATH)
+   Click "Lessons" at the top: a step-by-step piano course for each
+   player, from finding middle C to church chords and both hands. Play
+   the yellow keys; earn stars; the next lesson opens when you pass; come
+   back daily to grow your practice streak.
+   On the website you can also press "Microphone" to play a keyboard that
+   has no USB (single notes; headphones help).
