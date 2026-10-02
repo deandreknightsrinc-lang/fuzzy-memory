@@ -28,7 +28,7 @@ endif()
 # samples feed the C++ engine. Both are zipped into the binary at build time.
 set(KK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../knight-keys)
 file(GLOB KK_JS CONFIGURE_DEPENDS RELATIVE ${KK_DIR} ${KK_DIR}/js/*.js)
-file(GLOB KK_VENDOR CONFIGURE_DEPENDS RELATIVE ${KK_DIR} ${KK_DIR}/vendor/basic-pitch/*)
+file(GLOB KK_VENDOR CONFIGURE_DEPENDS RELATIVE ${KK_DIR} ${KK_DIR}/vendor/basic-pitch/* ${KK_DIR}/vendor/osmd/*)
 set(KK_WEB_FILES index.html styles.css ${KK_JS} ${KK_VENDOR})
 file(GLOB KK_SAMPLES CONFIGURE_DEPENDS RELATIVE ${KK_DIR} ${KK_DIR}/samples/salamander/*.mp3)
 

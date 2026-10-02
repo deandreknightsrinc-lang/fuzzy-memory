@@ -1,10 +1,12 @@
 // Knight Keys — app wiring: MIDI I/O, files, transport, panels and rendering.
 import { parseMidi, buildSong, writeMidi, splitHands } from './midi-file.js';
+import { makeChoirParts, choirMidi, PARTS as CHOIR_PARTS } from './choir.js';
+import { songToScore, scoreToMusicXML, musicXmlToMidi, scoreFileText } from './notation.js';
 import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_CHANNEL } from './synth.js';
 import { Player } from './player.js';
 import { KeyboardView, drawStaff, drawControllers, drawGroove, drawPianoRoll, drawDrumHighway } from './render.js';
-import { UNITS, pathState, lessonStars, starsForMistakes, starsForAccuracy, updateStreak, currentStreak } from './lessons.js';
-import { PitchListener } from './pitch.js';
+import { UNITS, COURSES, unitsFor, readNotes, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from './lessons.js';
+import { PitchListener, SingJudge, RangeFinder, voiceType, freqToCents, midiToFreq } from './pitch.js';
 import { GameSession, crownsFor, loadStage, saveStage, recordScore, courseState, scoreKey, PLAYER_COLORS } from './game.js';
 import { LANES, laneOf, sameDrum, outputFor, OUTPUTS, PIECES, KITS, kitById, resolveKit, kitNoteParams, loadSavedSamples, saveSample, deleteSample } from './drumkit.js';
 import { detectChord, noteName, pcName, solfege, keyName } from './theory.js';
@@ -260,7 +262,7 @@ function keyState(note) {
     if (lessonRun.targets.has(note)) return { color: LEARN_COLOR };
     if (lessonRun.upcoming === note) return { color: LEARN_COLOR, faded: true };
   }
-  if (learn.enabled && !learn.drums) {
+  if (learn.enabled && !learn.drums && !(lessonRun.active && lessonRun.step?.noHints)) {
     if (learn.expected.has(note)) return { color: LEARN_COLOR };
     if (learn.next.includes(note)) return { color: LEARN_COLOR, faded: true };
   }
@@ -656,17 +658,19 @@ $('keysCanvas').addEventListener('pointercancel', pointerEnd);
 const MIDI_EXT = /\.(mid|midi|kar|rmi|smf)$/i;
 const LESSON_EXT = /\.(klesson|json)$/i;
 const MEDIA_EXT = /\.(mp3|wav|m4a|aac|ogg|oga|opus|flac|mp4|m4v|mov|webm|mkv)$/i;
+const SCORE_EXT = /\.(musicxml|mxl|xml)$/i;
 
 async function handleFiles(files) {
   for (const file of files) {
     try {
-      if (LESSON_EXT.test(file.name)) await loadLesson(JSON.parse(await file.text()));
+      if (SCORE_EXT.test(file.name)) await openScoreFile(file);
+      else if (LESSON_EXT.test(file.name)) await loadLesson(JSON.parse(await file.text()));
       else if (MIDI_EXT.test(file.name) || file.type === 'audio/midi' || file.type === 'audio/x-midi') {
         loadMidiBytes(new Uint8Array(await file.arrayBuffer()), file.name);
       } else if (file.type.startsWith('audio/') || file.type.startsWith('video/') || MEDIA_EXT.test(file.name)) {
         loadMedia(file);
       } else {
-        toast(`Can't open ${file.name} — use MIDI, audio, video or .klesson files.`);
+        toast(`Can't open ${file.name} — use MIDI, MusicXML, audio, video or .klesson files.`);
       }
     } catch (err) {
       console.error(err);
@@ -705,6 +709,8 @@ function loadMidiBytes(bytes, name, { keepLoops = false } = {}) {
   player.transpose = state.transpose;
   player.setRate(state.rate);
   updateLessonMode();
+  scoreView.hidden.clear();
+  if ($('scoreDlg').open) setTimeout(renderScore);
   buildMixer();
   renderLoops();
   updateTitle();
@@ -2264,7 +2270,7 @@ function initKitRack() {
 // then a song in Learn mode. Stars per lesson, the next one opens when you
 // pass, and a daily practice streak, per player (the Stage players).
 
-const lessonRun = { active: false, lesson: null, stepIdx: 0, step: null, pos: 0, mistakes: 0, stars: [], targets: new Set(), upcoming: null, done: false };
+const lessonRun = { active: false, lesson: null, stepIdx: 0, step: null, pos: 0, mistakes: 0, stars: [], targets: new Set(), upcoming: null, done: false, readList: [], hint: false, missesHere: 0 };
 const NOTE_LETTERS = ['C', 'C♯', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'A♭', 'A', 'B♭', 'B'];
 const noteLetter = (n) => NOTE_LETTERS[n % 12];
 const todayStr = () => {
@@ -2283,13 +2289,24 @@ function renderLessonHeader() {
   setText($('lpStreak'), streak ? `🔥 ${streak}-day streak` : '');
 }
 
+let lessonCourse = 'piano';
 function renderLessonMap() {
   renderLessonHeader();
+  const tabs = $('lpCourses');
+  tabs.innerHTML = '';
+  for (const c of COURSES) {
+    const b = Object.assign(document.createElement('button'), { className: `mini${c.id === lessonCourse ? ' on' : ''}`, textContent: `${c.icon} ${c.name}` });
+    b.onclick = () => {
+      lessonCourse = c.id;
+      renderLessonMap();
+    };
+    tabs.append(b);
+  }
   const map = $('lpMap');
   map.innerHTML = '';
-  const state0 = pathState(lessonProgress());
+  const state0 = pathState(lessonProgress(), lessonCourse);
   const nextId = state0.find((x) => x.unlocked && !x.stars)?.lesson.id;
-  for (const unit of UNITS) {
+  for (const unit of unitsFor(lessonCourse)) {
     const sec = Object.assign(document.createElement('div'), { className: 'lp-unit' });
     sec.append(Object.assign(document.createElement('h3'), { textContent: `${unit.icon} ${unit.title}` }));
     const row = Object.assign(document.createElement('div'), { className: 'lp-row' });
@@ -2309,6 +2326,7 @@ function renderLessonMap() {
 
 function showLessonView(view) {
   $('lpMap').hidden = view !== 'map';
+  $('lpCourses').hidden = view !== 'map';
   $('lpLesson').hidden = view !== 'lesson';
   $('lpDone').hidden = view !== 'done';
 }
@@ -2322,6 +2340,7 @@ function startLesson(lesson) {
 }
 
 function stopLessonSong() {
+  stopSinging();
   if (lessonRun.step?.type === 'song') {
     player.pause();
     if (learn.enabled) setLearn(false);
@@ -2347,8 +2366,11 @@ function renderLessonTargets() {
   if (step.type === 'notes') step.notes.forEach((n, i) => chip(noteLetter(n), `finger ${step.fingers[i]}`, i < lessonRun.pos ? 'done' : i === lessonRun.pos ? 'now' : ''));
   else if (step.type === 'chords') step.chords.forEach((c, i) => chip(step.names[i], c.map(noteLetter).join(' '), i < lessonRun.pos ? 'done' : i === lessonRun.pos ? 'now' : ''));
   else if (step.type === 'info' && step.keys) step.keys.forEach((n) => chip(noteLetter(n), '', 'now'));
+  else if (step.type === 'read') lessonRun.readList.forEach((n, i) => chip(i < lessonRun.pos ? noteLetter(n) : '?', '', i < lessonRun.pos ? 'done' : i === lessonRun.pos && !lessonRun.done ? 'now' : ''));
+  else if (step.type === 'sing') step.notes.forEach((n, i) => chip(step.names?.[i] || noteLetter(n), step.names ? noteLetter(n) : '', i < lessonRun.pos ? 'done' : i === lessonRun.pos && !lessonRun.done ? 'now' : ''));
   const dots = $('lpDots');
   dots.innerHTML = lessonRun.lesson.steps.map((_, i) => `<span class="${i < lessonRun.stepIdx ? 'done' : i === lessonRun.stepIdx ? 'now' : ''}"></span>`).join('');
+  drawLessonStaff();
   markDirty();
 }
 
@@ -2360,19 +2382,24 @@ function setLessonTargets() {
     lessonRun.upcoming = step.notes[lessonRun.pos + 1] ?? null;
   } else if (step.type === 'chords') lessonRun.targets = new Set(step.chords[lessonRun.pos] || []);
   else if (step.type === 'info') lessonRun.targets = new Set(step.keys || []);
+  else if (step.type === 'sing') lessonRun.targets = new Set(lessonRun.pos < step.notes.length ? [step.notes[lessonRun.pos]] : []);
+  else if (step.type === 'read') lessonRun.targets = new Set(lessonRun.hint && lessonRun.pos < lessonRun.readList.length ? [lessonRun.readList[lessonRun.pos]] : []);
   else lessonRun.targets = new Set();
 }
 
 function showLessonStep(i) {
   stopLessonSong();
   const step = lessonRun.lesson.steps[i];
-  Object.assign(lessonRun, { stepIdx: i, step, pos: 0, mistakes: 0, done: step.type === 'info' });
+  Object.assign(lessonRun, { stepIdx: i, step, pos: 0, mistakes: 0, done: step.type === 'info', hint: false, missesHere: 0, readList: step.type === 'read' ? readNotes(step) : [] });
   setText($('lpText'), step.text + (step.type === 'chords' && micListener?.active ? ' (Chords need a USB keyboard or the on-screen keys: the microphone hears one note at a time.)' : ''));
-  lessonFeedback(step.type === 'info' ? '' : step.type === 'song' ? 'The song is playing. The yellow keys are yours.' : 'Your turn: the yellow key is next.');
+  lessonFeedback(step.type === 'info' ? '' : step.type === 'song' ? (step.voice ? 'The song is playing. Sing the yellow notes.' : step.noHints ? 'The song is playing. Read the staff and play.' : 'The song is playing. The yellow keys are yours.') : step.type === 'read' ? 'Which note is it? Play it.' : 'Your turn: the yellow key is next.');
+  $('lpSing').hidden = step.type !== 'sing' && step.type !== 'range';
+  $('lpHear').hidden = step.type !== 'sing';
   setLessonTargets();
   renderLessonTargets();
   $('lpNext').disabled = !lessonRun.done;
   $('lpNext').textContent = i === lessonRun.lesson.steps.length - 1 ? 'Finish ✓' : 'Next ▶';
+  if (step.type === 'sing' || step.type === 'range' || step.voice) startSinging(step);
   if (step.type === 'song') {
     const song = SONGS.find((s) => s.id === step.song);
     loadSongEntry(song, 'beginner');
@@ -2395,9 +2422,46 @@ function completeLessonStep(stars) {
   synth.noteOff(LIVE_CHANNEL, 84, synth.now + 0.3);
 }
 
+/** The lesson's staff: the note to read, or the notes an info step shows. */
+function drawLessonStaff() {
+  const step = lessonRun.step;
+  const cv = $('lpStaff');
+  let notes = [];
+  if (step?.type === 'read') {
+    const n = lessonRun.readList[Math.min(lessonRun.pos, lessonRun.readList.length - 1)];
+    if (n !== undefined) notes = [{ midi: n, color: lessonRun.done ? '#73d13d' : '#e6e6e6' }];
+  } else if (step?.staff) notes = step.staff.map((midi) => ({ midi, color: '#ffd60a' }));
+  cv.hidden = !notes.length && step?.type !== 'read';
+  if (cv.hidden) return;
+  drawStaff(cv, notes, { sf: step.sf || 0, spelling: 'auto', splitPoint: step.clef === 'bass' ? 61 : 60, fg: '#ddd' });
+}
+
 function lessonHit(note) {
   if (!lessonRun.active || lessonRun.done || !$('lessonDlg').open) return;
   const step = lessonRun.step;
+  if (step.type === 'read') {
+    const want = lessonRun.readList[lessonRun.pos];
+    // Singers and the mic may be in another octave: the letter is what counts when reading by voice.
+    const ok = note === want || (micListener?.active && note % 12 === want % 12);
+    if (ok) {
+      lessonRun.pos++;
+      lessonRun.hint = false;
+      lessonRun.missesHere = 0;
+      if (lessonRun.pos >= lessonRun.readList.length) {
+        setLessonTargets();
+        return completeLessonStep(starsForMistakes(lessonRun.mistakes, lessonRun.readList.length));
+      }
+      lessonFeedback(`✓ ${noteLetter(want)}! Next note…`, 'good');
+    } else {
+      lessonRun.mistakes++;
+      lessonRun.missesHere++;
+      if (lessonRun.missesHere >= 2) lessonRun.hint = true;
+      lessonFeedback(lessonRun.hint ? `It's ${noteLetter(want)}: the yellow key. Look at where it sits on the staff.` : `That was ${noteLetter(note)}. Look again: count the lines and spaces.`, 'bad');
+    }
+    setLessonTargets();
+    renderLessonTargets();
+    return;
+  }
   if (step.type === 'notes') {
     const want = step.notes[lessonRun.pos];
     if (note === want) {
@@ -2436,7 +2500,7 @@ function lessonSongDone() {
 }
 
 function finishLesson() {
-  const stars = lessonStars(lessonRun.lesson.steps.map((s, i) => (s.type === 'info' ? 0 : lessonRun.stars[i] || 1)));
+  const stars = lessonStars(lessonRun.lesson.steps.map((s, i) => (s.type === 'info' ? 0 : lessonRun.stars[i] ?? 1)));
   const prog = lessonProgress();
   const first = !prog[lessonRun.lesson.id];
   prog[lessonRun.lesson.id] = Math.max(prog[lessonRun.lesson.id] || 0, stars);
@@ -2451,7 +2515,7 @@ function finishLesson() {
   $('lpDoneStars').innerHTML = starsHtml(stars);
   const streak = stage.practice[stage.current].streak;
   setText($('lpDoneNote'), `${first ? 'The next lesson is open. ' : ''}🔥 ${streak}-day practice streak${streak > 1 ? ': keep it going tomorrow!' : '. Come back tomorrow to make it 2!'}`);
-  const all = UNITS.flatMap((u) => u.lessons);
+  const all = unitsFor(UNITS.find((u) => u.lessons.includes(lessonRun.lesson))?.course || 'piano').flatMap((u) => u.lessons);
   const next = all[all.findIndex((l) => l.id === lessonRun.lesson.id) + 1];
   $('lpDoneNext').hidden = !next;
   $('lpDoneNext').onclick = () => startLesson(next);
@@ -2472,18 +2536,34 @@ function leaveLesson() {
   markDirty();
 }
 
-// Microphone: notes heard from any piano or keyboard count like keys you played.
+// Microphone: notes heard from any piano, keyboard or singer count like keys you played.
 let micListener = null;
-async function toggleMic() {
+const micSupported = () => !IN_HOST && !!navigator.mediaDevices?.getUserMedia;
+const showMicOn = (on) => ['lpMic', 'boothMic'].forEach((id) => $(id).classList.toggle('on', on));
+
+/** Singers: a note in any octave counts as the one the song is waiting for. */
+function singingNow() {
+  return (lessonRun.active && lessonRun.step?.voice) || $('boothDlg').open;
+}
+function foldForSinger(midi) {
+  if (!singingNow() || !learn.enabled) return midi;
+  return [...learn.expected].find((n) => n % 12 === midi % 12) ?? midi;
+}
+
+async function toggleMic(force) {
   if (micListener?.active) {
+    if (force === true) return;
     micListener.stop();
-    $('lpMic').classList.remove('on');
+    showMicOn(false);
     toast('Microphone off.');
     return;
   }
   try {
     const ctx = synth.ensure();
-    micListener ??= new PitchListener((on, midi) => {
+    micListener ??= new PitchListener((on, heard) => {
+      const midi = on ? foldForSinger(heard) : (micHeld.get(heard) ?? heard);
+      if (on) micHeld.set(heard, midi);
+      else micHeld.delete(heard);
       if (on) {
         liveColor.set(midi, settings.inputColor);
         dNoteOn('in', midi);
@@ -2494,11 +2574,137 @@ async function toggleMic() {
       markDirty();
     });
     await micListener.start(ctx);
-    $('lpMic').classList.add('on');
-    toast('Listening 🎤 Play one note at a time. Headphones help, so the speakers don\'t confuse it.');
+    showMicOn(true);
+    for (const fn of pitchSubscribers) micListener.addPitchListener(fn);
+    toast(singingNow() || lessonRun.step?.type === 'sing' ? 'Listening 🎤 Sing! Headphones help, so the speakers don\'t sing for you.' : 'Listening 🎤 Play one note at a time. Headphones help, so the speakers don\'t confuse it.');
   } catch (err) {
     toast(`Couldn't use the microphone (${err.message || err.name}). Allow microphone access for this page.`);
   }
+}
+
+const micHeld = new Map(); // heard note -> note it counted as (folded octave), for the matching note-off
+
+// Anyone who wants the raw pitch (sing steps, the Vocal Booth) subscribes here,
+// before or after the mic starts.
+const pitchSubscribers = new Set();
+function onPitch(fn) {
+  pitchSubscribers.add(fn);
+  const off = micListener?.addPitchListener(fn);
+  return () => {
+    pitchSubscribers.delete(fn);
+    off?.();
+    micListener?.pitchListeners.delete(fn);
+  };
+}
+
+// ---- Singing steps (Voice course) ------------------------------------------
+
+const singRun = { judge: null, range: null, off: null, muteUntil: 0 };
+
+function playReference(note) {
+  synth.ensure();
+  synth.noteOn(LIVE_CHANNEL, note, 80, synth.now + 0.02);
+  synth.noteOff(LIVE_CHANNEL, note, synth.now + 0.9);
+  // Don't let the speakers "sing" the note for you.
+  singRun.muteUntil = performance.now() + 1300;
+}
+
+function showSingMeter(exact, target) {
+  const needle = $('lpNeedle');
+  if (exact === null) {
+    needle.classList.add('off');
+    setText($('lpHeard'), '–');
+    return;
+  }
+  const { midi, cents } = freqToCents(midiToFreq(exact));
+  // With a target: how far from it (any octave). Without: from the nearest note.
+  let off = cents;
+  if (target !== undefined) {
+    off = ((((exact - target) * 100 + 600) % 1200) + 1200) % 1200 - 600;
+    off = Math.max(-100, Math.min(100, off));
+  }
+  needle.classList.remove('off');
+  needle.style.left = `${50 + (target !== undefined ? off / 2 : off)}%`;
+  setText($('lpHeard'), `${noteLetter(midi)}${Math.floor(midi / 12) - 1}`);
+}
+
+function startSinging(step) {
+  stopSinging();
+  if (!micSupported()) {
+    if (step.type !== 'song') {
+      lessonRun.done = true;
+      lessonRun.stars[lessonRun.stepIdx] = 0;
+      $('lpNext').disabled = false;
+      lessonFeedback(IN_HOST ? 'Singing needs the microphone: open Knight Keys in Safari or Chrome for this step. Skip it for now with Next.' : 'This browser can\'t use a microphone. Skip this step with Next.', 'bad');
+    }
+    return;
+  }
+  toggleMic(true);
+  if (step.type === 'sing') {
+    singRun.judge = new SingJudge(step.notes, { hold: step.hold || 0.6 });
+    $('lpHold').style.width = '0%';
+    if (step.hear) setTimeout(() => lessonRun.step === step && playReference(step.notes[0]), 400);
+  }
+  if (step.type === 'range') {
+    singRun.range = new RangeFinder();
+    lessonFeedback('Sing low to high and back. Your range shows here.');
+  }
+  singRun.off = onPitch((exact, dt) => {
+    if (performance.now() < singRun.muteUntil) exact = null;
+    if (step.type === 'sing') singFrame(step, exact, dt);
+    else if (step.type === 'range') rangeFrame(exact);
+  });
+}
+
+function stopSinging() {
+  singRun.off?.();
+  Object.assign(singRun, { judge: null, range: null, off: null });
+}
+
+function singFrame(step, exact, dt) {
+  const judge = singRun.judge;
+  if (!judge || lessonRun.done) return;
+  showSingMeter(exact, judge.target);
+  const r = judge.push(exact, dt);
+  $('lpHold').style.width = `${Math.round(judge.progress * 100)}%`;
+  if (r === 'hit') {
+    lessonRun.pos = judge.pos;
+    setLessonTargets();
+    renderLessonTargets();
+    lessonFeedback('✓ In tune!', 'good');
+    if (step.hear) setTimeout(() => lessonRun.step === step && !lessonRun.done && playReference(judge.target), 350);
+  } else if (r === 'done') {
+    lessonRun.pos = judge.pos;
+    $('lpHold').style.width = '100%';
+    completeLessonStep(starsForSinging(judge.averageCents, judge.misses));
+  } else if (r === 'miss') {
+    const sharp = (judge.lastCents ?? 0) > 0;
+    lessonFeedback(`Not quite: you're ${sharp ? 'above' : 'below'} ${noteLetter(judge.target)}. Slide ${sharp ? 'down' : 'up'} until the needle is in the middle.`, 'bad');
+    if (step.hear) playReference(judge.target);
+  } else if (exact !== null && judge.lastCents !== null && Math.abs(judge.lastCents) > judge.tolerance) {
+    lessonFeedback(judge.lastCents > 0 ? 'A little high: come down ⬇' : 'A little low: go up ⬆');
+  }
+}
+
+function rangeFrame(exact) {
+  const rf = singRun.range;
+  if (!rf) return;
+  showSingMeter(exact);
+  rf.push(exact === null ? null : Math.round(exact));
+  if (rf.low === null) return;
+  const type = voiceType(rf.low, rf.high);
+  const name = (n) => `${noteLetter(n)}${Math.floor(n / 12) - 1}`;
+  if (rf.span >= 5) {
+    stage.voice ??= {};
+    stage.voice[stage.current] = { low: rf.low, high: rf.high, type: type.id };
+    saveStage(stage);
+    if (!lessonRun.done) {
+      lessonRun.stars[lessonRun.stepIdx] = 3;
+      lessonRun.done = true;
+      $('lpNext').disabled = false;
+    }
+    lessonFeedback(`Your range: ${name(rf.low)} to ${name(rf.high)}, about ${Math.round(rf.span / 12 * 10) / 10} octaves. That fits ${type.name}. Keep going to stretch it, or press Next.`, 'good');
+  } else lessonFeedback(`So far: ${name(rf.low)} to ${name(rf.high)}. Keep sliding up and down.`);
 }
 
 function initLessons() {
@@ -2512,8 +2718,12 @@ function initLessons() {
     dlg.close();
   };
   makeDraggable(dlg);
-  $('lpMic').hidden = IN_HOST || !navigator.mediaDevices?.getUserMedia;
-  $('lpMic').onclick = toggleMic;
+  $('lpMic').hidden = !micSupported();
+  $('lpMic').onclick = () => toggleMic();
+  $('lpHear').onclick = () => {
+    const t = singRun.judge?.target;
+    if (t !== undefined) playReference(t);
+  };
   $('lpPlayer').onchange = () => {
     stage.current = $('lpPlayer').value;
     saveStage(stage);
@@ -2531,6 +2741,415 @@ function initLessons() {
     else finishLesson();
   };
   $('lpDoneMap').onclick = () => renderLessonMap();
+}
+
+// ---- Full score (sheet music) ---------------------------------------------------
+//
+// Every instrument of the open song on its own staff, engraved by
+// OpenSheetMusicDisplay (vendor/osmd); print it, save it as PDF or MusicXML.
+// Sheet music saved as MusicXML opens as a song (score -> MIDI).
+
+const scoreView = { osmd: null, lib: null, xml: '', key: '', zoom: 0.85, cursorAt: -1, raf: 0, hidden: new Set() };
+
+function loadOsmd() {
+  if (window.opensheetmusicdisplay) return Promise.resolve(window.opensheetmusicdisplay);
+  scoreView.lib ??= new Promise((resolve, reject) => {
+    const el = document.createElement('script');
+    el.src = 'vendor/osmd/opensheetmusicdisplay.min.js';
+    el.onload = () => resolve(window.opensheetmusicdisplay);
+    el.onerror = () => reject(new Error('the score engraver did not load'));
+    document.head.append(el);
+  });
+  return scoreView.lib;
+}
+
+/** Score -> MIDI: open a MusicXML / .mxl file as the song, and keep the original score to show. */
+async function openScoreFile(file) {
+  const xml = await scoreFileText(file.name, new Uint8Array(await file.arrayBuffer()));
+  const res = musicXmlToMidi(xml);
+  if (!res.notes) throw new Error('no notes in that score');
+  const name = (res.title || file.name.replace(/\.[^.]+$/, '')).trim();
+  loadMidiBytes(res.bytes, `${name}.mid`);
+  state.scoreXml = { xml, for: state.midiName };
+  if ($('scoreDlg').open) renderScore();
+  toast(`Score → MIDI: ${name} (${res.parts.length} part${res.parts.length > 1 ? 's' : ''}, ${res.measures} bars, ${res.notes} notes).`, [
+    ['⬇ Save as MIDI', () => download(res.bytes, `${name}.mid`, 'audio/midi')],
+    ['📜 Show score', () => openScore()],
+  ], 8000);
+}
+
+function currentScoreXml() {
+  const song = state.song;
+  if (!song) return null;
+  const original = state.scoreXml?.for === state.midiName && $('scoreSource').value === 'original';
+  if (original) return { xml: state.scoreXml.xml, key: `orig:${state.midiName}`, original: true };
+  const melodic = song.channels.filter((ch) => !scoreView.hidden.has(ch));
+  const gridVal = $('scoreGrid').value;
+  const key = `${state.midiName}|${song.notes.length}|${gridVal}|${melodic.join(',')}|${state.chan.map((c) => c.program).join(',')}`;
+  if (key === scoreView.key && scoreView.xml) return { xml: scoreView.xml, key };
+  const score = songToScore(song, {
+    grid: gridVal === 'auto' ? 'auto' : Number(gridVal),
+    title: song.title || state.librarySong && SONGS.find((x) => x.id === state.librarySong)?.title || state.midiName || 'Score',
+    nameFor: (ch) => channelName(ch),
+    channels: melodic,
+  });
+  return { xml: scoreToMusicXML(score), key, score };
+}
+
+function renderScoreParts() {
+  const box = $('scoreParts');
+  box.innerHTML = '';
+  const song = state.song;
+  const original = state.scoreXml?.for === state.midiName && $('scoreSource').value === 'original';
+  if (!song || original) return;
+  for (const ch of song.channels) {
+    const label = document.createElement('label');
+    const cb = Object.assign(document.createElement('input'), { type: 'checkbox', checked: !scoreView.hidden.has(ch) });
+    cb.onchange = () => {
+      if (cb.checked) scoreView.hidden.delete(ch);
+      else if (song.channels.filter((c) => !scoreView.hidden.has(c)).length > 1) scoreView.hidden.add(ch);
+      else cb.checked = true; // keep at least one part
+      renderScore();
+    };
+    label.append(cb, ` ${channelName(ch)}`);
+    box.append(label);
+  }
+}
+
+async function renderScore() {
+  const view = $('scoreView');
+  $('scoreSourceWrap').hidden = state.scoreXml?.for !== state.midiName;
+  const original = state.scoreXml?.for === state.midiName && $('scoreSource').value === 'original';
+  $('scoreGrid').disabled = original;
+  renderScoreParts();
+  const cur = currentScoreXml();
+  if (!cur) {
+    view.innerHTML = '<p class="score-empty">Open a song (Songs, Open…, or Audio → MIDI) to see its full score.</p>';
+    setText($('scoreInfo'), '');
+    return;
+  }
+  scoreView.xml = cur.xml;
+  scoreView.key = cur.key;
+  setText($('scoreInfo'), cur.score ? `${cur.score.parts.length} part${cur.score.parts.length > 1 ? 's' : ''} · ${cur.score.measures} bars` : 'Original score');
+  try {
+    const lib = await loadOsmd();
+    if (!scoreView.osmd) {
+      view.innerHTML = '';
+      scoreView.osmd = new lib.OpenSheetMusicDisplay(view, { autoResize: true, backend: 'svg', drawTitle: true, drawPartNames: true, followCursor: false });
+    }
+    await scoreView.osmd.load(cur.xml);
+    scoreView.osmd.zoom = scoreView.zoom;
+    scoreView.osmd.render();
+    scoreView.cursorAt = -1;
+    if ($('scoreFollow').checked) scoreView.osmd.cursor.show();
+  } catch (err) {
+    console.error(err);
+    scoreView.osmd = null;
+    view.innerHTML = `<p class="score-empty">Couldn't draw this score (${err.message}). ⬇ MusicXML still works: open it in MuseScore or Logic.</p>`;
+  }
+}
+
+// The cursor follows the music (generated scores line up beat for beat).
+function followScore() {
+  const dlg = $('scoreDlg');
+  if (!dlg.open) {
+    scoreView.raf = 0;
+    return;
+  }
+  scoreView.raf = requestAnimationFrame(followScore);
+  const osmd = scoreView.osmd;
+  if (!osmd || !state.song || !$('scoreFollow').checked || !(player.playing || player.waiting)) return;
+  const cursor = osmd.cursor;
+  const target = state.song.beatAt(player.time) / 4 + 1e-4; // whole notes
+  const at = () => cursor.iterator.currentTimeStamp.RealValue;
+  if (at() > target + 0.01) cursor.reset();
+  let moved = false;
+  let guard = 0;
+  while (!cursor.iterator.EndReached && at() + 1e-4 < target && guard++ < 512) {
+    cursor.next();
+    moved = true;
+  }
+  if (moved && at() > target + 1e-3 && guard > 0) cursor.previous?.();
+  if (moved && cursor.cursorElement) {
+    const el = cursor.cursorElement;
+    const box = $('scoreView');
+    const top = el.offsetTop;
+    if (top < box.scrollTop + 20 || top > box.scrollTop + box.clientHeight - 120) box.scrollTo({ top: Math.max(0, top - 60), behavior: 'smooth' });
+  }
+}
+
+function openScore() {
+  const dlg = $('scoreDlg');
+  if (!dlg.open) dlg.show();
+  renderScore();
+  if (!scoreView.raf) scoreView.raf = requestAnimationFrame(followScore);
+}
+
+function initScore() {
+  const dlg = $('scoreDlg');
+  $('btnScore').onclick = openScore;
+  dlg.querySelector('[data-close]').onclick = () => dlg.close();
+  makeDraggable(dlg);
+  $('scoreGrid').onchange = renderScore;
+  $('scoreSource').onchange = renderScore;
+  $('scoreFollow').onchange = () => {
+    if (!scoreView.osmd) return;
+    if ($('scoreFollow').checked) scoreView.osmd.cursor.show();
+    else scoreView.osmd.cursor.hide();
+  };
+  const zoom = (f) => {
+    scoreView.zoom = Math.max(0.4, Math.min(2, scoreView.zoom * f));
+    if (!scoreView.osmd) return;
+    scoreView.osmd.zoom = scoreView.zoom;
+    scoreView.osmd.render();
+  };
+  $('scoreZoomIn').onclick = () => zoom(1.15);
+  $('scoreZoomOut').onclick = () => zoom(1 / 1.15);
+  $('scoreOpen').onclick = () => $('scoreFile').click();
+  $('scoreFile').onchange = async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (file) await openScoreFile(file).catch((err) => toast(`Couldn't open ${file.name}: ${err.message}`));
+  };
+  const baseName = () => (state.song?.title || state.midiName || 'score').replace(/[\\/:*?"<>|]/g, '-');
+  $('scoreXml').onclick = () => {
+    const cur = currentScoreXml();
+    if (!cur) return toast('Open a song first.');
+    download(cur.xml, `${baseName()}.musicxml`, 'application/vnd.recordare.musicxml+xml');
+  };
+  $('scoreMidi').onclick = () => {
+    if (!state.midiBytes) return toast('Open a song first.');
+    download(state.midiBytes, `${baseName()}.mid`, 'audio/midi');
+  };
+  $('scorePrint').onclick = () => {
+    if (!scoreView.osmd) return toast('Open a song first.');
+    if (IN_HOST) return toast('Printing works on the website. Here: ⬇ MusicXML, then open it in MuseScore or Logic to print.');
+    document.body.classList.add('print-score');
+    window.addEventListener('afterprint', () => document.body.classList.remove('print-score'), { once: true });
+    window.print();
+  };
+}
+
+// ---- Vocal Booth -------------------------------------------------------------
+//
+// For singers: a live pitch line over the song's notes (like Melodyne's blobs),
+// a tuner and your range; plus four-part choir parts (SATB) for any song, to
+// learn your part with the mic or export for ACE Studio, a choir plug-in or Logic.
+
+const booth = { trace: [], range: new RangeFinder(), off: null, raf: 0, choir: null, last: null };
+const noteLabel = (n) => `${noteLetter(n)}${Math.floor(n / 12) - 1}`;
+
+function boothPitch(exact) {
+  const now = performance.now() / 1000;
+  booth.trace.push({ t: now, n: exact });
+  while (booth.trace.length && booth.trace[0].t < now - 12) booth.trace.shift();
+  booth.range.push(exact === null ? null : Math.round(exact));
+  booth.last = exact;
+}
+
+function boothMelodyChannels() {
+  const v = $('boothMelody').value;
+  return v === '' ? null : [Number(v)];
+}
+
+function renderBoothInfo() {
+  const prof = stage.voice?.[stage.current];
+  const rf = booth.range;
+  const low = rf.low ?? prof?.low;
+  const high = rf.high ?? prof?.high;
+  setText($('boothRange'), low != null && high > low ? `${noteLabel(low)} – ${noteLabel(high)} (${voiceType(low, high).name})` : '–');
+  setText($('boothVoice'), prof ? `${stagePlayer().name}: ${voiceType(prof.low, prof.high).name}` : '');
+  const sel = $('boothMelody');
+  const prev = sel.value;
+  sel.innerHTML = '';
+  const melodic = (state.song?.channels || []).filter((ch) => ch !== DRUM_CHANNEL);
+  for (const ch of melodic) sel.append(new Option(`Ch ${ch + 1}: ${channelName(ch)}`, String(ch)));
+  if ([...sel.options].some((o) => o.value === prev)) sel.value = prev;
+  $('boothMake').disabled = !melodic.length;
+  if (!melodic.length) setText($('boothChoirInfo'), 'Open a song first (Songs button, or any MIDI file), then make its choir parts.');
+}
+
+function drawBooth() {
+  const cv = $('boothCanvas');
+  const dpr = window.devicePixelRatio || 1;
+  const w = cv.clientWidth || 760;
+  const h = cv.clientHeight || 300;
+  if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) {
+    cv.width = Math.round(w * dpr);
+    cv.height = Math.round(h * dpr);
+  }
+  const g = cv.getContext('2d');
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.clearRect(0, 0, w, h);
+  // Pitch range: your voice (from your range) or a wide default.
+  const prof = stage.voice?.[stage.current];
+  const lo = Math.max(28, (booth.range.low ?? prof?.low ?? 45) - 5);
+  const hi = Math.min(96, Math.max(lo + 18, (booth.range.high ?? prof?.high ?? 76) + 5));
+  const rowH = h / (hi - lo + 1);
+  const y = (n) => h - (n - lo + 0.5) * rowH;
+  const left = 34;
+  for (let n = lo; n <= hi; n++) {
+    const black = [1, 3, 6, 8, 10].includes(n % 12);
+    g.fillStyle = black ? '#171a21' : '#1c2029';
+    g.fillRect(left, y(n) - rowH / 2, w - left, rowH);
+    if (n % 12 === 0 || n % 12 === 7) {
+      g.fillStyle = '#7d8597';
+      g.font = '11px system-ui';
+      g.fillText(noteLabel(n), 2, y(n) + 4);
+    }
+  }
+  const pxPerSec = (w - left) / 8;
+  const nowX = left + (w - left) * 0.7;
+  // The song's notes for the part you sing (or the melody).
+  if (state.song) {
+    const chs = learn.enabled && !learn.drums ? learn.channels : new Set(boothMelodyChannels() || [state.song.channels.find((c) => c !== DRUM_CHANNEL)]);
+    const t = player.time;
+    const rate = player.rate || 1;
+    for (const n of state.song.notes) {
+      if (!chs.has(n.ch)) continue;
+      const x0 = nowX + ((n.time - t) / rate) * pxPerSec;
+      const x1 = nowX + ((n.time + n.dur - t) / rate) * pxPerSec;
+      if (x1 < left || x0 > w) continue;
+      // Show the note in the octave you sing, if it's out of view.
+      let nn = n.note + player.transpose;
+      while (nn > hi) nn -= 12;
+      while (nn < lo) nn += 12;
+      const want = learn.expected.has(n.note + player.transpose);
+      g.fillStyle = want ? '#ffd60a' : 'rgba(79, 140, 255, .55)';
+      const bx = Math.max(left, x0);
+      g.beginPath();
+      if (g.roundRect) g.roundRect(bx, y(nn) - rowH * 0.45, Math.max(3, x1 - bx), rowH * 0.9, Math.min(6, rowH / 2));
+      else g.rect(bx, y(nn) - rowH * 0.45, Math.max(3, x1 - bx), rowH * 0.9);
+      g.fill();
+    }
+  }
+  // Your voice: green when you're within 25 cents of a note.
+  const now = performance.now() / 1000;
+  g.lineWidth = 3;
+  g.lineCap = 'round';
+  let prev = null;
+  for (const p of booth.trace) {
+    if (p.n === null || p.n < lo - 1 || p.n > hi + 1) {
+      prev = null;
+      continue;
+    }
+    const pt = { x: nowX - (now - p.t) * pxPerSec, y: h - (p.n - lo + 0.5) * rowH, n: p.n };
+    if (prev && pt.x >= left) {
+      const off = Math.abs(p.n - Math.round(p.n)) * 100;
+      g.strokeStyle = off <= 25 ? '#73d13d' : off <= 40 ? '#ffd666' : '#ff7875';
+      g.beginPath();
+      g.moveTo(prev.x, prev.y);
+      g.lineTo(pt.x, pt.y);
+      g.stroke();
+    }
+    prev = pt;
+  }
+  g.strokeStyle = 'rgba(255,255,255,.35)';
+  g.lineWidth = 1;
+  g.beginPath();
+  g.moveTo(nowX, 0);
+  g.lineTo(nowX, h);
+  g.stroke();
+
+  // Tuner.
+  const el = $('boothNote');
+  if (booth.last == null) {
+    el.className = 'booth-note';
+    setText(el, '–');
+    setText($('boothCents'), micListener?.active ? 'Sing a note' : 'Turn on the microphone');
+  } else {
+    const { midi, cents } = freqToCents(midiToFreq(booth.last));
+    el.className = `booth-note ${Math.abs(cents) <= 15 ? 'good' : Math.abs(cents) <= 30 ? 'near' : 'far'}`;
+    setText(el, noteLabel(midi));
+    setText($('boothCents'), cents === 0 ? 'In tune' : `${cents > 0 ? '+' : ''}${cents} cents ${cents > 0 ? '(sharp)' : '(flat)'}`);
+  }
+  if (booth.range.low !== null) renderBoothRangeOnly();
+}
+
+let boothRangeShown = '';
+function renderBoothRangeOnly() {
+  const key = `${booth.range.low}-${booth.range.high}`;
+  if (key === boothRangeShown) return;
+  boothRangeShown = key;
+  renderBoothInfo();
+  if (booth.range.span >= 5) {
+    stage.voice ??= {};
+    stage.voice[stage.current] = { low: booth.range.low, high: booth.range.high, type: voiceType(booth.range.low, booth.range.high).id };
+    saveStage(stage);
+  }
+}
+
+function boothLoop() {
+  if (!$('boothDlg').open) {
+    booth.raf = 0;
+    return;
+  }
+  drawBooth();
+  booth.raf = requestAnimationFrame(boothLoop);
+}
+
+function openBooth() {
+  const dlg = $('boothDlg');
+  if (!dlg.open) dlg.show();
+  booth.off ??= onPitch(boothPitch);
+  renderBoothInfo();
+  if (!booth.raf) booth.raf = requestAnimationFrame(boothLoop);
+}
+
+function makeChoir() {
+  if (!state.song) return toast('Open a song first.');
+  const parts = makeChoirParts(state.song, { melodyChannels: boothMelodyChannels() });
+  if (!parts.soprano.length) return toast('No melody notes in that part. Pick another part as the melody.');
+  const title = `${state.song.title || state.midiName || 'Song'} - choir`;
+  const bytes = choirMidi(parts, { bpm: state.song.bpm, title, keySig: state.song.keySig, timeSig: state.song.timeSig, program: Number($('boothVowel').value) });
+  booth.choir = { parts, bytes, title };
+  ['boothOpen', 'boothLearn', 'boothDownload'].forEach((id) => ($(id).disabled = false));
+  setText($('boothChoirInfo'), `✓ ${parts.soprano.length} chords in four parts: ${CHOIR_PARTS.map((p) => `${p.name} ${noteLabel(Math.min(...parts[p.id].map((n) => n.note)))}–${noteLabel(Math.max(...parts[p.id].map((n) => n.note)))}`).join(', ')}. Check it by ear: it's a starting point, not a hymnal.`);
+  // Start on your own part if we know your voice.
+  const prof = stage.voice?.[stage.current];
+  if (prof) $('boothPart').value = String({ soprano: 0, mezzo: 0, alto: 1, tenor: 2, baritone: 3, bass: 3 }[prof.type] ?? 0);
+}
+
+function openChoirSong() {
+  if (!booth.choir) return false;
+  if (state.midiName !== booth.choir.title) {
+    if (learn.enabled) setLearn(false);
+    loadMidiBytes(booth.choir.bytes, `${booth.choir.title}.mid`);
+  }
+  return true;
+}
+
+function initBooth() {
+  const dlg = $('boothDlg');
+  $('btnBooth').onclick = openBooth;
+  dlg.querySelector('[data-close]').onclick = () => dlg.close();
+  makeDraggable(dlg);
+  $('boothMic').hidden = !micSupported();
+  $('boothNoMic').hidden = micSupported();
+  $('boothMic').onclick = () => toggleMic();
+  $('boothRangeReset').onclick = () => {
+    booth.range = new RangeFinder();
+    boothRangeShown = '';
+    renderBoothInfo();
+  };
+  $('boothMake').onclick = makeChoir;
+  $('boothVowel').onchange = () => booth.choir && makeChoir();
+  $('boothOpen').onclick = () => {
+    if (!openChoirSong()) return;
+    player.seek(0);
+    player.play();
+    renderBoothInfo();
+  };
+  $('boothLearn').onclick = () => {
+    if (!openChoirSong()) return;
+    $('learnPart').value = $('boothPart').value;
+    setLearn(true);
+    if (micSupported()) toggleMic(true);
+    player.seek(0);
+    player.play();
+    toast(`Sing the ${CHOIR_PARTS[Number($('boothPart').value)].name.toLowerCase()} part: the choir waits for each of your notes (any octave counts).`, [], 5000);
+  };
+  $('boothDownload').onclick = () => booth.choir && download(booth.choir.bytes, `${booth.choir.title}.mid`, 'audio/midi');
 }
 
 // ---- Stage (game mode) ---------------------------------------------------
@@ -3078,7 +3697,7 @@ function renderLearn(sf, spelling) {
   const names = learn.drums
     ? want.map((n) => PADS.find(([p]) => p === (PAD_ALIAS[n] ?? n))?.[1] || `#${n}`)
     : want.sort((a, b) => a - b).map((n) => noteName(n, sf, spelling));
-  const status = player.waiting ? `Play ${names.join(' + ')}` : player.playing ? 'Listening…' : 'Press ▶ to start';
+  const status = player.waiting ? `${!learn.drums && singingNow() ? 'Sing' : 'Play'} ${names.join(' + ')}` : player.playing ? 'Listening…' : 'Press ▶ to start';
   setText(el, `${status} · ✓${learn.correct} ✗${learn.wrong}`);
   const wantPads = new Set(learn.drums ? want.map((n) => PAD_ALIAS[n] ?? n) : []);
   padEls.forEach((p, note) => p.classList.toggle('want', wantPads.has(note)));
@@ -3729,6 +4348,8 @@ initDrums();
 initKitRack();
 initStage();
 initLessons();
+initBooth();
+initScore();
 initConverter();
 initSongs();
 applyLayout();

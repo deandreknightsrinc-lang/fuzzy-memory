@@ -10,7 +10,8 @@
 #       kk-mix (mix/mastering engineer), kk-sound (sound designer), kk-producer
 #   - Open WebUI: a ChatGPT-style page for the agents at http://<ip>:8080
 #   - Studio tools: kk-stems (split a song into vocals/drums/bass/other),
-#     kk-master (master a track to match a reference), kk-lyrics (transcribe)
+#     kk-master (master a track to match a reference), kk-lyrics (transcribe),
+#     kk-sheet (sheet music PDF/photo -> MusicXML + MIDI, with Audiveris)
 #   - A "studio" network folder for the Mac with drop-in folders that run the
 #     tools automatically (inbox -> outbox)
 #
@@ -142,14 +143,58 @@ EOF
 chmod 755 /usr/local/bin/kk-stems /usr/local/bin/kk-master /usr/local/bin/kk-lyrics
 ok "kk-stems, kk-master, kk-lyrics"
 
+# ---- Sheet music reader (Audiveris: printed music -> MusicXML; music21: -> MIDI) ------
+say "Installing the sheet music reader (Audiveris)"
+"$TOOLS/bin/pip" install -q music21 >/dev/null && ok "music21" || warn "music21 install failed (MIDI files from sheet music will be skipped)"
+AUDIVERIS=$(ls /opt/audiveris/bin/Audiveris /opt/Audiveris/bin/Audiveris 2>/dev/null | head -n 1)
+if [[ -z "$AUDIVERIS" ]]; then
+    . /etc/os-release
+    # The newest release's Ubuntu package (it carries its own Java); the matching Ubuntu version wins.
+    urls=$(curl -fsSL https://api.github.com/repos/Audiveris/audiveris/releases/latest | grep -o '"browser_download_url": *"[^"]*\.deb"' | cut -d'"' -f4 | grep -viE 'arm|aarch')
+    url=$(printf '%s\n' "$urls" | grep -i "ubuntu${VERSION_ID:-none}" | head -n 1)
+    [[ -z "$url" ]] && url=$(printf '%s\n' "$urls" | grep -i ubuntu | sort -V | tail -n 1)
+    [[ -z "$url" ]] && url=$(printf '%s\n' "$urls" | head -n 1)
+    if [[ -n "$url" ]] && curl -fsSL -o /tmp/audiveris.deb "$url" && apt-get install -y -qq /tmp/audiveris.deb >/dev/null 2>&1; then
+        AUDIVERIS=$(ls /opt/audiveris/bin/Audiveris /opt/Audiveris/bin/Audiveris 2>/dev/null | head -n 1)
+        [[ -z "$AUDIVERIS" ]] && AUDIVERIS=$(dpkg -L audiveris 2>/dev/null | grep -m1 '/bin/Audiveris$')
+    fi
+    rm -f /tmp/audiveris.deb
+fi
+apt-get install -y -qq tesseract-ocr tesseract-ocr-eng >/dev/null 2>&1 || true # words and lyrics on the page
+if [[ -n "$AUDIVERIS" ]]; then ok "Audiveris ($AUDIVERIS)"; else warn "Audiveris could not be installed here: get it from github.com/Audiveris/audiveris/releases (it also runs on the Mac)"; fi
+
+cat > /usr/local/bin/kk-sheet <<SHEET
+#!/bin/bash
+# kk-sheet MUSIC.pdf|.png|.jpg [OUTDIR]  - read printed sheet music: writes a
+# MusicXML score (.mxl) and a MIDI file (.mid). Open either in Knight Keys
+# (Open..., or Score > Open score), Logic, MuseScore or ACE Studio.
+set -e
+[[ -f "\${1:-}" ]] || { echo "usage: kk-sheet hymn.pdf [outdir]"; exit 1; }
+[[ -x "$AUDIVERIS" ]] || { echo "Audiveris isn't installed: run the setup again."; exit 1; }
+out="\${2:-$STUDIO/outbox/sheet}"
+mkdir -p "\$out"
+stamp=\$(mktemp)
+JAVA_TOOL_OPTIONS=-Djava.awt.headless=true "$AUDIVERIS" -batch -export -output "\$out" -- "\$1"
+# Every score it just wrote also becomes MIDI.
+find "\$out" -name '*.mxl' -newer "\$stamp" | while read -r mxl; do
+    mid="\${mxl%.*}.mid"
+    $TOOLS/bin/python -c 'import sys; from music21 import converter; converter.parse(sys.argv[1]).write("midi", fp=sys.argv[2])' "\$mxl" "\$mid" \
+        && echo "MIDI: \$mid" || echo "(no MIDI for \$mxl - open the .mxl in Knight Keys instead)"
+done
+rm -f "\$stamp"
+echo "Scores are in \$out. Check them against the page: printed music reads well, phone photos less so."
+SHEET
+chmod 755 /usr/local/bin/kk-sheet
+ok "kk-sheet"
+
 # ---- Drop folders: files dropped in inbox/* are processed automatically -----------
 say "Setting up the studio folders and automation"
-mkdir -p "$STUDIO"/{inbox/{stems,master,lyrics},outbox/{stems,master,lyrics},references}
+mkdir -p "$STUDIO"/{inbox/{stems,master,lyrics,sheet},outbox/{stems,master,lyrics,sheet},references}
 cat > /usr/local/bin/kk-watch <<EOF
 #!/bin/bash
 # Watches the inbox folders and runs the matching tool on every new file.
 inotifywait -m -e close_write -e moved_to --format '%w%f' \\
-    "$STUDIO/inbox/stems" "$STUDIO/inbox/master" "$STUDIO/inbox/lyrics" |
+    "$STUDIO/inbox/stems" "$STUDIO/inbox/master" "$STUDIO/inbox/lyrics" "$STUDIO/inbox/sheet" |
 while read -r f; do
     case "\$f" in */.*|*.part|*.crdownload) continue ;; esac
     sleep 2
@@ -157,6 +202,7 @@ while read -r f; do
         */inbox/stems/*) kk-stems "\$f" ;;
         */inbox/master/*) kk-master "\$f" ;;
         */inbox/lyrics/*) kk-lyrics "\$f" ;;
+        */inbox/sheet/*) kk-sheet "\$f" ;;
     esac && mkdir -p "\$(dirname "\$f")/done" && mv "\$f" "\$(dirname "\$f")/done/"
     chown -R studio:studio "$STUDIO" # so the Mac can move and delete the results
 done
@@ -250,10 +296,14 @@ cat <<EOF
        inbox/master  -> a mastered WAV appears in outbox/master
                         (put a finished song you like in references/ first)
        inbox/lyrics  -> a lyrics .txt appears in outbox/lyrics
+       inbox/sheet   -> sheet music (PDF, PNG, JPG): a MusicXML score (.mxl)
+                        and a MIDI file appear in outbox/sheet; open them in
+                        Knight Keys (Score > Open score) to hear and learn them
 
   IN TERMINAL (here)
      ollama run kk-mix          ask the mix engineer
      kk-stems song.mp3          kk-master mix.wav ref.wav          kk-lyrics song.mp3
+     kk-sheet hymn.pdf
 
   This machine has no graphics card, so answers and stems take a little
   while (a few minutes for a full song). That's normal.

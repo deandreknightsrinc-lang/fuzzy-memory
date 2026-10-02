@@ -72,6 +72,22 @@ export const PRESETS = {
     waves: [{ type: 'sine' }, { type: 'triangle', ratio: 2, gain: 0.15 }],
     att: 0.07, dec: 0.2, sus: 0.9, rel: 0.12, level: 0.4,
   },
+  choir: {
+    label: 'Choir Aah',
+    // A buzzy "vocal cord" source through the formants of an "ah" vowel, with
+    // vibrato and three slightly detuned singers per note for an ensemble.
+    waves: [{ type: 'sawtooth', detune: -9, gain: 0.45 }, { type: 'sawtooth', detune: 7, gain: 0.45 }, { type: 'sawtooth', detune: 1, gain: 0.35, ratio: 1 }],
+    formants: [[700, 1, 6], [1220, 0.5, 8], [2600, 0.25, 10], [3300, 0.1, 12]],
+    vibrato: { rate: 5.2, depth: 14, delay: 0.35 },
+    att: 0.18, dec: 0.4, sus: 0.9, rel: 0.45, level: 0.45,
+  },
+  choirooh: {
+    label: 'Choir Ooh',
+    waves: [{ type: 'sawtooth', detune: -8, gain: 0.45 }, { type: 'triangle', detune: 6, gain: 0.6 }, { type: 'sawtooth', detune: 2, gain: 0.3 }],
+    formants: [[320, 1, 6], [800, 0.45, 8], [2240, 0.12, 10]],
+    vibrato: { rate: 5, depth: 12, delay: 0.4 },
+    att: 0.22, dec: 0.4, sus: 0.9, rel: 0.5, level: 0.38,
+  },
   lead: {
     label: 'Synth Lead',
     waves: [{ type: 'square', gain: 0.5 }, { type: 'sawtooth', detune: 6, gain: 0.4 }],
@@ -89,6 +105,8 @@ export function presetForProgram(p) {
   if (p <= 31) return 'guitar';
   if (p <= 39) return 'bass';
   if (p <= 51) return 'strings';
+  if (p === 52) return 'choir'; // Choir Aahs
+  if (p === 53) return 'choirooh'; // Voice Oohs
   if (p <= 55) return 'pad';
   if (p <= 71) return 'brass';
   if (p <= 79) return 'flute';
@@ -228,6 +246,21 @@ class Voice {
       dest = flt;
     }
 
+    if (preset.formants) {
+      // Vowel: band-pass filters in parallel at the vowel's formant frequencies.
+      const input = ctx.createGain();
+      for (const [f, gain, q] of preset.formants) {
+        const bp = ctx.createBiquadFilter();
+        bp.type = 'bandpass';
+        bp.frequency.value = f;
+        bp.Q.value = q;
+        const g = ctx.createGain();
+        g.gain.value = gain * q * 0.5; // narrow bands let little through: make it up
+        input.connect(bp).connect(g).connect(dest);
+      }
+      dest = input;
+    }
+
     preset.waves.forEach((w, i) => {
       const o = ctx.createOscillator();
       if (w.harm) o.setPeriodicWave(synth.periodicWave(w.harm));
@@ -254,6 +287,19 @@ class Voice {
         this.modOsc = m;
       }
     });
+
+    if (preset.vibrato) {
+      // Singers ease into vibrato after the note starts.
+      const lfo = ctx.createOscillator();
+      lfo.frequency.value = preset.vibrato.rate * (0.95 + Math.random() * 0.1);
+      const depth = ctx.createGain();
+      depth.gain.setValueAtTime(0, time);
+      depth.gain.linearRampToValueAtTime(preset.vibrato.depth, time + preset.vibrato.delay + 0.3);
+      lfo.connect(depth);
+      for (const o of this.waveOscs) depth.connect(o.detune);
+      lfo.start(time);
+      this.oscs.push(lfo);
+    }
 
     this.env.connect(synth.channelInput(ch));
 
