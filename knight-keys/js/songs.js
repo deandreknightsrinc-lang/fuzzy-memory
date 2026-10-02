@@ -7,7 +7,8 @@
 //   Chord symbols: C, Cm, C7, Cm7, Cmaj7, with # or b (F#, Bb).
 // Channel 1 = melody (right hand), 2 = chords (left hand), 10 = drums.
 
-import { writeMidi } from './midi-file.js';
+import { writeMidi, metaEvent } from './midi-file.js';
+import { parseLyricTokens, lyricEventText, lineLyricEvents } from './lyrics.js';
 
 export const SONGS = [
   {
@@ -23,6 +24,7 @@ export const SONGS = [
     melody: `E4 D4 C4 D4 | E4 E4 E4:2 | D4 D4 D4:2 | E4 G4 G4:2 |
              E4 D4 C4 D4 | E4 E4 E4 E4 | D4 D4 E4 D4 | C4:4`,
     chords: 'C:4 C:4 G:4 C:4 C:4 C:4 G:4 C:4',
+    lyrics: 'Ma- ry had a lit- tle lamb, / lit- tle lamb, lit- tle lamb, / Ma- ry had a lit- tle lamb, / its fleece was white as snow.',
   },
   {
     id: 'twinkle',
@@ -39,6 +41,7 @@ export const SONGS = [
              C4 C4 G4 G4 | A4 A4 G4:2 | F4 F4 E4 E4 | D4 D4 C4:2`,
     chords: `C:4 F:2 C:2 F:2 C:2 G:2 C:2 C:2 F:2 C:2 G:2 C:2 F:2 C:2 G:2
              C:4 F:2 C:2 F:2 C:2 G:2 C:2`,
+    lyrics: 'Twin- kle, twin- kle, lit- tle star, / how I won- der what you are! / Up a- bove the world so high, / like a dia- mond in the sky. / Twin- kle, twin- kle, lit- tle star, / how I won- der what you are!',
   },
   {
     id: 'saints',
@@ -51,8 +54,9 @@ export const SONGS = [
     drums: 'twostep',
     about: 'The classic up-tempo spiritual. Each phrase starts after a rest, so count "1" and come in on "2".',
     melody: `r:1 C4 E4 F4 | G4:4 | r:1 C4 E4 F4 | G4:4 | r:1 C4 E4 F4 | G4:2 E4:2 | C4:2 E4:2 | D4:4 |
-             r:1 E4 E4 D4 | C4:3 C4 | E4:2 G4 G4 | F4:4 | r:2 E4 F4 | G4:2 E4:2 | C4:2 D4:2 | C4:4`,
+             r:1 E4 E4 D4 | C4:3 C4 | E4:2 G4 G4 | F4:2 F4:2 | r:2 E4 F4 | G4:2 E4:2 | C4:2 D4:2 | C4:4`,
     chords: 'C:4 C:4 C:4 C:4 C:4 C:4 C:4 G:4 C:4 C7:4 F:4 F:4 C:4 C:4 G:4 C:4',
+    lyrics: 'Oh, when the saints / go march- ing in, / oh, when the saints go march- ing in, / oh, Lord, I want to be in that num- ber, / when the saints go march- ing in.',
   },
   {
     id: 'birthday',
@@ -67,6 +71,7 @@ export const SONGS = [
     melody: `r:2 G4:0.75 G4:0.25 | A4 G4 C5 | B4:2 G4:0.75 G4:0.25 | A4 G4 D5 | C5:2 G4:0.75 G4:0.25 |
              G5 E5 C5 | B4 A4 F5:0.75 F5:0.25 | E5 C5 D5 | C5:3`,
     chords: '-:3 C:3 G:3 G:3 C:3 C:3 F:3 C:2 G:1 C:3',
+    lyrics: 'Hap- py birth- day to you, / hap- py birth- day to you, / hap- py birth- day, dear friend _ / hap- py birth- day to you!',
   },
   {
     id: 'amazing',
@@ -83,6 +88,8 @@ export const SONGS = [
              D5:2 B4:0.5 G4:0.5 | B4:2 A4 | G4:2 E4 | D4:2 D4 |
              G4:2 B4:0.5 G4:0.5 | B4:2 A4 | G4:3`,
     chords: '-:3 G:3 G:3 C:3 G:3 G:3 G:3 D:3 D:3 G:3 G:3 C:3 G:3 G:3 D:3 G:3',
+    lyrics: 'A- ma- zing _ grace, how sweet the sound / that saved _ a wretch like _ me! / I once _ was lost, but now am found, / was blind, _ but now I see.',
+    verses: ['\'Twas grace that taught my heart to fear,\nand grace my fears relieved;\nhow precious did that grace appear\nthe hour I first believed!', 'Through many dangers, toils and snares,\nI have already come;\n\'tis grace hath brought me safe thus far,\nand grace will lead me home.', 'When we\'ve been there ten thousand years,\nbright shining as the sun,\nwe\'ve no less days to sing God\'s praise\nthan when we\'d first begun.'],
   },
   {
     id: 'doxology',
@@ -102,6 +109,7 @@ export const SONGS = [
              G:2 G:1 Em:1 D:1 Em:1 C:1 G:1 D:2
              G:2 D:1 G:1 D:1 Em:1 C:1 D:1 G:2
              G:2 G:1 Em:1 D:1 C:1 G:1 D:1 G:4`,
+    lyrics: 'Praise God, from whom all bless- ings flow; / praise Him, all crea- tures here be- low; / praise Him a- bove, ye heav\'n- ly host; / praise Fa- ther, Son, and Ho- ly Ghost.',
   },
   {
     id: 'jesusloves',
@@ -119,6 +127,8 @@ export const SONGS = [
              G4:2 E4 G4 | A4:2 C5:2 | A4 A4 G4 C4 | E4 D4 C4:2`,
     chords: `C:4 C:4 F:4 C:4 C:4 C:4 F:2 C:2 G:2 C:2
              C:4 F:4 C:4 F:4 C:4 F:4 F:2 C:2 G:2 C:2`,
+    lyrics: 'Je- sus loves me! this I know, / for the Bi- ble tells me so. / Lit- tle ones to Him be- long; / they are weak, but He is strong. / Yes, Je- sus loves me! / Yes, Je- sus loves me! / Yes, Je- sus loves me! / The Bi- ble tells me so. _',
+    verses: ['Jesus loves me! He who died\nheaven\'s gate to open wide;\nHe will wash away my sin,\nlet His little child come in.', 'Jesus loves me! He will stay\nclose beside me all the way;\nif I love Him, when I die\nHe will take me home on high.'],
   },
   {
     id: 'michael',
@@ -136,6 +146,7 @@ export const SONGS = [
              E4 G4 G4:2 | E4 F4 E4:2 | D4:4 | C4 D4 E4:2 | D4:2 C4:2`,
     chords: `C:4 C:4 C:4 F:4 C:4 C:4 C:4 G:4 C:4 G:2 C:2
              C:4 C:4 C:4 F:4 C:4 C:4 C:4 G:4 C:4 G:2 C:2`,
+    lyrics: 'Mi- chael, row the boat a- shore, hal- le- lu- jah! / Mi- chael, row the boat a- shore, hal- le- lu- _ jah! / Sis- ter, help to trim the sail, hal- le- lu- jah! / Sis- ter, help to trim the sail, hal- le- lu- _ jah!',
   },
   {
     id: 'joyful',
@@ -154,6 +165,8 @@ export const SONGS = [
     chords: `C:4 G:4 C:4 C:2 G:2 C:4 G:4 C:4 G:2 C:2
              G:2 C:2 G:2 C:2 G:4 C:2 G:2
              C:4 G:4 C:4 G:2 C:2`,
+    lyrics: 'Joy- ful, joy- ful, we a- dore Thee, / God of glo- ry, Lord of love; / hearts un- fold like flowers be- fore Thee, / op\'- ning to the sun a- bove. / Melt the clouds of sin and _ sad- ness; / drive the _ dark of doubt a- way; / Giv- er of im- mor- tal glad- ness, / fill us with the light of day!',
+    verses: ['All Thy works with joy surround Thee,\nearth and heaven reflect Thy rays,\nstars and angels sing around Thee,\ncenter of unbroken praise.'],
   },
   {
     id: 'silentnight',
@@ -171,6 +184,8 @@ export const SONGS = [
     chords: `C:3 C:3 C:3 C:3 G7:3 G7:3 C:3 C:3
              F:3 F:3 C:3 C:3 F:3 F:3 C:3 C:3
              G7:3 G7:3 C:3 C:3 C:3 G7:3 C:6`,
+    lyrics: 'Si- lent night, _ ho- ly night, _ / all is calm, all is bright / round yon vir- gin moth- er and child. _ / Ho- ly in- fant so ten- der and mild, / sleep in heav- en- ly peace, / sleep in heav- en- ly _ _ peace.',
+    verses: ['Silent night, holy night,\nshepherds quake at the sight;\nglories stream from heaven afar,\nheavenly hosts sing Alleluia!\nChrist the Savior is born,\nChrist the Savior is born!', 'Silent night, holy night,\nSon of God, love\'s pure light;\nradiant beams from Thy holy face\nwith the dawn of redeeming grace,\nJesus, Lord, at Thy birth,\nJesus, Lord, at Thy birth.'],
   },
   {
     id: 'worshipflow',
@@ -564,6 +579,15 @@ export function songToMidi(song, { level = 'beginner' } = {}) {
   const chords = parseChords(song.chords);
   const end = Math.max(0, ...melody.map((n) => n.beat + n.beats), ...chords.map((c) => c.beat + c.beats));
 
+  // Lyrics, as MIDI lyric events: on the melody notes, or line by line over the bars for chord charts.
+  if (song.lyrics && melody.length) {
+    parseLyricTokens(song.lyrics).forEach((t, i) => {
+      if (t && melody[i]) add(melody[i].beat, metaEvent(0x05, lyricEventText(t)));
+    });
+  } else if (song.lyrics) {
+    for (const l of lineLyricEvents(song.lyrics, beatsPerBar, song.lyricBars || 2)) add(l.beat, metaEvent(0x05, l.text));
+  }
+
   // Right hand
   if (melody.length) {
     for (const n of melody) {
@@ -693,7 +717,12 @@ export function validateSong(song) {
     errors.push(e.message);
   }
   try {
-    parseMelody(song.melody);
+    const notes = parseMelody(song.melody);
+    // Lyrics written for a melody need one syllable (or "_") per note.
+    if (song.lyrics && notes.length) {
+      const n = parseLyricTokens(song.lyrics).length;
+      if (n !== notes.length) errors.push(`Lyrics: ${n} syllables for ${notes.length} melody notes (one each; "_" holds a syllable).`);
+    }
   } catch (e) {
     errors.push(`Melody: ${e.message}`);
   }

@@ -126,6 +126,22 @@ export function songToScore(song, { grid = 'auto', title = '', nameFor = null, c
       staves: staves.map((st) => ({ clef: st.clef, measures: voiceStaff(st.notes, measureQ, measures, grids.get(ch), drum) })),
     });
   }
+  // Words go under the melody: the first part, on the notes they start with.
+  const lead = parts.find((p) => !p.drum);
+  if (lead && song.lyrics?.length) {
+    const words = song.lyrics.map((l) => ({ beat: beatAt(l.time), text: l.text }));
+    const tol = (lead.grid || 0.25) / 2 + 1e-6;
+    lead.staves[0].measures.forEach((bar, m) => {
+      for (const e of bar) {
+        if (!e.pitches || e.tieStop) continue;
+        const w = words.find((x) => !x.used && Math.abs(x.beat - (m * measureQ + e.pos)) <= tol);
+        if (w) {
+          w.used = true;
+          e.lyric = w.text;
+        }
+      }
+    });
+  }
   return { title: title || song.title || 'Score', bpm: Math.round(song.bpm || 120), sf, minor: !!song.keySig?.minor, time: { beats: ts.num, beatType: ts.den }, measureQ, measures, parts };
 }
 
@@ -244,6 +260,7 @@ export function scoreToMusicXML(score) {
   L.push('  </part-list>');
   score.parts.forEach((p, pi) => {
     L.push(`  <part id="${p.id}">`);
+    let inWord = false; // lyric syllables: is a word still going?
     for (let m = 0; m < score.measures; m++) {
       L.push(`    <measure number="${m + 1}">`);
       if (m === 0) {
@@ -305,7 +322,15 @@ export function scoreToMusicXML(score) {
             const acc = sp.alter !== current && !e.tieStop ? `<accidental>${ACC_NAME[sp.alter]}</accidental>` : '';
             seen[key] = sp.alter;
             const alter = sp.alter ? `<alter>${sp.alter}</alter>` : '';
-            L.push(`      <note>${chord}<pitch><step>${sp.letter}</step>${alter}<octave>${sp.octave}</octave></pitch>${timing}${ties}${look}${acc}${staffTag}${tied}</note>`);
+            let lyric = '';
+            if (i === 0 && e.lyric) {
+              const end = /\s$/.test(e.lyric);
+              const text = e.lyric.replace(/^[/\\]/, '').trim();
+              const syllabic = inWord ? (end ? 'end' : 'middle') : end ? 'single' : 'begin';
+              inWord = !end;
+              if (text) lyric = `<lyric number="1"><syllabic>${syllabic}</syllabic><text>${esc(text)}</text></lyric>`;
+            }
+            L.push(`      <note>${chord}<pitch><step>${sp.letter}</step>${alter}<octave>${sp.octave}</octave></pitch>${timing}${ties}${look}${acc}${staffTag}${tied}${lyric}</note>`);
           });
         }
       });
@@ -502,7 +527,10 @@ function readPart(part, instruments) {
         }
         if (midi === null || midi < 0 || midi > 127) continue;
         const ties = kids(el, 'tie').map((t) => t.attrs.type);
-        const lyric = txt(kids(el, 'lyric').find((l) => !l.attrs.number || l.attrs.number === '1'), 'text');
+        const lyEl = kids(el, 'lyric').find((l) => !l.attrs.number || l.attrs.number === '1');
+        const syl = txt(lyEl, 'syllabic');
+        // Whole words and word ends get a space after them, so the words read right when sung along.
+        const lyric = lyEl && txt(lyEl, 'text') ? `${txt(lyEl, 'text')}${syl === 'begin' || syl === 'middle' ? '' : ' '}` : '';
         const noteVel = el.attrs.dynamics ? Math.max(1, Math.min(127, Math.round((90 * Number(el.attrs.dynamics)) / 100))) : vel;
         notes.push({ start, dur, midi, vel: noteVel, tieStart: ties.includes('start'), tieStop: ties.includes('stop'), drum, lyric, voice: txt(el, 'voice') || '1' });
       }

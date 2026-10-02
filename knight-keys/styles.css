@@ -697,3 +697,19 @@ dialog.band-window { width: min(920px, calc(100vw - 24px)); left: max(12px, calc
 .band-role.live { border-color: #73d13d; }
 .band-role.off { opacity: .55; }
 .band-tip { margin: 6px 0 0; }
+
+/* Lyrics (sing along) */
+dialog.lyrics-window { width: min(860px, calc(100vw - 24px)); left: max(12px, calc(50% - 430px)); top: 70px; max-height: calc(100vh - 80px); }
+.lyrics-window .tool-head { display: flex; align-items: center; gap: 10px; }
+.lyrics-window .tool-head h2 { margin: 0; flex: 1; }
+.lyrics-view { --ly-size: 34px; text-align: center; padding: 10px 6px 4px; }
+.ly-line { min-height: 1.3em; line-height: 1.3; }
+.ly-now { font-size: var(--ly-size); font-weight: 800; margin: 8px 0; }
+.ly-prev, .ly-next { font-size: calc(var(--ly-size) * 0.62); color: var(--muted); }
+.ly-prev { opacity: .5; }
+.ly-now .sung { color: #ffd60a; }
+.ly-now .now { color: #ffd60a; text-shadow: 0 0 12px rgba(255, 214, 10, .6); }
+.lyrics-more { margin-top: 10px; }
+.lyrics-more pre { white-space: pre-wrap; font-family: inherit; font-size: 16px; line-height: 1.45; margin: 8px 0 14px; }
+.band-lyric { text-align: center; font-size: 22px; font-weight: 700; min-height: 1.4em; margin: -2px 0 8px; }
+.band-lyric .sung { color: #ffd60a; }

@@ -2,6 +2,7 @@
 import { parseMidi, buildSong, writeMidi, splitHands } from './midi-file.js';
 import { makeChoirParts, choirMidi, PARTS as CHOIR_PARTS } from './choir.js';
 import { songToScore, scoreToMusicXML, musicXmlToMidi, scoreFileText } from './notation.js';
+import { lyricLines, lineAt } from './lyrics.js';
 import { ROLES as BAND_ROLES, arrangeBand, bandMidi, chordsFromChart, songInBeats, transposeSymbol } from './band.js';
 import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_CHANNEL } from './synth.js';
 import { Player } from './player.js';
@@ -697,6 +698,7 @@ function loadMidiBytes(bytes, name, { keepLoops = false } = {}) {
   resetChannels();
   clearPlaybackDisplay();
   state.song = song;
+  state.songVerses = null;
   state.midiBytes = bytes;
   state.midiName = name.replace(/\.[^.]+$/, '');
   for (let ch = 0; ch < 16; ch++) {
@@ -3013,6 +3015,86 @@ function initLessons() {
   $('lpDoneMap').onclick = () => renderLessonMap();
 }
 
+// ---- Lyrics (sing along) -----------------------------------------------------------
+//
+// The words of the open song, a line at a time, lighting up as they're sung.
+// They come from the song's MIDI lyric events (library songs, your songs, karaoke
+// files, MusicXML scores with lyrics and Band Room arrangements all carry them).
+
+const lyricsView = { lines: [], for: null, raf: 0, size: 34 };
+
+function songLyricLines() {
+  if (!state.song) return [];
+  if (lyricsView.for !== state.song) {
+    lyricsView.for = state.song;
+    lyricsView.lines = lyricLines(state.song.lyrics || []);
+  }
+  return lyricsView.lines;
+}
+
+/** Fill an element with a line's words, colored up to `time`. */
+function renderLyricLine(el, line, time) {
+  el.textContent = '';
+  if (!line) return;
+  line.words.forEach((w, i) => {
+    const span = document.createElement('span');
+    span.textContent = w.text;
+    const next = line.words[i + 1]?.time ?? line.end;
+    if (time !== null && w.time <= time + 0.03) span.className = time < next ? 'now' : 'sung';
+    el.append(span);
+  });
+}
+
+function lyricsLoop() {
+  if (!$('lyricsDlg').open) {
+    lyricsView.raf = 0;
+    return;
+  }
+  lyricsView.raf = requestAnimationFrame(lyricsLoop);
+  const lines = songLyricLines();
+  const t = player.time;
+  const i = lineAt(lines, t);
+  const key = `${i}:${lines.length}:${Math.round(t * 20)}`;
+  if (key === lyricsView.key) return;
+  lyricsView.key = key;
+  renderLyricLine($('lyPrev'), lines[i - 1], null);
+  // Before the first line, show it coming up.
+  renderLyricLine($('lyNow'), lines[Math.max(0, i)], i < 0 ? null : t);
+  renderLyricLine($('lyNext'), lines[Math.max(0, i) + 1], null);
+}
+
+function openLyrics() {
+  const dlg = $('lyricsDlg');
+  if (!dlg.open) dlg.show();
+  const lines = songLyricLines();
+  $('lyricsEmpty').hidden = lines.length > 0;
+  $('lyricsView').hidden = !lines.length;
+  setText($('lyricsSong'), state.song ? state.song.title || state.midiName || '' : '');
+  const verses = state.songVerses || [];
+  $('lyricsMore').hidden = !verses.length;
+  $('lyricsVerses').innerHTML = '';
+  verses.forEach((v, k) => {
+    const pre = document.createElement('pre');
+    pre.textContent = `${k + 2}. ${v}`;
+    $('lyricsVerses').append(pre);
+  });
+  lyricsView.key = '';
+  if (!lyricsView.raf) lyricsView.raf = requestAnimationFrame(lyricsLoop);
+}
+
+function initLyrics() {
+  const dlg = $('lyricsDlg');
+  $('btnLyrics').onclick = openLyrics;
+  dlg.querySelector('[data-close]').onclick = () => dlg.close();
+  makeDraggable(dlg);
+  const size = (d) => {
+    lyricsView.size = Math.max(20, Math.min(72, lyricsView.size + d));
+    $('lyricsView').style.setProperty('--ly-size', `${lyricsView.size}px`);
+  };
+  $('lyricsSmaller').onclick = () => size(-4);
+  $('lyricsBigger').onclick = () => size(4);
+}
+
 // ---- Band Room ----------------------------------------------------------------
 //
 // Rehearse as a worship band or a choir with whoever showed up: every part is a
@@ -3062,15 +3144,15 @@ function bandSource() {
     const song = buildSong(parseMidi(entryMidi(entry)));
     song.title = entry.title;
     const chart = entry.type !== 'midi' && entry.chords;
-    const { song: sb, melody } = songInBeats(song, entry.type === 'midi' ? song.channels.find((c) => c !== DRUM_CHANNEL) ?? null : entry.melody ? 0 : null);
-    return { song: sb, melody, chords: chart ? chordsFromChart(entry.chords) : null, drums: entry.drums, title: entry.title };
+    const { song: sb, melody, lyrics } = songInBeats(song, entry.type === 'midi' ? song.channels.find((c) => c !== DRUM_CHANNEL) ?? null : entry.melody ? 0 : null);
+    return { song: sb, melody, lyrics, verses: entry.verses, chords: chart ? chordsFromChart(entry.chords) : null, drums: entry.drums, title: entry.title };
   }
   if (!state.song) return null;
   // Any MIDI file: the first melodic part is the melody, the chords come from the notes.
   const song = state.song;
   const mel = song.channels.find((c) => c !== DRUM_CHANNEL);
-  const { song: sb, melody } = songInBeats({ ...song, title: song.title || state.midiName }, mel ?? null);
-  return { song: sb, melody, chords: null, drums: undefined, title: song.title || state.midiName || 'Song' };
+  const { song: sb, melody, lyrics } = songInBeats({ ...song, title: song.title || state.midiName }, mel ?? null);
+  return { song: sb, melody, lyrics, verses: state.songVerses, chords: null, drums: undefined, title: song.title || state.midiName || 'Song' };
 }
 
 function buildBand() {
@@ -3080,6 +3162,7 @@ function buildBand() {
   const arr = arrangeBand(src.song, {
     chords: src.chords,
     melody: src.melody,
+    lyrics: src.lyrics,
     level: Number($('bandLevel').value),
     drums: drumSel === 'auto' ? src.drums ?? undefined : drumSel || null,
   });
@@ -3090,6 +3173,8 @@ function buildBand() {
   band.bytes = bandMidi(arr);
   if (learn.enabled) setLearn(false);
   loadMidiBytes(band.bytes, `${src.title} (band).mid`);
+  state.songVerses = src.verses || null;
+  scoreView.hidden = new Set([11, 12]); // the click and count-in don't belong on the printed score
   state.channelLabels = { for: state.midiName };
   for (const r of BAND_ROLES) state.channelLabels[r.ch] = r.name;
   state.channelLabels[12] = 'Count-in';
@@ -3188,6 +3273,9 @@ function bandLoop() {
   const tr = state.transpose || 0;
   setText($('bandChord'), cur ? transposeSymbol(cur.symbol, tr) : beat < arr.offset ? '…' : '–');
   setText($('bandNext'), next ? transposeSymbol(next.symbol, tr) : '');
+  const lines = songLyricLines();
+  const li = lineAt(lines, player.time);
+  renderLyricLine($('bandLyric'), lines[Math.max(0, li)], li < 0 ? null : player.time);
   if (beat < arr.offset) setText($('bandBar'), `Count-in: ${Math.floor(beat) + 1}`);
   else setText($('bandBar'), `Bar ${Math.floor((beat - arr.offset) / barLen) + 1} of ${Math.round((arr.beats - arr.offset) / barLen)} · beat ${Math.floor((beat - arr.offset) % barLen) + 1}`);
 }
@@ -4230,6 +4318,7 @@ function loadSongEntry(entry, level) {
   loadMidiBytes(entryMidi(entry, level), `${entry.title}.mid`);
   state.librarySong = entry.type === 'midi' ? null : entry.id;
   state.libraryChart = entry.type !== 'midi' && !entry.melody;
+  state.songVerses = entry.verses || null;
   updateMixerNames();
   updateLearnParts();
 }
@@ -4339,6 +4428,8 @@ function builderSong() {
     chart: $('bChords').value,
     chords: conv.chords,
     melody: $('bMelody').value.trim(),
+    lyrics: $('bLyrics').value.trim(),
+    lyricBars: Number($('bLyricBars').value) || 2,
   };
   return { song, conv };
 }
@@ -4369,6 +4460,8 @@ function openBuilder(song = null) {
   $('bLevel').value = song?.level || 'Intermediate';
   $('bChords').value = song?.chart ?? '';
   $('bMelody').value = song?.melody || '';
+  $('bLyrics').value = song?.lyrics || '';
+  $('bLyricBars').value = String(song?.lyricBars || 2);
   $('bAbout').value = song?.about || '';
   $('bTemplate').value = '';
   $('bDelete').hidden = !song;
@@ -4385,7 +4478,7 @@ function initBuilder() {
   for (const [name, sf] of KEYS) $('bKey').append(new Option(`${name} major`, String(sf)));
   for (const [name, sf] of MINOR_KEYS) $('bKey').append(new Option(`${name} (minor)`, `m:${sf}`));
   for (const [id, name] of Object.entries(DRUM_STYLE_NAMES)) $('bDrums').append(new Option(name, id));
-  for (const id of ['bTitle', 'bChords', 'bMelody', 'bBpm', 'bTime', 'bKey']) $(id).addEventListener('input', updateBuilderStatus);
+  for (const id of ['bTitle', 'bChords', 'bMelody', 'bLyrics', 'bBpm', 'bTime', 'bKey']) $(id).addEventListener('input', updateBuilderStatus);
   $('bTime').onchange = () => {
     const t = $('bTime').value;
     if (t === '6/8' && !['ballad68', ''].includes($('bDrums').value)) $('bDrums').value = 'ballad68';
@@ -4845,6 +4938,7 @@ initLessons();
 initBooth();
 initScore();
 initBand();
+initLyrics();
 initConverter();
 initSongs();
 applyLayout();
