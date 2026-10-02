@@ -677,3 +677,23 @@ dialog.score-window { width: min(1200px, calc(100vw - 24px)); left: max(12px, ca
   body.print-score { background: #fff; }
 }
 .lp-fret { width: 100%; max-width: 560px; height: 190px; display: block; margin: 4px auto 8px; background: #181a22; border-radius: 8px; }
+
+/* Band Room */
+#btnBand.band-btn { background: linear-gradient(135deg, #fa8c16, #9254de); border-color: transparent; color: #fff; font-weight: 600; }
+dialog.band-window { width: min(920px, calc(100vw - 24px)); left: max(12px, calc(50% - 460px)); top: 56px; max-height: calc(100vh - 70px); }
+.band-window .tool-head { display: flex; align-items: center; gap: 10px; }
+.band-window .tool-head h2 { margin: 0; flex: 1; }
+.band-setup, .band-tools { flex-wrap: wrap; align-items: center; }
+.band-now { display: flex; gap: 24px; align-items: flex-end; margin: 10px 0; padding: 10px 14px; border-radius: 10px; background: #12141a; border: 1px solid var(--border); }
+.band-chord { font-size: 56px; font-weight: 800; line-height: 1; color: #ffd60a; min-width: 120px; }
+.band-next { font-size: 30px; font-weight: 700; color: var(--muted); min-width: 90px; }
+.band-bar { flex: 1; text-align: right; font-size: 15px; }
+.band-roles { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px; margin: 6px 0; }
+.band-role { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; background: #1b1e26; border: 1px solid var(--border); }
+.band-role .icon { width: 26px; text-align: center; font-weight: 800; }
+.band-role .nm { flex: 1; font-weight: 600; }
+.band-role .nm small { display: block; font-weight: 400; color: var(--muted); }
+.band-role select { max-width: 170px; }
+.band-role.live { border-color: #73d13d; }
+.band-role.off { opacity: .55; }
+.band-tip { margin: 6px 0 0; }
