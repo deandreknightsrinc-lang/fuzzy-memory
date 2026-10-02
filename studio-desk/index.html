@@ -140,6 +140,53 @@ ol.steps ul { padding-left: 18px; }
 @media (max-width: 720px) { #convert { grid-template-columns: 1fr; } }
 footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 10px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+.printonly { display: none; }
+.printbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.printbar .copy { margin-top: 0; }
+.copy.alt { background: transparent; color: var(--ink); border: 2px solid var(--ink); }
+
+/* Printing: a workshop sheet in black ink on white paper. "Print cut list" keeps just the
+   cut list, leather pieces and shopping list; "Print build packet" (or the browser's own Print)
+   adds the drawings, conversion and build steps. */
+@media print {
+  :root, :root[data-theme] {
+    --bg: #fff !important; --panel: #fff !important; --ink: #000 !important; --muted: #444 !important; --line: #bbb !important;
+    --accent: #000 !important; --knee: rgba(0, 0, 0, .06) !important; color-scheme: light !important;
+  }
+  @page { margin: 12mm; }
+  body { font-size: 10pt; background: #fff; }
+  .wrap { max-width: none; padding: 0; }
+  header.top .stamp, header.top .units, .grid, .printbar, .reset, footer .noprint { display: none !important; }
+  .brand h1 { font-size: 26pt; }
+  .brand p { font-size: 9pt; }
+  .printonly { display: block; }
+  section.block { margin-top: 14px; break-inside: auto; }
+  section.block > h2 { font-size: 18pt; break-after: avoid; }
+  section.block > p.lead { font-size: 9pt; }
+  .tablewrap { overflow: visible; border: 0; }
+  table { min-width: 0; font-size: 9pt; }
+  th { position: static; background: #eee; color: #000; }
+  th, td { padding: 3px 6px; }
+  tr { break-inside: avoid; }
+  tr.group td { background: #eee; color: #000; }
+  thead { display: table-header-group; }
+  td.tick { width: 18px; text-align: center; font-size: 12pt; }
+  th.printonly, td.printonly { display: table-cell; }
+  .totals { grid-template-columns: repeat(6, 1fr); gap: 4px; }
+  .total { padding: 4px 6px; }
+  .total .n { font-size: 12pt; }
+  .mode, ol.steps > li, .warnbox { break-inside: avoid; }
+  ol.steps > li { padding: 6px; grid-template-columns: 30px 1fr; }
+  ol.steps > li::before { font-size: 18pt; }
+  #convert { grid-template-columns: 1fr 1fr; }
+  #printSpec { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px 14px; margin: 8px 0 0; font-size: 9pt; border: 1px solid #000; padding: 6px 8px; }
+  #printSpec div b { display: block; font-family: var(--font-cond); text-transform: uppercase; letter-spacing: .05em; font-size: 7.5pt; color: #444; font-weight: 600; }
+  #printDrawings { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  #printDrawings figure { margin: 0; border: 1px solid #bbb; padding: 4px; break-inside: avoid; }
+  #printDrawings svg { width: 100%; height: auto; max-height: 90mm; display: block; }
+  #printDrawings figcaption { font-size: 8pt; color: #444; margin-top: 2px; }
+  body[data-print="cut"] .packet { display: none !important; }
+}
 </style>
 
 <div class="wrap">
@@ -158,6 +205,9 @@ footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px
       </div>
     </div>
   </header>
+
+  <div class="printonly" id="printSpec"></div>
+  <div class="printonly packet" id="printDrawings"></div>
 
   <div class="grid">
     <form class="card controls" id="form" autocomplete="off">
@@ -314,36 +364,41 @@ footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px
     <h2>Cut list</h2>
     <p class="lead" id="cutLead"></p>
     <div class="totals" id="totals"></div>
-    <div class="tablewrap"><table id="cut"><thead><tr><th>Part</th><th>Qty</th><th>Size (finished)</th><th>Layers</th><th>Cut / notes</th></tr></thead><tbody></tbody></table></div>
-    <button type="button" class="copy" id="copyCut">Copy cut list</button><span class="copied" id="copied" hidden>Copied as a spreadsheet table.</span>
+    <div class="tablewrap"><table id="cut"><thead><tr><th class="printonly">✓</th><th>Part</th><th>Qty</th><th>Size (finished)</th><th>Layers</th><th class="printonly">Pieces</th><th>Cut / notes</th></tr></thead><tbody></tbody></table></div>
+    <div class="printbar">
+      <button type="button" class="copy" id="printCut">Print cut list</button>
+      <button type="button" class="copy alt" id="printAll">Print build packet</button>
+      <button type="button" class="copy alt" id="copyCut">Copy cut list</button><span class="copied" id="copied" hidden>Copied as a spreadsheet table.</span>
+    </div>
+    <p class="hint printbar">The cut list prints with a tick box for every part and the total pieces to cut (quantity × layers). The build packet adds the drawings, the desk ↔ road case steps and the build steps. Choose "Save as PDF" in the print window to keep a copy.</p>
   </section>
 
   <section class="block" id="leatherBlock">
     <h2>Faux leather pieces</h2>
     <p class="lead" id="leatherLead"></p>
     <div class="totals" id="leatherTotals"></div>
-    <div class="tablewrap"><table id="leatherCut"><thead><tr><th>Piece</th><th>Qty</th><th>Cut size (with wrap)</th><th>Covers</th></tr></thead><tbody></tbody></table></div>
+    <div class="tablewrap"><table id="leatherCut"><thead><tr><th class="printonly">✓</th><th>Piece</th><th>Qty</th><th>Cut size (with wrap)</th><th>Covers</th></tr></thead><tbody></tbody></table></div>
   </section>
 
   <section class="block">
     <h2>Shopping list</h2>
     <p class="lead">Everything besides the cardboard. Quantities come from your design; buy a little extra leather for mistakes.</p>
-    <div class="tablewrap"><table id="shop"><thead><tr><th>Item</th><th>How many</th><th>What it's for</th></tr></thead><tbody></tbody></table></div>
+    <div class="tablewrap"><table id="shop"><thead><tr><th class="printonly">✓</th><th>Item</th><th>How many</th><th>What it's for</th></tr></thead><tbody></tbody></table></div>
   </section>
 
-  <section class="block">
+  <section class="block packet">
     <h2>Desk ↔ road case</h2>
     <p class="lead">Two ways to live: set up as an L-shaped studio desk, or closed up as two rolling road cases and a top pack. Nothing is left over in either mode: every part has a job in both.</p>
     <div class="cols2" id="convert"></div>
   </section>
 
-  <section class="block">
+  <section class="block packet">
     <h2>Build it</h2>
     <p class="lead">The order matters: laminate and flatten every panel first, build the two cases, then the tops, then finish. Strength comes from three things: layers glued with their corrugation crossing, ribs inside the tops, and glued corner blocks.</p>
     <ol class="steps" id="steps"></ol>
   </section>
 
-  <section class="block">
+  <section class="block packet">
     <h2>Before you power it on</h2>
     <div class="cols2">
       <div class="warnbox">
@@ -800,7 +855,7 @@ footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px
     s += dimV(pad - 7, pad, p.L2 + pad, `return ${short(p.L2)}`, fs);
     s += dimH(pad, p.D2 + pad, p.L2 + pad + 6, short(p.D2), fs, fs * 1.6);
     s += '</svg>';
-    return { svg: s, cap: `Top view. Shaded areas are leg room. The Tower Case sits under the corner, ${short(g.bearing)} deeper than the main top so the keys wing can rest on it; the leg panel holds up the far end of the wing.` };
+    return { svg: s, cap: `Top view. Shaded areas are leg room. The Tower Case sits under the corner, ${short(g.bearing)} deeper than the main top so the keys wing can rest on it; ${p.lids ? 'the Tower lid, standing on end as the leg,' : 'the leg panel'} holds up the far end of the wing.` };
   }
 
   function drawTower(g) {
@@ -1127,9 +1182,9 @@ footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px
     ].map(([n, l]) => `<div class="total"><div class="n">${esc(n)}</div><div class="l">${esc(l)}</div></div>`).join('');
     let rows = '', grp = '';
     for (const x of list) {
-      if (x.group !== grp) { grp = x.group; rows += `<tr class="group"><td colspan="5">${esc(grp)}</td></tr>`; }
+      if (x.group !== grp) { grp = x.group; rows += `<tr class="group"><td class="printonly"></td><td colspan="6">${esc(grp)}</td></tr>`; }
       const big = tot.big.includes(x) ? ' Longer than a sheet: splice and stagger the joints.' : '';
-      rows += `<tr><td>${esc(x.name)}</td><td class="num">${x.qty}</td><td class="num">${esc(fmt(x.w))} × ${esc(fmt(x.h))}</td><td class="num">${x.layers}</td><td class="note">${esc(x.note + big)}</td></tr>`;
+      rows += `<tr><td class="printonly tick">☐</td><td>${esc(x.name)}</td><td class="num">${x.qty}</td><td class="num">${esc(fmt(x.w))} × ${esc(fmt(x.h))}</td><td class="num">${x.layers}</td><td class="num printonly">${x.qty * x.layers}</td><td class="note">${esc(x.note + big)}</td></tr>`;
     }
     document.querySelector('#cut tbody').innerHTML = rows;
     // faux leather, shopping, conversion
@@ -1145,9 +1200,19 @@ footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px
       $('leatherLead').textContent = `Cut these from ${LEATHER[p.leatherColor].name} faux leather. Sizes include ${short(WRAP)} on every side to fold around edges and glue down out of sight. Long sides run across the ${short(p.rollW)} roll.`;
       $('leatherTotals').innerHTML = [[`${lea.yards} yd`, `of ${short(p.rollW)} roll, 10% extra`], [Math.round(lea.area), 'sq ft of leather'], [lea.pieces.reduce((a, x) => a + x.qty, 0), 'pieces to cut'], [lea.cans, 'cans of spray adhesive']]
         .map(([n, l]) => `<div class="total"><div class="n">${esc(n)}</div><div class="l">${esc(l)}</div></div>`).join('');
-      document.querySelector('#leatherCut tbody').innerHTML = lea.pieces.map((x) => `<tr><td>${esc(x.name)}</td><td class="num">${x.qty}</td><td class="num">${esc(fmt(Math.max(x.w, x.h)))} × ${esc(fmt(Math.min(x.w, x.h)))}${lea.tooWide.includes(x) ? ' (seamed)' : ''}</td><td class="note">${esc(x.covers)}</td></tr>`).join('');
+      document.querySelector('#leatherCut tbody').innerHTML = lea.pieces.map((x) => `<tr><td class="printonly tick">☐</td><td>${esc(x.name)}</td><td class="num">${x.qty}</td><td class="num">${esc(fmt(Math.max(x.w, x.h)))} × ${esc(fmt(Math.min(x.w, x.h)))}${lea.tooWide.includes(x) ? ' (seamed)' : ''}</td><td class="note">${esc(x.covers)}</td></tr>`).join('');
     }
-    document.querySelector('#shop tbody').innerHTML = shopping(g, lea, tot).map(([a, b, c]) => `<tr><td>${esc(a)}</td><td class="num">${esc(b)}</td><td class="note">${esc(c)}</td></tr>`).join('');
+    document.querySelector('#shop tbody').innerHTML = shopping(g, lea, tot).map(([a, b, c]) => `<tr><td class="printonly tick">☐</td><td>${esc(a)}</td><td class="num">${esc(b)}</td><td class="note">${esc(c)}</td></tr>`).join('');
+    // print header: the design at a glance
+    const spec = [
+      ['Desk height', short(p.H)], ['Main run', `${short(p.L1)} × ${short(p.D1)}`], ['Return wing', `${short(p.L2)} × ${short(p.D2)}`], ['Leg room', short(g.kneeMain)],
+      ['Tower Case', `${short(g.WA)} × ${short(g.DA)} × ${short(g.caseH)}`], ['Keys Case', `${short(g.WB)} × ${short(g.DB)} × ${short(g.caseH)}`],
+      ['Material', m.name], [m.card ? 'Walls / tops' : 'Tops', m.card ? `${short(g.tw)} / ${short(g.T)}` : '3/4 in plywood'],
+      ['Finish', isLea ? `${LEATHER[p.leatherColor].name} faux leather${lea ? `, ${lea.yards} yd` : ''}` : p.finish === 'shellac' ? 'shellac + wax + paint' : 'sealer + paint'],
+      ['Road case', [p.lids && 'lids', p.casters && 'casters', p.handles && 'handles'].filter(Boolean).join(', ') || 'none'],
+      ['Top pieces', `${g.sec1 + g.sec2}, longest ${short(Math.max(g.sec1Len, g.sec2Len))}`], ['Printed', new Date().toLocaleDateString()],
+    ];
+    $('printSpec').innerHTML = spec.map(([k, v]) => `<div><b>${esc(k)}</b>${esc(v)}</div>`).join('');
     const cv = conversion(g);
     const list2 = (rows) => rows.map(([h, d]) => `<li><b>${esc(h)}</b> ${esc(d)}</li>`).join('');
     $('convert').innerHTML = `<div class="mode"><h3>Desk → road case</h3><p class="when">About 15 minutes, one person (two for the top pack).</p><ol>${list2(cv.toRoad)}</ol></div>`
@@ -1197,6 +1262,25 @@ footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px
     document.querySelectorAll('.tabs button').forEach((x) => x.setAttribute('aria-selected', x === b));
     render();
   }));
+  // Drawings for the build packet, drawn fresh at print time in the chosen finish colors.
+  function printDrawings() {
+    const g = compute();
+    const views = [[drawIso, 'Overview'], [drawPlan, 'Floor plan'], [drawTower, 'Tower Case front'], [drawKeys, 'Keys Case front'], ...(p.lids || p.casters ? [[drawRoad, 'Road mode']] : []), [drawSection, 'Desktop build-up']];
+    const box = $('printDrawings');
+    box.innerHTML = views.map(([fn, name]) => { const d = fn(g); return `<figure data-v="${esc(name)}">${d.svg}<figcaption><b>${esc(name)}.</b> ${esc(d.cap)}</figcaption></figure>`; }).join('');
+    if (p.finish === 'leather') box.querySelectorAll('figure:not([data-v="Desktop build-up"])').forEach((f) => {
+      for (const [i, k] of ['', '-2', '-3'].entries()) { f.style.setProperty(`--case${k}`, LEATHER[p.leatherColor].c[i]); f.style.setProperty(`--top${k}`, LEATHER[p.leatherColor].t[i]); }
+    });
+  }
+  const doPrint = (mode) => {
+    document.body.dataset.print = mode;
+    if (mode === 'all') printDrawings();
+    window.print();
+  };
+  window.addEventListener('beforeprint', () => { if (document.body.dataset.print !== 'cut') printDrawings(); });
+  window.addEventListener('afterprint', () => { delete document.body.dataset.print; });
+  $('printCut').onclick = () => doPrint('cut');
+  $('printAll').onclick = () => doPrint('all');
   $('copyCut').onclick = () => {
     const text = ['Part\tQty\tLength\tWidth\tLayers\tNotes', ...window.__cut.map((x) => `${x.group}: ${x.name}\t${x.qty}\t${fmt(x.w)}\t${fmt(x.h)}\t${x.layers}\t${x.note}`)].join('\n');
     const done = () => { $('copied').hidden = false; setTimeout(() => ($('copied').hidden = true), 2500); };
