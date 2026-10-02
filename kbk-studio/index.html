@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KBK Studio</title>
+  <meta name="description" content="Knight Lyfe sample pads, URL reader, stem splitter and audio converter. Plays from your MIDI keyboard." />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="vendor/lamejs/lame.min.js" defer></script>
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">♞</span>
+      <span class="brand-text"><b>KBK STUDIO</b><small>Knight Lyfe Ultimate</small></span>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="pads" class="on">Pads</button>
+      <button role="tab" data-tab="reader">URL Reader</button>
+      <button role="tab" data-tab="stems">Stem Split</button>
+      <button role="tab" data-tab="convert">Converter</button>
+      <button role="tab" data-tab="library">Library <span id="libCount" class="count">0</span></button>
+    </nav>
+    <div class="status">
+      <button id="midiChip" class="chip" title="MIDI keyboard"><i id="midiLed" class="led"></i><span id="midiLabel">MIDI</span></button>
+      <button id="helperChip" class="chip" title="KBK helper server"><i id="helperLed" class="led"></i><span>Helper</span></button>
+      <label class="master" title="Master volume">
+        <span>MASTER</span>
+        <input id="master" type="range" min="0" max="1" step="0.01" value="0.9" />
+        <span class="meter"><i id="meterFill"></i></span>
+      </label>
+    </div>
+  </header>
+
+  <div id="audioGate" class="gate" hidden>
+    <button id="audioGateBtn" class="primary big">Click to start audio</button>
+    <p>Browsers keep sound off until you click once.</p>
+  </div>
+
+  <main>
+    <!-- ================= PADS ================= -->
+    <section id="tab-pads" class="tab on">
+      <div class="pads-layout">
+        <div class="panel pad-panel">
+          <div class="panel-head">
+            <h2>Pads</h2>
+            <div class="seg" id="playMode" title="How your keyboard plays the pads">
+              <button data-mode="pads" class="on">Pads</button>
+              <button data-mode="keys">Keys</button>
+              <button data-mode="split">Split</button>
+            </div>
+          </div>
+          <div id="padGrid" class="pad-grid"></div>
+          <div class="pad-foot">
+            <label>Pad 1 note <select id="baseNote"></select></label>
+            <button id="learnBase" class="ghost" title="Press this, then the key on your keyboard that should play pad 1">Learn from key</button>
+            <label class="check"><input id="velocity" type="checkbox" checked /> Velocity</label>
+            <button id="stopAll" class="ghost">■ Stop all</button>
+          </div>
+          <p id="modeHint" class="hint"></p>
+        </div>
+
+        <div class="panel editor" id="padEditor">
+          <div class="panel-head">
+            <h2 id="edTitle">Pad 1</h2>
+            <button id="edPlay" class="primary">▶ Play</button>
+          </div>
+          <div class="wave-wrap">
+            <canvas id="edWave" class="wave"></canvas>
+            <div id="edEmpty" class="wave-empty">Drop a sample here, paste a link below, or pick a file.</div>
+          </div>
+          <div class="range2">
+            <label>Start <input id="edStart" type="range" min="0" max="1" step="0.001" value="0" /></label>
+            <label>End <input id="edEnd" type="range" min="0" max="1" step="0.001" value="1" /></label>
+          </div>
+          <div class="load-row">
+            <input id="edUrl" type="url" placeholder="Paste a sample link (WAV, MP3, Dropbox, Drive, YouTube…)" />
+            <button id="edUrlLoad" class="primary">Load link</button>
+          </div>
+          <div class="load-row">
+            <label class="btn"><input id="edFile" type="file" accept="audio/*,video/*,.wav,.aif,.aiff,.mp3,.flac,.ogg,.m4a" hidden />Open file…</label>
+            <select id="edFromLib"><option value="">From library…</option></select>
+            <button id="edClear" class="ghost danger">Clear pad</button>
+          </div>
+          <p id="edStatus" class="status-line"></p>
+          <div class="knobs">
+            <label class="knob"><span>Level</span><input id="edGain" type="range" min="0" max="1.5" step="0.01" /><output id="edGainOut"></output></label>
+            <label class="knob"><span>Tune</span><input id="edTune" type="range" min="-24" max="24" step="1" /><output id="edTuneOut"></output></label>
+            <label class="knob"><span>Pan</span><input id="edPan" type="range" min="-1" max="1" step="0.01" /><output id="edPanOut"></output></label>
+          </div>
+          <div class="opts">
+            <label>Play <select id="edMode"><option value="oneshot">One-shot</option><option value="gate">Hold (gate)</option><option value="loop">Loop</option></select></label>
+            <label>Choke <select id="edChoke"><option value="0">Off</option><option value="1">Group 1</option><option value="2">Group 2</option><option value="3">Group 3</option><option value="4">Group 4</option></select></label>
+            <label class="check"><input id="edReverse" type="checkbox" /> Reverse</label>
+          </div>
+          <div class="opts">
+            <span>MIDI note <b id="edNote">C1</b></span>
+            <button id="edLearn" class="ghost">Learn note</button>
+            <button id="edDownload" class="ghost">Download WAV</button>
+            <button id="edToLib" class="ghost">Save to library</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= URL READER ================= -->
+    <section id="tab-reader" class="tab">
+      <div class="panel">
+        <div class="panel-head"><h2>URL Reader</h2><span class="sub">Paste a link. Get audio you can play, chop, put on pads or save as a file.</span></div>
+        <div class="load-row big">
+          <input id="rdUrl" type="url" placeholder="https://… (audio file, Dropbox, Google Drive, GitHub, YouTube, SoundCloud…)" />
+          <button id="rdGo" class="primary">Read link</button>
+        </div>
+        <ol id="rdLog" class="log"></ol>
+      </div>
+      <div id="rdResult" class="panel" hidden>
+        <div class="panel-head">
+          <h2 id="rdName">Audio</h2>
+          <span id="rdInfo" class="sub"></span>
+        </div>
+        <div class="wave-wrap"><canvas id="rdWave" class="wave tall"></canvas></div>
+        <div class="range2">
+          <label>From <input id="rdStart" type="range" min="0" max="1" step="0.0005" value="0" /><output id="rdStartOut"></output></label>
+          <label>To <input id="rdEnd" type="range" min="0" max="1" step="0.0005" value="1" /><output id="rdEndOut"></output></label>
+        </div>
+        <div class="actions">
+          <button id="rdPlay" class="primary">▶ Play selection</button>
+          <button id="rdStop" class="ghost">■ Stop</button>
+          <span class="sep"></span>
+          <select id="rdPad"></select>
+          <button id="rdToPad">Put selection on pad</button>
+          <span class="sep"></span>
+          <select id="rdChopN"><option value="hits">Chop by hits</option><option value="4">Chop into 4</option><option value="8">Chop into 8</option><option value="16" selected>Chop into 16</option></select>
+          <button id="rdChop">Chop to pads</button>
+        </div>
+        <div class="actions">
+          <button id="rdToLib">Save to library</button>
+          <button id="rdToStems">Split stems…</button>
+          <span class="sep"></span>
+          <select id="rdFmt" class="fmt-select"></select>
+          <button id="rdDownload" class="primary">Download audio file</button>
+        </div>
+      </div>
+      <div class="panel tips">
+        <h3>What links work</h3>
+        <ul>
+          <li><b>Direct audio files</b> (.wav .mp3 .aif .flac .ogg .m4a): read right in the browser when the site allows it.</li>
+          <li><b>Dropbox, Google Drive, OneDrive, GitHub</b> share links: changed to the direct file for you.</li>
+          <li><b>YouTube, SoundCloud, TikTok, Instagram, Vimeo, Bandcamp</b> and sites that block reading: need the <a href="#" data-open-helper>KBK helper</a> running.</li>
+          <li><b>Spotify, Apple Music, Tidal</b> lock their audio and can't be read.</li>
+          <li>Only pull audio you own or have the rights to use.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ================= STEMS ================= -->
+    <section id="tab-stems" class="tab">
+      <div class="panel">
+        <div class="panel-head"><h2>Stem Split</h2><span class="sub">Vocals, drums, bass and everything else, ready for pads or Logic.</span></div>
+        <div class="drop" id="stDrop">
+          <p><b>Drop a song here</b> or <label class="link"><input id="stFile" type="file" accept="audio/*,video/*" hidden />pick a file</label></p>
+          <select id="stFromLib"><option value="">…or a song from the library</option></select>
+          <p id="stSource" class="sub"></p>
+        </div>
+        <div class="opts">
+          <label>Engine
+            <select id="stEngine">
+              <option value="quick">Quick (in this browser)</option>
+              <option value="htdemucs">Pro: Demucs (helper)</option>
+              <option value="htdemucs_ft">Pro+: Demucs fine-tuned (helper, slower)</option>
+              <option value="htdemucs_6s">Pro 6 stems: + guitar, piano (helper)</option>
+            </select>
+          </label>
+          <label>Stems
+            <select id="stCount"><option value="4">4: vocals, drums, bass, other</option><option value="2">2: vocals + instrumental</option></select>
+          </label>
+          <button id="stGo" class="primary">Split</button>
+        </div>
+        <div class="progress" id="stProgress" hidden><i></i><span></span></div>
+        <p class="hint">Quick runs on this computer with no setup and is good for sampling. Pro uses the Demucs AI model on the KBK helper for studio-clean stems.</p>
+      </div>
+      <div id="stResults" class="stem-list"></div>
+    </section>
+
+    <!-- ================= CONVERTER ================= -->
+    <section id="tab-convert" class="tab">
+      <div class="panel">
+        <div class="panel-head"><h2>File Converter</h2><span class="sub">Any audio or video file in, the format you need out. Several at once.</span></div>
+        <div class="drop" id="cvDrop">
+          <p><b>Drop audio or video files here</b> or <label class="link"><input id="cvFiles" type="file" multiple accept="audio/*,video/*" hidden />choose files</label></p>
+        </div>
+        <div class="opts">
+          <label>Format <select id="cvFmt" class="fmt-select"></select></label>
+          <label>Sample rate <select id="cvRate"><option value="">Keep</option><option>44100</option><option>48000</option><option>88200</option><option>96000</option><option>22050</option></select></label>
+          <label>Channels <select id="cvCh"><option value="">Keep</option><option value="2">Stereo</option><option value="1">Mono</option></select></label>
+          <label class="check"><input id="cvNorm" type="checkbox" /> Normalize</label>
+          <label class="check"><input id="cvTrim" type="checkbox" /> Trim silence</label>
+          <button id="cvGo" class="primary">Convert</button>
+          <button id="cvAll" class="ghost" disabled>Download all</button>
+        </div>
+      </div>
+      <div id="cvList" class="file-list"></div>
+    </section>
+
+    <!-- ================= LIBRARY ================= -->
+    <section id="tab-library" class="tab">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Library</h2>
+          <span class="sub">Everything you read, split, converted or saved. Kept on this computer.</span>
+          <label class="btn"><input id="libImport" type="file" multiple accept="audio/*,video/*" hidden />Import files…</label>
+        </div>
+        <div id="libList" class="lib-list"></div>
+        <p id="libEmpty" class="hint">Nothing here yet. Read a link, split a song, or import files.</p>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="midiDlg" class="dlg">
+    <h2>MIDI keyboard</h2>
+    <p id="midiMsg" class="sub"></p>
+    <label>Input <select id="midiIn"></select></label>
+    <p class="sub">Last message: <b id="midiLast">—</b></p>
+    <ul class="sub">
+      <li><b>Pads</b>: 16 keys from the pad-1 note play the pads (pad controllers usually start at C1 = 36).</li>
+      <li><b>Keys</b>: the whole keyboard plays the selected pad up and down in pitch. C3 (middle C) is its own pitch.</li>
+      <li><b>Split</b>: pads on the lowest 16 keys, the selected pad on every key above.</li>
+      <li>Sustain pedal holds Hold/Loop pads, pitch bend bends them, the volume knob (CC 7) sets the master.</li>
+      <li>Computer keys work too: 1 2 3 4 / Q W E R / A S D F / Z X C V, Space stops all.</li>
+    </ul>
+    <div class="actions"><button id="midiRescan">Rescan</button><button class="primary" data-close>Done</button></div>
+  </dialog>
+
+  <dialog id="helperDlg" class="dlg">
+    <h2>KBK helper</h2>
+    <p class="sub">A small program for your Mac or studio server that does what a browser can't: read YouTube/SoundCloud and sites that block reading, Demucs stems, and FLAC/M4A/OGG files.</p>
+    <p id="helperMsg" class="status-line"></p>
+    <label>Helper address <input id="helperUrl" type="url" placeholder="http://localhost:8765" /></label>
+    <div class="actions"><button id="helperTest" class="primary">Connect</button><button data-close>Close</button></div>
+    <h3>Start it on your Mac</h3>
+    <pre>cd fuzzy-memory/kbk-studio/server
+bash setup-helper.sh      # once: ffmpeg, yt-dlp, demucs
+python3 kbk_server.py     # then open http://localhost:8765</pre>
+  </dialog>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+</body>
+</html>
