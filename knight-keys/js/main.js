@@ -5,7 +5,7 @@ import { songToScore, scoreToMusicXML, musicXmlToMidi, scoreFileText } from './n
 import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_CHANNEL } from './synth.js';
 import { Player } from './player.js';
 import { KeyboardView, drawStaff, drawControllers, drawGroove, drawPianoRoll, drawDrumHighway } from './render.js';
-import { UNITS, COURSES, unitsFor, readNotes, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from './lessons.js';
+import { UNITS, COURSES, unitsFor, readNotes, grooveMidi, DrumJudge, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from './lessons.js';
 import { PitchListener, SingJudge, RangeFinder, voiceType, freqToCents, midiToFreq } from './pitch.js';
 import { GameSession, crownsFor, loadStage, saveStage, recordScore, courseState, scoreKey, PLAYER_COLORS } from './game.js';
 import { LANES, laneOf, sameDrum, outputFor, OUTPUTS, PIECES, KITS, kitById, resolveKit, kitNoteParams, loadSavedSamples, saveSample, deleteSample } from './drumkit.js';
@@ -400,6 +400,7 @@ const player = new Player({
   },
   onEnd() {
     if (lessonRun.active && lessonRun.step?.type === 'song') return lessonSongDone();
+    if (lessonRun.active && lessonRun.step?.type === 'groove') return lessonGrooveDone();
     if (stageRun.phase === 'play') return finishStage();
     if (learn.enabled && learn.total) {
       const pct = Math.round((100 * learn.correct) / Math.max(1, learn.correct + learn.wrong));
@@ -1783,6 +1784,7 @@ function liveDrum(note, vel) {
   if (lane >= 0) highwayHits[lane] = performance.now() / 1000;
   learnCheck(note, true);
   stageHit(note, true);
+  lessonDrumHit(note);
 }
 
 function toggleGroove() {
@@ -2341,7 +2343,9 @@ function startLesson(lesson) {
 
 function stopLessonSong() {
   stopSinging();
-  if (lessonRun.step?.type === 'song') {
+  if (lessonRun.step?.type === 'song' || lessonRun.step?.type === 'groove') {
+    player.silent = null;
+    drumRun.judge = null;
     player.pause();
     if (learn.enabled) setLearn(false);
   }
@@ -2366,6 +2370,7 @@ function renderLessonTargets() {
   if (step.type === 'notes') step.notes.forEach((n, i) => chip(noteLetter(n), `finger ${step.fingers[i]}`, i < lessonRun.pos ? 'done' : i === lessonRun.pos ? 'now' : ''));
   else if (step.type === 'chords') step.chords.forEach((c, i) => chip(step.names[i], c.map(noteLetter).join(' '), i < lessonRun.pos ? 'done' : i === lessonRun.pos ? 'now' : ''));
   else if (step.type === 'info' && step.keys) step.keys.forEach((n) => chip(noteLetter(n), '', 'now'));
+  else if (step.type === 'hits') step.hits.forEach((h, i) => chip([].concat(h).map(drumName).join(' + '), step.sticking?.[i] || '', i < lessonRun.pos ? 'done' : i === lessonRun.pos && !lessonRun.done ? 'now' : ''));
   else if (step.type === 'read') lessonRun.readList.forEach((n, i) => chip(i < lessonRun.pos ? noteLetter(n) : '?', '', i < lessonRun.pos ? 'done' : i === lessonRun.pos && !lessonRun.done ? 'now' : ''));
   else if (step.type === 'sing') step.notes.forEach((n, i) => chip(step.names?.[i] || noteLetter(n), step.names ? noteLetter(n) : '', i < lessonRun.pos ? 'done' : i === lessonRun.pos && !lessonRun.done ? 'now' : ''));
   const dots = $('lpDots');
@@ -2392,7 +2397,8 @@ function showLessonStep(i) {
   const step = lessonRun.lesson.steps[i];
   Object.assign(lessonRun, { stepIdx: i, step, pos: 0, mistakes: 0, done: step.type === 'info', hint: false, missesHere: 0, readList: step.type === 'read' ? readNotes(step) : [] });
   setText($('lpText'), step.text + (step.type === 'chords' && micListener?.active ? ' (Chords need a USB keyboard or the on-screen keys: the microphone hears one note at a time.)' : ''));
-  lessonFeedback(step.type === 'info' ? '' : step.type === 'song' ? (step.voice ? 'The song is playing. Sing the yellow notes.' : step.noHints ? 'The song is playing. Read the staff and play.' : 'The song is playing. The yellow keys are yours.') : step.type === 'read' ? 'Which note is it? Play it.' : 'Your turn: the yellow key is next.');
+  if (step.type === 'hits' || step.type === 'groove') lessonFeedback(step.type === 'hits' ? 'Your turn: hit the drum that\'s lit up.' : step.mode === 'time' ? 'Count-in: one bar of clicks, then play!' : 'The beat waits for each hit. Follow the highway.');
+  else lessonFeedback(step.type === 'info' ? '' : step.type === 'song' ? (step.voice ? 'The song is playing. Sing the yellow notes.' : step.noHints ? 'The song is playing. Read the staff and play.' : 'The song is playing. The yellow keys are yours.') : step.type === 'read' ? 'Which note is it? Play it.' : 'Your turn: the yellow key is next.');
   $('lpSing').hidden = step.type !== 'sing' && step.type !== 'range';
   $('lpHear').hidden = step.type !== 'sing';
   setLessonTargets();
@@ -2400,6 +2406,7 @@ function showLessonStep(i) {
   $('lpNext').disabled = !lessonRun.done;
   $('lpNext').textContent = i === lessonRun.lesson.steps.length - 1 ? 'Finish ✓' : 'Next ▶';
   if (step.type === 'sing' || step.type === 'range' || step.voice) startSinging(step);
+  if (step.type === 'groove') startGroove(step);
   if (step.type === 'song') {
     const song = SONGS.find((s) => s.id === step.song);
     loadSongEntry(song, 'beginner');
@@ -2595,6 +2602,93 @@ function onPitch(fn) {
     off?.();
     micListener?.pitchListeners.delete(fn);
   };
+}
+
+// ---- Drum steps ------------------------------------------------------------------
+
+const DRUM_LABEL = { 35: 'Kick', 36: 'Kick', 37: 'Side stick', 38: 'Snare', 40: 'Snare', 42: 'Hi-hat', 44: 'Hi-hat pedal', 46: 'Open hi-hat', 49: 'Crash', 51: 'Ride', 48: 'Tom 1', 50: 'Tom 1', 45: 'Tom 2', 47: 'Tom 2', 43: 'Floor tom', 41: 'Floor tom' };
+const drumName = (n) => DRUM_LABEL[n] || `Drum ${n}`;
+const drumRun = { judge: null, together: new Map(), lastFeedback: 0 };
+
+/** Pads to light up for the current drum step (on-screen pads use these notes). */
+function lessonPadTargets() {
+  const step = lessonRun.active && !lessonRun.done ? lessonRun.step : null;
+  if (step?.type !== 'hits') return new Set();
+  const want = [].concat(step.hits[lessonRun.pos] ?? []);
+  return new Set(want.map((n) => PAD_ALIAS[n] ?? n));
+}
+
+function lessonDrumHit(note) {
+  if (!lessonRun.active || lessonRun.done || !$('lessonDlg').open) return;
+  const step = lessonRun.step;
+  if (step.type === 'hits') {
+    const want = [].concat(step.hits[lessonRun.pos]);
+    const match = want.find((n) => sameDrum(n, note));
+    if (match === undefined) {
+      lessonRun.mistakes++;
+      lessonFeedback(`That was the ${drumName(note).toLowerCase()}. Hit the ${want.map(drumName).join(' and the ').toLowerCase()}.`, 'bad');
+      return;
+    }
+    // Drums hit together count if they land within a third of a second.
+    const now = performance.now();
+    drumRun.together.set(match, now);
+    if (want.every((n) => now - (drumRun.together.get(n) ?? -1e9) < 330)) {
+      drumRun.together.clear();
+      lessonRun.pos++;
+      if (lessonRun.pos >= step.hits.length) return completeLessonStep(starsForMistakes(lessonRun.mistakes, step.hits.length));
+      lessonFeedback('✓', 'good');
+      renderLessonTargets();
+    } else lessonFeedback(`Now with the ${want.filter((n) => n !== match).map(drumName).join(' and ').toLowerCase()} at the same time!`);
+    return;
+  }
+  if (step.type === 'groove' && step.mode === 'time' && drumRun.judge && player.playing) {
+    const r = drumRun.judge.hit(note, player.time);
+    const missed = drumRun.judge.missedBy(player.time);
+    lessonFeedback(`${r === 'perfect' ? '⭐ Perfect' : r === 'good' ? '✓ Good' : '✗ Extra hit'} · ${drumRun.judge.hits} hit, ${missed} missed`, r === 'extra' ? 'bad' : 'good');
+  }
+}
+
+function startGroove(step) {
+  const g = grooveMidi(step, `Drums: ${lessonRun.lesson.title}`);
+  if (learn.enabled) setLearn(false);
+  loadMidiBytes(g.bytes, `${lessonRun.lesson.title}.mid`);
+  setDrumView('highway');
+  if (step.mode === 'learn') {
+    $('learnPart').value = String(DRUM_CHANNEL);
+    setLearn(true);
+    drumRun.judge = null;
+  } else {
+    // The beat is yours: the drums are left out (the click keeps playing) and every hit is timed.
+    player.silent = { isTarget: (e) => e.ch === DRUM_CHANNEL };
+    drumRun.judge = new DrumJudge(g.hits, sameDrum);
+  }
+  player.seek(0);
+  player.play();
+}
+
+function lessonGrooveDone() {
+  const step = lessonRun.step;
+  player.silent = null;
+  if (step.mode === 'learn') {
+    const acc = Math.round((100 * learn.correct) / Math.max(1, learn.correct + learn.wrong));
+    if (learn.enabled) setLearn(false);
+    completeLessonStep(starsForAccuracy(acc));
+    lessonFeedback(`Beat learned: ${acc}% of your hits right. ${'★'.repeat(starsForAccuracy(acc))} Next: play it in time.`, 'good');
+    return;
+  }
+  const j = drumRun.judge;
+  drumRun.judge = null;
+  if (!j) return;
+  const acc = j.accuracy;
+  const off = j.averageOffsetMs;
+  const feel = Math.abs(off) < 40 ? 'Right on the click!' : off < 0 ? `You're a little early (rushing) by ${-off} ms: relax and lean back.` : `You're a little late (dragging) by ${off} ms: listen for the click.`;
+  if (acc < 50) {
+    // Not passed yet: try again (the step stays open).
+    lessonFeedback(`${acc}% in time. ${feel} Press "Start this step again" to try once more; the Learn step before this one helps too.`, 'bad');
+    return;
+  }
+  completeLessonStep(starsForAccuracy(acc));
+  lessonFeedback(`${acc}% in time, ${j.perfects} perfect. ${feel} ${'★'.repeat(starsForAccuracy(acc))}`, 'good');
 }
 
 // ---- Singing steps (Voice course) ------------------------------------------
@@ -3690,7 +3784,8 @@ function renderLearn(sf, spelling) {
   const el = $('learnStats');
   if (!learn.enabled) {
     setText(el, '');
-    padEls.forEach((p) => p.classList.remove('want'));
+    const want = lessonPadTargets();
+    padEls.forEach((p, note) => p.classList.toggle('want', want.has(note)));
     return;
   }
   const want = [...learn.expected];

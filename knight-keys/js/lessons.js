@@ -9,6 +9,9 @@
 //   range   - sing your lowest and highest notes to find your choir part
 //   read    - a note appears on the staff (no keys lit): play or sing it.
 //             `notes` in order, or `pool` + `count` for a random drill
+//   hits    - hit these drums in order (an array is drums hit together)
+//   groove  - a drum beat written as a grid: mode 'learn' waits for every hit,
+//             mode 'time' plays along with a click and scores your timing
 // Info steps can show notes on the staff too (`staff: [...]`); song steps with
 // `noHints` don't light the keys, so you read the music instead.
 // Stars: 3 for a clean step, fewer for mistakes. Pass a lesson to open the next.
@@ -16,13 +19,21 @@
 
 // Note numbers: middle C = 60. Fingers: 1 thumb, 2 index, 3 middle, 4 ring, 5 pinky.
 const C4 = 60, D4 = 62, E4 = 64, F4 = 65, G4 = 67, A4 = 69, B4 = 71, B3 = 59;
+import { writeMidi } from './midi-file.js';
+
 const C3 = 48, D3 = 50, E3 = 52, F3 = 53, G3 = 55, A3 = 57, C5 = 72;
 
 export const COURSES = [
   { id: 'piano', name: 'Piano', icon: '🎹' },
   { id: 'voice', name: 'Voice', icon: '🎤' },
   { id: 'reading', name: 'Read music', icon: '📖' },
+  { id: 'drums', name: 'Drums', icon: '🥁' },
 ];
+
+// Drums (General MIDI notes).
+const K = 36, S = 38, H = 42, T1 = 48, T2 = 45, FT = 43, CR = 49, RD = 51;
+/** Grid rows of a groove bar: row name -> drum note. */
+export const GROOVE_ROWS = { kk: 36, sn: 38, ss: 37, hh: 42, ho: 46, ph: 44, cr: 49, rd: 51, t1: 48, t2: 45, ft: 43 };
 
 // White keys in a range, for the reading drills.
 const whites = (lo, hi) => Array.from({ length: hi - lo + 1 }, (_, i) => lo + i).filter((n) => ![1, 3, 6, 8, 10].includes(n % 12));
@@ -459,6 +470,154 @@ export const UNITS = [
       { id: 'r-jesus-lh', title: 'Read: bass clef chords', steps: [{ type: 'song', song: 'jesusloves', part: '1', noHints: true, text: 'Left hand, read from the bass staff: the chords of Jesus Loves Me.' }] },
     ],
   },
+
+  // ---- Drums ---------------------------------------------------------------
+  // Hit steps take any note of the right drum (snare rim = snare, hi-hat edge =
+  // hi-hat), so e-kits like the Alesis Nitro Max and the on-screen pads both work.
+  {
+    id: 'drums-kit',
+    course: 'drums',
+    title: 'Meet the kit',
+    icon: '🥁',
+    lessons: [
+      {
+        id: 'd-kit',
+        title: 'Kick, snare and hi-hat',
+        steps: [
+          { type: 'info', text: 'Sit so your thighs are level and you can reach every pad. Right foot on the kick pedal, left foot on the hi-hat pedal. Hold the sticks loosely between thumb and first finger, about a third of the way up, and let them bounce.' },
+          { type: 'info', text: 'The three drums of almost every beat: the kick (bass drum, right foot) is the low "boom", the snare (in front of you) is the "crack", and the hi-hat (left, two cymbals on a stand) keeps time with "tick tick tick".' },
+          { type: 'hits', hits: [K, K, K, K], text: 'Kick: press the pedal with your right foot, 4 times. Let the beater bounce back off the head.' },
+          { type: 'hits', hits: [S, S, S, S], text: 'Snare: hit the middle of the snare pad 4 times, right stick.' },
+          { type: 'hits', hits: [H, H, H, H], text: 'Hi-hat: hit the hi-hat 4 times with your right stick, crossing over your left hand.' },
+        ],
+      },
+      {
+        id: 'd-toms',
+        title: 'Toms and cymbals',
+        steps: [
+          { type: 'info', text: 'The toms are the round drums above the kick and on your right: tom 1 is the highest, the floor tom the lowest. The crash (left, high) is the big accent cymbal; the ride (right) is for steady time in bigger parts of a song.' },
+          { type: 'hits', hits: [T1, T2, FT], text: 'Down the toms: tom 1, tom 2, floor tom.' },
+          { type: 'hits', hits: [FT, T2, T1], text: 'And back up.' },
+          { type: 'hits', hits: [CR, RD, CR, RD], text: 'Crash, ride, crash, ride.' },
+          { type: 'hits', hits: [[K, CR], [K, CR]], text: 'The big accent: kick and crash at the same time. Twice.' },
+        ],
+      },
+      {
+        id: 'd-sticking',
+        title: 'Sticking: right, left',
+        steps: [
+          { type: 'info', text: 'Drummers write which hand plays each note: R for right, L for left. "Single strokes" go R L R L. Keep both sticks at the same height so every hit sounds the same.' },
+          { type: 'hits', hits: [S, S, S, S, S, S, S, S], sticking: 'RLRLRLRL', text: 'Single strokes on the snare: R L R L R L R L.' },
+          { type: 'hits', hits: [S, S, T1, T1, T2, T2, FT, FT], sticking: 'RLRLRLRL', text: 'Around the kit, two hits per drum: snare, tom 1, tom 2, floor tom.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'drums-beats',
+    course: 'drums',
+    title: 'Your first beats',
+    icon: '🎵',
+    lessons: [
+      {
+        id: 'd-quarter',
+        title: 'Kick and snare: 1 2 3 4',
+        steps: [
+          { type: 'info', text: 'Count "1 2 3 4" out loud. Kick on 1 and 3, snare on 2 and 4: "boom crack boom crack". The snare on 2 and 4 is the backbeat, the heartbeat of most songs.' },
+          { type: 'groove', mode: 'learn', bpm: 60, bars: [{ steps: 4, kk: 'x.x.', sn: '.x.x' }], repeat: 2, text: 'Learn it: the beat waits for every hit. Follow the highway.' },
+          { type: 'groove', mode: 'time', bpm: 60, bars: [{ steps: 4, kk: 'x.x.', sn: '.x.x' }], repeat: 4, text: 'Now in time with the click (one bar of clicks first). Stay with the click!' },
+        ],
+      },
+      {
+        id: 'd-rock',
+        title: 'The basic beat (8 hi-hats)',
+        steps: [
+          { type: 'info', text: 'Add the hi-hat on every "1 and 2 and 3 and 4 and" (8 per bar) with your right hand. Kick on 1 and 3, snare on 2 and 4 with your left hand. This one beat plays thousands of songs.' },
+          { type: 'groove', mode: 'learn', bpm: 60, bars: [{ steps: 8, hh: 'xxxxxxxx', kk: 'x...x...', sn: '..x...x.' }], repeat: 2, text: 'Learn it slowly. Hands and foot land together on 1, 2, 3 and 4.' },
+          { type: 'groove', mode: 'time', bpm: 66, bars: [{ steps: 8, hh: 'xxxxxxxx', kk: 'x...x...', sn: '..x...x.' }], repeat: 4, text: 'Play it in time.' },
+        ],
+      },
+      {
+        id: 'd-worship',
+        title: 'Worship beat',
+        steps: [
+          { type: 'info', text: 'Modern worship songs push the kick: 1, the "and" of 2, and 3. Count "1 and 2 AND 3 and 4 and" and kick on the bold ones.' },
+          { type: 'groove', mode: 'learn', bpm: 66, bars: [{ steps: 8, hh: 'xxxxxxxx', kk: 'x..xx...', sn: '..x...x.' }], repeat: 2, text: 'Learn the worship beat.' },
+          { type: 'groove', mode: 'time', bpm: 72, bars: [{ steps: 8, hh: 'xxxxxxxx', kk: 'x..xx...', sn: '..x...x.' }], repeat: 4, text: 'Play it in time.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'drums-fills',
+    course: 'drums',
+    title: 'Crashes and fills',
+    icon: '💥',
+    lessons: [
+      {
+        id: 'd-crash',
+        title: 'Crash on 1',
+        steps: [
+          { type: 'info', text: 'A new part of a song (verse to chorus) starts with a crash and kick together on beat 1, instead of the hi-hat.' },
+          { type: 'groove', mode: 'time', bpm: 66, bars: [{ steps: 8, cr: 'x.......', hh: '.xxxxxxx', kk: 'x...x...', sn: '..x...x.' }, { steps: 8, hh: 'xxxxxxxx', kk: 'x...x...', sn: '..x...x.' }], repeat: 2, text: 'Crash on the first beat, then the basic beat. Twice.' },
+        ],
+      },
+      {
+        id: 'd-fill1',
+        title: 'Your first fill',
+        steps: [
+          { type: 'info', text: 'A fill is a short break that leads into the next part. The easiest: play the beat for 3 beats, then four snare hits on "4 and" (R L R L as 16ths: "4 e and a"), then crash on 1.' },
+          { type: 'groove', mode: 'learn', bpm: 60, bars: [{ steps: 16, hh: 'x.x.x.x.x.x.....', kk: 'x.......x.......', sn: '....x.......xxxx' }, { steps: 16, cr: 'x...............', kk: 'x...............' }], repeat: 1, text: 'Learn it: beat, fill, crash.' },
+          { type: 'groove', mode: 'time', bpm: 60, bars: [{ steps: 16, hh: 'x.x.x.x.x.x.x.x.', kk: 'x.......x.......', sn: '....x.......x...' }, { steps: 16, hh: 'x.x.x.x.x.x.....', kk: 'x.......x.......', sn: '....x.......xxxx' }, { steps: 16, cr: 'x...............', kk: 'x...............' }], repeat: 1, text: 'One bar of beat, one bar with the fill, crash.' },
+        ],
+      },
+      {
+        id: 'd-tomfill',
+        title: 'Around the toms',
+        steps: [
+          { type: 'groove', mode: 'learn', bpm: 60, bars: [{ steps: 8, sn: 'xx', t1: '..xx', t2: '....xx', ft: '......xx' }, { steps: 8, cr: 'x', kk: 'x' }], repeat: 1, text: 'Eighth notes around the kit: snare, snare, tom 1, tom 1, tom 2, tom 2, floor, floor, then crash.' },
+          { type: 'groove', mode: 'time', bpm: 66, bars: [{ steps: 8, hh: 'xxxxxxxx', kk: 'x...x...', sn: '..x...x.' }, { steps: 8, sn: 'xx', t1: '..xx', t2: '....xx', ft: '......xx' }, { steps: 8, cr: 'x', kk: 'x' }], repeat: 1, text: 'Beat, tom fill, crash: in time.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'drums-church',
+    course: 'drums',
+    title: 'Church grooves',
+    icon: '⛪',
+    lessons: [
+      {
+        id: 'd-hymn',
+        title: 'Hymn in 3/4',
+        steps: [
+          { type: 'info', text: 'Amazing Grace and Silent Night are in 3/4: count "1 2 3". Kick on 1, cross-stick (stick laid across the snare, hitting the rim) or snare on 2 and 3, hi-hat on every beat. Play soft: support the singers.' },
+          { type: 'groove', mode: 'learn', bpm: 66, time: [3, 4], bars: [{ steps: 3, hh: 'xxx', kk: 'x..', ss: '.xx' }], repeat: 2, text: 'Learn the hymn waltz.' },
+          { type: 'groove', mode: 'time', bpm: 72, time: [3, 4], bars: [{ steps: 3, hh: 'xxx', kk: 'x..', ss: '.xx' }], repeat: 4, text: 'Play it in time.' },
+        ],
+      },
+      {
+        id: 'd-shuffle',
+        title: 'Gospel shuffle',
+        steps: [
+          { type: 'info', text: 'The shuffle swings: each beat splits in three ("1 trip-let") and the hi-hat plays the first and last: "1 . a 2 . a". Kick on 1 and 3, snare on 2 and 4. It\'s the bounce of a lot of gospel and blues.' },
+          { type: 'groove', mode: 'learn', bpm: 66, bars: [{ steps: 12, hh: 'x.xx.xx.xx.x', kk: 'x.....x.....', sn: '...x.....x..' }], repeat: 2, text: 'Learn the shuffle.' },
+          { type: 'groove', mode: 'time', bpm: 72, bars: [{ steps: 12, hh: 'x.xx.xx.xx.x', kk: 'x.....x.....', sn: '...x.....x..' }], repeat: 4, text: 'Play it in time: feel the bounce.' },
+        ],
+      },
+      {
+        id: 'd-twostep',
+        title: 'Gospel two-step',
+        steps: [
+          { type: 'info', text: 'The praise-break feel: kick on every beat ("four on the floor"), snare on 2 and 4, hi-hats in 8ths. Start slow; in church it can go very fast.' },
+          { type: 'groove', mode: 'learn', bpm: 72, bars: [{ steps: 8, hh: 'xxxxxxxx', kk: 'x.x.x.x.', sn: '..x...x.' }], repeat: 2, text: 'Learn the two-step.' },
+          { type: 'groove', mode: 'time', bpm: 88, bars: [{ steps: 8, hh: 'xxxxxxxx', kk: 'x.x.x.x.', sn: '..x...x.' }], repeat: 4, text: 'In time. Speed it up later on Stage.' },
+        ],
+      },
+      { id: 'd-song-jesus', title: 'Drums for a song: Jesus Loves Me', steps: [{ type: 'song', song: 'jesusloves', part: '9', text: 'Play the drum part of a whole song. It waits for every hit, so learn it at your own speed; then try it on Stage.' }] },
+      { id: 'd-song-amazing', title: 'Drums for a song: Amazing Grace', steps: [{ type: 'song', song: 'amazing', part: '9', text: 'The hymn waltz in a real song: 3/4, soft and steady.' }] },
+    ],
+  },
 ];
 
 for (const u of UNITS) u.course ??= 'piano';
@@ -486,6 +645,113 @@ export function readNotes(step, rand = Math.random) {
     if (n !== out[out.length - 1] || step.pool.length === 1) out.push(n);
   }
   return out;
+}
+
+/**
+ * The hits of a groove step, in beats: [{ beat, note, vel }], bar after bar.
+ * Each bar is a grid: `steps` slots per bar and one string per drum
+ * ('x' hit, 'X' accent, anything else rest; missing slots are rests).
+ */
+export function grooveHits(step) {
+  const beatsPerBar = ((step.time?.[0] || 4) * 4) / (step.time?.[1] || 4);
+  const out = [];
+  let bar = 0;
+  for (let r = 0; r < (step.repeat || 1); r++) {
+    for (const g of step.bars) {
+      const slot = beatsPerBar / g.steps;
+      for (const [row, note] of Object.entries(GROOVE_ROWS)) {
+        const pattern = (g[row] || '').replace(/\s/g, '');
+        for (let i = 0; i < Math.min(pattern.length, g.steps); i++) {
+          if (pattern[i] === 'x' || pattern[i] === 'X') out.push({ beat: bar * beatsPerBar + i * slot, note, vel: pattern[i] === 'X' ? 115 : note === 42 ? 70 : 95 });
+        }
+      }
+      bar++;
+    }
+  }
+  return out.sort((a, b) => a.beat - b.beat || a.note - b.note);
+}
+
+/**
+ * MIDI for a groove step: one bar of count-in clicks, then the beat on the
+ * drum channel with a click (woodblock, channel 1) on every beat.
+ * Returns { bytes, countIn (seconds), hits: [{ time, note }] }.
+ */
+export function grooveMidi(step, name = 'Drum lesson') {
+  const bpm = step.bpm || 70;
+  const spb = 60 / bpm;
+  const [num, den] = step.time || [4, 4];
+  const beatsPerBar = (num * 4) / den;
+  const hits = grooveHits(step);
+  const bars = (step.repeat || 1) * step.bars.length;
+  const ev = [];
+  const add = (beat, bytes) => ev.push({ time: beat * spb, bytes });
+  add(0, [0xff, 0x58, 0x04, num, Math.log2(den), 0x18, 0x08]);
+  add(0, [0xc0, 115]); // woodblock click
+  for (let b = 0; b < (bars + 1) * beatsPerBar; b++) {
+    const accent = b % beatsPerBar === 0;
+    add(b, [0x90, accent ? 84 : 79, accent ? 100 : 70]);
+    add(b + 0.1, [0x80, accent ? 84 : 79, 0]);
+  }
+  for (const h of hits) {
+    add(beatsPerBar + h.beat, [0x99, h.note, h.vel]);
+    add(beatsPerBar + h.beat + 0.1, [0x89, h.note, 0]);
+  }
+  return { bytes: writeMidi(ev, { bpm, name }), countIn: beatsPerBar * spb, hits: hits.map((h) => ({ time: (beatsPerBar + h.beat) * spb, note: h.note })) };
+}
+
+/**
+ * Playing in time: every expected hit can be matched once, by a hit on the same
+ * drum within `window` seconds. sameDrum(a, b) says whether two notes are one drum.
+ */
+export class DrumJudge {
+  constructor(expected, sameDrum, { window = 0.13, perfect = 0.05 } = {}) {
+    this.expected = expected.map((e) => ({ ...e, hit: false }));
+    this.sameDrum = sameDrum;
+    this.window = window;
+    this.perfect = perfect;
+    this.hits = 0;
+    this.perfects = 0;
+    this.extra = 0;
+    this.offsets = [];
+  }
+
+  /** A hit at song time `t`: 'perfect', 'good', or 'extra' (nothing to match). */
+  hit(note, t) {
+    let best = null;
+    for (const e of this.expected) {
+      if (e.hit || !this.sameDrum(e.note, note)) continue;
+      const d = Math.abs(e.time - t);
+      if (d <= this.window && (!best || d < Math.abs(best.time - t))) best = e;
+    }
+    if (!best) {
+      this.extra++;
+      return 'extra';
+    }
+    best.hit = true;
+    this.hits++;
+    this.offsets.push(t - best.time);
+    if (Math.abs(t - best.time) <= this.perfect) {
+      this.perfects++;
+      return 'perfect';
+    }
+    return 'good';
+  }
+
+  /** Expected hits already too late to play (as of song time `t`). */
+  missedBy(t) {
+    return this.expected.filter((e) => !e.hit && e.time < t - this.window).length;
+  }
+
+  /** 0-100: hits matched, less a little for extra hits. */
+  get accuracy() {
+    const total = this.expected.length || 1;
+    return Math.max(0, Math.round((100 * (this.hits - this.extra * 0.5)) / total));
+  }
+
+  /** Are you early or late on average (ms, negative = early)? */
+  get averageOffsetMs() {
+    return this.offsets.length ? Math.round((1000 * this.offsets.reduce((a, b) => a + b, 0)) / this.offsets.length) : 0;
+  }
 }
 
 /** Stars for a singing step from the average distance off center of your notes (cents) and misses. */
