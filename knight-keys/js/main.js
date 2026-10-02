@@ -4,7 +4,7 @@ import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_C
 import { Player } from './player.js';
 import { KeyboardView, drawStaff, drawControllers, drawGroove, drawPianoRoll, drawDrumHighway } from './render.js';
 import { GameSession, crownsFor, loadStage, saveStage, recordScore, courseState, scoreKey, PLAYER_COLORS } from './game.js';
-import { LANES, laneOf, sameDrum, PIECES, KITS, kitById, resolveKit, kitNoteParams, loadSavedSamples, saveSample, deleteSample } from './drumkit.js';
+import { LANES, laneOf, sameDrum, outputFor, OUTPUTS, PIECES, KITS, kitById, resolveKit, kitNoteParams, loadSavedSamples, saveSample, deleteSample } from './drumkit.js';
 import { detectChord, noteName, pcName, solfege, keyName } from './theory.js';
 import { createDemoMidi } from './demo.js';
 import { GROOVES, GroovePlayer } from './grooves.js';
@@ -2094,7 +2094,8 @@ function renderKitRack() {
   const piece = PIECES.find((p) => p.id === kitPiece);
   const v = resolved[kitPiece];
   setText($('kitPieceName'), piece.name);
-  setText($('kitPieceNotes'), `Notes ${piece.notes.join(', ')}`);
+  const out = outputFor(piece.notes[0]);
+  setText($('kitPieceNotes'), `Notes ${piece.notes.join(', ')}${IN_HOST ? ` · Logic multi-output: ${out} (outputs ${3 + 2 * OUTPUTS.indexOf(out)}-${4 + 2 * OUTPUTS.indexOf(out)})` : ''}`);
   setKnob($('knobTune'), v.tune);
   setKnob($('knobDecay'), v.decay);
   setKnob($('knobLevel'), v.level);

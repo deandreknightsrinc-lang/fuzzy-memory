@@ -342,7 +342,7 @@ void SoundEngine::routeHostMessage (const juce::MidiMessage& m, int offset)
     }
 }
 
-void SoundEngine::process (juce::AudioBuffer<float>& buffer, const juce::MidiBuffer& hostMidi)
+void SoundEngine::process (juce::AudioBuffer<float>& buffer, const juce::MidiBuffer& hostMidi, const DrumOutputs* drumOutputs)
 {
     const int numSamples = buffer.getNumSamples();
     const double blockStart = clockMs();
@@ -418,10 +418,19 @@ void SoundEngine::process (juce::AudioBuffer<float>& buffer, const juce::MidiBuf
 
     // 4. Render.
     buffer.clear();
+    if (drumOutputs != nullptr)
+        for (auto* out : *drumOutputs)
+            if (out != nullptr)
+                out->clear();
     songPiano.renderNextBlock (buffer, songMidi, 0, numSamples);
     livePiano.renderNextBlock (buffer, liveMidi, 0, numSamples);
-    drums.render (buffer, 0, numSamples);
-    buffer.applyGain (interfaceVolume.load());
+    drums.render (buffer, drumOutputs, 0, numSamples);
+    const float volume = interfaceVolume.load();
+    buffer.applyGain (volume);
+    if (drumOutputs != nullptr)
+        for (auto* out : *drumOutputs)
+            if (out != nullptr)
+                out->applyGain (volume);
 }
 
 } // namespace knightlyfe

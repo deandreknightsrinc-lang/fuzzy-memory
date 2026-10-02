@@ -129,3 +129,17 @@ Unzip the files first (double-click each .zip).
    Sampler instrument menu, channel strip settings and project templates.
    Drop new sounds into its Inbox folder and run organize-samples.sh to sort
    them by name. See README.md in that folder.
+
+11. MULTI-OUTPUT DRUMS (each drum on its own mixer channel)
+   - New Software Instrument track > Instrument slot > AU Instruments >
+     Knight Lyfe > Knight Lyfe Ultimate > Multi-Output (7xStereo).
+   - On the track's channel strip in the Mixer, click the small "+" under
+     the meter once for each drum output. Logic adds aux channels:
+       outputs 3-4 Kick, 5-6 Snare, 7-8 Hi-Hat, 9-10 Toms,
+       11-12 Cymbals, 13-14 Percussion.  1-2 is the main mix (piano + rest).
+   - Now put EQ, compression and reverb on each drum separately. The Kit
+     Rack shows which output each drum uses.
+   - If the drums go quiet, the aux channels haven't been created yet:
+     click "+" again (or pick the Stereo version of the plug-in).
+   - Drums on their own outputs skip the plug-in's built-in Room reverb;
+     use Logic's effects on those channels instead.

@@ -1,6 +1,7 @@
 // Offline tests for the Knight Lyfe sound engine: renders notes and checks the audio.
 #include "Engine/SoundEngine.h"
 
+#include <array>
 #include <cstdio>
 #include <thread>
 
@@ -266,6 +267,52 @@ int main()
         bad->setProperty ("note", 40);
         bad->setProperty ("data", juce::Base64::toBase64 ("not audio", 9));
         CHECK (! r.engine.handleDrumSample (juce::var (bad)), "a file that isn't audio is refused");
+    }
+
+    std::printf ("Multi-output drums\n");
+    {
+        r.run (1.0);
+        std::array<juce::AudioBuffer<float>, numDrumGroups> groupBufs;
+        DrumOutputs outs {};
+        for (int g = 0; g < numDrumGroups; ++g)
+        {
+            groupBufs[(size_t) g].setSize (2, Render::block);
+            outs[(size_t) g] = &groupBufs[(size_t) g];
+        }
+        auto renderMulti = [&] (double seconds, std::array<float, numDrumGroups>& groupPeaks) {
+            juce::AudioBuffer<float> main (2, Render::block);
+            float mainPeak = 0.0f;
+            groupPeaks.fill (0.0f);
+            for (int pos = 0; pos < (int) (seconds * Render::sr); pos += Render::block)
+            {
+                r.engine.process (main, {}, &outs);
+                mainPeak = juce::jmax (mainPeak, main.getMagnitude (0, Render::block));
+                for (int g = 0; g < numDrumGroups; ++g)
+                    groupPeaks[(size_t) g] = juce::jmax (groupPeaks[(size_t) g], groupBufs[(size_t) g].getMagnitude (0, Render::block));
+                r.now += 1000.0 * Render::block / Render::sr;
+            }
+            return mainPeak;
+        };
+        std::array<float, numDrumGroups> gp {};
+        r.engine.postMidi (18, 0x99, 36, 110, 0.0);
+        float mainPeak = renderMulti (0.3, gp);
+        CHECK (gp[(size_t) DrumGroup::kick] > 0.1f && mainPeak < 0.001f && gp[(size_t) DrumGroup::snare] < 0.001f,
+               "the kick goes only to the Kick output");
+        renderMulti (1.0, gp);
+        r.engine.postMidi (18, 0x99, 46, 110, 0.0);
+        renderMulti (0.3, gp);
+        CHECK (gp[(size_t) DrumGroup::hihat] > 0.05f && gp[(size_t) DrumGroup::kick] < 0.001f, "an open hat goes to the Hi-Hat output");
+        renderMulti (1.0, gp);
+        r.engine.postMidi (16, 0x90, 60, 100, 0.0);
+        mainPeak = renderMulti (0.3, gp);
+        float drumsTotal = 0.0f;
+        for (auto v : gp) drumsTotal += v;
+        CHECK (mainPeak > 0.05f && drumsTotal < 0.001f, "the piano stays on the main output");
+        r.engine.postMidi (16, 0x80, 60, 0, 0.0);
+        renderMulti (1.5, gp);
+        CHECK (DrumSynth::groupFor (40) == DrumGroup::snare && DrumSynth::groupFor (59) == DrumGroup::cymbals
+                   && DrumSynth::groupFor (58) == DrumGroup::toms && DrumSynth::groupFor (56) == DrumGroup::percussion,
+               "e-kit notes map to the right outputs");
     }
 
     std::printf ("Host transport\n");

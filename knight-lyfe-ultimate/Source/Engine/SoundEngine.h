@@ -38,7 +38,9 @@ public:
     SoundEngine();
 
     void prepare (double sampleRate, int maxBlockSize);
-    void process (juce::AudioBuffer<float>& buffer, const juce::MidiBuffer& hostMidi);
+    /** Renders everything into `buffer`; with `drumOutputs`, drums whose group has a
+        buffer go there instead (the plug-in's multi-output mode). */
+    void process (juce::AudioBuffer<float>& buffer, const juce::MidiBuffer& hostMidi, const DrumOutputs* drumOutputs = nullptr);
 
     // ---- From the interface (message thread) ----------------------------------
     void postMidi (int uiChannel, int status, int data1, int data2, double delayMs);

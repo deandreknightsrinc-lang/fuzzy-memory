@@ -10,9 +10,18 @@ namespace knightlyfe
 
 /** Synthesized General MIDI drum kit (kick, snare, hats, toms, cymbals, percussion).
     The same recipes as the Knight Keys web synth, so grooves sound alike in both. */
+/** Drum groups for the plug-in's multi-output mode (each can have its own Logic channel). */
+enum class DrumGroup : int { kick, snare, hihat, toms, cymbals, percussion };
+constexpr int numDrumGroups = 6;
+/** Per-group render targets; nullptr = mix into the main output. */
+using DrumOutputs = std::array<juce::AudioBuffer<float>*, numDrumGroups>;
+
 class DrumSynth
 {
 public:
+    /** Which group a General MIDI / e-kit drum note belongs to. */
+    static DrumGroup groupFor (int note) noexcept;
+
     /** A recorded one-shot that replaces the synthesized sound of one note. */
     struct Sample
     {
@@ -37,7 +46,9 @@ public:
     /** Silences hits started after `offset` and fades out ringing ones. */
     void stopAll();
 
-    void render (juce::AudioBuffer<float>& out, int startSample, int numSamples);
+    void render (juce::AudioBuffer<float>& out, int startSample, int numSamples) { render (out, nullptr, startSample, numSamples); }
+    /** Renders each hit into its group's buffer when one is given, otherwise into `out`. */
+    void render (juce::AudioBuffer<float>& out, const DrumOutputs* groups, int startSample, int numSamples);
 
 private:
     struct Hit
@@ -61,6 +72,7 @@ private:
         const Sample* sample = nullptr;
         double pos = 0.0, step = 1.0;
         int sampleEnd = 0;      // where the (decay-shortened) sample fades out
+        int group = 0;          // DrumGroup, for multi-output
     };
 
     Hit* freeHit();

@@ -1,8 +1,20 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#include <array>
+
+// Output 1 is the main mix. Outputs 2-7 are the drum groups for Logic's
+// "Multi-Output" version: turn them on and each drum gets its own mixer channel.
+juce::AudioProcessor::BusesProperties KnightLyfeProcessor::makeBuses()
+{
+    auto buses = BusesProperties().withOutput ("Main", juce::AudioChannelSet::stereo(), true);
+    for (const auto* name : { "Kick", "Snare", "Hi-Hat", "Toms", "Cymbals", "Percussion" })
+        buses = buses.withOutput (name, juce::AudioChannelSet::stereo(), false);
+    return buses;
+}
+
 KnightLyfeProcessor::KnightLyfeProcessor()
-    : AudioProcessor (BusesProperties().withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
+    : AudioProcessor (makeBuses()),
       parameters (*this, nullptr, "KnightLyfe", createParameters())
 {
     masterParam = parameters.getRawParameterValue ("master");
@@ -31,7 +43,15 @@ juce::AudioProcessorValueTreeState::ParameterLayout KnightLyfeProcessor::createP
 bool KnightLyfeProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
     const auto out = layouts.getMainOutputChannelSet();
-    return out == juce::AudioChannelSet::stereo() || out == juce::AudioChannelSet::mono();
+    if (out != juce::AudioChannelSet::stereo() && out != juce::AudioChannelSet::mono())
+        return false;
+    for (int i = 1; i < layouts.outputBuses.size(); ++i) // drum outputs: off or stereo
+    {
+        const auto& set = layouts.outputBuses.getReference (i);
+        if (! set.isDisabled() && set != juce::AudioChannelSet::stereo())
+            return false;
+    }
+    return true;
 }
 
 void KnightLyfeProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -49,13 +69,30 @@ void KnightLyfeProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 void KnightLyfeProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midi)
 {
     juce::ScopedNoDenormals noDenormals;
+    const int numSamples = buffer.getNumSamples();
+
+    // Main output (bus 0) and any drum outputs Logic has switched on.
+    auto main = getBusBuffer (buffer, false, 0);
+    std::array<juce::AudioBuffer<float>, knightlyfe::numDrumGroups> drumBuses;
+    knightlyfe::DrumOutputs drumOuts {};
+    bool anyDrumOut = false;
+    for (int g = 0; g < knightlyfe::numDrumGroups; ++g)
+    {
+        const int bus = g + 1;
+        if (bus < getBusCount (false) && getBus (false, bus)->isEnabled() && getBus (false, bus)->getNumberOfChannels() > 0)
+        {
+            drumBuses[(size_t) g] = getBusBuffer (buffer, false, bus);
+            drumOuts[(size_t) g] = &drumBuses[(size_t) g];
+            anyDrumOut = true;
+        }
+    }
 
     // The engine renders in stereo; fold to mono if the track is mono.
     auto& stereo = monoScratch;
-    juce::AudioBuffer<float>* target = &buffer;
-    if (buffer.getNumChannels() < 2)
+    juce::AudioBuffer<float>* target = &main;
+    if (main.getNumChannels() < 2)
     {
-        stereo.setSize (2, buffer.getNumSamples(), false, false, true); // no allocation within the prepared size
+        stereo.setSize (2, numSamples, false, false, true); // no allocation within the prepared size
         target = &stereo;
     }
 
@@ -78,7 +115,7 @@ void KnightLyfeProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
                 engine.setHostPosition (hp);
             }
 
-    engine.process (*target, midi);
+    engine.process (*target, midi, anyDrumOut ? &drumOuts : nullptr);
 
     const float room = reverbParam->load();
     juce::dsp::Reverb::Parameters p;
@@ -96,6 +133,9 @@ void KnightLyfeProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
     }
 
     masterGain.setTargetValue (masterParam->load());
+    for (auto* out : drumOuts) // drum outputs follow the volume too (Logic's own effects do the rest)
+        if (out != nullptr)
+            out->applyGain (masterGain.getCurrentValue());
     masterGain.applyGain (*target, target->getNumSamples());
 
     if (target->getNumChannels() >= 2)
@@ -105,11 +145,11 @@ void KnightLyfeProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
         limiter.process (juce::dsp::ProcessContextReplacing<float> (outStereo));
     }
 
-    if (target != &buffer)
+    if (target != &main)
     {
-        buffer.copyFrom (0, 0, stereo, 0, 0, buffer.getNumSamples());
-        buffer.addFrom (0, 0, stereo, 1, 0, buffer.getNumSamples());
-        buffer.applyGain (0.5f);
+        main.copyFrom (0, 0, stereo, 0, 0, numSamples);
+        main.addFrom (0, 0, stereo, 1, 0, numSamples);
+        main.applyGain (0.5f);
     }
 
     midi.clear(); // an instrument: nothing goes out
