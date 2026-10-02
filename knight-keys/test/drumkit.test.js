@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { LANES, laneOf, sameDrum, PIECES, KITS, resolveKit, kitNoteParams, outputFor } from '../js/drumkit.js';
+import { LANES, laneOf, sameDrum, PIECES, KITS, resolveKit, kitNoteParams, outputFor, DRUM_OUTPUTS, ROUTE_DEFAULT, ROUTE_MAIN, ROUTE_PRESETS, outputName, logicChannels, routeOutput, routeRows, routesFromHost } from '../js/drumkit.js';
 
 test('e-kit notes land in the right highway lane (Alesis Nitro Max and General MIDI)', () => {
   const lane = (n) => LANES[laneOf(n)]?.id;
@@ -45,4 +45,31 @@ test('kits resolve to per-note settings for the sound engines', () => {
 
 test('multi-output names match the plug-in groups', () => {
   assert.deepEqual([36, 40, 46, 58, 59, 56].map(outputFor), ['Kick', 'Snare', 'Hi-Hat', 'Toms', 'Cymbals', 'Percussion']);
+});
+
+test('per-drum routing for the plug-in\'s multi-output version', () => {
+  assert.equal(DRUM_OUTPUTS, 15);
+  // Same numbers as DrumSynth::outputFor in the plug-in.
+  assert.equal(routeOutput(36), 1, 'kick by default on the Kick output');
+  assert.equal(routeOutput(59), 5, 'ride on Cymbals');
+  assert.equal(routeOutput(59, 15), 15);
+  assert.equal(routeOutput(59, ROUTE_MAIN), ROUTE_MAIN);
+  assert.equal(routeOutput(36, 99), 1, 'an output that does not exist means the default');
+  assert.deepEqual([0, 1, 6, 7, 15].map(outputName), ['Main mix', 'Kick', 'Percussion', 'Drums 7', 'Drums 15'], 'the names Logic shows');
+  assert.deepEqual([0, 1, 15].map(logicChannels), ['1-2', '3-4', '31-32']);
+  // Rows cover every note of every piece.
+  const rows = routeRows({ kick: 9, snare: ROUTE_MAIN, ride: 'x' });
+  assert.equal(rows.length, PIECES.reduce((a, p) => a + p.notes.length, 0));
+  assert.deepEqual(rows.filter(([n]) => n === 35 || n === 36).map(([, r]) => r), [9, 9], 'both kick notes go together');
+  assert.deepEqual(rows.find(([n]) => n === 40), [40, ROUTE_MAIN]);
+  assert.deepEqual(rows.find(([n]) => n === 51), [51, ROUTE_DEFAULT], 'bad values fall back to the default');
+  // Presets: 15 drums, 15 outputs, one each.
+  assert.equal(PIECES.length, DRUM_OUTPUTS);
+  assert.deepEqual(new Set(Object.values(ROUTE_PRESETS.each)).size, 15);
+  assert.deepEqual(Object.keys(ROUTE_PRESETS.each).sort(), PIECES.map((p) => p.id).sort(), 'every drum gets an output');
+  for (const p of PIECES) if (ROUTE_PRESETS.each[p.id] <= 6) assert.equal(outputName(ROUTE_PRESETS.each[p.id]), outputName(routeOutput(p.notes[0])), `${p.name} sits on an output named for it`);
+  assert.ok(routeRows(ROUTE_PRESETS.group).every(([, r]) => r === ROUTE_DEFAULT));
+  assert.ok(routeRows(ROUTE_PRESETS.main).every(([, r]) => r === ROUTE_MAIN));
+  // Reading the plug-in's saved routing back.
+  assert.deepEqual(routesFromHost({ 36: 9, 35: 9, 49: 0 }), { kick: 9, crash: 0 });
 });

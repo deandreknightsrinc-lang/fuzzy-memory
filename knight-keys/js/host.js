@@ -119,6 +119,11 @@ export class HostSynth extends Synth {
     this.post({ kit: rows });
   }
 
+  // Per-drum routing for Logic's Multi-Output version: [[note, route], ...].
+  setRoutes(rows) {
+    this.post({ route: rows });
+  }
+
   async loadDrumSample(notes, bytes, name = 'sample') {
     const data = toBase64(new Uint8Array(bytes));
     const replies = notes.map((note) => waitForSampleReply(note));
@@ -216,10 +221,11 @@ export class HostTransport {
   }
 }
 
-/** Ask the plug-in which drum notes play your samples: fn({ "<note>": "<file name>" }). */
+/** Ask the plug-in which drum notes play your samples and where each drum is routed:
+    fn({ "<note>": "<file name>" }, { "<note>": route }). */
 export function queryHostKit(fn) {
   if (!juce) return;
-  juce.backend.addEventListener('kkKitState', (state) => fn(state?.samples || {}));
+  juce.backend.addEventListener('kkKitState', (state) => fn(state?.samples || {}, state?.routes || {}));
   juce.backend.emitEvent('kkKitQuery', {});
 }
 

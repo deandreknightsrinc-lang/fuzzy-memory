@@ -63,6 +63,58 @@ export function outputFor(note) {
   return 'Percussion';
 }
 
+// ---- Per-drum routing (the plug-in's Multi-Output version) ------------------------
+// Matches DrumSynth::setRoute / outputFor in the plug-in: a route is ROUTE_DEFAULT (the
+// drum's group output above), ROUTE_MAIN (the main mix) or a drum output 1-15.
+
+export const DRUM_OUTPUTS = 15;
+export const ROUTE_DEFAULT = -1;
+export const ROUTE_MAIN = 0;
+
+/** The name Logic shows for an output (0 = the main mix). */
+export function outputName(out) {
+  if (out === ROUTE_MAIN) return 'Main mix';
+  return out <= OUTPUTS.length ? OUTPUTS[out - 1] : `Drums ${out}`;
+}
+
+/** Logic's channel numbers for an output: the main mix is 1-2, drum output 1 is 3-4. */
+export const logicChannels = (out) => `${2 * out + 1}-${2 * out + 2}`;
+
+/** The output a note plays on with a route (like DrumSynth::outputFor). */
+export function routeOutput(note, route = ROUTE_DEFAULT) {
+  if (route === ROUTE_MAIN || (route >= 1 && route <= DRUM_OUTPUTS)) return route;
+  return OUTPUTS.indexOf(outputFor(note)) + 1;
+}
+
+/** Ready-made routings: by drum type (the default), every drum on its own output, all on the main mix. */
+export const ROUTE_PRESETS = {
+  group: {},
+  // Outputs 1-6 keep their names (Kick, Snare, Hi-Hat, Toms, Cymbals, Percussion); the rest go on 7-15.
+  each: Object.fromEntries(['kick', 'snare', 'hhc', 'tom1', 'crash', 'clap', 'stick', 'hhp', 'hho', 'tom2', 'tom3', 'ride', 'bell', 'tamb', 'cowbell'].map((id, i) => [id, i + 1])),
+  main: Object.fromEntries(PIECES.map((p) => [p.id, ROUTE_MAIN])),
+};
+
+/** { pieceId: route } -> rows for the plug-in: [[note, route], ...] for every note of every piece. */
+export function routeRows(routes = {}) {
+  const rows = [];
+  for (const p of PIECES) {
+    const r = routes[p.id];
+    const route = Number.isInteger(r) && (r === ROUTE_MAIN || (r >= 1 && r <= DRUM_OUTPUTS)) ? r : ROUTE_DEFAULT;
+    for (const n of p.notes) rows.push([n, route]);
+  }
+  return rows;
+}
+
+/** The plug-in's routing ({ "<note>": route }) -> { pieceId: route } (by each piece's first note). */
+export function routesFromHost(byNote = {}) {
+  const out = {};
+  for (const p of PIECES) {
+    const r = byNote[String(p.notes[0])];
+    if (Number.isInteger(r)) out[p.id] = r;
+  }
+  return out;
+}
+
 export const DEFAULT_PIECE = { tune: 0, decay: 1, level: 1 };
 
 /** Built-in kits: the synthesized drums, tuned and shaped differently. */

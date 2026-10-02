@@ -18,7 +18,7 @@ import { TUNINGS, STRING_NAMES, fretNote, chordShape, chordTarget, chartTimeline
 import { UNITS, COURSES, unitsFor, readNotes, grooveMidi, DrumJudge, addCourse, removeCourse, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from './lessons.js';
 import { PitchListener, SingJudge, RangeFinder, voiceType, freqToCents, midiToFreq, chromaMatches } from './pitch.js';
 import { GameSession, crownsFor, loadStage, saveStage, recordScore, courseState, scoreKey, PLAYER_COLORS } from './game.js';
-import { LANES, laneOf, sameDrum, outputFor, OUTPUTS, PIECES, KITS, kitById, resolveKit, kitNoteParams, loadSavedSamples, saveSample, deleteSample } from './drumkit.js';
+import { LANES, laneOf, sameDrum, PIECES, KITS, DRUM_OUTPUTS, ROUTE_DEFAULT, ROUTE_MAIN, ROUTE_PRESETS, outputName, logicChannels, routeOutput, routeRows, routesFromHost, kitById, resolveKit, kitNoteParams, loadSavedSamples, saveSample, deleteSample } from './drumkit.js';
 import { detectChord, noteName, pcName, solfege, keyName } from './theory.js';
 import { createDemoMidi } from './demo.js';
 import { GROOVES, GroovePlayer } from './grooves.js';
@@ -93,6 +93,7 @@ const DEFAULTS = {
   groove: { id: GROOVES[0].id, bpm: GROOVES[0].bpm, intensity: 'full', autoFill: 0, volume: 1, lock: true },
   followHost: true, // plug-in: play songs and grooves in time with Logic's transport
   kit: { id: 'studio', custom: {} }, // Kit Rack: built-in kit + your tweaks per drum
+  drumRoutes: null, // plug-in multi-output: { pieceId: output } (null = never changed: by drum type)
   drumView: 'grid', // drums panel: 'grid' (groove) or 'highway' (falling notes)
 };
 
@@ -2041,6 +2042,58 @@ function applyKit() {
   synth.setKit(kitNoteParams(resolveKit(settings.kit.id, settings.kit.custom)));
 }
 
+// Per-drum routing for Logic's Multi-Output version (the plug-in also keeps it itself).
+function applyRoutes() {
+  if (settings.drumRoutes) synth.setRoutes(routeRows(settings.drumRoutes));
+}
+
+function setDrumRoutes(routes) {
+  settings.drumRoutes = { ...routes };
+  applyRoutes();
+  saveKitSoon();
+  renderKitRoutes();
+}
+
+function routeOptions(note) {
+  const def = routeOutput(note, ROUTE_DEFAULT);
+  const opts = [[ROUTE_DEFAULT, `By drum type: ${outputName(def)} (${logicChannels(def)})`], [ROUTE_MAIN, `Main mix (1-2)`]];
+  for (let o = 1; o <= DRUM_OUTPUTS; o++) opts.push([o, `${outputName(o)} (${logicChannels(o)})`]);
+  return opts;
+}
+
+function renderKitRoutes() {
+  const box = $('kitRoutes');
+  if (!box) return;
+  const routes = settings.drumRoutes || {};
+  box.innerHTML = '';
+  for (const p of PIECES) {
+    const sel = document.createElement('select');
+    sel.title = `Logic output for the ${p.name.toLowerCase()}`;
+    for (const [v, label] of routeOptions(p.notes[0])) sel.append(new Option(label, v));
+    sel.value = String(routes[p.id] ?? ROUTE_DEFAULT);
+    sel.onchange = () => {
+      const next = { ...(settings.drumRoutes || {}) };
+      const v = Number(sel.value);
+      if (v === ROUTE_DEFAULT) delete next[p.id];
+      else next[p.id] = v;
+      setDrumRoutes(next);
+    };
+    const name = Object.assign(document.createElement('button'), { className: 'kit-route-name', type: 'button', textContent: p.name, title: 'Select and hear this drum' });
+    name.onclick = () => {
+      kitPiece = p.id;
+      renderKitRack();
+      auditionPiece(p.id);
+    };
+    const row = document.createElement('div');
+    row.className = `kit-route${p.id === kitPiece ? ' sel' : ''}`;
+    row.append(name, sel);
+    box.append(row);
+  }
+  const used = new Set(PIECES.map((p) => routeOutput(p.notes[0], routes[p.id])).filter((o) => o > 0));
+  const top = Math.max(0, ...used);
+  setText($('kitRouteSum'), used.size ? `In Logic, click + on the channel strip until you reach output ${top} (channels ${logicChannels(top)}).` : 'Every drum plays on the main mix.');
+}
+
 function saveKitSoon() {
   clearTimeout(kitSaveTimer);
   kitSaveTimer = setTimeout(saveSettings, 300);
@@ -2123,8 +2176,8 @@ function renderKitRack() {
   const piece = PIECES.find((p) => p.id === kitPiece);
   const v = resolved[kitPiece];
   setText($('kitPieceName'), piece.name);
-  const out = outputFor(piece.notes[0]);
-  setText($('kitPieceNotes'), `Notes ${piece.notes.join(', ')}${IN_HOST ? ` · Logic multi-output: ${out} (outputs ${3 + 2 * OUTPUTS.indexOf(out)}-${4 + 2 * OUTPUTS.indexOf(out)})` : ''}`);
+  const out = routeOutput(piece.notes[0], settings.drumRoutes?.[piece.id]);
+  setText($('kitPieceNotes'), `Notes ${piece.notes.join(', ')} · Logic output: ${outputName(out)} (${logicChannels(out)})`);
   setKnob($('knobTune'), v.tune);
   setKnob($('knobDecay'), v.decay);
   setKnob($('knobLevel'), v.level);
@@ -2136,6 +2189,7 @@ function renderKitRack() {
   });
   const n = Object.keys(kitSampleNames).length;
   setText($('kitMyCount'), n ? `${n} of your samples` : '');
+  renderKitRoutes();
 }
 
 async function loadKitSample(pieceId, file) {
@@ -2261,6 +2315,8 @@ function initKitRack() {
   }
 
   applyKit();
+  applyRoutes();
+  for (const b of document.querySelectorAll('[data-routes]')) b.onclick = () => setDrumRoutes(ROUTE_PRESETS[b.dataset.routes]);
   loadSavedSamples().then(async (saved) => {
     for (const [id, { name, bytes }] of Object.entries(saved)) {
       const piece = PIECES.find((p) => p.id === id);
@@ -2269,11 +2325,13 @@ function initKitRack() {
     if (dlg.open) renderKitRack();
     // The plug-in also keeps your samples itself (so they play with this window closed):
     // show those even if this browser storage was cleared.
-    queryHostKit((samples) => {
+    queryHostKit((samples, routes) => {
       for (const p of PIECES) {
         const name = samples[p.notes[0]];
         if (name && !kitSampleNames[p.id]) kitSampleNames[p.id] = name;
       }
+      // Routing saved in the plug-in wins when this window has none of its own.
+      if (!settings.drumRoutes && Object.keys(routes).length) settings.drumRoutes = routesFromHost(routes);
       if (dlg.open) renderKitRack();
     });
   });

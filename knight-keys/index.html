@@ -480,6 +480,19 @@ Every evening I will sing"></textarea>
           </div>
         </div>
         <div id="kitKeys" class="kit-keys" title="The notes each drum answers to (your e-kit and pad controller send these)"></div>
+        <div class="kit-outputs">
+          <div class="kit-out-head">
+            <b>Logic outputs</b>
+            <span class="small">For the plug-in's Multi-Output version in Logic: send each drum to its own mixer channel.</span>
+            <span class="kit-out-presets">
+              <button type="button" class="mini" data-routes="group" title="Kick, snare, hi-hat, toms, cymbals and percussion each on one output">By drum type</button>
+              <button type="button" class="mini" data-routes="each" title="All 15 drums on outputs 1-15">Each drum on its own</button>
+              <button type="button" class="mini" data-routes="main" title="Everything on the main mix">All on main</button>
+            </span>
+          </div>
+          <div id="kitRoutes" class="kit-routes"></div>
+          <div id="kitRouteSum" class="small kit-route-sum"></div>
+        </div>
       </section>
     </div>
   </dialog>
