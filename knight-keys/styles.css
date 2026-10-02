@@ -713,3 +713,50 @@ dialog.lyrics-window { width: min(860px, calc(100vw - 24px)); left: max(12px, ca
 .lyrics-more pre { white-space: pre-wrap; font-family: inherit; font-size: 16px; line-height: 1.45; margin: 8px 0 14px; }
 .band-lyric { text-align: center; font-size: 22px; font-weight: 700; min-height: 1.4em; margin: -2px 0 8px; }
 .band-lyric .sung { color: #ffd60a; }
+
+/* Teachers, video and quiz steps */
+.lp-course-info { font-size: 13px; color: var(--muted); margin: -2px 0 8px; display: flex; gap: 8px; align-items: center; }
+.lp-teacher { display: flex; align-items: center; gap: 10px; margin: 10px 0 0; }
+.t-avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-size: 22px; flex: none; color: #111; font-weight: 800; }
+.lp-teacher .t-name { font-weight: 700; }
+.lp-teacher .t-role { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+.lp-lesson.has-teacher .lp-text { position: relative; background: #1d2130; border-radius: 12px; padding: 10px 14px; margin-top: 8px; }
+.lp-video { margin: 10px 0; }
+.lp-video video, .lp-video iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 10px; background: #000; }
+.lp-video .lp-script { white-space: pre-wrap; font-size: 15px; background: #1d2130; border-radius: 10px; padding: 12px; max-height: 260px; overflow: auto; }
+.lp-quiz { display: grid; gap: 6px; margin: 8px 0; }
+.lp-quiz button { text-align: left; font-size: 16px; padding: 10px 12px; }
+.lp-quiz button.right { border-color: #73d13d; background: rgba(115, 209, 61, .15); }
+.lp-quiz button.wrong { border-color: #ff7875; background: rgba(255, 120, 117, .12); }
+
+/* Course Studio */
+dialog.studio-window { width: min(1180px, calc(100vw - 24px)); left: max(12px, calc(50% - 590px)); top: 50px; max-height: calc(100vh - 60px); }
+.studio-window .tool-head { display: flex; align-items: center; gap: 10px; }
+.studio-window .tool-head h2 { margin: 0; }
+.studio-window .tool-head .small { flex: 1; }
+.studio { display: grid; grid-template-columns: 250px 1fr; gap: 14px; position: relative; }
+.studio h4 { margin: 10px 0 4px; font-size: 13px; }
+.cs-courses { display: grid; gap: 4px; }
+.cs-courses button { text-align: left; }
+.cs-courses button.on { border-color: var(--accent); background: rgba(79, 140, 255, .15); }
+.cs-teachers { display: grid; gap: 4px; }
+.cs-teacher { display: flex; gap: 8px; align-items: center; font-size: 13px; cursor: pointer; padding: 3px; border-radius: 8px; }
+.cs-teacher:hover { background: #1d2130; }
+.cs-teacher .t-avatar { width: 30px; height: 30px; font-size: 15px; }
+.studio-main textarea { width: 100%; }
+.studio-cols { display: grid; grid-template-columns: 260px 1fr; gap: 12px; margin-top: 8px; }
+.cs-tree { display: grid; gap: 2px; max-height: 380px; overflow: auto; }
+.cs-tree .unit { font-weight: 700; margin-top: 6px; display: flex; gap: 4px; align-items: center; }
+.cs-tree .unit input { flex: 1; font-weight: 700; }
+.cs-tree button.lesson { text-align: left; margin-left: 14px; }
+.cs-tree button.lesson.on { border-color: var(--accent); background: rgba(79, 140, 255, .15); }
+.cs-steps { display: grid; gap: 6px; max-height: 420px; overflow: auto; margin: 6px 0; }
+.cs-step { border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; background: #1b1e26; display: grid; gap: 4px; }
+.cs-step .head { display: flex; gap: 6px; align-items: center; font-weight: 600; font-size: 13px; }
+.cs-step .head span { flex: 1; }
+.cs-step input, .cs-step textarea, .cs-step select { width: 100%; }
+.cs-status.err { color: #ff7875; }
+.cs-status.ok { color: #95de64; }
+.cs-script { position: absolute; inset: 0; background: var(--panel, #15171d); z-index: 2; display: flex; flex-direction: column; padding: 4px; }
+.cs-script pre { flex: 1; overflow: auto; white-space: pre-wrap; background: #101218; border-radius: 8px; padding: 12px; font-size: 14px; line-height: 1.45; }
+@media (max-width: 900px) { .studio, .studio-cols { grid-template-columns: 1fr; } }

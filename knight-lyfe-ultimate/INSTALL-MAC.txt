@@ -209,3 +209,12 @@ Unzip the files first (double-click each .zip).
    songs, type the words in the Song Builder (Songs > New song). Karaoke
    MIDI files (.kar) work too. The words also appear in the Band Room,
    on the printed score, and in MIDI files you save.
+
+19. COURSE STUDIO AND AI TEACHERS
+   Lessons > "Course Studio": make a course for any subject (lessons with
+   talks, videos, quizzes and music exercises), taught by a Knight Lyfe
+   character. "Video script" writes what the teacher says for each lesson;
+   make the video in HeyGen, Synthesia or another AI video tool, then paste
+   its link (or pick the file) to add it to the lesson. Save puts the
+   course in Lessons; "Course pack" saves it as one file to share.
+   In the Band Room, each missing position shows the character covering it.

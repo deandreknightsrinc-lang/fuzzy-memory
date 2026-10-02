@@ -840,6 +840,32 @@ for (const u of UNITS) u.course ??= 'piano';
 export const ALL_LESSONS = UNITS.flatMap((u) => u.lessons.map((l) => ({ ...l, unit: u.id, course: u.course })));
 export const unitsFor = (course) => UNITS.filter((u) => u.course === course);
 
+/**
+ * Add a course pack (your own courses) to the lessons: its units and lessons join
+ * the built-in ones under their own tab. Lesson ids get the course id in front so
+ * they never clash. Returns the course id.
+ */
+export function addCourse(pack) {
+  removeCourse(pack.id);
+  COURSES.push({ id: pack.id, name: pack.title, icon: pack.icon || '📘', custom: true, teacher: pack.teacher, by: pack.by || '' });
+  for (const u of pack.units) {
+    const unit = { id: `${pack.id}/${u.id}`, course: pack.id, title: u.title, icon: u.icon || '⭐', lessons: u.lessons.map((l) => ({ ...l, id: `${pack.id}/${l.id}` })) };
+    UNITS.push(unit);
+    for (const l of unit.lessons) ALL_LESSONS.push({ ...l, unit: unit.id, course: pack.id });
+  }
+  return pack.id;
+}
+
+/** Take a course pack's lessons out again. */
+export function removeCourse(id) {
+  const drop = (arr, keep) => {
+    for (let i = arr.length - 1; i >= 0; i--) if (!keep(arr[i])) arr.splice(i, 1);
+  };
+  drop(COURSES, (c) => !(c.custom && c.id === id));
+  drop(UNITS, (u) => u.course !== id || !u.id.includes('/'));
+  drop(ALL_LESSONS, (l) => l.course !== id || !l.id.includes('/'));
+}
+
 /** Stars for an exercise step from the number of wrong notes. */
 export const starsForMistakes = (mistakes, length) => (mistakes <= Math.max(0, Math.floor(length / 8)) ? 3 : mistakes <= Math.max(2, Math.floor(length / 3)) ? 2 : 1);
 /** Stars for a song step from Learn-mode accuracy (0-100). */

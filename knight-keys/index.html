@@ -490,11 +490,13 @@ Every evening I will sing"></textarea>
       <h2 id="lessonTitle">🎓 Lessons</h2>
       <span id="lpStreak" class="lp-streak"></span>
       <select id="lpPlayer" title="Who's learning?"></select>
+      <button id="lpStudio" class="mini" title="Course Studio: make your own courses (any subject) with AI-teacher videos, quizzes and lessons">🛠 Course Studio</button>
       <button id="lpMic" class="mini" title="Sing, or play any piano or keyboard without USB: Knight Keys listens through the microphone (single notes)">🎤 Microphone</button>
       <button class="mini" data-close aria-label="Close">✕</button>
     </header>
     <div class="tool-body">
       <div id="lpCourses" class="lp-courses"></div>
+      <div id="lpCourseInfo" class="lp-course-info"></div>
       <section id="lpMap" class="lp-map"></section>
       <section id="lpLesson" class="lp-lesson" hidden>
         <div class="lp-top">
@@ -502,7 +504,10 @@ Every evening I will sing"></textarea>
           <span id="lpTitle" class="lp-title"></span>
           <span id="lpDots" class="lp-dots"></span>
         </div>
+        <div id="lpTeacher" class="lp-teacher" hidden></div>
+        <div id="lpVideo" class="lp-video" hidden></div>
         <p id="lpText" class="lp-text"></p>
+        <div id="lpQuiz" class="lp-quiz" hidden></div>
         <canvas id="lpStaff" class="lp-staff" width="520" height="190" hidden></canvas>
         <canvas id="lpFret" class="lp-fret" width="560" height="190" hidden></canvas>
         <div id="lpTargets" class="lp-targets"></div>
@@ -529,6 +534,75 @@ Every evening I will sing"></textarea>
           <button id="lpDoneAgain">↺ Again</button>
           <button id="lpDoneMap">All lessons</button>
         </div>
+      </section>
+    </div>
+  </dialog>
+
+  <dialog id="studioDlg" class="tool-window studio-window" aria-labelledby="studioTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="studioTitle">🛠 Course Studio</h2>
+      <span class="small">Make a course for any subject: music, Bible study, any class</span>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="tool-body studio">
+      <aside class="studio-list">
+        <div class="row wrap">
+          <button id="csNew" class="primary">+ New course</button>
+          <button id="csImport" title="Open a course pack (.kcourse) someone shared">📂 Import</button>
+          <input id="csFile" type="file" hidden accept=".kcourse,.json,application/json" />
+        </div>
+        <h4>Your courses</h4>
+        <div id="csCourses" class="cs-courses"></div>
+        <h4>Start from a Knight Lyfe course</h4>
+        <div id="csTemplates" class="cs-courses"></div>
+        <h4>The teachers</h4>
+        <div id="csTeachers" class="cs-teachers"></div>
+      </aside>
+      <section id="csMain" class="studio-main" hidden>
+        <div class="row wrap">
+          <label>Title <input id="csTitle" type="text" maxlength="80" /></label>
+          <label>Icon <input id="csIcon" type="text" maxlength="4" size="3" /></label>
+          <label>Subject <input id="csSubject" type="text" maxlength="40" placeholder="Music, Bible, Math..." /></label>
+          <label>By <input id="csBy" type="text" maxlength="60" /></label>
+        </div>
+        <div class="row wrap">
+          <label>Teacher <select id="csTeacher"></select></label>
+          <span id="csTeacherRole" class="small"></span>
+        </div>
+        <textarea id="csDesc" rows="2" placeholder="What students will learn in this course"></textarea>
+        <div class="studio-cols">
+          <div class="cs-tree-col">
+            <h4>Units and lessons</h4>
+            <div id="csTree" class="cs-tree"></div>
+            <div class="row wrap"><button id="csAddUnit" class="mini">+ Unit</button><button id="csAddLesson" class="mini">+ Lesson</button></div>
+          </div>
+          <div class="cs-lesson-col">
+            <div class="row"><label class="grow">Lesson <input id="csLessonName" type="text" maxlength="80" /></label><button id="csDelLesson" class="mini" title="Delete this lesson">🗑</button></div>
+            <div id="csSteps" class="cs-steps"></div>
+            <div class="row wrap"><select id="csStepType"></select><button id="csAddStep">+ Add step</button></div>
+            <h4>🎬 Teacher video for this lesson</h4>
+            <div class="row wrap">
+              <input id="csVideoUrl" type="text" placeholder="Link: YouTube, Vimeo or an .mp4" class="grow" />
+              <button id="csVideoFile" title="Use a video file from this computer">📁 File</button>
+              <input id="csVideoPick" type="file" hidden accept="video/*" />
+            </div>
+            <div class="row wrap"><button id="csScript">📝 Video script for this lesson</button><span id="csVideoNote" class="small"></span></div>
+            <details><summary>Edit this lesson as JSON (advanced)</summary><textarea id="csJson" rows="8" spellcheck="false"></textarea><button id="csJsonApply" class="mini">Apply</button></details>
+          </div>
+        </div>
+        <div id="csStatus" class="small cs-status"></div>
+        <div class="row wrap">
+          <button id="csSave" class="primary" title="Save and add it to the Lessons window">💾 Save to Lessons</button>
+          <button id="csTry">▶ Try the lesson</button>
+          <button id="csExport" title="One file with the whole course, to share or run on another copy">⬇ Course pack (.kcourse)</button>
+          <button id="csScripts" title="Every lesson's video script, ready for HeyGen, Synthesia, D-ID...">⬇ All video scripts</button>
+          <button id="csCsv" title="One row per lesson, for bulk video tools">⬇ Scripts CSV</button>
+          <button id="csDelete" class="danger">🗑 Delete course</button>
+        </div>
+      </section>
+      <section id="csScriptBox" class="cs-script" hidden>
+        <div class="row"><b id="csScriptTitle" class="grow"></b><button id="csScriptCopy" class="mini">📋 Copy</button><button id="csScriptClose" class="mini">✕</button></div>
+        <pre id="csScriptText"></pre>
       </section>
     </div>
   </dialog>

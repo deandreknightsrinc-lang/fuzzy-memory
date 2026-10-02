@@ -3,19 +3,22 @@ import { parseMidi, buildSong, writeMidi, splitHands } from './midi-file.js';
 import { makeChoirParts, choirMidi, PARTS as CHOIR_PARTS } from './choir.js';
 import { songToScore, scoreToMusicXML, musicXmlToMidi, scoreFileText } from './notation.js';
 import { lyricLines, lineAt } from './lyrics.js';
+import { TEACHERS, COURSE_TEACHERS, teacherById, characterBrief, characterFor } from './teachers.js';
+import { BUNDLED_PACKS } from './course-packs.js';
+import { STEP_TYPES, STEP_LABELS, newCourse, courseToPack, validateCourse, videoSource, lessonScript, scriptsCsv, loadCourses, saveCourses, loadVideos, saveVideos, saveVideoFile, loadVideoFile } from './courses.js';
 import { ROLES as BAND_ROLES, arrangeBand, bandMidi, chordsFromChart, songInBeats, transposeSymbol } from './band.js';
 import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_CHANNEL } from './synth.js';
 import { Player } from './player.js';
 import { KeyboardView, drawStaff, drawControllers, drawGroove, drawPianoRoll, drawDrumHighway, drawFretboard } from './render.js';
 import { TUNINGS, STRING_NAMES, fretNote, chordShape, chordTarget, chartTimeline, ChartJudge, rootPosition } from './fretted.js';
-import { UNITS, COURSES, unitsFor, readNotes, grooveMidi, DrumJudge, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from './lessons.js';
+import { UNITS, COURSES, unitsFor, readNotes, grooveMidi, DrumJudge, addCourse, removeCourse, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from './lessons.js';
 import { PitchListener, SingJudge, RangeFinder, voiceType, freqToCents, midiToFreq, chromaMatches } from './pitch.js';
 import { GameSession, crownsFor, loadStage, saveStage, recordScore, courseState, scoreKey, PLAYER_COLORS } from './game.js';
 import { LANES, laneOf, sameDrum, outputFor, OUTPUTS, PIECES, KITS, kitById, resolveKit, kitNoteParams, loadSavedSamples, saveSample, deleteSample } from './drumkit.js';
 import { detectChord, noteName, pcName, solfege, keyName } from './theory.js';
 import { createDemoMidi } from './demo.js';
 import { GROOVES, GroovePlayer } from './grooves.js';
-import { SONGS, LEVELS, LEVEL_NAMES, DRUM_STYLE_NAMES, songToMidi, chartToChords, validateSong, loadMySongs, saveMySongs } from './songs.js';
+import { SONGS, LEVELS, LEVEL_NAMES, DRUM_STYLE_NAMES, parsePitch, songToMidi, chartToChords, validateSong, loadMySongs, saveMySongs } from './songs.js';
 import { HostSynth, HostTransport, IN_HOST, onHostMidi, onHostTransport, hostSave, queryHostKit } from './host.js';
 
 const $ = (id) => document.getElementById(id);
@@ -2310,6 +2313,11 @@ function renderLessonMap() {
     };
     tabs.append(b);
   }
+  const info = $('lpCourseInfo');
+  info.innerHTML = '';
+  const course = COURSES.find((c) => c.id === lessonCourse);
+  const t = teacherForCourse(lessonCourse);
+  info.append(teacherAvatar(t, 26), Object.assign(document.createElement('span'), { textContent: `Taught by ${t.name}${course?.by ? ` · by ${course.by}` : ''}` }));
   const map = $('lpMap');
   map.innerHTML = '';
   const state0 = pathState(lessonProgress(), lessonCourse);
@@ -2341,7 +2349,11 @@ function showLessonView(view) {
 
 function startLesson(lesson) {
   stopLessonSong();
-  Object.assign(lessonRun, { active: true, lesson, stars: [], stepIdx: 0 });
+  const base = lesson.base || lesson;
+  const video = courseVideos[base.id];
+  const run = video && base.steps[0]?.type !== 'video' ? { ...base, base, steps: [{ type: 'video', src: video.src, text: `${teacherForCourse(courseOfLesson(base)).name} teaches this lesson. Watch, then press Next.` }, ...base.steps] } : base;
+  Object.assign(lessonRun, { active: true, lesson: run, stars: [], stepIdx: 0 });
+  lessonRun.teacher = teacherForCourse(courseOfLesson(base));
   setText($('lpTitle'), lesson.title);
   showLessonView('lesson');
   showLessonStep(0);
@@ -2374,7 +2386,7 @@ function renderLessonTargets() {
     if (sub) c.append(Object.assign(document.createElement('small'), { textContent: sub }));
     box.append(c);
   };
-  if (step.type === 'notes') step.notes.forEach((n, i) => chip(noteLetter(n), `finger ${step.fingers[i]}`, i < lessonRun.pos ? 'done' : i === lessonRun.pos ? 'now' : ''));
+  if (step.type === 'notes') step.notes.forEach((n, i) => chip(noteLetter(n), step.fingers ? `finger ${step.fingers[i]}` : '', i < lessonRun.pos ? 'done' : i === lessonRun.pos ? 'now' : ''));
   else if (step.type === 'chords') step.chords.forEach((c, i) => chip(step.names[i], c.map(noteLetter).join(' '), i < lessonRun.pos ? 'done' : i === lessonRun.pos ? 'now' : ''));
   else if (step.type === 'info' && step.keys) step.keys.forEach((n) => chip(noteLetter(n), '', 'now'));
   else if (step.type === 'fret') step.notes.forEach(([str, fret], i) => chip(noteLetter(fretNote(step.instrument, str, fret)), `${STRING_NAMES[step.instrument][str]} ${fret ? `fret ${fret}` : 'open'}`, i < lessonRun.pos ? 'done' : i === lessonRun.pos && !lessonRun.done ? 'now' : ''));
@@ -2407,8 +2419,8 @@ function setLessonTargets() {
 function showLessonStep(i) {
   stopLessonSong();
   const step = lessonRun.lesson.steps[i];
-  Object.assign(lessonRun, { stepIdx: i, step, pos: 0, mistakes: 0, done: step.type === 'info', hint: false, missesHere: 0, readList: step.type === 'read' ? readNotes(step) : [] });
-  setText($('lpText'), step.text + (step.type === 'chords' && micListener?.active ? ' (Chords need a USB keyboard or the on-screen keys: the microphone hears one note at a time.)' : ''));
+  Object.assign(lessonRun, { stepIdx: i, step, pos: 0, mistakes: 0, quizTries: 0, done: step.type === 'info', hint: false, missesHere: 0, readList: step.type === 'read' ? readNotes(step) : [] });
+  setText($('lpText'), (step.type === 'quiz' ? step.question : step.text || '') + (step.type === 'chords' && micListener?.active ? ' (Chords need a USB keyboard or the on-screen keys: the microphone hears one note at a time.)' : ''));
   micListener?.setRange(step.instrument === 'bass' ? 'bass' : 'normal');
   if (step.type === 'fret' || step.type === 'strum' || step.type === 'chart') lessonFeedback(micSupported() ? (step.type === 'chart' ? 'Count-in: one bar of clicks, then play!' : 'Your turn! (Turn on 🎤 so it can hear your guitar.)') : 'Play it on a MIDI keyboard or the keys below (the microphone works on the website).');
   else if (step.type === 'hits' || step.type === 'groove') lessonFeedback(step.type === 'hits' ? 'Your turn: hit the drum that\'s lit up.' : step.mode === 'time' ? 'Count-in: one bar of clicks, then play!' : 'The beat waits for each hit. Follow the highway.');
@@ -2419,6 +2431,9 @@ function showLessonStep(i) {
   renderLessonTargets();
   $('lpNext').disabled = !lessonRun.done;
   $('lpNext').textContent = i === lessonRun.lesson.steps.length - 1 ? 'Finish ✓' : 'Next ▶';
+  renderTeacherCard();
+  renderVideoStep(step);
+  renderQuizStep(step);
   if (step.type === 'sing' || step.type === 'range' || step.voice) startSinging(step);
   if (step.type === 'groove') startGroove(step);
   if (step.type === 'strum') startStrum(step);
@@ -2564,11 +2579,11 @@ function finishLesson() {
   $('lpDoneStars').innerHTML = starsHtml(stars);
   const streak = stage.practice[stage.current].streak;
   setText($('lpDoneNote'), `${first ? 'The next lesson is open. ' : ''}🔥 ${streak}-day practice streak${streak > 1 ? ': keep it going tomorrow!' : '. Come back tomorrow to make it 2!'}`);
-  const all = unitsFor(UNITS.find((u) => u.lessons.includes(lessonRun.lesson))?.course || 'piano').flatMap((u) => u.lessons);
+  const all = unitsFor(courseOfLesson(lessonRun.lesson)).flatMap((u) => u.lessons);
   const next = all[all.findIndex((l) => l.id === lessonRun.lesson.id) + 1];
   $('lpDoneNext').hidden = !next;
   $('lpDoneNext').onclick = () => startLesson(next);
-  $('lpDoneAgain').onclick = () => startLesson(lessonRun.lesson);
+  $('lpDoneAgain').onclick = () => startLesson(lessonRun.lesson.base || lessonRun.lesson);
   [60, 64, 67, 72].forEach((n, i) => {
     synth.noteOn(LIVE_CHANNEL, n, 85, synth.now + 0.1 * i + 0.05);
     synth.noteOff(LIVE_CHANNEL, n, synth.now + 1.2);
@@ -3015,6 +3030,497 @@ function initLessons() {
   $('lpDoneMap').onclick = () => renderLessonMap();
 }
 
+// ---- Teachers, video and quiz steps (course template) ----------------------------
+
+let courseVideos = loadVideos();
+const courseOfLesson = (lesson) => UNITS.find((u) => u.lessons.some((l) => l.id === lesson.id))?.course || 'piano';
+function teacherForCourse(courseId) {
+  const c = COURSES.find((x) => x.id === courseId);
+  const t = c?.teacher ?? COURSE_TEACHERS[courseId];
+  return typeof t === 'object' && t ? { ...TEACHERS[0], ...t } : teacherById(t);
+}
+function teacherAvatar(t, size = 44) {
+  const a = Object.assign(document.createElement('span'), { className: 't-avatar', textContent: t.avatar ? '' : t.emoji || t.name[0] });
+  a.style.background = t.color || '#4f8cff';
+  a.style.width = a.style.height = `${size}px`;
+  a.style.fontSize = `${Math.round(size / 2)}px`;
+  if (t.avatar) Object.assign(a.style, { backgroundImage: `url("${t.avatar}")`, backgroundSize: 'cover' });
+  a.title = t.name;
+  return a;
+}
+
+function renderTeacherCard() {
+  const box = $('lpTeacher');
+  const t = lessonRun.teacher;
+  box.hidden = !t;
+  $('lpLesson').classList.toggle('has-teacher', !!t);
+  if (!t) return;
+  box.innerHTML = '';
+  const name = Object.assign(document.createElement('span'), { className: 't-name', textContent: t.name });
+  name.append(Object.assign(document.createElement('span'), { className: 't-role', textContent: t.role }));
+  box.append(teacherAvatar(t), name);
+}
+
+let videoUrl = null;
+async function renderVideoStep(step) {
+  const box = $('lpVideo');
+  box.innerHTML = '';
+  if (videoUrl) URL.revokeObjectURL(videoUrl);
+  videoUrl = null;
+  box.hidden = step.type !== 'video';
+  if (step.type !== 'video') return;
+  const done = () => {
+    if (lessonRun.step !== step || lessonRun.done) return;
+    lessonRun.done = true;
+    lessonRun.stars[lessonRun.stepIdx] = 0; // watching doesn't change the stars
+    $('lpNext').disabled = false;
+    lessonFeedback('✓ Watched. Press Next when you\'re ready.', 'good');
+  };
+  let src = step.src;
+  if (src?.startsWith('idb:')) {
+    const blob = await loadVideoFile(src.slice(4));
+    src = blob ? (videoUrl = URL.createObjectURL(blob)) : null;
+  }
+  const v = videoSource(src);
+  if (!v) {
+    // No video made yet: the teacher's script reads along instead, so the course works today.
+    const pre = Object.assign(document.createElement('div'), { className: 'lp-script', textContent: step.script || step.text || '' });
+    box.append(pre);
+    done();
+    return;
+  }
+  if (v.kind === 'file') {
+    const el = Object.assign(document.createElement('video'), { src: v.embed, controls: true, playsInline: true });
+    el.addEventListener('ended', done);
+    el.addEventListener('timeupdate', () => el.duration && el.currentTime / el.duration >= 0.9 && done());
+    el.addEventListener('error', () => {
+      lessonFeedback('This video couldn\'t play here. Check the link in the Course Studio.', 'bad');
+      done();
+    });
+    box.append(el);
+  } else {
+    const frame = Object.assign(document.createElement('iframe'), { src: v.embed, allow: 'autoplay; fullscreen; picture-in-picture', allowFullscreen: true });
+    const watched = Object.assign(document.createElement('button'), { textContent: '✓ I watched it', className: 'mini' });
+    watched.onclick = done;
+    box.append(frame, watched);
+  }
+  lessonFeedback('Watch the video, then press Next.');
+}
+
+function renderQuizStep(step) {
+  const box = $('lpQuiz');
+  box.innerHTML = '';
+  box.hidden = step.type !== 'quiz';
+  if (step.type !== 'quiz') return;
+  lessonFeedback('Pick an answer.');
+  step.choices.forEach((c, k) => {
+    const b = Object.assign(document.createElement('button'), { textContent: c });
+    b.onclick = () => {
+      if (lessonRun.done) return;
+      lessonRun.quizTries++;
+      if (k === step.answer) {
+        b.classList.add('right');
+        completeLessonStep(lessonRun.quizTries === 1 ? 3 : lessonRun.quizTries === 2 ? 2 : 1);
+        lessonFeedback(`✓ Right! ${step.explain || ''}`, 'good');
+      } else {
+        b.classList.add('wrong');
+        lessonFeedback(`Not quite. ${step.hint || 'Try again.'}`, 'bad');
+      }
+    };
+    box.append(b);
+  });
+}
+
+// ---- Course Studio ---------------------------------------------------------------
+//
+// Make courses for any subject with the same engine: units, lessons and steps
+// (talks, videos, quizzes, music exercises), an AI teacher, and a video script
+// for every lesson. Courses save as portable packs (.kcourse).
+
+const studio = { list: loadCourses(), pack: null, unit: 0, lesson: 0 };
+// Courses that come with the app (on the same template), then your own.
+for (const p of BUNDLED_PACKS) {
+  addCourse(p);
+  COURSES.find((c) => c.id === p.id).bundled = true;
+}
+for (const p of studio.list) addCourse(p);
+const songTitle = (id) => SONGS.find((x) => x.id === id)?.title || '';
+
+function studioLesson() {
+  return studio.pack?.units[studio.unit]?.lessons[studio.lesson] || null;
+}
+function videoKey(lesson) {
+  return studio.pack.builtin ? lesson.id : `${studio.pack.id}/${lesson.id}`;
+}
+
+function renderStudioLists() {
+  const mine = $('csCourses');
+  mine.innerHTML = '';
+  if (!studio.list.length) mine.append(Object.assign(document.createElement('p'), { className: 'small', textContent: 'None yet. Make one, or copy a Knight Lyfe course below.' }));
+  for (const p of studio.list) {
+    const b = Object.assign(document.createElement('button'), { textContent: `${p.icon || '📘'} ${p.title}`, className: studio.pack?.id === p.id ? 'on' : '' });
+    b.onclick = () => openStudioPack(JSON.parse(JSON.stringify(p)));
+    mine.append(b);
+  }
+  const tpl = $('csTemplates');
+  tpl.innerHTML = '';
+  for (const c of COURSES.filter((x) => !x.custom || x.bundled)) {
+    const b = Object.assign(document.createElement('button'), { textContent: `${c.icon} ${c.name}`, title: 'Copy this course to change it, or attach teacher videos to its lessons' });
+    b.onclick = () => {
+      const bundled = BUNDLED_PACKS.find((x) => x.id === c.id);
+      const pack = bundled ? { ...JSON.parse(JSON.stringify(bundled)), units: bundled.units.map((u) => ({ ...u, lessons: u.lessons.map((l) => ({ ...l, id: `${c.id}/${l.id}` })) })) } : courseToPack(c, unitsFor(c.id));
+      pack.builtin = true; // videos attach to the built-in lessons; "Save" makes your own copy
+      openStudioPack(pack);
+    };
+    tpl.append(b);
+  }
+  const tb = $('csTeachers');
+  tb.innerHTML = '';
+  for (const t of TEACHERS) {
+    const row = Object.assign(document.createElement('div'), { className: 'cs-teacher', title: 'Show the character brief for AI video tools' });
+    row.append(teacherAvatar(t, 30), Object.assign(document.createElement('span'), { textContent: `${t.name} · ${t.role}` }));
+    row.onclick = () => showScript(`${t.name}: character brief`, characterBrief(t));
+    tb.append(row);
+  }
+}
+
+function openStudioPack(pack) {
+  studio.pack = pack;
+  studio.unit = 0;
+  studio.lesson = 0;
+  $('csMain').hidden = false;
+  $('csTitle').value = pack.title;
+  $('csIcon').value = pack.icon || '';
+  $('csSubject').value = pack.subject || '';
+  $('csBy').value = pack.by || '';
+  $('csDesc').value = pack.description || '';
+  $('csTeacher').value = typeof pack.teacher === 'string' ? pack.teacher : TEACHERS[0].id;
+  $('csDelete').hidden = !!pack.builtin || !studio.list.some((p) => p.id === pack.id);
+  renderStudio();
+  renderStudioLists();
+}
+
+function readStudioFields() {
+  const p = studio.pack;
+  Object.assign(p, { title: $('csTitle').value.trim() || 'Untitled course', icon: $('csIcon').value.trim() || '📘', subject: $('csSubject').value.trim(), by: $('csBy').value.trim(), description: $('csDesc').value.trim(), teacher: $('csTeacher').value });
+  const l = studioLesson();
+  if (l) l.title = $('csLessonName').value.trim() || l.title;
+}
+
+function renderStudio() {
+  const p = studio.pack;
+  const t = teacherById($('csTeacher').value);
+  setText($('csTeacherRole'), `${t.emoji} ${t.role}: ${t.voice}`);
+  const tree = $('csTree');
+  tree.innerHTML = '';
+  p.units.forEach((u, ui) => {
+    const row = Object.assign(document.createElement('div'), { className: 'unit' });
+    const name = Object.assign(document.createElement('input'), { value: u.title, title: 'Unit name' });
+    name.oninput = () => (u.title = name.value);
+    const del = Object.assign(document.createElement('button'), { className: 'mini', textContent: '🗑', title: 'Delete this unit' });
+    del.onclick = () => {
+      if (p.units.length < 2) return toast('A course needs at least one unit.');
+      if (!confirm(`Delete the unit "${u.title}" and its lessons?`)) return;
+      p.units.splice(ui, 1);
+      studio.unit = 0;
+      studio.lesson = 0;
+      renderStudio();
+    };
+    row.append(Object.assign(document.createElement('span'), { textContent: u.icon || '⭐' }), name, del);
+    tree.append(row);
+    u.lessons.forEach((l, li) => {
+      const b = Object.assign(document.createElement('button'), { className: `lesson mini${ui === studio.unit && li === studio.lesson ? ' on' : ''}`, textContent: `${courseVideos[studio.pack.builtin ? l.id : `${p.id}/${l.id}`] ? '🎬 ' : ''}${l.title}` });
+      b.onclick = () => {
+        readStudioFields();
+        studio.unit = ui;
+        studio.lesson = li;
+        renderStudio();
+      };
+      tree.append(b);
+    });
+  });
+  const l = studioLesson();
+  $('csLessonName').value = l?.title || '';
+  renderStudioSteps();
+  const v = l && courseVideos[videoKey(l)];
+  $('csVideoUrl').value = v && !v.src.startsWith('idb:') ? v.src : '';
+  setText($('csVideoNote'), v ? (v.src.startsWith('idb:') ? `🎬 File: ${v.name}` : '🎬 Video attached') : 'No video yet: students see the script until you add one.');
+  $('csJson').value = l ? JSON.stringify(l.steps, null, 1) : '';
+  const errors = validateCourse(p, { songIds: new Set(SONGS.map((x) => x.id)) });
+  const st = $('csStatus');
+  st.className = `small cs-status ${errors.length ? 'err' : 'ok'}`;
+  st.textContent = errors.length ? `⚠ ${errors.slice(0, 3).join(' · ')}` : `✓ ${p.units.reduce((a, u) => a + u.lessons.length, 0)} lessons, ready to save.`;
+}
+
+function stepEditor(step, i, steps) {
+  const box = Object.assign(document.createElement('div'), { className: 'cs-step' });
+  const head = Object.assign(document.createElement('div'), { className: 'head' });
+  head.append(Object.assign(document.createElement('span'), { textContent: `${i + 1}. ${STEP_LABELS[step.type] || step.type}` }));
+  const move = (d) => {
+    const j = i + d;
+    if (j < 0 || j >= steps.length) return;
+    [steps[i], steps[j]] = [steps[j], steps[i]];
+    renderStudio();
+  };
+  for (const [label, fn, title] of [['↑', () => move(-1), 'Move up'], ['↓', () => move(1), 'Move down'], ['✕', () => (steps.splice(i, 1), renderStudio()), 'Delete step']]) {
+    const b = Object.assign(document.createElement('button'), { className: 'mini', textContent: label, title });
+    b.onclick = fn;
+    head.append(b);
+  }
+  box.append(head);
+  const field = (tag, key, attrs = {}, parse = (v) => v, show = (v) => v ?? '') => {
+    const el = Object.assign(document.createElement(tag), attrs);
+    el.value = show(step[key]);
+    el.oninput = () => {
+      step[key] = parse(el.value);
+      const errors = validateCourse(studio.pack, { songIds: new Set(SONGS.map((x) => x.id)) });
+      $('csStatus').className = `small cs-status ${errors.length ? 'err' : 'ok'}`;
+      $('csStatus').textContent = errors.length ? `⚠ ${errors.slice(0, 3).join(' · ')}` : '✓ Ready to save.';
+    };
+    box.append(el);
+    return el;
+  };
+  const text = (ph) => field('textarea', 'text', { rows: 2, placeholder: ph });
+  switch (step.type) {
+    case 'info':
+      text('What the teacher says or explains');
+      break;
+    case 'video':
+      field('input', 'src', { placeholder: 'Video link (YouTube, Vimeo, .mp4), or leave empty and add it later' });
+      text('Shown under the video');
+      field('textarea', 'script', { rows: 3, placeholder: 'Script for the AI teacher video (shown as read-along until the video exists)' });
+      break;
+    case 'quiz': {
+      field('input', 'question', { placeholder: 'Question' });
+      field('textarea', 'choices', { rows: 3, placeholder: 'One answer per line' }, (v) => v.split('\n').map((x) => x.trim()).filter(Boolean), (v) => (v || []).join('\n'));
+      const ans = Object.assign(document.createElement('select'), { title: 'The right answer' });
+      (step.choices || []).forEach((c, k) => ans.append(new Option(`✓ ${c}`, String(k))));
+      ans.value = String(step.answer ?? 0);
+      ans.onchange = () => (step.answer = Number(ans.value));
+      box.append(ans);
+      field('input', 'explain', { placeholder: 'Why it\'s right (shown after answering)' });
+      break;
+    }
+    case 'notes':
+      text('Instructions');
+      field('input', 'notes', { placeholder: 'Notes, e.g. C4 D4 E4' }, (v) => v.split(/[\s,]+/).filter(Boolean).map((x) => { try { return parsePitch(x); } catch { return NaN; } }).filter((n) => Number.isFinite(n)), (v) => (v || []).map((n) => noteLabel(n).replace('♯', '#').replace('♭', 'b')).join(' '));
+      break;
+    case 'song': {
+      const sel = document.createElement('select');
+      for (const x of SONGS) sel.append(new Option(x.title, x.id));
+      sel.value = step.song || SONGS[0].id;
+      step.song = sel.value;
+      sel.onchange = () => (step.song = sel.value);
+      const part = document.createElement('select');
+      for (const [v, l] of [['0', 'Right hand / melody'], ['1', 'Left hand / chords'], ['0,1', 'Both hands'], ['9', 'Drums']]) part.append(new Option(l, v));
+      part.value = step.part || '0';
+      step.part = part.value;
+      part.onchange = () => (step.part = part.value);
+      box.append(sel, part);
+      text('Instructions');
+      break;
+    }
+    default:
+      box.append(Object.assign(document.createElement('div'), { className: 'small', textContent: step.text || '(a music exercise: edit it as JSON below)' }));
+  }
+  return box;
+}
+
+function renderStudioSteps() {
+  const box = $('csSteps');
+  box.innerHTML = '';
+  const l = studioLesson();
+  if (!l) return;
+  l.steps.forEach((st, i) => box.append(stepEditor(st, i, l.steps)));
+}
+
+function showScript(title, text) {
+  setText($('csScriptTitle'), title);
+  setText($('csScriptText'), text);
+  $('csScriptBox').hidden = false;
+}
+
+function saveStudioPack() {
+  readStudioFields();
+  const p = studio.pack;
+  if (p.builtin) {
+    // A copy of a Knight Lyfe course becomes your own course.
+    delete p.builtin;
+    p.id = `${p.id}-mine-${Date.now().toString(36)}`;
+    p.title = `${p.title} (my version)`;
+    $('csTitle').value = p.title;
+  }
+  const errors = validateCourse(p, { songIds: new Set(SONGS.map((x) => x.id)) });
+  if (errors.length) return toast(`Fix this first: ${errors[0]}`);
+  const i = studio.list.findIndex((x) => x.id === p.id);
+  const copy = JSON.parse(JSON.stringify(p));
+  if (i >= 0) studio.list[i] = copy;
+  else studio.list.push(copy);
+  saveCourses(studio.list);
+  addCourse(copy);
+  $('csDelete').hidden = false;
+  renderStudioLists();
+  renderStudio();
+  toast(`Saved: "${p.title}" is in Lessons under its own tab.`);
+}
+
+function initStudio() {
+  const dlg = $('studioDlg');
+  $('lpStudio').onclick = () => {
+    if (!dlg.open) dlg.show();
+    renderStudioLists();
+  };
+  dlg.querySelector('[data-close]').onclick = () => dlg.close();
+  makeDraggable(dlg);
+  for (const t of TEACHERS) $('csTeacher').append(new Option(`${t.emoji} ${t.name} (${t.role})`, t.id));
+  for (const type of STEP_TYPES) $('csStepType').append(new Option(STEP_LABELS[type], type));
+  $('csStepType').value = 'info';
+  $('csNew').onclick = () => openStudioPack(newCourse('New course', $('csTeacher').value || TEACHERS[0].id));
+  for (const id of ['csTitle', 'csIcon', 'csSubject', 'csBy', 'csDesc']) $(id).oninput = () => readStudioFields();
+  $('csTeacher').onchange = () => {
+    readStudioFields();
+    renderStudio();
+  };
+  $('csLessonName').oninput = () => readStudioFields();
+  $('csAddUnit').onclick = () => {
+    readStudioFields();
+    const n = studio.pack.units.length + 1;
+    studio.pack.units.push({ id: `unit-${Date.now().toString(36)}`, title: `Unit ${n}`, icon: '⭐', lessons: [{ id: `lesson-${Date.now().toString(36)}`, title: 'New lesson', steps: [{ type: 'info', text: 'Introduce the lesson here.' }] }] });
+    studio.unit = studio.pack.units.length - 1;
+    studio.lesson = 0;
+    renderStudio();
+  };
+  $('csAddLesson').onclick = () => {
+    readStudioFields();
+    const u = studio.pack.units[studio.unit];
+    u.lessons.push({ id: `lesson-${Date.now().toString(36)}`, title: 'New lesson', steps: [{ type: 'info', text: 'Introduce the lesson here.' }] });
+    studio.lesson = u.lessons.length - 1;
+    renderStudio();
+  };
+  $('csDelLesson').onclick = () => {
+    const u = studio.pack.units[studio.unit];
+    if (u.lessons.length < 2) return toast('A unit needs at least one lesson.');
+    if (!confirm(`Delete the lesson "${studioLesson().title}"?`)) return;
+    u.lessons.splice(studio.lesson, 1);
+    studio.lesson = 0;
+    renderStudio();
+  };
+  $('csAddStep').onclick = () => {
+    const l = studioLesson();
+    const type = $('csStepType').value;
+    const blank = { info: { text: '' }, video: { src: '', text: '', script: '' }, quiz: { question: '', choices: ['', ''], answer: 0, explain: '' }, notes: { text: 'Play these notes.', notes: [60, 62, 64] }, song: { song: SONGS[0].id, part: '0', text: 'Play along.' } }[type] || { text: 'Edit this step as JSON below.' };
+    l.steps.push({ type, ...blank });
+    renderStudio();
+  };
+  $('csJsonApply').onclick = () => {
+    try {
+      const steps = JSON.parse($('csJson').value);
+      if (!Array.isArray(steps)) throw new Error('expected a list of steps');
+      studioLesson().steps = steps;
+      renderStudio();
+    } catch (err) {
+      toast(`That JSON has a problem: ${err.message}`);
+    }
+  };
+  // Videos for a lesson: a link, or a file kept in this browser.
+  $('csVideoUrl').onchange = () => {
+    const l = studioLesson();
+    const v = $('csVideoUrl').value.trim();
+    if (v) courseVideos[videoKey(l)] = { src: v };
+    else delete courseVideos[videoKey(l)];
+    saveVideos(courseVideos);
+    renderStudio();
+  };
+  $('csVideoFile').onclick = () => $('csVideoPick').click();
+  $('csVideoPick').onchange = async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    const key = videoKey(studioLesson());
+    try {
+      await saveVideoFile(key, file);
+      courseVideos[key] = { src: `idb:${key}`, name: file.name };
+      saveVideos(courseVideos);
+      renderStudio();
+      toast(`Video added: ${file.name}. It stays in this browser; for other devices, upload it (YouTube unlisted, Vimeo...) and paste the link.`, [], 6000);
+    } catch (err) {
+      toast(`Couldn't keep that video here (${err.message}). Paste a link instead.`);
+    }
+  };
+  $('csScript').onclick = () => {
+    readStudioFields();
+    const p = studio.pack;
+    const n = p.units.slice(0, studio.unit).reduce((a, u) => a + u.lessons.length, 0) + studio.lesson + 1;
+    const s = lessonScript(studioLesson(), { teacher: p.teacher, course: p.title, unit: p.units[studio.unit].title, number: n, songTitle });
+    showScript(`Video script · about ${Math.max(1, Math.round(s.seconds / 60))} min`, `${s.text}\n\n----\nCHARACTER BRIEF (paste into your AI video tool)\n${characterBrief(teacherById(p.teacher))}`);
+  };
+  $('csScriptCopy').onclick = () => navigator.clipboard?.writeText($('csScriptText').textContent).then(() => toast('Copied.'), () => toast('Select the text and copy it.'));
+  $('csScriptClose').onclick = () => ($('csScriptBox').hidden = true);
+  $('csSave').onclick = saveStudioPack;
+  $('csTry').onclick = () => {
+    readStudioFields();
+    if (studio.pack.builtin) {
+      const lesson = unitsFor(studio.pack.id)[studio.unit]?.lessons[studio.lesson];
+      if (lesson) startLessonFromStudio(lesson);
+      return;
+    }
+    saveStudioPack();
+    const lesson = UNITS.find((u) => u.id === `${studio.pack.id}/${studio.pack.units[studio.unit].id}`)?.lessons[studio.lesson];
+    if (lesson) startLessonFromStudio(lesson);
+  };
+  const fileName = () => (studio.pack.title || 'course').replace(/[\\/:*?"<>|]/g, '-');
+  $('csExport').onclick = () => {
+    readStudioFields();
+    const p = { ...studio.pack };
+    delete p.builtin;
+    download(JSON.stringify(p, null, 1), `${fileName()}.kcourse`, 'application/json');
+  };
+  $('csScripts').onclick = () => {
+    readStudioFields();
+    const p = studio.pack;
+    let n = 0;
+    const all = p.units.flatMap((u) => u.lessons.map((l) => lessonScript(l, { teacher: p.teacher, course: p.title, unit: u.title, number: ++n, songTitle }).text));
+    download(`${p.title}: video scripts\n\nCHARACTER BRIEF\n${characterBrief(teacherById(p.teacher))}\n\n${'='.repeat(60)}\n\n${all.join(`\n\n${'='.repeat(60)}\n\n`)}`, `${fileName()} - video scripts.txt`, 'text/plain');
+  };
+  $('csCsv').onclick = () => {
+    readStudioFields();
+    download(scriptsCsv(studio.pack, songTitle), `${fileName()} - scripts.csv`, 'text/csv');
+  };
+  $('csDelete').onclick = () => {
+    const p = studio.pack;
+    if (!confirm(`Delete the course "${p.title}"? Its lessons leave the Lessons window.`)) return;
+    studio.list = studio.list.filter((x) => x.id !== p.id);
+    saveCourses(studio.list);
+    removeCourse(p.id);
+    studio.pack = null;
+    $('csMain').hidden = true;
+    renderStudioLists();
+  };
+  $('csImport').onclick = () => $('csFile').click();
+  $('csFile').onchange = async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const pack = JSON.parse(await file.text());
+      const errors = validateCourse(pack, { songIds: new Set(SONGS.map((x) => x.id)) });
+      if (errors.length) return toast(`Can't use this course: ${errors[0]}`);
+      openStudioPack(pack);
+      saveStudioPack();
+    } catch (err) {
+      toast(`Couldn't read ${file.name}: ${err.message}`);
+    }
+  };
+}
+
+function startLessonFromStudio(lesson) {
+  $('studioDlg').close(); // out of the way; 🛠 Course Studio brings it back
+  const dlg = $('lessonDlg');
+  if (!dlg.open) dlg.show();
+  lessonCourse = courseOfLesson(lesson);
+  startLesson(lesson);
+}
+
 // ---- Lyrics (sing along) -----------------------------------------------------------
 //
 // The words of the open song, a line at a time, lighting up as they're sung.
@@ -3237,7 +3743,10 @@ function renderBandRoles() {
       for (const [val, label] of [['band', '🤖 Full AI band'], ['keys', '🎹 AI keys only'], ['organ', '⛪ AI organ only'], ['none', 'A cappella (none)']]) sel.append(new Option(label, val));
     } else {
       const sing = choirTab || CHOIR_IDS.includes(row.id) || row.id === 'choir' || row.id === 'lead';
-      sel.append(new Option(sing ? '🤖 AI sings it' : '🤖 AI plays it', 'ai'));
+      // A Knight Lyfe character fills the position when nobody from the family is on it.
+      const who = characterFor(row.roles[0]);
+      const choirPart = CHOIR_IDS.includes(row.id) || row.id === 'choir';
+      sel.append(new Option(row.id === 'click' ? '🤖 Click on' : choirPart ? `🤖 AI choir (${who.name})` : `🤖 ${who.name} ${sing ? 'sings' : 'plays'} it`, 'ai'));
       sel.append(new Option(sing ? '🔉 Quiet guide' : '🔉 AI quietly', 'guide'));
       if (row.id !== 'click') {
         if (sing) sel.append(new Option('🙋 We sing it (AI off)', 'live'));
@@ -3251,7 +3760,9 @@ function renderBandRoles() {
       applyBand();
       renderBandRoles();
     };
-    el.append(icon, nm, sel);
+    el.append(icon, nm);
+    if ((v === 'ai' || v === 'guide') && row.id !== 'click' && !row.accomp) el.append(teacherAvatar(characterFor(row.roles[0]), 24));
+    el.append(sel);
     box.append(el);
   }
 }
@@ -4939,6 +5450,7 @@ initBooth();
 initScore();
 initBand();
 initLyrics();
+initStudio();
 initConverter();
 initSongs();
 applyLayout();
