@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Service screen</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #07060c; }
+    #stage { position: fixed; inset: 0; }
+    #hint { position: fixed; left: 12px; bottom: 10px; color: #aaa; font: 13px system-ui; opacity: .7; }
+  </style>
+</head>
+<body>
+  <div id="stage" class="stage"></div>
+  <div id="hint">Waiting for the Church window… (double-click for full screen)</div>
+  <script type="module" src="js/stage.js"></script>
+</body>
+</html>

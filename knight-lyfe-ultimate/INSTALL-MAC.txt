@@ -218,3 +218,10 @@ Unzip the files first (double-click each .zip).
    its link (or pick the file) to add it to the lesson. Save puts the
    course in Lessons; "Course pack" saves it as one file to share.
    In the Band Room, each missing position shows the character covering it.
+
+20. VIRTUAL CHURCH (WEBSITE)
+   "Church" at the top: plan the order of service (your church's name,
+   colors, links), then "Run the service". Worship songs play with the AI
+   band and the words on screen. "Open stream screen" opens a clean window:
+   put it on the projector, or capture it in OBS (free) to go live on
+   YouTube or Facebook. Arrow keys move through the service.

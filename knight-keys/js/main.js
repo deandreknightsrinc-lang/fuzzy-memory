@@ -5,6 +5,8 @@ import { songToScore, scoreToMusicXML, musicXmlToMidi, scoreFileText } from './n
 import { lyricLines, lineAt } from './lyrics.js';
 import { TEACHERS, COURSE_TEACHERS, teacherById, characterBrief, characterFor } from './teachers.js';
 import { BUNDLED_PACKS } from './course-packs.js';
+import { SEGMENT_TYPES, newService, validateService, stageFrame, invitePost, hostScript, loadServices, saveServices } from './church.js';
+import { renderStage, STAGE_CSS } from './stage-view.js';
 import { STEP_TYPES, STEP_LABELS, newCourse, courseToPack, validateCourse, videoSource, lessonScript, scriptsCsv, loadCourses, saveCourses, loadVideos, saveVideos, saveVideoFile, loadVideoFile } from './courses.js';
 import { ROLES as BAND_ROLES, arrangeBand, bandMidi, chordsFromChart, songInBeats, transposeSymbol } from './band.js';
 import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_CHANNEL } from './synth.js';
@@ -3521,6 +3523,361 @@ function startLessonFromStudio(lesson) {
   startLesson(lesson);
 }
 
+// ---- Virtual Church -----------------------------------------------------------------
+//
+// Plan an order of service and run it as big slides: worship songs are played by
+// the Band Room (AI musicians on every part) with their words on screen, plus
+// scripture, prayer, announcements, the sermon video and giving. The stream
+// screen (stage.html) mirrors it for the projector or OBS -> YouTube / Facebook Live.
+
+const church = { list: loadServices(), svc: null, sel: 0, run: 0, tab: 'plan', raf: 0, frameKey: '', stageSeen: false, padNotes: [] };
+const stageChannel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('knight-stage') : null;
+document.head.append(Object.assign(document.createElement('style'), { textContent: STAGE_CSS }));
+
+function churchSongOptions(sel, value) {
+  sel.innerHTML = '';
+  const group = (label, list, prefix) => {
+    if (!list.length) return;
+    const g = Object.assign(document.createElement('optgroup'), { label });
+    for (const x of list) g.append(new Option(x.title, `${prefix}${x.id}`));
+    sel.append(g);
+  };
+  group('Church & worship', SONGS.filter((x) => x.category === 'church'), 'lib:');
+  group('My songs', mySongs, 'my:');
+  group('Other songs', SONGS.filter((x) => x.category !== 'church'), 'lib:');
+  sel.value = value || sel.options[0]?.value;
+}
+
+function churchServiceList() {
+  const sel = $('chService');
+  sel.innerHTML = '';
+  for (const x of church.list) sel.append(new Option(x.title, x.id));
+  if (church.svc && !church.list.some((x) => x.id === church.svc.id)) sel.append(new Option(`${church.svc.title} (not saved)`, church.svc.id));
+  if (church.svc) sel.value = church.svc.id;
+}
+
+function openService(svc) {
+  church.svc = svc;
+  church.sel = 0;
+  church.run = 0;
+  const c = svc.church;
+  $('chName').value = c.name || '';
+  $('chTagline').value = c.tagline || '';
+  $('chColor').value = c.color || '#7c3aed';
+  $('chLogo').value = c.logo || '';
+  $('chGiving').value = c.giving || '';
+  $('chWebsite').value = c.website || '';
+  $('chSocial').value = c.social || '';
+  $('chPowered').checked = svc.poweredBy !== false;
+  $('chTitle').value = svc.title;
+  churchServiceList();
+  renderChurchPlan();
+}
+
+function readChurchFields() {
+  const svc = church.svc;
+  Object.assign(svc.church, { name: $('chName').value.trim(), tagline: $('chTagline').value.trim(), color: $('chColor').value, logo: $('chLogo').value.trim(), giving: $('chGiving').value.trim(), website: $('chWebsite').value.trim(), social: $('chSocial').value.trim() });
+  svc.poweredBy = $('chPowered').checked;
+  svc.title = $('chTitle').value.trim() || 'Worship Service';
+}
+
+function renderChurchPlan() {
+  const svc = church.svc;
+  const box = $('chSegs');
+  box.innerHTML = '';
+  svc.segments.forEach((seg, i) => {
+    const row = Object.assign(document.createElement('div'), { className: 'ch-seg' });
+    const pick = Object.assign(document.createElement('button'), { className: `pick mini${i === church.sel ? ' on' : ''}`, textContent: `${SEGMENT_TYPES[seg.type]?.icon || '•'} ${seg.title || SEGMENT_TYPES[seg.type]?.label}` });
+    pick.onclick = () => {
+      church.sel = i;
+      renderChurchPlan();
+    };
+    const btn = (label, title, fn) => {
+      const b = Object.assign(document.createElement('button'), { className: 'mini', textContent: label, title });
+      b.onclick = fn;
+      return b;
+    };
+    const move = (d) => {
+      const j = i + d;
+      if (j < 0 || j >= svc.segments.length) return;
+      [svc.segments[i], svc.segments[j]] = [svc.segments[j], svc.segments[i]];
+      church.sel = j;
+      renderChurchPlan();
+    };
+    row.append(pick, btn('↑', 'Earlier', () => move(-1)), btn('↓', 'Later', () => move(1)), btn('✕', 'Remove', () => {
+      svc.segments.splice(i, 1);
+      church.sel = Math.max(0, Math.min(church.sel, svc.segments.length - 1));
+      renderChurchPlan();
+    }));
+    box.append(row);
+  });
+  renderChurchEditor();
+  const errors = validateService(svc);
+  const st = $('chStatus');
+  st.className = `small cs-status ${errors.length ? 'err' : 'ok'}`;
+  st.textContent = errors.length ? `⚠ ${errors.slice(0, 3).join(' · ')}` : `✓ ${svc.segments.length} parts, ready to run.`;
+}
+
+function renderChurchEditor() {
+  const box = $('chEdit');
+  box.innerHTML = '';
+  const seg = church.svc.segments[church.sel];
+  if (!seg) return;
+  const label = (text, el) => {
+    const l = Object.assign(document.createElement('label'), { textContent: text });
+    l.append(el);
+    box.append(l);
+    return el;
+  };
+  const input = (text, key, attrs = {}) => {
+    const el = Object.assign(document.createElement(attrs.rows ? 'textarea' : 'input'), { ...attrs });
+    el.value = seg[key] ?? '';
+    el.oninput = () => {
+      seg[key] = el.value;
+      if (key === 'title') renderChurchPlanListOnly();
+    };
+    return label(text, el);
+  };
+  box.append(Object.assign(document.createElement('h4'), { textContent: `${SEGMENT_TYPES[seg.type].icon} ${SEGMENT_TYPES[seg.type].label}` }));
+  input('Title on screen ', 'title', { type: 'text' });
+  if (seg.type === 'song') {
+    const sel = document.createElement('select');
+    churchSongOptions(sel, seg.song);
+    seg.song = sel.value;
+    sel.onchange = () => {
+      seg.song = sel.value;
+      seg.title = sel.selectedOptions[0]?.textContent || seg.title;
+      renderChurchPlan();
+    };
+    label('Song (the Band Room plays it, words on screen) ', sel);
+  }
+  if (['scripture', 'benediction'].includes(seg.type)) input('Reference ', 'reference', { type: 'text', placeholder: 'e.g. John 3:16 (KJV)' });
+  if (seg.type !== 'song') input('Words on screen ', 'text', { rows: seg.type === 'scripture' ? 6 : 4 });
+  if (['welcome', 'sermon', 'video'].includes(seg.type)) input('Video link or file address ', 'video', { type: 'text', placeholder: 'YouTube, Vimeo or .mp4 (a recorded sermon, a host welcome video...)' });
+  if (seg.type === 'sermon') input('Speaker notes (only here, not on screen) ', 'notes', { rows: 3 });
+  if (seg.type === 'prayer') {
+    const cb = Object.assign(document.createElement('input'), { type: 'checkbox', checked: !!seg.pad });
+    cb.onchange = () => (seg.pad = cb.checked);
+    label('Soft pad music underneath ', cb);
+  }
+  if (['welcome', 'announcement', 'giving'].includes(seg.type)) {
+    const sel = document.createElement('select');
+    sel.append(new Option('No host character', ''));
+    for (const t of TEACHERS) sel.append(new Option(`${t.emoji} ${t.name}`, t.id));
+    sel.value = seg.host || '';
+    sel.onchange = () => (seg.host = sel.value);
+    label('Host (Knight Lyfe character for an AI video) ', sel);
+    const b = Object.assign(document.createElement('button'), { className: 'mini', textContent: '📝 Host video script' });
+    b.onclick = () => {
+      if (!seg.host) return toast('Pick a host character first.');
+      const text = `${hostScript(church.svc, seg, teacherById(seg.host))}\n\n----\nCHARACTER BRIEF\n${characterBrief(teacherById(seg.host))}`;
+      download(text, `${seg.title || 'host'} - video script.txt`, 'text/plain');
+    };
+    box.append(b);
+  }
+}
+
+function renderChurchPlanListOnly() {
+  const buttons = $('chSegs').querySelectorAll('.pick');
+  church.svc.segments.forEach((seg, i) => buttons[i] && (buttons[i].textContent = `${SEGMENT_TYPES[seg.type]?.icon || '•'} ${seg.title || SEGMENT_TYPES[seg.type]?.label}`));
+}
+
+// ---- Running the service
+
+function stopChurchMedia() {
+  if (church.padNotes.length) {
+    for (const n of church.padNotes) synth.noteOff(15, n);
+    church.padNotes = [];
+  }
+  if (player.playing) player.pause();
+}
+
+function churchGo(i) {
+  const svc = church.svc;
+  if (!svc || i < 0 || i >= svc.segments.length) return;
+  stopChurchMedia();
+  church.run = i;
+  const seg = svc.segments[i];
+  if (seg.type === 'song') {
+    bandSongOptions();
+    $('bandSong').value = seg.song;
+    if ($('bandSong').value === seg.song) buildBand();
+    else toast(`Can't find the song for "${seg.title}". Pick it again in the plan.`);
+  }
+  if (seg.type === 'prayer' && seg.pad) {
+    synth.ensure();
+    synth.program(15, 89);
+    church.padNotes = [48, 55, 60, 64, 67];
+    for (const n of church.padNotes) synth.noteOn(15, n, 38);
+  }
+  church.frameKey = '';
+  renderChurchRun();
+}
+
+function churchFrame() {
+  const svc = church.svc;
+  const seg = svc.segments[church.run];
+  const extra = {};
+  if (seg?.type === 'song' && state.midiName === state.channelLabels?.for) {
+    const lines = songLyricLines();
+    const li = lineAt(lines, player.time);
+    const words = (l) => (l ? l.words.map((w) => w.text).join('').trim() : '');
+    extra.lyricNow = words(lines[Math.max(0, li)]);
+    extra.lyricNext = words(lines[Math.max(0, li) + 1]);
+  }
+  return stageFrame(svc, church.run, extra);
+}
+
+function sendFrame(force = false) {
+  if (!church.svc) return;
+  const frame = churchFrame();
+  const key = JSON.stringify(frame);
+  if (!force && key === church.frameKey) return;
+  church.frameKey = key;
+  renderStage($('chPreview'), frame, { muted: church.stageSeen });
+  stageChannel?.postMessage({ frame });
+}
+
+function renderChurchRun() {
+  const list = $('chRunList');
+  list.innerHTML = '';
+  church.svc.segments.forEach((seg, i) => {
+    const b = Object.assign(document.createElement('button'), { className: `mini${i === church.run ? ' on' : ''}`, textContent: `${SEGMENT_TYPES[seg.type]?.icon || '•'} ${seg.title}` });
+    b.onclick = () => churchGo(i);
+    list.append(b);
+  });
+  const seg = church.svc.segments[church.run];
+  setText($('chNow'), `${church.run + 1} of ${church.svc.segments.length}${seg?.notes ? ` · Notes: ${seg.notes}` : ''}`);
+  $('chSongPlay').disabled = seg?.type !== 'song';
+  sendFrame(true);
+}
+
+function churchLoop() {
+  if (!$('churchDlg').open) {
+    church.raf = 0;
+    return;
+  }
+  church.raf = requestAnimationFrame(churchLoop);
+  if (church.tab === 'run') sendFrame();
+}
+
+function churchTab(tab) {
+  church.tab = tab;
+  $('chTabs').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
+  $('chPlan').hidden = tab !== 'plan';
+  $('chRun').hidden = tab !== 'run';
+  if (tab === 'run') {
+    readChurchFields();
+    renderChurchRun();
+  } else stopChurchMedia();
+}
+
+function openChurch() {
+  const dlg = $('churchDlg');
+  if (!dlg.open) dlg.show();
+  if (!church.svc) openService(church.list[0] ? JSON.parse(JSON.stringify(church.list[0])) : newService());
+  if (!church.raf) church.raf = requestAnimationFrame(churchLoop);
+}
+
+function initChurch() {
+  const dlg = $('churchDlg');
+  $('btnChurch').onclick = openChurch;
+  dlg.querySelector('[data-close]').onclick = () => {
+    stopChurchMedia();
+    dlg.close();
+  };
+  makeDraggable(dlg);
+  for (const [type, t] of Object.entries(SEGMENT_TYPES)) $('chAddType').append(new Option(`${t.icon} ${t.label}`, type));
+  $('chTabs').querySelectorAll('button').forEach((b) => (b.onclick = () => churchTab(b.dataset.tab)));
+  for (const id of ['chName', 'chTagline', 'chColor', 'chLogo', 'chGiving', 'chWebsite', 'chSocial', 'chPowered', 'chTitle']) $(id).addEventListener('input', () => {
+    readChurchFields();
+    if (id === 'chTitle' || id === 'chName') renderChurchPlan();
+  });
+  $('chPowered').addEventListener('change', readChurchFields);
+  $('chService').onchange = () => {
+    const found = church.list.find((x) => x.id === $('chService').value);
+    if (found) openService(JSON.parse(JSON.stringify(found)));
+  };
+  $('chAdd').onclick = () => {
+    const type = $('chAddType').value;
+    const seg = { type, title: SEGMENT_TYPES[type].label, text: '' };
+    if (type === 'song') seg.song = 'lib:amazing';
+    church.svc.segments.splice(church.sel + 1, 0, seg);
+    church.sel += 1;
+    renderChurchPlan();
+  };
+  $('chSave').onclick = () => {
+    readChurchFields();
+    const errors = validateService(church.svc);
+    if (errors.length) return toast(`Fix this first: ${errors[0]}`);
+    const i = church.list.findIndex((x) => x.id === church.svc.id);
+    const copy = JSON.parse(JSON.stringify(church.svc));
+    if (i >= 0) church.list[i] = copy;
+    else church.list.push(copy);
+    saveServices(church.list);
+    churchServiceList();
+    toast(`Saved: ${church.svc.title}`);
+  };
+  $('chNew').onclick = () => openService(newService($('chName').value.trim() || 'BAC Ministries'));
+  $('chInvite').onclick = () => {
+    readChurchFields();
+    const post = invitePost(church.svc);
+    navigator.clipboard?.writeText(post).then(() => toast('Invite post copied: paste it on Facebook, Instagram or YouTube.', [], 5000), () => download(post, 'invite post.txt', 'text/plain'));
+  };
+  $('chExport').onclick = () => {
+    readChurchFields();
+    download(JSON.stringify(church.svc, null, 1), `${church.svc.title.replace(/[\\/:*?"<>|]/g, '-')}.kservice`, 'application/json');
+  };
+  $('chImport').onclick = () => $('chFile').click();
+  $('chFile').onchange = async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const svc = JSON.parse(await file.text());
+      const errors = validateService(svc);
+      if (errors.length) return toast(`Can't use this service: ${errors[0]}`);
+      openService(svc);
+    } catch (err) {
+      toast(`Couldn't read ${file.name}: ${err.message}`);
+    }
+  };
+  $('chDelete').onclick = () => {
+    if (!confirm(`Delete "${church.svc.title}"?`)) return;
+    church.list = church.list.filter((x) => x.id !== church.svc.id);
+    saveServices(church.list);
+    openService(church.list[0] ? JSON.parse(JSON.stringify(church.list[0])) : newService());
+  };
+  $('chPrev').onclick = () => churchGo(church.run - 1);
+  $('chNext').onclick = () => churchGo(church.run + 1);
+  $('chSongPlay').onclick = () => togglePlay();
+  $('chStage').onclick = () => {
+    if (IN_HOST) return toast('The stream screen opens on the website (in Safari or Chrome).');
+    window.open('stage.html', 'knight-stage', 'width=1280,height=720');
+  };
+  const full = () => ($('chPreview').requestFullscreen ? $('chPreview').requestFullscreen() : toast('Full screen isn\'t available here.'));
+  $('chFull').onclick = full;
+  $('chPreview').ondblclick = full;
+  if (stageChannel) {
+    stageChannel.onmessage = (e) => {
+      if (e.data?.hello) {
+        church.stageSeen = true;
+        sendFrame(true);
+      }
+    };
+  }
+  window.addEventListener('keydown', (e) => {
+    if (!dlg.open || church.tab !== 'run' || typingTarget(e)) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+      e.preventDefault();
+      churchGo(church.run + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault();
+      churchGo(church.run - 1);
+    }
+  });
+}
+
 // ---- Lyrics (sing along) -----------------------------------------------------------
 //
 // The words of the open song, a line at a time, lighting up as they're sung.
@@ -5451,6 +5808,7 @@ initScore();
 initBand();
 initLyrics();
 initStudio();
+initChurch();
 initConverter();
 initSongs();
 applyLayout();

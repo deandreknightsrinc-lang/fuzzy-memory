@@ -34,7 +34,7 @@ jobs:
           cp index.html _site/
           cp -r dashboard _site/
           mkdir _site/knight-keys
-          cp -r knight-keys/index.html knight-keys/styles.css knight-keys/js knight-keys/samples knight-keys/vendor _site/knight-keys/
+          cp -r knight-keys/index.html knight-keys/stage.html knight-keys/styles.css knight-keys/js knight-keys/samples knight-keys/vendor _site/knight-keys/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
