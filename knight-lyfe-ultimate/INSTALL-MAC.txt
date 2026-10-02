@@ -185,3 +185,10 @@ Unzip the files first (double-click each .zip).
    fills, and church grooves (hymn 3/4, gospel shuffle, two-step). Each
    beat: first it waits for every hit, then you play it in time with a
    click and get a timing score.
+
+16. GUITAR AND BASS LESSONS
+   Lessons > "Guitar" or "Bass" (on the website, with the microphone on):
+   tune every string, learn the notes and first chords on a fretboard
+   picture, then strum (or play roots on bass) along with a click to
+   Worship Flow and Amazing Grace. It hears single notes and strummed
+   chords. Headphones help, so the speakers don't play for you.

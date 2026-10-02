@@ -693,3 +693,120 @@ export function drawDrumHighway(canvas, view) {
     ctx.globalAlpha = 1;
   }
 }
+
+// ---- Fretboard (guitar and bass lessons) ---------------------------------------
+
+/**
+ * A neck seen from the front, thinnest string on top (like tab).
+ * opts: { strings: { 1: midi, 2: ... } open-string notes, from: first fret, to: last
+ * fret, dots: [{ string, fret, label, color }], muted: [string...], open: [string...],
+ * title, fg }
+ */
+export function drawFretboard(canvas, opts) {
+  const { ctx, w, h } = fitCanvas(canvas);
+  ctx.clearRect(0, 0, w, h);
+  const fg = opts.fg || '#ddd';
+  const nums = Object.keys(opts.strings).map(Number).sort((a, b) => a - b); // 1 = top
+  const from = opts.from ?? 0;
+  const to = Math.max(from + 3, opts.to ?? 5);
+  const left = 54;
+  const right = w - 14;
+  const top = opts.title ? 30 : 14;
+  const bottom = h - 34;
+  const sy = (i) => top + (i * (bottom - top)) / (nums.length - 1);
+  const frets = to - from;
+  const fx = (f) => left + ((f - from) * (right - left)) / frets; // fret wire x
+  const spotX = (f) => (f === 0 ? left - 16 : (fx(f - 1) + fx(f)) / 2); // where a finger goes
+
+  if (opts.title) {
+    ctx.fillStyle = fg;
+    ctx.font = 'bold 18px system-ui, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(opts.title, 8, 15);
+  }
+  // Wood, fret wires, nut and position dots.
+  ctx.fillStyle = '#3b2a1e';
+  ctx.fillRect(left, top - 6, right - left, bottom - top + 12);
+  ctx.fillStyle = 'rgba(255,255,255,.18)';
+  for (let f = Math.max(1, from + 1); f <= to; f++) {
+    if ([3, 5, 7, 9, 15, 17].includes(f)) {
+      ctx.beginPath();
+      ctx.arc(spotX(f), (top + bottom) / 2, 5, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (f === 12) {
+      for (const y of [top + (bottom - top) * 0.3, top + (bottom - top) * 0.7]) {
+        ctx.beginPath();
+        ctx.arc(spotX(f), y, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+  for (let f = from; f <= to; f++) {
+    ctx.strokeStyle = f === 0 ? '#eee' : '#9a9a9a';
+    ctx.lineWidth = f === 0 ? 6 : 2;
+    ctx.beginPath();
+    ctx.moveTo(fx(f), top - 6);
+    ctx.lineTo(fx(f), bottom + 6);
+    ctx.stroke();
+  }
+  ctx.fillStyle = fg;
+  ctx.font = '11px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  for (let f = Math.max(1, from + 1); f <= to; f++) ctx.fillText(String(f), spotX(f), bottom + 18);
+  // Strings, thicker toward the bass, with their names.
+  nums.forEach((s, i) => {
+    ctx.strokeStyle = '#d8d0c0';
+    ctx.lineWidth = 1 + (i / Math.max(1, nums.length - 1)) * 2.2;
+    ctx.beginPath();
+    ctx.moveTo(left, sy(i));
+    ctx.lineTo(right, sy(i));
+    ctx.stroke();
+    ctx.fillStyle = fg;
+    ctx.font = '12px system-ui, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    const name = ['C', 'C♯', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'A♭', 'A', 'B♭', 'B'][opts.strings[s] % 12];
+    ctx.fillText(name, left - 30, sy(i));
+  });
+  // Open (o) and muted (x) strings at the nut.
+  ctx.font = 'bold 14px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  nums.forEach((s, i) => {
+    if (opts.muted?.includes(s)) {
+      ctx.fillStyle = '#ff7875';
+      ctx.fillText('×', left - 14, sy(i));
+    } else if (opts.open?.includes(s)) {
+      ctx.strokeStyle = '#73d13d';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(left - 14, sy(i), 6, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  });
+  // Barre.
+  if (opts.barre != null) {
+    ctx.fillStyle = 'rgba(255, 214, 10, .55)';
+    const x = spotX(opts.barre);
+    ctx.fillRect(x - 7, sy(0) - 9, 14, sy(nums.length - 1) - sy(0) + 18);
+  }
+  // Fingers.
+  const r = Math.min(12, (bottom - top) / (nums.length - 1) / 2 - 1);
+  for (const d of opts.dots || []) {
+    const i = nums.indexOf(d.string);
+    if (i < 0) continue;
+    const x = spotX(d.fret);
+    ctx.fillStyle = d.color || '#ffd60a';
+    ctx.beginPath();
+    ctx.arc(x, sy(i), r, 0, Math.PI * 2);
+    ctx.fill();
+    if (d.label != null) {
+      ctx.fillStyle = '#111';
+      ctx.font = `bold ${Math.round(r * 1.2)}px system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(d.label), x, sy(i) + 1);
+    }
+  }
+}

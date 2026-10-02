@@ -676,3 +676,4 @@ dialog.score-window { width: min(1200px, calc(100vw - 24px)); left: max(12px, ca
   body.print-score .score-view { max-height: none; overflow: visible; padding: 0; }
   body.print-score { background: #fff; }
 }
+.lp-fret { width: 100%; max-width: 560px; height: 190px; display: block; margin: 4px auto 8px; background: #181a22; border-radius: 8px; }

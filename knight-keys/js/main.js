@@ -4,9 +4,10 @@ import { makeChoirParts, choirMidi, PARTS as CHOIR_PARTS } from './choir.js';
 import { songToScore, scoreToMusicXML, musicXmlToMidi, scoreFileText } from './notation.js';
 import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_CHANNEL } from './synth.js';
 import { Player } from './player.js';
-import { KeyboardView, drawStaff, drawControllers, drawGroove, drawPianoRoll, drawDrumHighway } from './render.js';
+import { KeyboardView, drawStaff, drawControllers, drawGroove, drawPianoRoll, drawDrumHighway, drawFretboard } from './render.js';
+import { TUNINGS, STRING_NAMES, fretNote, chordShape, chordTarget, chartTimeline, ChartJudge, rootPosition } from './fretted.js';
 import { UNITS, COURSES, unitsFor, readNotes, grooveMidi, DrumJudge, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from './lessons.js';
-import { PitchListener, SingJudge, RangeFinder, voiceType, freqToCents, midiToFreq } from './pitch.js';
+import { PitchListener, SingJudge, RangeFinder, voiceType, freqToCents, midiToFreq, chromaMatches } from './pitch.js';
 import { GameSession, crownsFor, loadStage, saveStage, recordScore, courseState, scoreKey, PLAYER_COLORS } from './game.js';
 import { LANES, laneOf, sameDrum, outputFor, OUTPUTS, PIECES, KITS, kitById, resolveKit, kitNoteParams, loadSavedSamples, saveSample, deleteSample } from './drumkit.js';
 import { detectChord, noteName, pcName, solfege, keyName } from './theory.js';
@@ -401,6 +402,7 @@ const player = new Player({
   onEnd() {
     if (lessonRun.active && lessonRun.step?.type === 'song') return lessonSongDone();
     if (lessonRun.active && lessonRun.step?.type === 'groove') return lessonGrooveDone();
+    if (lessonRun.active && lessonRun.step?.type === 'chart') return lessonChartDone();
     if (stageRun.phase === 'play') return finishStage();
     if (learn.enabled && learn.total) {
       const pct = Math.round((100 * learn.correct) / Math.max(1, learn.correct + learn.wrong));
@@ -2343,6 +2345,7 @@ function startLesson(lesson) {
 
 function stopLessonSong() {
   stopSinging();
+  stopFretted();
   if (lessonRun.step?.type === 'song' || lessonRun.step?.type === 'groove') {
     player.silent = null;
     drumRun.judge = null;
@@ -2370,12 +2373,16 @@ function renderLessonTargets() {
   if (step.type === 'notes') step.notes.forEach((n, i) => chip(noteLetter(n), `finger ${step.fingers[i]}`, i < lessonRun.pos ? 'done' : i === lessonRun.pos ? 'now' : ''));
   else if (step.type === 'chords') step.chords.forEach((c, i) => chip(step.names[i], c.map(noteLetter).join(' '), i < lessonRun.pos ? 'done' : i === lessonRun.pos ? 'now' : ''));
   else if (step.type === 'info' && step.keys) step.keys.forEach((n) => chip(noteLetter(n), '', 'now'));
+  else if (step.type === 'fret') step.notes.forEach(([str, fret], i) => chip(noteLetter(fretNote(step.instrument, str, fret)), `${STRING_NAMES[step.instrument][str]} ${fret ? `fret ${fret}` : 'open'}`, i < lessonRun.pos ? 'done' : i === lessonRun.pos && !lessonRun.done ? 'now' : ''));
+  else if (step.type === 'strum') step.chords.forEach((c, i) => chip(c, '', i < lessonRun.pos ? 'done' : i === lessonRun.pos && !lessonRun.done ? 'now' : ''));
+  else if (step.type === 'chart' && chartRun.timeline) chartRun.timeline.windows.forEach((w, i) => chip(w.symbol, '', chartRun.judge?.passed(chartRun.judge.windows[i]) ? 'done' : i === chartRun.index ? 'now' : ''));
   else if (step.type === 'hits') step.hits.forEach((h, i) => chip([].concat(h).map(drumName).join(' + '), step.sticking?.[i] || '', i < lessonRun.pos ? 'done' : i === lessonRun.pos && !lessonRun.done ? 'now' : ''));
   else if (step.type === 'read') lessonRun.readList.forEach((n, i) => chip(i < lessonRun.pos ? noteLetter(n) : '?', '', i < lessonRun.pos ? 'done' : i === lessonRun.pos && !lessonRun.done ? 'now' : ''));
   else if (step.type === 'sing') step.notes.forEach((n, i) => chip(step.names?.[i] || noteLetter(n), step.names ? noteLetter(n) : '', i < lessonRun.pos ? 'done' : i === lessonRun.pos && !lessonRun.done ? 'now' : ''));
   const dots = $('lpDots');
   dots.innerHTML = lessonRun.lesson.steps.map((_, i) => `<span class="${i < lessonRun.stepIdx ? 'done' : i === lessonRun.stepIdx ? 'now' : ''}"></span>`).join('');
   drawLessonStaff();
+  drawLessonFret();
   markDirty();
 }
 
@@ -2388,6 +2395,7 @@ function setLessonTargets() {
   } else if (step.type === 'chords') lessonRun.targets = new Set(step.chords[lessonRun.pos] || []);
   else if (step.type === 'info') lessonRun.targets = new Set(step.keys || []);
   else if (step.type === 'sing') lessonRun.targets = new Set(lessonRun.pos < step.notes.length ? [step.notes[lessonRun.pos]] : []);
+  else if (step.type === 'fret') lessonRun.targets = new Set(lessonRun.pos < step.notes.length ? [fretNote(step.instrument, ...step.notes[lessonRun.pos])] : []);
   else if (step.type === 'read') lessonRun.targets = new Set(lessonRun.hint && lessonRun.pos < lessonRun.readList.length ? [lessonRun.readList[lessonRun.pos]] : []);
   else lessonRun.targets = new Set();
 }
@@ -2397,7 +2405,9 @@ function showLessonStep(i) {
   const step = lessonRun.lesson.steps[i];
   Object.assign(lessonRun, { stepIdx: i, step, pos: 0, mistakes: 0, done: step.type === 'info', hint: false, missesHere: 0, readList: step.type === 'read' ? readNotes(step) : [] });
   setText($('lpText'), step.text + (step.type === 'chords' && micListener?.active ? ' (Chords need a USB keyboard or the on-screen keys: the microphone hears one note at a time.)' : ''));
-  if (step.type === 'hits' || step.type === 'groove') lessonFeedback(step.type === 'hits' ? 'Your turn: hit the drum that\'s lit up.' : step.mode === 'time' ? 'Count-in: one bar of clicks, then play!' : 'The beat waits for each hit. Follow the highway.');
+  micListener?.setRange(step.instrument === 'bass' ? 'bass' : 'normal');
+  if (step.type === 'fret' || step.type === 'strum' || step.type === 'chart') lessonFeedback(micSupported() ? (step.type === 'chart' ? 'Count-in: one bar of clicks, then play!' : 'Your turn! (Turn on 🎤 so it can hear your guitar.)') : 'Play it on a MIDI keyboard or the keys below (the microphone works on the website).');
+  else if (step.type === 'hits' || step.type === 'groove') lessonFeedback(step.type === 'hits' ? 'Your turn: hit the drum that\'s lit up.' : step.mode === 'time' ? 'Count-in: one bar of clicks, then play!' : 'The beat waits for each hit. Follow the highway.');
   else lessonFeedback(step.type === 'info' ? '' : step.type === 'song' ? (step.voice ? 'The song is playing. Sing the yellow notes.' : step.noHints ? 'The song is playing. Read the staff and play.' : 'The song is playing. The yellow keys are yours.') : step.type === 'read' ? 'Which note is it? Play it.' : 'Your turn: the yellow key is next.');
   $('lpSing').hidden = step.type !== 'sing' && step.type !== 'range';
   $('lpHear').hidden = step.type !== 'sing';
@@ -2407,6 +2417,9 @@ function showLessonStep(i) {
   $('lpNext').textContent = i === lessonRun.lesson.steps.length - 1 ? 'Finish ✓' : 'Next ▶';
   if (step.type === 'sing' || step.type === 'range' || step.voice) startSinging(step);
   if (step.type === 'groove') startGroove(step);
+  if (step.type === 'strum') startStrum(step);
+  if (step.type === 'chart') startChart(step);
+  if ((step.type === 'fret' || step.type === 'strum' || step.type === 'chart') && micSupported()) toggleMic(true);
   if (step.type === 'song') {
     const song = SONGS.find((s) => s.id === step.song);
     loadSongEntry(song, 'beginner');
@@ -2446,6 +2459,31 @@ function drawLessonStaff() {
 function lessonHit(note) {
   if (!lessonRun.active || lessonRun.done || !$('lessonDlg').open) return;
   const step = lessonRun.step;
+  if (step.type === 'fret') {
+    const want = fretNote(step.instrument, ...step.notes[lessonRun.pos]);
+    // The microphone can hear a string an octave off (overtones): the note name is what counts then.
+    if (note === want || (micListener?.active && note % 12 === want % 12)) {
+      lessonRun.pos++;
+      if (lessonRun.pos >= step.notes.length) {
+        setLessonTargets();
+        return completeLessonStep(starsForMistakes(lessonRun.mistakes, step.notes.length));
+      }
+      lessonFeedback(`✓ ${noteLetter(want)}`, 'good');
+    } else {
+      lessonRun.mistakes++;
+      const [str, fret] = step.notes[lessonRun.pos];
+      lessonFeedback(`That was ${noteLetter(note)}. Play ${noteLetter(want)}: ${STRING_NAMES[step.instrument][str]} string, ${fret ? `fret ${fret}` : 'open'}.`, 'bad');
+    }
+    setLessonTargets();
+    renderLessonTargets();
+    return;
+  }
+  if (step.type === 'strum') {
+    const t = chordTarget(step.chords[lessonRun.pos]);
+    const pcs = new Set([...liveNotesDown()].map((n) => n % 12));
+    if (t.pcs.every((pc) => pcs.has(pc))) strumHit();
+    return;
+  }
   if (step.type === 'read') {
     const want = lessonRun.readList[lessonRun.pos];
     // Singers and the mic may be in another octave: the letter is what counts when reading by voice.
@@ -2583,6 +2621,8 @@ async function toggleMic(force) {
     await micListener.start(ctx);
     showMicOn(true);
     for (const fn of pitchSubscribers) micListener.addPitchListener(fn);
+    for (const fn of chromaSubscribers) micListener.addChromaListener(fn);
+    micListener.setRange(lessonRun.step?.instrument === 'bass' ? 'bass' : 'normal');
     toast(singingNow() || lessonRun.step?.type === 'sing' ? 'Listening 🎤 Sing! Headphones help, so the speakers don\'t sing for you.' : 'Listening 🎤 Play one note at a time. Headphones help, so the speakers don\'t confuse it.');
   } catch (err) {
     toast(`Couldn't use the microphone (${err.message || err.name}). Allow microphone access for this page.`);
@@ -2602,6 +2642,140 @@ function onPitch(fn) {
     off?.();
     micListener?.pitchListeners.delete(fn);
   };
+}
+
+// ---- Guitar and bass steps -------------------------------------------------------
+
+const chartRun = { timeline: null, judge: null, timer: 0, index: -1, chroma: null, pitch: null, off: [] };
+const strumRun = { count: 0, quietUntil: 0, off: null };
+
+// Chord recognition subscribers (like pitch ones), kept across mic restarts.
+const chromaSubscribers = new Set();
+function onChroma(fn) {
+  chromaSubscribers.add(fn);
+  const off = micListener?.addChromaListener(fn);
+  return () => {
+    chromaSubscribers.delete(fn);
+    off?.();
+    micListener?.chromaListeners.delete(fn);
+  };
+}
+
+/** The neck for the current step: the note to play, the chord shape, or what an info step shows. */
+function drawLessonFret() {
+  const step = lessonRun.step;
+  const cv = $('lpFret');
+  let opts = null;
+  if (step?.type === 'fret' && lessonRun.pos < step.notes.length) {
+    const [str, fret] = step.notes[Math.min(lessonRun.pos, step.notes.length - 1)];
+    opts = { instrument: step.instrument, dots: fret ? [{ string: str, fret, label: step.fingers?.[lessonRun.pos] || '' }] : [], open: fret ? [] : [str], to: Math.max(5, fret + 1) };
+  } else if (step?.type === 'strum' && lessonRun.pos < step.chords.length) opts = shapeOpts(step.chords[lessonRun.pos]);
+  else if (step?.type === 'chart' && chartRun.timeline) {
+    const w = chartRun.timeline.windows[Math.max(0, chartRun.index)];
+    if (step.match === 'root') {
+      const [str, fret] = rootPosition('bass', w.bass);
+      opts = { instrument: 'bass', title: `${w.symbol}: play ${noteLetter(w.bass)}`, dots: fret ? [{ string: str, fret, label: 'R' }] : [], open: fret ? [] : [str] };
+    } else opts = shapeOpts(w.symbol);
+  } else if (step?.type === 'info' && step.chord) opts = shapeOpts(step.chord);
+  else if (step?.type === 'info' && step.fretboard) {
+    const f = step.fretboard;
+    opts = { instrument: f.instrument, open: f.open || [], dots: (f.dots || []).map(([string, fret, label]) => ({ string, fret, label })) };
+  }
+  cv.hidden = !opts;
+  if (!opts) return;
+  drawFretboard(cv, { strings: TUNINGS[opts.instrument], from: 0, to: opts.to || 5, fg: '#ddd', ...opts });
+}
+
+function shapeOpts(symbol) {
+  const shape = chordShape(symbol);
+  if (!shape) return { instrument: 'guitar', title: `${symbol} (no shape here yet)`, dots: [] };
+  const dots = [];
+  const open = [];
+  const muted = [];
+  shape.frets.forEach((f, i) => {
+    const string = 6 - i;
+    if (f < 0) muted.push(string);
+    else if (f === 0) open.push(string);
+    else if (!(shape.barre === f && shape.fingers[i] === 1 && i > 1)) dots.push({ string, fret: f, label: shape.fingers[i] || '' });
+  });
+  return { instrument: 'guitar', title: shape.name === symbol ? symbol : `${symbol} (play ${shape.name})`, dots, open, muted, barre: shape.barre };
+}
+
+function strumHit() {
+  const step = lessonRun.step;
+  strumRun.count = 0;
+  strumRun.quietUntil = performance.now() + 700; // one strum is one chord, even if it rings
+  lessonRun.pos++;
+  if (lessonRun.pos >= step.chords.length) {
+    renderLessonTargets();
+    return completeLessonStep(starsForMistakes(lessonRun.mistakes, step.chords.length));
+  }
+  lessonFeedback(`✓ ${step.chords[lessonRun.pos - 1]}! Now ${step.chords[lessonRun.pos]}.`, 'good');
+  renderLessonTargets();
+}
+
+function startStrum(step) {
+  strumRun.count = 0;
+  strumRun.off = onChroma((chroma) => {
+    if (lessonRun.step !== step || lessonRun.done || !chroma || performance.now() < strumRun.quietUntil) return;
+    const t = chordTarget(step.chords[lessonRun.pos]);
+    if (chromaMatches(chroma, t.root, t.quality, t.sus ? t.pcs : null)) {
+      if (++strumRun.count >= 3) strumHit();
+    } else strumRun.count = 0;
+  });
+}
+
+function startChart(step) {
+  const tl = chartTimeline({ ...step, name: `Play along: ${lessonRun.lesson.title}` }, SONGS);
+  Object.assign(chartRun, { timeline: tl, judge: new ChartJudge(tl.windows), index: -1, chroma: null, pitch: null });
+  if (learn.enabled) setLearn(false);
+  loadMidiBytes(tl.bytes, `${lessonRun.lesson.title}.mid`);
+  chartRun.off = [onChroma((c) => (chartRun.chroma = c)), onPitch((exact) => (chartRun.pitch = exact))];
+  // Listen every 30 ms: does what's sounding match the chord of this moment?
+  chartRun.timer = setInterval(() => {
+    if (!player.playing || !chartRun.judge) return;
+    const t = player.time;
+    const w = chartRun.judge.current(t);
+    const i = w ? chartRun.judge.windows.indexOf(w) : chartRun.index;
+    let ok = false;
+    if (w) {
+      const keys = [...liveNotesDown()].map((n) => n % 12);
+      if (step.match === 'root') ok = keys.includes(w.bass) || (chartRun.pitch !== null && ((Math.round(chartRun.pitch) % 12) + 12) % 12 === w.bass);
+      else ok = w.pcs.every((pc) => keys.includes(pc)) || (!!chartRun.chroma && chromaMatches(chartRun.chroma, w.root, w.quality, w.sus ? w.pcs : null));
+      chartRun.judge.frame(t, ok);
+    }
+    if (i !== chartRun.index) {
+      chartRun.index = i;
+      renderLessonTargets();
+    } else if (w && ok && chartRun.judge.passed(w)) {
+      lessonFeedback(`✓ ${w.symbol}`, 'good');
+      renderLessonTargets();
+    }
+  }, 30);
+  player.seek(0);
+  player.play();
+}
+
+function stopFretted() {
+  clearInterval(chartRun.timer);
+  chartRun.off.forEach((off) => off());
+  Object.assign(chartRun, { timer: 0, off: [], judge: null, timeline: null, index: -1 });
+  strumRun.off?.();
+  strumRun.off = null;
+}
+
+function lessonChartDone() {
+  const j = chartRun.judge;
+  clearInterval(chartRun.timer);
+  if (!j) return;
+  const acc = j.accuracy;
+  renderLessonTargets();
+  if (acc < 50) {
+    lessonFeedback(`${j.done} of ${j.windows.length} chords heard (${acc}%). Press "Start this step again" and try once more; practice the changes slowly in the lesson before this one.`, 'bad');
+    return;
+  }
+  completeLessonStep(starsForAccuracy(acc));
+  lessonFeedback(`${j.done} of ${j.windows.length} chords right (${acc}%). ${'★'.repeat(starsForAccuracy(acc))}`, 'good');
 }
 
 // ---- Drum steps ------------------------------------------------------------------
@@ -2735,7 +2909,7 @@ function startSinging(step) {
   }
   toggleMic(true);
   if (step.type === 'sing') {
-    singRun.judge = new SingJudge(step.notes, { hold: step.hold || 0.6 });
+    singRun.judge = new SingJudge(step.notes, { hold: step.hold || 0.6, tolerance: step.tolerance || 40 });
     $('lpHold').style.width = '0%';
     if (step.hear) setTimeout(() => lessonRun.step === step && playReference(step.notes[0]), 400);
   }
@@ -2765,7 +2939,7 @@ function singFrame(step, exact, dt) {
     lessonRun.pos = judge.pos;
     setLessonTargets();
     renderLessonTargets();
-    lessonFeedback('✓ In tune!', 'good');
+    lessonFeedback(step.tune ? '✓ In tune! Next string.' : '✓ In tune!', 'good');
     if (step.hear) setTimeout(() => lessonRun.step === step && !lessonRun.done && playReference(judge.target), 350);
   } else if (r === 'done') {
     lessonRun.pos = judge.pos;
@@ -2773,10 +2947,10 @@ function singFrame(step, exact, dt) {
     completeLessonStep(starsForSinging(judge.averageCents, judge.misses));
   } else if (r === 'miss') {
     const sharp = (judge.lastCents ?? 0) > 0;
-    lessonFeedback(`Not quite: you're ${sharp ? 'above' : 'below'} ${noteLetter(judge.target)}. Slide ${sharp ? 'down' : 'up'} until the needle is in the middle.`, 'bad');
+    lessonFeedback(step.tune ? `${sharp ? 'Too high: loosen the string (tune down) ⬇' : 'Too low: tighten the string (tune up) ⬆'}, a little at a time.` : `Not quite: you're ${sharp ? 'above' : 'below'} ${noteLetter(judge.target)}. Slide ${sharp ? 'down' : 'up'} until the needle is in the middle.`, 'bad');
     if (step.hear) playReference(judge.target);
   } else if (exact !== null && judge.lastCents !== null && Math.abs(judge.lastCents) > judge.tolerance) {
-    lessonFeedback(judge.lastCents > 0 ? 'A little high: come down ⬇' : 'A little low: go up ⬆');
+    lessonFeedback(step.tune ? (judge.lastCents > 0 ? 'A little high: loosen ⬇' : 'A little low: tighten ⬆') : judge.lastCents > 0 ? 'A little high: come down ⬇' : 'A little low: go up ⬆');
   }
 }
 
