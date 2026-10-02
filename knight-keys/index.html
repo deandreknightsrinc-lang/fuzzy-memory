@@ -546,6 +546,7 @@ Every evening I will sing"></textarea>
       <select id="askTeacher" title="Who to ask"></select>
       <button id="askVoice" class="mini" title="The teacher speaks the answers out loud">🔊 Voice on</button>
       <button id="askSetup" class="mini" title="AI server settings">⚙</button>
+      <button id="askPuppet" class="mini" title="Puppet Studio: play this character live with your face and voice">🎭</button>
       <button class="mini" data-close aria-label="Close">✕</button>
     </header>
     <div class="tool-body">
@@ -578,10 +579,44 @@ Every evening I will sing"></textarea>
     </div>
   </dialog>
 
+  <dialog id="puppetDlg" class="tool-window puppet-window" aria-labelledby="puppetTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="puppetTitle">🎭 Puppet Studio</h2>
+      <select id="ppTeacher" title="Which character you're playing"></select>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="tool-body">
+      <div class="pp-top">
+        <div id="ppFace" class="pp-face"></div>
+        <div class="pp-cam">
+          <video id="ppVideo" muted playsinline></video>
+          <div id="ppCamOff" class="small">Camera off. Turn it on and the character copies your face: head, eyes, eyebrows, smile and mouth.</div>
+        </div>
+      </div>
+      <div class="row wrap pp-controls">
+        <button id="ppCamera" class="mini" title="Face tracking with your webcam (runs on this computer; no video leaves it)">📷 Camera</button>
+        <button id="ppMic" class="mini" title="The mouth moves when you talk">🎤 Voice</button>
+        <button id="ppCenter" class="mini" title="Look straight at the camera and press this so the character looks straight too">🎯 Center</button>
+        <label class="check" title="When a teacher answers in Ask the teacher, the puppet speaks it"><input id="ppFollowAsk" type="checkbox" /> Ask answers move the mouth</label>
+        <button id="ppScreen" class="primary" title="Open the puppet screen for OBS, a projector or a livestream">📺 Open puppet screen</button>
+      </div>
+      <div class="row wrap pp-controls">
+        <label>Background <select id="ppBg"></select></label>
+        <label class="check"><input id="ppLower" type="checkbox" checked /> Name on screen</label>
+        <input id="ppLowerText" type="text" class="grow" maxlength="80" placeholder="Under the name (default: their role)" />
+      </div>
+      <div class="pp-gestures-title small">Expressions and gestures: hold the key (or click)</div>
+      <div id="ppGestures" class="pp-gestures"></div>
+      <div id="ppStatus" class="small pp-status"></div>
+      <p class="small pp-note">You play an AI character live. Tell your audience it's a character played by a person. The puppet screen has a green background: in OBS add it as a Window Capture with a Chroma Key filter, then stream to YouTube or Facebook Live.</p>
+    </div>
+  </dialog>
+
   <dialog id="churchDlg" class="tool-window church-window" aria-labelledby="churchTitle">
     <header class="dlg-head tool-head">
       <h2 id="churchTitle">⛪ Virtual Church</h2>
       <select id="chService" title="Your services"></select>
+      <button id="chPuppet" class="mini" title="Puppet Studio: a person plays a Knight Lyfe character live, for kids' church or the stream">🎭 Puppet</button>
       <button class="mini" data-close aria-label="Close">✕</button>
     </header>
     <div class="tool-body">
