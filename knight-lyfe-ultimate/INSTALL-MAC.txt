@@ -202,3 +202,10 @@ Unzip the files first (double-click each .zip).
    rest. Works with 1 person or the whole family.
    In Logic, the plug-in plays piano and drums only: use "Band MIDI" and
    drag it into Logic to give each part its own Logic instrument.
+
+18. LYRICS (SING ALONG)
+   "Lyrics" at the top shows the words of the open song, lighting up as
+   they're sung. Built in for the hymns and starter songs; for your own
+   songs, type the words in the Song Builder (Songs > New song). Karaoke
+   MIDI files (.kar) work too. The words also appear in the Band Room,
+   on the printed score, and in MIDI files you save.

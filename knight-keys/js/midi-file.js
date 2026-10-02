@@ -131,6 +131,8 @@ export function buildSong(parsed) {
   let timeSig = null;
   const trackNames = [];
   let title = '';
+  const lyricTicks = []; // lyric events (0x05), or karaoke text (0x01) if a file has no lyric events
+  const textTicks = [];
   tracks.forEach((events, ti) => {
     for (const e of events) {
       if (e.kind !== 'meta') continue;
@@ -140,6 +142,11 @@ export function buildSong(parsed) {
         keySig = { sf: (e.data[0] << 24) >> 24, minor: e.data[1] === 1 };
       } else if (e.type === 0x58 && e.data.length >= 2 && !timeSig) {
         timeSig = { num: e.data[0], den: 2 ** e.data[1] };
+      } else if (e.type === 0x05) {
+        lyricTicks.push({ tick: e.tick, text: bytesToText(e.data) });
+      } else if (e.type === 0x01) {
+        const t = bytesToText(e.data);
+        if (!t.startsWith('@') && !t.startsWith('%')) textTicks.push({ tick: e.tick, text: t });
       } else if (e.type === 0x03 && trackNames[ti] === undefined) {
         trackNames[ti] = bytesToText(e.data).trim();
         if (ti === 0 && !title) title = trackNames[ti];
@@ -238,6 +245,9 @@ export function buildSong(parsed) {
   events.sort((a, b) => a.time - b.time || order[a.type] - order[b.type]);
 
   const lastTime = events.length ? events[events.length - 1].time : 0;
+  // Karaoke files often keep their words in text events instead of lyric events.
+  const lyricSource = lyricTicks.length ? lyricTicks : textTicks.length >= 8 ? textTicks : [];
+  const lyrics = lyricSource.map((l) => ({ time: tickToSec(l.tick), text: l.text })).sort((a, b) => a.time - b.time);
   const bpm = tempoEvents.length ? 60e6 / tempoEvents[0].us : 120;
 
   return {
@@ -249,6 +259,7 @@ export function buildSong(parsed) {
     keySig,
     timeSig,
     trackNames,
+    lyrics,
     channels: [...usedChannels].sort((a, b) => a - b),
     firstProgram,
     beatAt,

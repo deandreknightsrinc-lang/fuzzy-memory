@@ -57,6 +57,7 @@
       </details>
       <button id="btnLessons" class="lessons-btn" title="Lessons: step-by-step piano and voice courses, like a teacher at your side">🎓 Lessons</button>
       <button id="btnBooth" class="booth-btn" title="Vocal Booth: live pitch graph and tuner for singers, plus four-part choir parts for any song">🎙 Vocal</button>
+      <button id="btnLyrics" title="Lyrics: sing along, the words light up as the song plays">🎤 Lyrics</button>
       <button id="btnBand" class="band-btn" title="Band Room: rehearse as a worship band or choir; AI musicians and an AI choir fill every part nobody is playing">🎶 Band</button>
       <button id="btnStage" class="stage-btn" title="Stage: play songs like a game, earn crowns, unlock songs, beat the family high score">🎸 Stage</button>
       <button id="btnScore" title="Full score: sheet music for every instrument in the song (print, PDF, MusicXML), and open sheet music (MusicXML) as MIDI">📜 Score</button>
@@ -393,6 +394,12 @@ G D/F# Em C x2"></textarea>
         <textarea id="bMelody" rows="3" spellcheck="false" placeholder="E4 D4 C4 D4 | E4 E4 E4:2 | r:1 G4 A4:2"></textarea>
       </label>
       <p class="hint small">Melody: a note name and octave (middle C is <code>C4</code>), then <code>:beats</code> if it's not one beat. <code>r:1</code> is a rest, and <code>F#4</code> and <code>Bb3</code> are sharps and flats.</p>
+      <label class="field block">Lyrics <span class="small">(optional, for singing along: your own words or songs you have the rights to)</span>
+        <textarea id="bLyrics" rows="5" spellcheck="true" placeholder="One line of the song per line, e.g.
+Every morning I will praise You
+Every evening I will sing"></textarea>
+      </label>
+      <p class="hint small">Without a melody, each line of words takes <select id="bLyricBars"><option value="1">1 bar</option><option value="2" selected>2 bars</option><option value="4">4 bars</option></select> of the chord chart, in order (blank lines are skipped). With a melody, write one syllable per melody note: <code>A- ma- zing grace</code> joins syllables, <code>_</code> holds a syllable over the next note, <code>/</code> starts a new line.</p>
       <label class="field block">Notes for the band <input id="bAbout" type="text" maxlength="200" placeholder="e.g. Capo 2, repeat chorus 3x, slow down on the last line" /></label>
       <div id="bStatus" class="builder-status"></div>
       <div class="row wrap">
@@ -526,6 +533,25 @@ G D/F# Em C x2"></textarea>
     </div>
   </dialog>
 
+  <dialog id="lyricsDlg" class="tool-window lyrics-window" aria-labelledby="lyricsTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="lyricsTitle">🎤 Lyrics</h2>
+      <span id="lyricsSong" class="small"></span>
+      <button id="lyricsSmaller" class="mini" title="Smaller words">A−</button>
+      <button id="lyricsBigger" class="mini" title="Bigger words">A+</button>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="tool-body">
+      <div id="lyricsView" class="lyrics-view">
+        <div id="lyPrev" class="ly-line ly-prev"></div>
+        <div id="lyNow" class="ly-line ly-now"></div>
+        <div id="lyNext" class="ly-line ly-next"></div>
+      </div>
+      <p id="lyricsEmpty" class="small" hidden>This song has no lyrics yet. Songs in the library with words: Amazing Grace, Jesus Loves Me, Silent Night, Joyful Joyful, Doxology, When the Saints, Michael Row the Boat, and the starter songs. For your own songs, type the words in Songs → New song (Lyrics box). Karaoke MIDI files (.kar) show their words too.</p>
+      <details id="lyricsMore" class="lyrics-more" hidden><summary>More verses</summary><div id="lyricsVerses"></div></details>
+    </div>
+  </dialog>
+
   <dialog id="bandDlg" class="tool-window band-window" aria-labelledby="bandTitle">
     <header class="dlg-head tool-head">
       <h2 id="bandTitle">🎶 Band Room</h2>
@@ -549,6 +575,7 @@ G D/F# Em C x2"></textarea>
         <div><div class="small">Next</div><div id="bandNext" class="band-next">–</div></div>
         <div id="bandBar" class="band-bar small">Pick a song and press Start.</div>
       </div>
+      <div id="bandLyric" class="band-lyric"></div>
       <div id="bandRoles" class="band-roles"></div>
       <div class="row band-tools">
         <label>Tempo <input id="bandTempo" type="range" min="50" max="125" value="100" /> <span id="bandTempoVal">100%</span></label>

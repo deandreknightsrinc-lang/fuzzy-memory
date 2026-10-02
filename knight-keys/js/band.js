@@ -247,7 +247,8 @@ export function arrangeBand(song, opts = {}) {
   // The count-in bar: always heard, on its own channel.
   const countIn = Array.from({ length: offset ? bar : 0 }, (_, b) => ({ beat: b, beats: 0.1, note: b === 0 ? 84 : 79, vel: b === 0 ? 100 : 70 }));
   tracks.push({ role: 'countin', name: 'Count-in', ch: COUNT_IN_CH, program: 115, notes: countIn });
-  return { tracks, chords: chords.map((c) => ({ ...c, beat: c.beat + offset })), beats: offset + totalBars * bar, offset, bpm: song.bpm || 90, timeSig: ts, keySig: song.keySig || null, title: song.title || 'Song' };
+  const lyrics = (opts.lyrics || []).map((l) => ({ beat: l.beat + offset, text: l.text }));
+  return { tracks, lyrics, chords: chords.map((c) => ({ ...c, beat: c.beat + offset })), beats: offset + totalBars * bar, offset, bpm: song.bpm || 90, timeSig: ts, keySig: song.keySig || null, title: song.title || 'Song' };
 }
 
 /** The band as a MIDI file: one named track per part (play it here, or drag it into Logic). */
@@ -256,6 +257,8 @@ export function bandMidi(arr, ppq = 480) {
   const conductor = [metaEvent(0x03, `${arr.title} (band)`), metaEvent(0x51, [(us >> 16) & 0xff, (us >> 8) & 0xff, us & 0xff]), metaEvent(0x58, [arr.timeSig.num, Math.log2(arr.timeSig.den), 0x18, 0x08])];
   if (arr.keySig) conductor.push(metaEvent(0x59, [arr.keySig.sf & 0xff, arr.keySig.minor ? 1 : 0]));
   const tracks = [{ events: conductor.map((bytes) => ({ tick: 0, bytes })) }];
+  // The words ride along as lyric events, so the Lyrics window (and ACE Studio) can use them.
+  for (const l of arr.lyrics || []) tracks[0].events.push({ tick: l.beat * ppq, bytes: metaEvent(0x05, l.text) });
   for (const t of arr.tracks) {
     if (!t.notes.length) continue;
     const events = [{ tick: 0, bytes: metaEvent(0x03, t.name) }];
@@ -274,7 +277,8 @@ export function songInBeats(song, melodyChannel = null) {
   const beatAt = song.beatAt || ((sec) => (sec * (song.bpm || 120)) / 60);
   const notes = song.notes.map((n) => ({ beat: beatAt(n.time), beats: beatAt(n.time + n.dur) - beatAt(n.time), note: n.note, vel: n.vel, ch: n.ch }));
   const melody = melodyChannel === null ? null : melodyLine(song, [melodyChannel]).map((m) => ({ beat: beatAt(m.time), beats: beatAt(m.time + m.dur) - beatAt(m.time), note: m.note, vel: m.vel }));
-  return { song: { bpm: song.bpm, timeSig: song.timeSig, keySig: song.keySig, title: song.title, notes }, melody };
+  const lyrics = (song.lyrics || []).map((l) => ({ beat: beatAt(l.time), text: l.text }));
+  return { song: { bpm: song.bpm, timeSig: song.timeSig, keySig: song.keySig, title: song.title, notes }, melody, lyrics };
 }
 
 /** A chord symbol moved by `semitones` (G/B up 2 -> A/C#). */
