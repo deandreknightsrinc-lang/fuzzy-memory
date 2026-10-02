@@ -7,6 +7,8 @@ namespace knightlyfe
 
 SoundEngine::SoundEngine()
 {
+    for (auto& v : kitValues)
+        v = { 0.0f, 1.0f, 1.0f };
     for (auto& g : songGains) g = 1.0f;
     for (auto& g : liveGains) g = 1.0f;
     for (auto& g : uiGains) g = 1.0f;
@@ -87,7 +89,170 @@ void SoundEngine::handleInterfaceBatch (const juce::var& v)
             postPanic();
         else if (item.hasProperty ("v"))
             setInterfaceVolume ((float) (double) item.getProperty ("v", 1.0));
+        else if (const auto* kit = item.getProperty ("kit", {}).getArray(); kit != nullptr)
+        {
+            for (const auto& piece : *kit)
+            {
+                const auto* p = piece.getArray();
+                if (p == nullptr || p->size() < 4)
+                    continue;
+                const int note = (int) (*p)[0];
+                const float t = (float) (double) (*p)[1], d = (float) (double) (*p)[2], l = (float) (double) (*p)[3];
+                setDrumPiece (note, t, d, l);
+                if (note >= 0 && note < 128)
+                    kitValues[(size_t) note] = { t, d, l };
+            }
+            saveKitValues();
+        }
     }
+}
+
+//==============================================================================
+void SoundEngine::retireSample (int note)
+{
+    const auto now = juce::Time::getMillisecondCounterHiRes();
+    for (auto& s : sampleStore)
+        if (s.sample.get() == activeSamples[(size_t) note])
+            s.retiredMs = now;
+    activeSamples[(size_t) note] = nullptr;
+    // Free samples replaced more than 30 s ago: no hit rings that long.
+    sampleStore.erase (std::remove_if (sampleStore.begin(), sampleStore.end(),
+                                       [now] (const StoredSample& s) { return s.retiredMs >= 0.0 && now - s.retiredMs > 30000.0; }),
+                       sampleStore.end());
+}
+
+bool SoundEngine::loadDrumSample (int note, const void* fileData, size_t size)
+{
+    if (note < 0 || note > 127 || fileData == nullptr || size == 0)
+        return false;
+
+    juce::AudioFormatManager formats;
+    formats.registerBasicFormats();
+    std::unique_ptr<juce::AudioFormatReader> reader (
+        formats.createReaderFor (std::make_unique<juce::MemoryInputStream> (fileData, size, false)));
+    if (reader == nullptr || reader->lengthInSamples <= 1 || reader->sampleRate <= 0)
+        return false;
+
+    auto smp = std::make_unique<DrumSynth::Sample>();
+    const int channels = juce::jlimit (1, 2, (int) reader->numChannels);
+    const int length = (int) juce::jmin<juce::int64> (reader->lengthInSamples, (juce::int64) (reader->sampleRate * 20.0)); // 20 s max
+    smp->audio.setSize (channels, length);
+    reader->read (&smp->audio, 0, length, 0, true, channels > 1);
+    smp->sampleRate = reader->sampleRate;
+
+    const auto* raw = smp.get();
+    drums.setSample (note, raw); // the audio thread may now play it
+    retireSample (note);
+    activeSamples[(size_t) note] = raw;
+    sampleStore.push_back ({ std::move (smp), -1.0 });
+    return true;
+}
+
+void SoundEngine::clearDrumSample (int note)
+{
+    if (note < 0 || note > 127)
+        return;
+    drums.setSample (note, nullptr);
+    retireSample (note);
+}
+
+bool SoundEngine::decodeBase64 (const juce::String& text, juce::MemoryBlock& out)
+{
+    out.reset();
+    bool ok = false;
+    {
+        juce::MemoryOutputStream stream (out, false);
+        ok = juce::Base64::convertFromBase64 (stream, text);
+    } // the stream sets the block's final size when it goes away
+    return ok && out.getSize() > 0;
+}
+
+bool SoundEngine::handleDrumSample (const juce::var& request)
+{
+    const int note = (int) request.getProperty ("note", -1);
+    if (note < 0 || note > 127)
+        return false;
+    const auto file = [this, note] (const char* ext) { return kitFolder.getChildFile ("sample-" + juce::String (note) + ext); };
+    if ((bool) request.getProperty ("clear", false))
+    {
+        clearDrumSample (note);
+        sampleNames[(size_t) note] = {};
+        if (kitFolder != juce::File())
+        {
+            file (".bin").deleteFile();
+            file (".name").deleteFile();
+        }
+        return true;
+    }
+    juce::MemoryBlock data;
+    if (! decodeBase64 (request.getProperty ("data", "").toString(), data))
+        return false;
+    if (! loadDrumSample (note, data.getData(), data.getSize()))
+        return false;
+    sampleNames[(size_t) note] = request.getProperty ("name", "sample").toString();
+    if (kitFolder != juce::File())
+    {
+        file (".bin").replaceWithData (data.getData(), data.getSize());
+        file (".name").replaceWithText (sampleNames[(size_t) note]);
+    }
+    return true;
+}
+
+void SoundEngine::saveKitValues() const
+{
+    if (kitFolder == juce::File())
+        return;
+    juce::Array<juce::var> rows;
+    for (int n = 0; n < 128; ++n)
+    {
+        const auto& v = kitValues[(size_t) n];
+        if (! juce::exactlyEqual (v[0], 0.0f) || ! juce::exactlyEqual (v[1], 1.0f) || ! juce::exactlyEqual (v[2], 1.0f))
+            rows.add (juce::Array<juce::var> { n, v[0], v[1], v[2] });
+    }
+    kitFolder.getChildFile ("kit.json").replaceWithText (juce::JSON::toString (rows));
+}
+
+void SoundEngine::setKitFolder (const juce::File& folder)
+{
+    kitFolder = folder;
+    if (! kitFolder.createDirectory())
+    {
+        kitFolder = juce::File();
+        return;
+    }
+    const auto saved = juce::JSON::parse (kitFolder.getChildFile ("kit.json")); // keep it alive while reading
+    if (const auto* rows = saved.getArray())
+    {
+        for (const auto& row : *rows)
+        {
+            const auto* p = row.getArray();
+            if (p == nullptr || p->size() < 4)
+                continue;
+            const int note = (int) (*p)[0];
+            if (note < 0 || note > 127)
+                continue;
+            kitValues[(size_t) note] = { (float) (double) (*p)[1], (float) (double) (*p)[2], (float) (double) (*p)[3] };
+            setDrumPiece (note, kitValues[(size_t) note][0], kitValues[(size_t) note][1], kitValues[(size_t) note][2]);
+        }
+    }
+    for (const auto& f : kitFolder.findChildFiles (juce::File::findFiles, false, "sample-*.bin"))
+    {
+        const int note = f.getFileNameWithoutExtension().fromFirstOccurrenceOf ("-", false, false).getIntValue();
+        juce::MemoryBlock data;
+        if (note >= 0 && note < 128 && f.loadFileAsData (data) && loadDrumSample (note, data.getData(), data.getSize()))
+            sampleNames[(size_t) note] = f.withFileExtension (".name").loadFileAsString();
+    }
+}
+
+juce::var SoundEngine::getKitState() const
+{
+    auto* samplesObj = new juce::DynamicObject();
+    for (int n = 0; n < 128; ++n)
+        if (activeSamples[(size_t) n] != nullptr)
+            samplesObj->setProperty (juce::String (n), sampleNames[(size_t) n].isEmpty() ? juce::String ("sample") : sampleNames[(size_t) n]);
+    auto* state = new juce::DynamicObject();
+    state->setProperty ("samples", juce::var (samplesObj));
+    return juce::var (state);
 }
 
 int SoundEngine::drainHostMidi (std::vector<HostMessage>& out)

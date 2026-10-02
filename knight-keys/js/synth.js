@@ -306,6 +306,8 @@ class Voice {
 export class Synth {
   constructor() {
     this.ctx = null;
+    this.kitParams = new Map(); // drum note -> { tune, decay, level } (Kit Rack)
+    this.kitSamples = new Map(); // drum note -> AudioBuffer (your own samples)
     this.waves = new Map();
     this.voices = [];
     this.oneShots = [];
@@ -650,23 +652,69 @@ export class Synth {
     this.oneShots = this.oneShots.filter((s) => s.end > t);
   }
 
+  // ---- Kit Rack ----------------------------------------------------------------
+
+  /** Tune / decay / level per drum note: [[note, tuneSemitones, decay, level], ...]. */
+  setKit(rows) {
+    this.kitParams = new Map(rows.map(([n, tune, decay, level]) => [n, { tune, decay, level }]));
+  }
+
+  /** Play your own sample (audio file bytes) for these notes. Resolves true if it decoded. */
+  async loadDrumSample(notes, bytes, name) { // eslint-disable-line no-unused-vars
+    try {
+      // Decode without starting audio (browsers only allow that after a click).
+      const ctx = this.ctx || (this.decodeCtx ??= new OfflineAudioContext(2, 1, 44100));
+      const buffer = await ctx.decodeAudioData(bytes.slice(0));
+      for (const n of notes) this.kitSamples.set(n, buffer);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  clearDrumSample(notes) {
+    for (const n of notes) this.kitSamples.delete(n);
+  }
+
   // ---- Drums (GM channel 10) -------------------------------------------------
 
   drum(note, vel, time, ch = DRUM_CHANNEL) {
     const ctx = this.ctx;
-    const v = (vel / 127) ** 1.2;
+    const kit = this.kitParams.get(note);
+    const ratio = 2 ** ((kit?.tune ?? 0) / 12);
+    const dm = kit?.decay ?? 1;
+    const v = (vel / 127) ** 1.2 * (kit?.level ?? 1);
     const out = ctx.createGain();
     out.connect(this.channelInput(ch));
-    const shot = { start: time, end: time + 2.5, gain: out, ch };
+    const shot = { start: time, end: time + 2.5 * Math.max(1, dm), gain: out, ch };
     this.oneShots.push(shot);
     out.gain.setValueAtTime(v, time);
 
+    const sample = this.kitSamples.get(note);
+    if (sample) {
+      if (note === 42 || note === 44 || note === 22) this.openHat?.[ch]?.gain.setTargetAtTime(0, time, 0.01);
+      const src = ctx.createBufferSource();
+      src.buffer = sample;
+      src.playbackRate.value = ratio;
+      const full = sample.duration / ratio;
+      const dur = Math.min(full, full * dm); // decay below 1 shortens the sample
+      if (dur < full) out.gain.setTargetAtTime(0, time + dur * 0.8, dur * 0.06);
+      src.connect(out);
+      src.start(time);
+      src.stop(time + dur + 0.05);
+      shot.end = time + dur + 0.05;
+      if (note === 46 || note === 26) this.openHat = { ...this.openHat, [ch]: out };
+      return;
+    }
+
     const noise = (dur, type, freq, q = 1, level = 1, decay = dur / 4) => {
+      dur *= dm;
+      decay *= dm;
       const src = ctx.createBufferSource();
       src.buffer = this.noise;
       const f = ctx.createBiquadFilter();
       f.type = type;
-      f.frequency.value = freq;
+      f.frequency.value = Math.min(freq * ratio, 18000);
       f.Q.value = q;
       const g = ctx.createGain();
       g.gain.setValueAtTime(level, time);
@@ -677,6 +725,10 @@ export class Synth {
       return g;
     };
     const tone = (f0, f1, dur, type = 'sine', level = 1, decay = dur / 4) => {
+      f0 *= ratio;
+      f1 *= ratio;
+      dur *= dm;
+      decay *= dm;
       const o = ctx.createOscillator();
       o.type = type;
       o.frequency.setValueAtTime(f0, time);
@@ -703,11 +755,13 @@ export class Synth {
         const g = noise(0.2, 'bandpass', 1200, 1.5, 0.9, i === 2 ? 0.05 : 0.008);
         g.gain.setValueAtTime(0.9, time + i * 0.01);
       }
-    } else if (note === 42 || note === 44) {
+    } else if (note === 42 || note === 44 || note === 22) {
       this.openHat?.[ch]?.gain.setTargetAtTime(0, time, 0.01); // closed hat chokes the open hat
       noise(0.08, 'highpass', 7500, 1, 0.5, 0.015);
-    } else if (note === 46) {
+    } else if (note === 46 || note === 26) {
       this.openHat = { ...this.openHat, [ch]: noise(0.6, 'highpass', 7000, 1, 0.45, 0.12) };
+    } else if (note === 58) {
+      tone(80 * 1.6, 80, 0.5, 'sine', 1, 0.12); // e-kit floor tom rim
     } else if (toms[note]) {
       tone(toms[note] * 1.6, toms[note], 0.5, 'sine', 1, 0.12);
     } else if (note === 49 || note === 57 || note === 52 || note === 55) {

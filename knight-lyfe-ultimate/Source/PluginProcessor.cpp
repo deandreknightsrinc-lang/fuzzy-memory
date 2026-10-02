@@ -6,6 +6,14 @@ KnightLyfeProcessor::KnightLyfeProcessor()
       parameters (*this, nullptr, "KnightLyfe", createParameters())
 {
     masterParam = parameters.getRawParameterValue ("master");
+
+    // Your Kit Rack (tuning and samples) lives outside the project, like a sound library.
+   #if JUCE_MAC
+    const auto support = juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory).getChildFile ("Application Support");
+   #else
+    const auto support = juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory);
+   #endif
+    engine.setKitFolder (support.getChildFile ("Knight Lyfe").getChildFile ("Kit"));
     reverbParam = parameters.getRawParameterValue ("reverb");
 }
 

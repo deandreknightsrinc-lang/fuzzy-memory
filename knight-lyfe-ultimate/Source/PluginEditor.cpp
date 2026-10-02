@@ -32,7 +32,17 @@ juce::WebBrowserComponent::Options KnightLyfeEditor::makeOptions()
         .withKeepPageLoadedWhenBrowserIsHidden()
         .withResourceProvider ([this] (const juce::String& url) { return assets.get (url); })
         .withEventListener ("kk", [this] (const juce::var& v) { processor.handleInterfaceBatch (v); })
-        .withEventListener ("kkSave", [this] (const juce::var& v) { saveFile (v); });
+        .withEventListener ("kkSave", [this] (const juce::var& v) { saveFile (v); })
+        .withEventListener ("kkKitQuery", [this] (const juce::var&) {
+            browser.emitEventIfBrowserIsVisible ("kkKitState", processor.getEngine().getKitState());
+        })
+        .withEventListener ("kkSample", [this] (const juce::var& v) {
+            const bool ok = processor.getEngine().handleDrumSample (v);
+            auto* reply = new juce::DynamicObject();
+            reply->setProperty ("note", v.getProperty ("note", -1));
+            reply->setProperty ("ok", ok);
+            browser.emitEventIfBrowserIsVisible ("kkSampleLoaded", juce::var (reply));
+        });
 }
 
 void KnightLyfeEditor::paint (juce::Graphics& g)
@@ -92,7 +102,7 @@ void KnightLyfeEditor::saveFile (const juce::var& request)
 {
     const auto name = request.getProperty ("name", "Knight Lyfe file").toString();
     auto data = std::make_shared<juce::MemoryBlock>();
-    if (! data->fromBase64Encoding (request.getProperty ("data", "").toString()))
+    if (! knightlyfe::SoundEngine::decodeBase64 (request.getProperty ("data", "").toString(), *data))
         return;
 
     chooser = std::make_unique<juce::FileChooser> (

@@ -162,6 +162,112 @@ int main()
     r.run (0.05);
     CHECK (peak (r.run (0.2)) < 0.001f, "panic message works");
 
+    std::printf ("Kit Rack (custom drum kit)\n");
+    {
+        juce::MemoryBlock b64;
+        CHECK (SoundEngine::decodeBase64 ("aGVsbG8gZHJ1bXM=", b64) && b64.toString() == "hello drums",
+               "standard base64 from the browser decodes");
+
+        auto hitPeak = [&] (int note, double seconds = 0.3) {
+            r.run (1.0);
+            r.engine.postMidi (18, 0x99, note, 110, 0.0);
+            return peak (r.run (seconds));
+        };
+        auto tailEnergy = [&] (int note) { // loudness 150-400 ms after the hit
+            r.run (1.0);
+            r.engine.postMidi (18, 0x99, note, 110, 0.0);
+            auto out = r.run (0.4);
+            return peak (out, (int) (0.15 * Render::sr), (int) (0.25 * Render::sr));
+        };
+
+        const float stockSnare = hitPeak (38);
+        r.engine.handleInterfaceBatch (juce::JSON::parse (R"({"batch":[{"kit":[[38,0,1,0]]}]})"));
+        CHECK (hitPeak (38) < 0.001f, "kit message: level 0 silences that drum");
+        r.engine.handleInterfaceBatch (juce::JSON::parse (R"({"batch":[{"kit":[[38,0,1,0.5]]}]})"));
+        const float halfSnare = hitPeak (38);
+        CHECK (std::abs (halfSnare / stockSnare - 0.5f) < 0.15f, "level 0.5 is about half as loud");
+        r.engine.setDrumPiece (38, 0.0f, 1.0f, 1.0f);
+
+        const float longKick = tailEnergy (36);
+        r.engine.setDrumPiece (36, 0.0f, 0.3f, 1.0f);
+        const float shortKick = tailEnergy (36);
+        std::printf ("       kick tail: stock %.4f, decay 0.3 %.4f\n", longKick, shortKick);
+        CHECK (shortKick < longKick * 0.5f, "decay shortens the drum");
+        r.engine.setDrumPiece (36, 0.0f, 1.0f, 1.0f);
+
+        // Your own sample: 0.2 s of a 1 kHz tone as a WAV file, sent the way the interface sends it.
+        juce::AudioBuffer<float> tone (1, 8820);
+        for (int i = 0; i < tone.getNumSamples(); ++i)
+            tone.setSample (0, i, 0.8f * std::sin (juce::MathConstants<float>::twoPi * 1000.0f * (float) i / 44100.0f));
+        juce::MemoryBlock wav;
+        {
+            juce::WavAudioFormat format;
+            std::unique_ptr<juce::OutputStream> stream = std::make_unique<juce::MemoryOutputStream> (wav, false);
+            auto writer = format.createWriterFor (stream, juce::AudioFormatWriterOptions {}
+                                                              .withSampleRate (44100.0)
+                                                              .withNumChannels (1)
+                                                              .withBitsPerSample (16));
+            writer->writeFromAudioSampleBuffer (tone, 0, tone.getNumSamples());
+        }
+        auto* req = new juce::DynamicObject();
+        req->setProperty ("note", 38);
+        req->setProperty ("data", juce::Base64::toBase64 (wav.getData(), wav.getSize()));
+        CHECK (r.engine.handleDrumSample (juce::var (req)) && r.engine.hasDrumSample (38), "a WAV sample loads onto the snare");
+
+        r.run (1.0);
+        r.engine.postMidi (18, 0x99, 38, 127, 0.0);
+        auto s = r.run (0.5);
+        const float during = peak (s, 0, (int) (0.18 * Render::sr));
+        const float after = peak (s, (int) (0.25 * Render::sr), (int) (0.2 * Render::sr));
+        std::printf ("       sample hit: %.3f during, %.4f after it ends\n", during, after);
+        CHECK (during > 0.2f && after < 0.001f, "the snare now plays the sample, for the sample's length");
+
+        r.engine.setDrumPiece (38, 12.0f, 1.0f, 1.0f); // an octave up plays twice as fast
+        r.run (1.0);
+        r.engine.postMidi (18, 0x99, 38, 127, 0.0);
+        auto octaveUp = r.run (0.3);
+        CHECK (peak (octaveUp, (int) (0.13 * Render::sr), (int) (0.1 * Render::sr)) < 0.001f, "tune +12 plays the sample in half the time");
+        r.engine.setDrumPiece (38, 0.0f, 1.0f, 1.0f);
+
+        auto* clear = new juce::DynamicObject();
+        clear->setProperty ("note", 38);
+        clear->setProperty ("clear", true);
+        r.engine.handleDrumSample (juce::var (clear));
+        CHECK (! r.engine.hasDrumSample (38) && hitPeak (38) > 0.1f, "clearing it brings back the synthesized snare");
+
+        // The kit is kept on disk and comes back in a new plug-in instance.
+        const auto folder = juce::File::getSpecialLocation (juce::File::tempDirectory).getChildFile ("kl-kit-test");
+        folder.deleteRecursively();
+        {
+            SoundEngine e1;
+            e1.setKitFolder (folder);
+            auto* again = new juce::DynamicObject();
+            again->setProperty ("note", 39);
+            again->setProperty ("name", "my clap.wav");
+            again->setProperty ("data", juce::Base64::toBase64 (wav.getData(), wav.getSize()));
+            e1.handleDrumSample (juce::var (again));
+            e1.handleInterfaceBatch (juce::JSON::parse (R"({"batch":[{"kit":[[36,-3,2,0.75]]}]})"));
+        }
+        {
+            Render r2;
+            r2.engine.setKitFolder (folder);
+            const auto state = r2.engine.getKitState();
+            CHECK (r2.engine.hasDrumSample (39) && state["samples"]["39"].toString() == "my clap.wav",
+                   "a saved sample comes back in a new instance, with its name");
+            r2.engine.postMidi (18, 0x99, 39, 127, 0.0);
+            auto out = r2.run (0.5);
+            CHECK (peak (out, 0, (int) (0.18 * Render::sr)) > 0.2f && peak (out, (int) (0.25 * Render::sr), (int) (0.2 * Render::sr)) < 0.001f,
+                   "and plays without the window ever opening");
+            CHECK (folder.getChildFile ("kit.json").loadFileAsString().contains ("-3"), "kit tuning is saved too");
+        }
+        folder.deleteRecursively();
+
+        auto* bad = new juce::DynamicObject();
+        bad->setProperty ("note", 40);
+        bad->setProperty ("data", juce::Base64::toBase64 ("not audio", 9));
+        CHECK (! r.engine.handleDrumSample (juce::var (bad)), "a file that isn't audio is refused");
+    }
+
     std::printf ("Host transport\n");
     {
         SoundEngine e;

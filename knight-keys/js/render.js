@@ -582,3 +582,89 @@ export function drawPianoRoll(canvas, notes, duration, colors) {
   }
   ctx.globalAlpha = 1;
 }
+
+/**
+ * Drum highway: one lane per drum, notes fall toward the hit line.
+ * view: { lanes: [{ short, color }], notes: [{ t, lane, vel }], time, ahead,
+ *         want: Set(lane) waiting in learn mode, flash: [seconds since last hit per lane],
+ *         beats: [t of each beat], fg, bg, empty }
+ */
+export function drawDrumHighway(canvas, view) {
+  const { ctx, w, h } = fitCanvas(canvas);
+  const { lanes, notes, time, ahead = 2.5 } = view;
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = view.bg;
+  ctx.fillRect(0, 0, w, h);
+
+  const labelH = 20;
+  const hitY = h - labelH - 10;
+  const pxPerSec = (hitY - 4) / ahead;
+  const laneW = w / lanes.length;
+  const yAt = (t) => hitY - (t - time) * pxPerSec;
+
+  // Lane backgrounds, beat lines, hit line.
+  lanes.forEach((lane, i) => {
+    ctx.fillStyle = i % 2 ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.06)';
+    ctx.fillRect(i * laneW, 0, laneW, hitY);
+  });
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 1;
+  for (const b of view.beats || []) {
+    const y = yAt(b);
+    if (y < 0 || y > hitY) continue;
+    ctx.beginPath();
+    ctx.moveTo(0, Math.round(y) + 0.5);
+    ctx.lineTo(w, Math.round(y) + 0.5);
+    ctx.stroke();
+  }
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.fillRect(0, hitY - 1, w, 2);
+
+  // Notes.
+  const gemH = Math.max(5, Math.min(16, laneW * 0.25, pxPerSec * 0.07));
+  for (const n of notes) {
+    const y = yAt(n.t);
+    if (y < -gemH || y > hitY + gemH * 2) continue;
+    const lane = lanes[n.lane];
+    const past = n.t < time - 0.03;
+    ctx.globalAlpha = past ? 0.25 : 0.55 + 0.45 * Math.min(1, n.vel / 110);
+    ctx.fillStyle = lane.color;
+    roundRect(ctx, n.lane * laneW + 4, y - gemH / 2, laneW - 8, gemH, 4);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  // Hit flashes and learn-mode targets at the hit line, then lane names.
+  lanes.forEach((lane, i) => {
+    const x = i * laneW;
+    const since = view.flash?.[i] ?? 99;
+    if (since < 0.18) {
+      ctx.globalAlpha = 1 - since / 0.18;
+      ctx.fillStyle = lane.color;
+      roundRect(ctx, x + 2, hitY - gemH, laneW - 4, gemH * 2, 6);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    if (view.want?.has(i)) {
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 3;
+      roundRect(ctx, x + 3, hitY - gemH, laneW - 6, gemH * 2, 6);
+      ctx.stroke();
+    }
+    ctx.fillStyle = lane.color;
+    ctx.fillRect(x + 2, h - labelH, laneW - 4, 3);
+    ctx.fillStyle = view.fg;
+    ctx.font = `${Math.min(12, laneW * 0.3)}px system-ui, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(lane.short, x + laneW / 2, h - labelH / 2 + 2);
+  });
+
+  if (!notes.length && view.empty) {
+    ctx.fillStyle = view.fg;
+    ctx.globalAlpha = 0.6;
+    ctx.font = '13px system-ui, sans-serif';
+    ctx.fillText(view.empty, w / 2, hitY / 2);
+    ctx.globalAlpha = 1;
+  }
+}

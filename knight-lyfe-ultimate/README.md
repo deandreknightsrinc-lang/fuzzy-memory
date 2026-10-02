@@ -8,6 +8,8 @@ The Knight Keys learning studio as a **Logic Pro plug-in (Audio Unit)**, a **VST
   - the Knight Keys drum kit
   - room reverb, a volume control and an output limiter
 - MIDI from Logic (or from your keyboard and e-kit in the standalone app) plays instantly and lights up the interface. Learn mode, recording and chord names all follow it.
+- **Kit Rack:** a drum sampler window with a kit library, Tune/Decay/Level per drum, and your own samples on any drum. The C++ engine plays them through Logic and keeps your kit in `~/Library/Application Support/Knight Lyfe/Kit`, so it plays even with the window closed.
+- **Drum highway + e-kit learning:** falling notes per drum lane; the Alesis Nitro Max's rims and edges count as the right drum in Learn mode.
 - **Tempo sync:** with **Follow Logic** ticked (Groove panel), pressing Play in Logic plays the loaded song and the groove at Logic's tempo, lined up with Logic's bar 1. Stop, moving the playhead and cycle all follow. With no song loaded, a started groove waits for Logic's Play button.
 
 ## Get it
@@ -57,6 +59,7 @@ knight-keys/  (web app)           Source/  (C++)
   - sustain pedal, drums, mixer gains, cancel, stop and panic
   - the exact JSON messages the interface sends
   - Logic's transport position is passed on without torn reads
+  - Kit Rack: kit messages, tune/decay/level, your WAV samples, saved kit loading in a new instance
 - `../knight-keys/test/host.test.js` checks the interface side of the bridge; `midi.test.js` checks songs following Logic's tempo, cycle and stop.
 - The Mac CI job runs `install.sh` exactly as a user would and checks the result.
 

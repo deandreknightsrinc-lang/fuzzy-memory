@@ -3,6 +3,7 @@
 #include <juce_audio_basics/juce_audio_basics.h>
 
 #include <array>
+#include <atomic>
 
 namespace knightlyfe
 {
@@ -12,7 +13,23 @@ namespace knightlyfe
 class DrumSynth
 {
 public:
+    /** A recorded one-shot that replaces the synthesized sound of one note. */
+    struct Sample
+    {
+        juce::AudioBuffer<float> audio; // 1 or 2 channels
+        double sampleRate = 44100.0;
+    };
+
+    DrumSynth();
+
     void prepare (double sampleRate);
+
+    /** Kit Rack settings for one note (any thread): tune in semitones, decay and
+        level as multipliers (1 = the stock sound). */
+    void setPiece (int note, float tuneSemitones, float decay, float level) noexcept;
+    /** Plays `sample` (or the synthesized sound again, if nullptr) for `note`.
+        The sample must stay alive while it may be playing; SoundEngine owns them. */
+    void setSample (int note, const Sample* sample) noexcept;
 
     /** Starts a hit `offset` samples into the next render call. `gain` scales the hit. */
     void trigger (int note, int velocity127, float gain, int offset);
@@ -40,12 +57,20 @@ private:
         float hpState = 0.0f, hpPrev = 0.0f, lpState = 0.0f;
         int bursts = 0;         // clap
         bool openHat = false;
+        // recorded sample
+        const Sample* sample = nullptr;
+        double pos = 0.0, step = 1.0;
+        int sampleEnd = 0;      // where the (decay-shortened) sample fades out
     };
 
     Hit* freeHit();
     float coeffFor (float seconds) const;
 
+    void renderSample (Hit&, float* outL, float* outR, int startSample, int numSamples);
+
     std::array<Hit, 32> hits;
+    std::array<std::atomic<float>, 128> pieceTune, pieceDecay, pieceLevel;
+    std::array<std::atomic<const Sample*>, 128> pieceSample;
     double sampleRate = 44100.0;
     juce::Random random;
 };
