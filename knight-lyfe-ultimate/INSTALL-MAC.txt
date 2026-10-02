@@ -110,3 +110,13 @@ Unzip the files first (double-click each .zip).
    - Practice: the song waits for you at every note.
    One crown on a song unlocks the next one. If your hits always land a
    bit late, raise "Timing" (in ms) in the Stage menu.
+
+9. CHURCH SONGS, HARDER LEVELS AND YOUR OWN SONGS
+   Click "Songs":
+   - Church & Worship: hymns and spirituals, plus worship and gospel chord
+     progressions to practice for service.
+   - Arrangement: Beginner, Intermediate or Advanced (harmony, walking
+     bass, gospel voicings, busier drums). Stage has the same levels.
+   - "+ New song": type any song's chord chart (and a melody if you
+     want) and save it to My Songs. "Save the open song" keeps a MIDI file.
+     Your songs show up in Songs and in Stage > My Songs.

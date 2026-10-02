@@ -8,7 +8,7 @@ import { LANES, laneOf, sameDrum, PIECES, KITS, kitById, resolveKit, kitNotePara
 import { detectChord, noteName, pcName, solfege, keyName } from './theory.js';
 import { createDemoMidi } from './demo.js';
 import { GROOVES, GroovePlayer } from './grooves.js';
-import { SONGS, songToMidi } from './songs.js';
+import { SONGS, LEVELS, LEVEL_NAMES, DRUM_STYLE_NAMES, songToMidi, chartToChords, validateSong, loadMySongs, saveMySongs } from './songs.js';
 import { HostSynth, HostTransport, IN_HOST, onHostMidi, onHostTransport, hostSave, queryHostKit } from './host.js';
 
 const $ = (id) => document.getElementById(id);
@@ -703,6 +703,7 @@ function loadMidiBytes(bytes, name, { keepLoops = false } = {}) {
   fillKeySelect();
   updateGrooveLock();
   state.librarySong = null;
+  state.libraryChart = false;
   updateLearnParts();
   markDirty();
 }
@@ -1082,7 +1083,7 @@ function presetOptions(select, value, withAuto) {
 
 function channelName(ch) {
   if (ch === DRUM_CHANNEL) return 'Drums';
-  if (state.librarySong && ch <= 1) return ch === 0 ? 'Melody (right hand)' : 'Chords (left hand)';
+  if (state.librarySong && ch <= 1) return state.libraryChart ? (ch === 0 ? 'Chords (right hand)' : 'Bass (left hand)') : ch === 0 ? 'Melody (right hand)' : 'Chords (left hand)';
   return GM_NAMES[state.chan[ch].program] || `Program ${state.chan[ch].program}`;
 }
 
@@ -2257,6 +2258,8 @@ function initKitRack() {
 const stage = loadStage();
 const stageRun = {
   phase: 'menu', // menu | count | play | results
+  course: 'church', // church | starter | mine
+  level: 'beginner',
   part: '0',
   mode: 'perform',
   speed: 1,
@@ -2279,9 +2282,17 @@ const crownsHtml = (n) => Array.from({ length: 5 }, (_, i) => `<span class="${i 
 const stagePlayer = () => stage.players.find((p) => p.id === stage.current) || stage.players[0];
 const partName = (part) => ({ 0: 'Right hand', 1: 'Left hand', '0,1': 'Both hands', 9: 'Drums' })[part] || `Part ${part}`;
 
+const LEVEL_RANK = { Beginner: 0, Easy: 1, Intermediate: 2, Advanced: 3 };
+/** Built-in songs of a category, easiest first. */
+const songsIn = (category) => SONGS.filter((s) => s.category === category).sort((a, b) => (LEVEL_RANK[a.level] ?? 9) - (LEVEL_RANK[b.level] ?? 9));
+
 function stageSongs(part) {
-  return SONGS.filter((s) => part !== String(DRUM_CHANNEL) || s.drums);
+  const list = stageRun.course === 'mine' ? mySongs : songsIn(stageRun.course);
+  return list.filter((s) => part !== String(DRUM_CHANNEL) || s.drums || s.type === 'midi');
 }
+
+/** Scores are kept per song and arrangement level (Beginner keeps the plain song id). */
+const stageSongKey = (song) => (stageRun.level === 'beginner' ? song.id : `${song.id}@${stageRun.level}`);
 
 function renderStageMenu() {
   const me = stagePlayer();
@@ -2310,15 +2321,25 @@ function renderStageMenu() {
   }
   document.querySelectorAll('#stageParts button').forEach((b) => b.classList.toggle('on', b.dataset.part === stageRun.part));
   document.querySelectorAll('#stageModes button').forEach((b) => b.classList.toggle('on', b.dataset.mode === stageRun.mode));
+  document.querySelectorAll('#stageCourses button').forEach((b) => b.classList.toggle('on', b.dataset.course === stageRun.course));
+  document.querySelectorAll('#stageLevels button').forEach((b) => b.classList.toggle('on', b.dataset.level === stageRun.level));
   const list = $('stageCourse');
   list.innerHTML = '';
-  courseState(stage, stageSongs(stageRun.part), stageRun.part, me.id).forEach(({ song, crowns, unlocked }, i) => {
+  const songs = stageSongs(stageRun.part);
+  if (!songs.length) {
+    const li = Object.assign(document.createElement('li'), { className: 'stage-song locked', textContent: stageRun.course === 'mine' ? 'No songs here yet: add one with Songs → ＋ New song.' : 'No songs with this part.' });
+    list.append(li);
+  }
+  const keyed = songs.map((song) => ({ ...song, id: stageSongKey(song), entry: song }));
+  courseState(stage, keyed, stageRun.part, me.id).forEach(({ song: keyedSong, crowns, unlocked: open }, i) => {
+    const song = keyedSong.entry;
+    const unlocked = open || stageRun.course === 'mine' || stage.unlockAll; // your own songs are always open
     const li = document.createElement('li');
     li.className = `stage-song${unlocked ? '' : ' locked'}`;
-    const board = stage.scores[scoreKey(song.id, stageRun.part)] || [];
+    const board = stage.scores[scoreKey(keyedSong.id, stageRun.part)] || [];
     const best = Math.max(0, ...board.filter((r) => r.player === me.id).map((r) => r.score));
     li.innerHTML = `<div class="ss-num"></div><div class="ss-title"></div><div class="ss-crowns">${crownsHtml(crowns)}</div><div class="ss-best"></div>${unlocked ? '' : '<span class="ss-lock">🔒</span>'}`;
-    li.querySelector('.ss-num').textContent = `Song ${i + 1} · ${song.level}`;
+    li.querySelector('.ss-num').textContent = `Song ${i + 1}${song.level ? ` · ${song.level}` : ''}${song.type !== 'midi' && !song.melody ? ' · chords' : ''}`;
     li.querySelector('.ss-title').textContent = song.title;
     li.querySelector('.ss-best').textContent = best ? `Best ${best.toLocaleString()}` : unlocked ? 'Not played yet' : 'Earn a 👑 on the song before to unlock';
     li.onclick = () => (unlocked ? startStage(song) : toast('Earn at least one 👑 on the song before this one to unlock it.'));
@@ -2366,23 +2387,19 @@ function buildStageTargets(part) {
 function startStage(song) {
   synth.ensure();
   if (song) {
-    if (state.mediaFile) ejectMedia();
-    loadMidiBytes(songToMidi(song), `${song.title}.mid`);
-    state.librarySong = song.id;
-    updateMixerNames();
-    updateLearnParts();
+    loadSongEntry(song, stageRun.level);
   } else if (!state.song) {
     return toast('Open a MIDI song first (Open… or Audio → MIDI), or pick one of the songs here.');
   }
   let part = stageRun.part;
   if (!song) {
-    // Your own song: use the part picked next to the Learn button.
+    // The song that's open: use the part picked next to the Learn button.
     part = $('learnPart').value || part;
-  }
+  } else part = mapPartForSong(part);
   const channels = part.split(',').map(Number);
   if (!channels.some((c) => state.song.channels.includes(c))) return toast(`This song has no ${partName(part).toLowerCase()} part.`);
   stageRun.song = song;
-  stageRun.key = song ? song.id : `file:${state.midiName}`;
+  stageRun.key = song ? stageSongKey(song) : `file:${state.midiName}`;
   stageRun.playPart = part;
   if (learn.enabled) setLearn(false);
   player.pause();
@@ -2392,7 +2409,7 @@ function startStage(song) {
   player.loop = { ...player.loop, enabled: false };
   const built = buildStageTargets(part);
   Object.assign(stageRun, built, { pops: [], seenEvents: 0, lastCount: -1 });
-  setText($('hudSong'), `${state.song.title || state.midiName} · ${partName(part)} · ${stageRun.mode === 'perform' ? 'Perform' : 'Practice'}${stageRun.speed < 1 ? ` · ${Math.round(stageRun.speed * 100)}%` : ''}`);
+  setText($('hudSong'), `${song?.title || state.song.title || state.midiName} · ${partName(stageRun.part)}${song && song.type !== 'midi' ? ` · ${LEVEL_NAMES[stageRun.level]}` : ''} · ${stageRun.mode === 'perform' ? 'Perform' : 'Practice'}${stageRun.speed < 1 ? ` · ${Math.round(stageRun.speed * 100)}%` : ''}`);
   setText($('stageHint'), built.drums ? 'Hit your e-kit, the pads, or tap the drum pads on screen.' : 'Play your keyboard, click the keys, or use the computer keys (A W S E D…).');
   buildStageTaps();
   if (stageRun.mode === 'practice') {
@@ -2621,7 +2638,8 @@ function finishStage() {
   const songs = stageSongs(stageRun.part);
   const idx = stageRun.song ? songs.findIndex((x) => x.id === stageRun.song.id) : -1;
   const next = idx >= 0 ? songs[idx + 1] : null;
-  const nextOpen = next && courseState(stage, songs, stageRun.part, me.id)[idx + 1].unlocked;
+  const keyed = songs.map((x) => ({ id: stageSongKey(x) }));
+  const nextOpen = next && (stageRun.course === 'mine' || stage.unlockAll || courseState(stage, keyed, stageRun.part, me.id)[idx + 1].unlocked);
   $('resNext').hidden = !nextOpen;
   $('resNext').onclick = () => startStage(next);
   showStage('results');
@@ -2658,6 +2676,14 @@ function initStage() {
     stageRun.mode = b.dataset.mode;
     renderStageMenu();
   }));
+  document.querySelectorAll('#stageCourses button').forEach((b) => (b.onclick = () => {
+    stageRun.course = b.dataset.course;
+    renderStageMenu();
+  }));
+  document.querySelectorAll('#stageLevels button').forEach((b) => (b.onclick = () => {
+    stageRun.level = b.dataset.level;
+    renderStageMenu();
+  }));
   $('stageSpeed').onchange = () => (stageRun.speed = Number($('stageSpeed').value));
   $('stageCalib').value = String(Math.round((stage.calibration || 0) * 1000));
   $('stageCalib').onchange = () => {
@@ -2665,6 +2691,12 @@ function initStage() {
     saveStage(stage);
   };
   $('stageCurrent').onclick = () => startStage(null);
+  $('stageUnlock').checked = !!stage.unlockAll;
+  $('stageUnlock').onchange = () => {
+    stage.unlockAll = $('stageUnlock').checked;
+    saveStage(stage);
+    renderStageMenu();
+  };
   $('stageStop').onclick = () => stopStage();
   $('stageRestart').onclick = () => {
     stopStage(false);
@@ -2690,7 +2722,8 @@ function updateLearnParts() {
   if (song) {
     const melodic = song.channels.filter((ch) => ch !== DRUM_CHANNEL);
     if (state.librarySong) {
-      sel.append(new Option('Right hand (melody)', '0'), new Option('Left hand (chords)', '1'), new Option('Both hands', '0,1'));
+      const [rh, lh] = state.libraryChart ? ['Right hand (chords)', 'Left hand (bass)'] : ['Right hand (melody)', 'Left hand (chords)'];
+      sel.append(new Option(rh, '0'), new Option(lh, '1'), new Option('Both hands', '0,1'));
     } else {
       for (const ch of melodic) sel.append(new Option(`Ch ${ch + 1}: ${channelName(ch)}`, String(ch)));
       if (melodic.length > 1) sel.append(new Option('All parts', melodic.join(',')));
@@ -2769,50 +2802,253 @@ function renderLearn(sf, spelling) {
 
 // ---- Song library (tool window) ------------------------------------------
 
-function openLibrarySong(song, part) {
+// Songs: the built-in library plus your own (chord charts you typed, or saved MIDI files).
+let mySongs = loadMySongs();
+const libLevel = () => $('libLevel').value || 'beginner';
+
+/** MIDI bytes for a song entry at an arrangement level. */
+function entryMidi(entry, level = 'beginner') {
+  return entry.type === 'midi' ? fromB64(entry.midi) : songToMidi(entry, { level });
+}
+
+/** For a MIDI song, the channels that count as right hand / left hand / both / drums. */
+function mapPartForSong(part) {
+  if (state.librarySong || part === String(DRUM_CHANNEL)) return part;
+  const melodic = (state.song?.channels || []).filter((ch) => ch !== DRUM_CHANNEL);
+  if (!melodic.length) return part;
+  if (part === '0') return String(melodic[0]);
+  if (part === '1') return String(melodic[1] ?? melodic[0]);
+  return melodic.slice(0, 2).join(',');
+}
+
+function loadSongEntry(entry, level) {
   synth.ensure();
   if (state.mediaFile) ejectMedia();
-  loadMidiBytes(songToMidi(song), `${song.title}.mid`);
-  state.librarySong = song.id;
+  loadMidiBytes(entryMidi(entry, level), `${entry.title}.mid`);
+  state.librarySong = entry.type === 'midi' ? null : entry.id;
+  state.libraryChart = entry.type !== 'midi' && !entry.melody;
   updateMixerNames();
   updateLearnParts();
+}
+
+function openLibrarySong(song, part, level = libLevel()) {
+  loadSongEntry(song, level);
   if (part) {
-    $('learnPart').value = part;
+    $('learnPart').value = mapPartForSong(part);
     setLearn(true);
   } else if (learn.enabled) setLearn(false);
   player.play();
   markDirty();
 }
 
-function initSongs() {
-  const list = $('songList');
-  for (const song of SONGS) {
-    const li = document.createElement('li');
-    const top = document.createElement('div');
-    top.className = 'song-top';
-    const title = Object.assign(document.createElement('span'), { className: 'song-name', textContent: song.title });
-    const level = Object.assign(document.createElement('span'), { className: `level ${song.level.toLowerCase()}`, textContent: song.level });
-    const meta = Object.assign(document.createElement('span'), {
+function songItem(song, { mine = false } = {}) {
+  const li = document.createElement('li');
+  const top = document.createElement('div');
+  top.className = 'song-top';
+  const chart = song.type !== 'midi' && !song.melody;
+  const title = Object.assign(document.createElement('span'), { className: 'song-name', textContent: song.title });
+  top.append(title);
+  if (song.level) top.append(Object.assign(document.createElement('span'), { className: `level ${song.level.toLowerCase()}`, textContent: song.level }));
+  if (chart) top.append(Object.assign(document.createElement('span'), { className: 'tag-practice', textContent: 'Chords' }));
+  if (song.type !== 'midi') {
+    top.append(Object.assign(document.createElement('span'), {
       className: 'meta',
-      textContent: `${keyName(song.key)} · ${song.time[0]}/${song.time[1]} · ${song.bpm} bpm`,
-    });
-    top.append(title, level, meta);
-    const about = Object.assign(document.createElement('p'), { className: 'about', textContent: song.about });
-    const row = document.createElement('div');
-    row.className = 'row wrap';
-    const button = (label, fn, titleText) => {
-      const b = Object.assign(document.createElement('button'), { textContent: label, title: titleText || '' });
-      b.onclick = fn;
-      row.append(b);
-    };
-    button('▶ Listen', () => openLibrarySong(song), 'Hear the whole song');
-    button('🎯 Right hand', () => openLibrarySong(song, '0'), 'Learn the melody');
-    button('🎯 Left hand', () => openLibrarySong(song, '1'), 'Learn the chords');
-    button('🎯 Both hands', () => openLibrarySong(song, '0,1'));
-    if (song.drums) button('🥁 Drums', () => openLibrarySong(song, String(DRUM_CHANNEL)), 'Learn the drum part on the pads or your e-kit');
-    li.append(top, about, row);
-    list.append(li);
+      textContent: `${keyName(song.key)}${song.minor ? ' minor' : ''} · ${song.time[0]}/${song.time[1]} · ${song.bpm} bpm`,
+    }));
+  } else top.append(Object.assign(document.createElement('span'), { className: 'meta', textContent: 'MIDI file' }));
+  if (mine) {
+    const actions = Object.assign(document.createElement('span'), { className: 'actions-mine' });
+    if (song.type !== 'midi') actions.append(Object.assign(document.createElement('button'), { className: 'mini', textContent: '✎ Edit', onclick: () => openBuilder(song) }));
+    actions.append(Object.assign(document.createElement('button'), {
+      className: 'mini',
+      textContent: '🗑',
+      title: 'Delete',
+      onclick: () => {
+        if (!confirm(`Delete "${song.title}" from My Songs?`)) return;
+        mySongs = mySongs.filter((x) => x.id !== song.id);
+        saveMySongs(mySongs);
+        renderSongLists();
+      },
+    }));
+    top.append(actions);
   }
+  li.append(top);
+  if (song.about) li.append(Object.assign(document.createElement('p'), { className: 'about', textContent: song.about }));
+  const row = document.createElement('div');
+  row.className = 'row wrap';
+  const button = (label, fn, titleText) => {
+    const b = Object.assign(document.createElement('button'), { textContent: label, title: titleText || '' });
+    b.onclick = fn;
+    row.append(b);
+  };
+  button('▶ Listen', () => openLibrarySong(song), 'Hear the whole song');
+  button(chart ? '🎯 Right hand (chords)' : '🎯 Right hand', () => openLibrarySong(song, '0'), chart ? 'Learn the chords' : 'Learn the melody');
+  button(chart ? '🎯 Left hand (bass)' : '🎯 Left hand', () => openLibrarySong(song, '1'), chart ? 'Learn the bass line' : 'Learn the chords');
+  button('🎯 Both hands', () => openLibrarySong(song, '0,1'));
+  if (song.drums || song.type === 'midi') button('🥁 Drums', () => openLibrarySong(song, String(DRUM_CHANNEL)), 'Learn the drum part on the pads or your e-kit');
+  li.append(row);
+  return li;
+}
+
+function renderSongLists() {
+  for (const [id, cat] of [['songListChurch', 'church'], ['songList', 'starter']]) {
+    const list = $(id);
+    list.innerHTML = '';
+    for (const song of songsIn(cat)) list.append(songItem(song));
+  }
+  const mine = $('songListMine');
+  mine.innerHTML = '';
+  for (const song of mySongs) mine.append(songItem(song, { mine: true }));
+  $('mySongsEmpty').hidden = mySongs.length > 0;
+  if ($('stageDlg').open && stageRun.phase === 'menu') renderStageMenu();
+}
+
+// ---- Song Builder --------------------------------------------------------
+
+const KEYS = [['C', 0], ['G', 1], ['D', 2], ['A', 3], ['E', 4], ['B', 5], ['F#', 6], ['Db', -5], ['Ab', -4], ['Eb', -3], ['Bb', -2], ['F', -1]];
+const MINOR_KEYS = [['Am', 0], ['Em', 1], ['Bm', 2], ['F#m', 3], ['C#m', 4], ['G#m', 5], ['Ebm', -6], ['Bbm', -5], ['Fm', -4], ['Cm', -3], ['Gm', -2], ['Dm', -1]];
+const TEMPLATES = {
+  worship: { key: '1', time: '4/4', bpm: 72, drums: 'straight', chords: 'Verse:\n| G | D/F# | Em | C |\n| G | D/F# | Em | C |\nChorus:\n| C | G | D | Em |\n| C | G | Dsus4 D | G |' },
+  gospel: { key: '0', time: '4/4', bpm: 84, drums: 'shuffle', chords: 'Vamp:\n| Dm7 | G7 | Cmaj7 | A7 | x2\nTurnaround:\n| Fmaj7 | Fm6 | Em7 A7 | Dm7 G7 |' },
+  hymn: { key: '-1', time: '4/4', bpm: 80, drums: 'straight', chords: '| F | Bb F | C | F |\n| F | Bb F | C7 | F |' },
+  ballad: { key: '2', time: '6/8', bpm: 60, drums: 'ballad68', chords: '| D | G/D | Bm | A |\n| G | A | D | D |' },
+  praise: { key: '-4', time: '4/4', bpm: 128, drums: 'twostep', chords: 'Praise break:\n| Ab | Db/Ab | Ab | Eb7 | x2\n| Db | Ebsus4 Eb | Ab | Ab |' },
+};
+let builderEditing = null;
+
+function builderSong() {
+  const [num, den] = $('bTime').value.split('/').map(Number);
+  const beatsPerBar = (num * 4) / den;
+  const keyVal = $('bKey').value; // "sf" or "m:sf"
+  const minor = keyVal.startsWith('m:');
+  const conv = chartToChords($('bChords').value, beatsPerBar);
+  const song = {
+    id: builderEditing?.id || `my-${Date.now().toString(36)}`,
+    type: 'chart',
+    title: $('bTitle').value.trim(),
+    key: Number(minor ? keyVal.slice(2) : keyVal),
+    minor,
+    time: [num, den],
+    bpm: Math.round(Number($('bBpm').value) || 0),
+    drums: $('bDrums').value || null,
+    level: $('bLevel').value,
+    about: $('bAbout').value.trim(),
+    chart: $('bChords').value,
+    chords: conv.chords,
+    melody: $('bMelody').value.trim(),
+  };
+  return { song, conv };
+}
+
+function updateBuilderStatus() {
+  const { song, conv } = builderSong();
+  const errors = [...conv.errors, ...validateSong(song).filter((e) => !/title/i.test(e) || $('bTitle').value)];
+  const el = $('bStatus');
+  if (errors.length) {
+    el.className = 'builder-status err';
+    el.textContent = `⚠ ${errors.slice(0, 3).join(' · ')}`;
+  } else {
+    el.className = 'builder-status ok';
+    const secs = (conv.bars * song.time[0] * 4 / song.time[1] * 60) / Math.max(30, song.bpm);
+    el.textContent = `✓ ${conv.bars} bars · about ${Math.floor(secs / 60)}:${String(Math.round(secs % 60)).padStart(2, '0')}${song.melody ? ' · with melody' : ' · right hand plays the chords'}`;
+  }
+  return errors;
+}
+
+function openBuilder(song = null) {
+  builderEditing = song;
+  $('builderTitle').textContent = song ? `Edit: ${song.title}` : 'Song Builder';
+  $('bTitle').value = song?.title || '';
+  $('bKey').value = song ? (song.minor ? `m:${song.key}` : String(song.key)) : '0';
+  $('bTime').value = song ? `${song.time[0]}/${song.time[1]}` : '4/4';
+  $('bBpm').value = song?.bpm || 80;
+  $('bDrums').value = song?.drums || (song ? '' : 'straight');
+  $('bLevel').value = song?.level || 'Intermediate';
+  $('bChords').value = song?.chart ?? '';
+  $('bMelody').value = song?.melody || '';
+  $('bAbout').value = song?.about || '';
+  $('bTemplate').value = '';
+  $('bDelete').hidden = !song;
+  updateBuilderStatus();
+  const dlg = $('builderDlg');
+  if (!dlg.open) dlg.show();
+  $('bTitle').focus();
+}
+
+function initBuilder() {
+  const dlg = $('builderDlg');
+  makeDraggable(dlg);
+  dlg.querySelector('[data-close]').onclick = () => dlg.close();
+  for (const [name, sf] of KEYS) $('bKey').append(new Option(`${name} major`, String(sf)));
+  for (const [name, sf] of MINOR_KEYS) $('bKey').append(new Option(`${name} (minor)`, `m:${sf}`));
+  for (const [id, name] of Object.entries(DRUM_STYLE_NAMES)) $('bDrums').append(new Option(name, id));
+  for (const id of ['bTitle', 'bChords', 'bMelody', 'bBpm', 'bTime', 'bKey']) $(id).addEventListener('input', updateBuilderStatus);
+  $('bTime').onchange = () => {
+    const t = $('bTime').value;
+    if (t === '6/8' && !['ballad68', ''].includes($('bDrums').value)) $('bDrums').value = 'ballad68';
+    if (t === '3/4' && !['waltz', ''].includes($('bDrums').value)) $('bDrums').value = 'waltz';
+    if (t === '12/8' && $('bDrums').value === 'straight') $('bDrums').value = 'shuffle';
+    updateBuilderStatus();
+  };
+  $('bTemplate').onchange = () => {
+    const t = TEMPLATES[$('bTemplate').value];
+    if (!t) return;
+    if ($('bChords').value.trim() && !confirm('Replace the chords you typed with this template?')) {
+      $('bTemplate').value = '';
+      return;
+    }
+    $('bKey').value = t.key;
+    $('bTime').value = t.time;
+    $('bBpm').value = t.bpm;
+    $('bDrums').value = t.drums;
+    $('bChords').value = t.chords;
+    updateBuilderStatus();
+  };
+  $('bPreview').onclick = () => {
+    const errors = updateBuilderStatus().filter((e) => !/title/i.test(e));
+    if (errors.length) return toast(errors[0]);
+    const { song } = builderSong();
+    openLibrarySong({ ...song, title: song.title || 'New song' });
+  };
+  $('bSave').onclick = () => {
+    const errors = updateBuilderStatus();
+    if (errors.length) return toast(errors[0]);
+    const { song } = builderSong();
+    const i = mySongs.findIndex((x) => x.id === song.id);
+    if (i >= 0) mySongs[i] = song;
+    else mySongs.push(song);
+    if (!saveMySongs(mySongs)) return toast('Could not save (browser storage is full or blocked).');
+    builderEditing = song;
+    $('bDelete').hidden = false;
+    renderSongLists();
+    toast(`Saved "${song.title}" to My Songs. Find it in Songs and in 🎸 Stage → My Songs.`);
+  };
+  $('bDelete').onclick = () => {
+    if (!builderEditing || !confirm(`Delete "${builderEditing.title}"?`)) return;
+    mySongs = mySongs.filter((x) => x.id !== builderEditing.id);
+    saveMySongs(mySongs);
+    renderSongLists();
+    dlg.close();
+  };
+}
+
+function initSongs() {
+  renderSongLists();
+  $('libLevel').onchange = () => toast(`${LEVEL_NAMES[libLevel()]} arrangement: pick a song to hear it.`);
+  $('libNew').onclick = () => openBuilder();
+  $('libSaveOpen').onclick = () => {
+    if (!state.midiBytes || state.librarySong) return toast('Open a MIDI file first (Open…, or Audio → MIDI → Open MIDI only). Built-in songs are already in the library.');
+    const title = prompt('Name for this song', (state.song?.title || state.midiName || 'My song').replace(/\.midi?$/i, ''));
+    if (!title) return;
+    mySongs.push({ id: `my-${Date.now().toString(36)}`, type: 'midi', title: title.trim().slice(0, 80), midi: toB64(state.midiBytes) });
+    if (!saveMySongs(mySongs)) {
+      mySongs.pop();
+      return toast('That file is too big to keep in the browser.');
+    }
+    renderSongLists();
+    toast(`Saved "${title}" to My Songs.`);
+  };
+  initBuilder();
   $('btnSongs').onclick = () => $('songsDlg').open || $('songsDlg').show();
   $('songsDlg').querySelector('[data-close]').onclick = () => $('songsDlg').close();
   makeDraggable($('songsDlg'));

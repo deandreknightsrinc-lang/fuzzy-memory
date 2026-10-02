@@ -287,9 +287,22 @@
       <button class="mini" data-close aria-label="Close">✕</button>
     </header>
     <div class="tool-body">
-      <p class="hint">Free to use: public-domain melodies, arranged for Knight Keys. <b>🎯 Learn</b> waits for you: the song pauses until you play the right note on your keyboard (or the right drum on your e-kit or the pads), while the other parts play along.</p>
+      <div class="row wrap lib-bar">
+        <label class="field" title="Beginner plays the song as written. Intermediate adds right-hand harmony, bass + chords and drum fills. Advanced adds fuller gospel voicings, an octave bass that walks into each chord, and busier drums.">Arrangement
+          <select id="libLevel"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select>
+        </label>
+        <button id="libNew" class="primary" title="Type in any song: its chord chart, and a melody if you like">＋ New song</button>
+        <button id="libSaveOpen" title="Keep the MIDI song that's open (from Open… or Audio → MIDI) in My Songs">💾 Save the open song</button>
+      </div>
+      <p class="hint"><b>🎯 Learn</b> waits for you: the song pauses until you play the right note on your keyboard (or the right drum on your e-kit or the pads), while the other parts play along. For a game with scores, use <b>🎸 Stage</b>.</p>
+      <h3 class="lib-head">⛪ Church &amp; Worship</h3>
+      <ol id="songListChurch" class="song-list"></ol>
+      <h3 class="lib-head">⭐ My Songs</h3>
+      <ol id="songListMine" class="song-list"></ol>
+      <p id="mySongsEmpty" class="hint">No songs yet. <b>＋ New song</b> types in any song from its chord chart (a melody is optional), or open a MIDI file and press <b>💾 Save the open song</b>.</p>
+      <h3 class="lib-head">🎵 Starter songs</h3>
       <ol id="songList" class="song-list"></ol>
-      <p class="hint">Add your own songs: open any MIDI file with <b>Open…</b>, or turn a recording into MIDI with <b>Audio → MIDI</b>. Learn mode works with those too.</p>
+      <p class="hint">Built-in songs are public-domain melodies with Knight Keys arrangements. Songs still under copyright (most modern worship songs) can't be included, but you can type their chord charts into <b>＋ New song</b> for your own practice.</p>
     </div>
   </dialog>
 
@@ -331,6 +344,59 @@
     </div>
   </dialog>
 
+
+
+  <dialog id="builderDlg" class="tool-window" aria-labelledby="builderTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="builderTitle">Song Builder</h2>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="tool-body builder">
+      <div class="row wrap">
+        <label class="field grow">Title <input id="bTitle" type="text" maxlength="80" placeholder="e.g. Sunday Opener" /></label>
+        <label class="field">Start from
+          <select id="bTemplate">
+            <option value="">— blank —</option>
+            <option value="worship">Worship 1-5-6-4 (G)</option>
+            <option value="gospel">Gospel 2-5-1 vamp (C)</option>
+            <option value="hymn">Hymn style 1-4-5 (F)</option>
+            <option value="ballad">6/8 ballad (D)</option>
+            <option value="praise">Praise break (Ab)</option>
+          </select>
+        </label>
+      </div>
+      <div class="row wrap">
+        <label class="field">Key <select id="bKey"></select></label>
+        <label class="field">Time
+          <select id="bTime"><option value="4/4">4/4</option><option value="3/4">3/4</option><option value="6/8">6/8</option><option value="12/8">12/8</option></select>
+        </label>
+        <label class="field">Tempo <input id="bBpm" type="number" min="30" max="260" value="80" /> BPM</label>
+        <label class="field">Drums <select id="bDrums"></select></label>
+        <label class="field">Level label
+          <select id="bLevel"><option>Beginner</option><option>Easy</option><option selected>Intermediate</option><option>Advanced</option></select>
+        </label>
+      </div>
+      <label class="field block">Chord chart
+        <textarea id="bChords" rows="7" spellcheck="false" placeholder="Verse:
+| G | D/F# | Em | C |
+| G | D | C | C |
+Chorus:
+G D/F# Em C x2"></textarea>
+      </label>
+      <p class="hint small">Bars go between <code>|</code> lines, and chords in one bar share it. Without bar lines, each chord is one bar. <code>G:2</code> gives exact beats, <code>%</code> repeats the last chord, <code>N.C.</code> is no chord, <code>x2</code> at the end repeats a line, and labels like <code>Verse:</code> or <code>[Chorus]</code> are fine. Chords like <code>Cmaj7 Dm7 G7sus4 Gadd9 D/F# Bbm7b5</code> all work.</p>
+      <label class="field block">Melody <span class="small">(optional: leave empty and the right hand plays the chords)</span>
+        <textarea id="bMelody" rows="3" spellcheck="false" placeholder="E4 D4 C4 D4 | E4 E4 E4:2 | r:1 G4 A4:2"></textarea>
+      </label>
+      <p class="hint small">Melody: a note name and octave (middle C is <code>C4</code>), then <code>:beats</code> if it's not one beat. <code>r:1</code> is a rest, and <code>F#4</code> and <code>Bb3</code> are sharps and flats.</p>
+      <label class="field block">Notes for the band <input id="bAbout" type="text" maxlength="200" placeholder="e.g. Capo 2, repeat chorus 3x, slow down on the last line" /></label>
+      <div id="bStatus" class="builder-status"></div>
+      <div class="row wrap">
+        <button id="bPreview">▶ Preview</button>
+        <button id="bSave" class="primary">💾 Save to My Songs</button>
+        <button id="bDelete" class="danger" hidden>Delete</button>
+      </div>
+    </div>
+  </dialog>
 
   <dialog id="kitDlg" class="tool-window kit-window" aria-labelledby="kitTitle">
     <header class="dlg-head tool-head">
@@ -420,6 +486,19 @@
           <button id="stageAddPlayer" class="mini" title="Add a player">＋ Player</button>
         </div>
         <div class="stage-row">
+          <span class="stage-label">Songs</span>
+          <div id="stageCourses" class="stage-seg">
+            <button data-course="church">⛪ Church &amp; Worship</button>
+            <button data-course="starter">🎵 Starter</button>
+            <button data-course="mine">⭐ My Songs</button>
+          </div>
+          <div id="stageLevels" class="stage-seg" title="Beginner plays the song as written; Intermediate and Advanced add harmony, bass lines, gospel voicings and busier drums. Each level has its own crowns and leaderboard.">
+            <button data-level="beginner">Beginner</button>
+            <button data-level="intermediate">Intermediate</button>
+            <button data-level="advanced">Advanced</button>
+          </div>
+        </div>
+        <div class="stage-row">
           <span class="stage-label">Instrument</span>
           <div id="stageParts" class="stage-seg">
             <button data-part="0">🎹 Right hand</button>
@@ -445,6 +524,7 @@
         <div class="stage-row">
           <button id="stageCurrent" title="Play the MIDI song that's open in Knight Keys (yours, or one made with Audio → MIDI)">🎵 Play the song that's open</button>
           <span class="small">Earn 👑 on a song to unlock the next one. Every player has their own progress.</span>
+          <label class="field" title="Open every song now, for example to practice what's on for Sunday"><input id="stageUnlock" type="checkbox" /> 🔓 Open all songs</label>
         </div>
       </section>
 

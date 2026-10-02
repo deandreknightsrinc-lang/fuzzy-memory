@@ -580,3 +580,18 @@ dialog.stage-window { width: min(1100px, calc(100vw - 24px)); left: max(12px, ca
 .stage-taps button:active, .stage-taps button.down { background: var(--tc, #4f8cff); color: #111; }
 .stage-taps button.kick { flex: 1 0 100%; height: 36px; }
 .stage-taps button.black { background: #0c0d12; }
+
+/* Song library sections + Song Builder */
+.lib-bar { align-items: center; }
+.lib-head { margin: 14px 0 4px; font-size: 14px; letter-spacing: .02em; }
+.song-list .actions-mine { margin-left: auto; display: inline-flex; gap: 4px; }
+.song-list .tag-practice { font-size: 11px; padding: 1px 7px; border-radius: 999px; background: rgba(179,127,235,.2); color: #d3adf7; }
+.builder textarea { width: 100%; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 8px; resize: vertical; }
+.builder .field.block { display: block; margin: 8px 0 2px; }
+.builder .field.grow { flex: 1; }
+.builder .field.grow input, .builder .field.block input { width: 100%; }
+.builder code { background: var(--surface-2); padding: 0 4px; border-radius: 3px; }
+.builder-status { min-height: 1.4em; font-size: 13px; margin: 6px 0; }
+.builder-status.ok { color: #95de64; }
+.builder-status.err { color: #ff7875; }
+.stage-tabs { margin-top: 4px; }

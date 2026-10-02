@@ -12,6 +12,7 @@ import { writeMidi } from './midi-file.js';
 export const SONGS = [
   {
     id: 'mary',
+    category: 'starter',
     title: 'Mary Had a Little Lamb',
     level: 'Beginner',
     key: 0,
@@ -25,6 +26,7 @@ export const SONGS = [
   },
   {
     id: 'twinkle',
+    category: 'starter',
     title: 'Twinkle, Twinkle, Little Star',
     level: 'Beginner',
     key: 0,
@@ -39,24 +41,8 @@ export const SONGS = [
              C:4 F:2 C:2 F:2 C:2 G:2 C:2`,
   },
   {
-    id: 'joyful',
-    title: 'Joyful, Joyful (Ode to Joy)',
-    level: 'Beginner',
-    key: 0,
-    time: [4, 4],
-    bpm: 108,
-    drums: 'straight',
-    about: 'Beethoven\'s melody, sung in church as "Joyful, Joyful, We Adore Thee". Five fingers, one hand position.',
-    melody: `E4 E4 F4 G4 | G4 F4 E4 D4 | C4 C4 D4 E4 | E4:1.5 D4:0.5 D4:2 |
-             E4 E4 F4 G4 | G4 F4 E4 D4 | C4 C4 D4 E4 | D4:1.5 C4:0.5 C4:2 |
-             D4 D4 E4 C4 | D4 E4:0.5 F4:0.5 E4 C4 | D4 E4:0.5 F4:0.5 E4 D4 | C4 D4 G3:2 |
-             E4 E4 F4 G4 | G4 F4 E4 D4 | C4 C4 D4 E4 | D4:1.5 C4:0.5 C4:2`,
-    chords: `C:4 G:4 C:4 C:2 G:2 C:4 G:4 C:4 G:2 C:2
-             G:2 C:2 G:2 C:2 G:4 C:2 G:2
-             C:4 G:4 C:4 G:2 C:2`,
-  },
-  {
     id: 'saints',
+    category: 'church',
     title: 'When the Saints Go Marching In',
     level: 'Easy',
     key: 0,
@@ -70,6 +56,7 @@ export const SONGS = [
   },
   {
     id: 'birthday',
+    category: 'starter',
     title: 'Happy Birthday',
     level: 'Easy',
     key: 0,
@@ -83,6 +70,7 @@ export const SONGS = [
   },
   {
     id: 'amazing',
+    category: 'church',
     title: 'Amazing Grace',
     level: 'Intermediate',
     key: 1,
@@ -98,6 +86,7 @@ export const SONGS = [
   },
   {
     id: 'doxology',
+    category: 'church',
     title: 'Doxology (Old Hundredth)',
     level: 'Intermediate',
     key: 1,
@@ -114,9 +103,123 @@ export const SONGS = [
              G:2 D:1 G:1 D:1 Em:1 C:1 D:1 G:2
              G:2 G:1 Em:1 D:1 C:1 G:1 D:1 G:4`,
   },
+  {
+    id: 'jesusloves',
+    category: 'church',
+    title: 'Jesus Loves Me',
+    level: 'Beginner',
+    key: 0,
+    time: [4, 4],
+    bpm: 92,
+    drums: 'straight',
+    about: 'William Bradbury\'s 1862 children\'s hymn. The verse uses five notes; the chorus "Yes, Jesus loves me" reaches up to high C.',
+    melody: `G4 E4 E4 D4 | E4 G4 G4:2 | A4 A4 C5 A4 | A4 G4 G4:2 |
+             G4 E4 E4 D4 | E4 G4 G4:2 | A4 A4 G4 C4 | E4 D4 C4:2 |
+             G4:2 E4 G4 | A4:2 C5:2 | G4:2 E4 G4 | A4:2 C5:2 |
+             G4:2 E4 G4 | A4:2 C5:2 | A4 A4 G4 C4 | E4 D4 C4:2`,
+    chords: `C:4 C:4 F:4 C:4 C:4 C:4 F:2 C:2 G:2 C:2
+             C:4 F:4 C:4 F:4 C:4 F:4 F:2 C:2 G:2 C:2`,
+  },
+  {
+    id: 'michael',
+    category: 'church',
+    title: 'Michael, Row the Boat Ashore',
+    level: 'Beginner',
+    key: 0,
+    time: [4, 4],
+    bpm: 104,
+    drums: 'twostep',
+    about: 'A spiritual from the Sea Islands of South Carolina. Call and answer: every line ends with "Hallelujah!"',
+    melody: `C4 E4 G4:2 | E4 G4 A4:2 | G4:4 | E4 G4 A4:2 | G4:4 |
+             E4 G4 G4:2 | E4 F4 E4:2 | D4:4 | C4 D4 E4:2 | D4:2 C4:2 |
+             C4 E4 G4:2 | E4 G4 A4:2 | G4:4 | E4 G4 A4:2 | G4:4 |
+             E4 G4 G4:2 | E4 F4 E4:2 | D4:4 | C4 D4 E4:2 | D4:2 C4:2`,
+    chords: `C:4 C:4 C:4 F:4 C:4 C:4 C:4 G:4 C:4 G:2 C:2
+             C:4 C:4 C:4 F:4 C:4 C:4 C:4 G:4 C:4 G:2 C:2`,
+  },
+  {
+    id: 'joyful',
+    category: 'church',
+    title: 'Joyful, Joyful (Ode to Joy)',
+    level: 'Beginner',
+    key: 0,
+    time: [4, 4],
+    bpm: 108,
+    drums: 'straight',
+    about: 'Beethoven\'s melody, sung in church as "Joyful, Joyful, We Adore Thee". Five fingers, one hand position.',
+    melody: `E4 E4 F4 G4 | G4 F4 E4 D4 | C4 C4 D4 E4 | E4:1.5 D4:0.5 D4:2 |
+             E4 E4 F4 G4 | G4 F4 E4 D4 | C4 C4 D4 E4 | D4:1.5 C4:0.5 C4:2 |
+             D4 D4 E4 C4 | D4 E4:0.5 F4:0.5 E4 C4 | D4 E4:0.5 F4:0.5 E4 D4 | C4 D4 G3:2 |
+             E4 E4 F4 G4 | G4 F4 E4 D4 | C4 C4 D4 E4 | D4:1.5 C4:0.5 C4:2`,
+    chords: `C:4 G:4 C:4 C:2 G:2 C:4 G:4 C:4 G:2 C:2
+             G:2 C:2 G:2 C:2 G:4 C:2 G:2
+             C:4 G:4 C:4 G:2 C:2`,
+  },
+  {
+    id: 'silentnight',
+    category: 'church',
+    title: 'Silent Night',
+    level: 'Easy',
+    key: 0,
+    time: [3, 4],
+    bpm: 84,
+    drums: 'waltz',
+    about: 'Franz Gruber\'s 1818 carol, for the Christmas Eve service. A gentle 3/4 with the long-short "Si-lent" rhythm.',
+    melody: `G4:1.5 A4:0.5 G4 | E4:3 | G4:1.5 A4:0.5 G4 | E4:3 | D5:2 D5 | B4:3 | C5:2 C5 | G4:3 |
+             A4:2 A4 | C5:1.5 B4:0.5 A4 | G4:1.5 A4:0.5 G4 | E4:3 | A4:2 A4 | C5:1.5 B4:0.5 A4 | G4:1.5 A4:0.5 G4 | E4:3 |
+             D5:2 D5 | F5:1.5 D5:0.5 B4 | C5:3 | E5:3 | C5:1.5 G4:0.5 E4 | G4:1.5 F4:0.5 D4 | C4:6`,
+    chords: `C:3 C:3 C:3 C:3 G7:3 G7:3 C:3 C:3
+             F:3 F:3 C:3 C:3 F:3 F:3 C:3 C:3
+             G7:3 G7:3 C:3 C:3 C:3 G7:3 C:6`,
+  },
+  {
+    id: 'worshipflow',
+    category: 'church',
+    title: 'Worship Flow (1-5-6-4 in G)',
+    level: 'Easy',
+    key: 1,
+    time: [4, 4],
+    bpm: 72,
+    drums: 'straight',
+    practice: true,
+    about: 'The progression behind many modern worship songs: G, D/F#, Em, C. Right hand plays the chords, left hand the bass. Learn it here, then use it on Sunday.',
+    chords: `G:4 D/F#:4 Em:4 C:4 G:4 D/F#:4 Em:4 C:4
+             Em:4 D:4 C:4 C:4 Em:4 D:4 C:4 Dsus4:2 D:2`,
+  },
+  {
+    id: 'gospelvamp',
+    category: 'church',
+    title: 'Gospel 2-5-1 Vamp in C',
+    level: 'Intermediate',
+    key: 0,
+    time: [4, 4],
+    bpm: 84,
+    drums: 'shuffle',
+    practice: true,
+    about: 'Dm7, G7, Cmaj7 and the A7 turnaround: the vamp for praise breaks, altar calls and shout music. Try it on Advanced for gospel voicings and a walking bass.',
+    chords: `Dm7:4 G7:4 Cmaj7:4 A7:4 Dm7:4 G7:4 Cmaj7:2 C7:2 Fmaj7:4
+             Fm6:4 Em7:2 A7:2 Dm7:2 G7:2 Cmaj7:4`,
+  },
+  {
+    id: 'ballad68',
+    category: 'church',
+    title: '6/8 Worship Ballad in D',
+    level: 'Intermediate',
+    key: 2,
+    time: [6, 8],
+    bpm: 66,
+    drums: 'ballad68',
+    practice: true,
+    about: 'A slow 6/8 progression for meditation and offering: D, G/D, Bm, A, with a sus resolution. Count "1-2-3-4-5-6".',
+    chords: `D:3 G/D:3 D:3 A/C#:3 Bm:3 G:3 Asus4:1.5 A:1.5 D:3
+             G:3 A:3 F#m:3 Bm:3 G:3 A:3 D:3 D:3`,
+  },
 ];
 
 const PC = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+
+export const LEVELS = ['beginner', 'intermediate', 'advanced'];
+export const LEVEL_NAMES = { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' };
 
 /** "F#4" -> 66 */
 export function parsePitch(token) {
@@ -133,82 +236,381 @@ function tokens(str) {
 export function parseMelody(str) {
   const out = [];
   let beat = 0;
-  for (const t of tokens(str)) {
+  for (const t of tokens(str || '')) {
     const [p, d] = t.split(':');
     const beats = d ? Number(d) : 1;
+    if (!(beats > 0)) throw new Error(`Bad length in "${t}"`);
     if (p !== 'r') out.push({ beat, beats, note: parsePitch(p) });
     beat += beats;
   }
   return out;
 }
 
-const QUALITY = { '': [0, 4, 7], m: [0, 3, 7], 7: [0, 4, 7, 10], m7: [0, 3, 7, 10], maj7: [0, 4, 7, 11] };
+// Chord qualities as intervals above the root (9 = 14 so it sits above the octave).
+const QUALITY = {
+  '': [0, 4, 7], m: [0, 3, 7], 5: [0, 7],
+  7: [0, 4, 7, 10], m7: [0, 3, 7, 10], maj7: [0, 4, 7, 11], mmaj7: [0, 3, 7, 11],
+  6: [0, 4, 7, 9], m6: [0, 3, 7, 9],
+  9: [0, 4, 7, 10, 14], m9: [0, 3, 7, 10, 14], maj9: [0, 4, 7, 11, 14],
+  add9: [0, 4, 7, 14], madd9: [0, 3, 7, 14], 2: [0, 2, 7], sus2: [0, 2, 7], sus4: [0, 5, 7], sus: [0, 5, 7],
+  '7sus4': [0, 5, 7, 10], '7sus': [0, 5, 7, 10], 11: [0, 5, 7, 10, 14], 13: [0, 4, 7, 10, 14, 21],
+  dim: [0, 3, 6], dim7: [0, 3, 6, 9], m7b5: [0, 3, 6, 10], aug: [0, 4, 8],
+};
+const ALIASES = { M7: 'maj7', Maj7: 'maj7', 'Δ': 'maj7', 'Δ7': 'maj7', min: 'm', mi: 'm', '-': 'm', min7: 'm7', '-7': 'm7', 'ø': 'm7b5', o: 'dim', '°': 'dim', '+': 'aug', maj: '', M: '' };
 
-/** "Bb" / "F#m7" -> left-hand notes around C3, root lowest. */
-export function chordNotes(symbol) {
-  const m = /^([A-G])([#b]?)(maj7|m7|m|7)?$/.exec(symbol);
+const pcOf = (letter, acc) => (PC[letter] + (acc === '#' ? 1 : acc === 'b' ? -1 : 0) + 12) % 12;
+
+/** "F#m7/C#" -> { root: 6, intervals: [0,3,7,10], bass: 1, quality: 'm7' } */
+export function parseChordSymbol(symbol) {
+  const m = /^([A-G])([#b]?)([^/]*)(?:\/([A-G])([#b]?))?$/.exec(symbol);
   if (!m) throw new Error(`Bad chord "${symbol}"`);
-  const pc = (PC[m[1]] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0) + 12) % 12;
-  let root = 48 + pc; // C3..B3
-  if (root > 55) root -= 12; // keep the left hand between G#2 and G3
-  return QUALITY[m[3] || ''].map((i) => root + i);
+  const quality = ALIASES[m[3]] ?? m[3];
+  const intervals = QUALITY[quality];
+  if (!intervals) throw new Error(`Bad chord "${symbol}"`);
+  const root = pcOf(m[1], m[2]);
+  return { root, intervals, quality, bass: m[4] ? pcOf(m[4], m[5]) : root };
 }
 
-/** Chord string -> [{ beat, beats, notes }]. */
+/** "Bb" / "F#m7" / "D/F#" -> left-hand notes around C3, lowest first. */
+export function chordNotes(symbol) {
+  const c = parseChordSymbol(symbol);
+  let root = 48 + c.root; // C3..B3
+  if (root > 55) root -= 12; // keep the left hand between G#2 and G3
+  const notes = c.intervals.filter((i) => i < 12).map((i) => root + i);
+  if (c.bass !== c.root) {
+    let bass = 36 + c.bass;
+    while (bass + 12 < notes[0]) bass += 12;
+    if (bass >= notes[0]) bass -= 12;
+    notes.unshift(bass);
+  }
+  return notes;
+}
+
+/** Chord string -> [{ beat, beats, notes, symbol, chord }]. */
 export function parseChords(str) {
   const out = [];
   let beat = 0;
-  for (const t of tokens(str)) {
+  for (const t of tokens(str || '')) {
     const [sym, d] = t.split(':');
     const beats = Number(d);
-    if (sym !== '-') out.push({ beat, beats, notes: chordNotes(sym), symbol: sym });
+    if (!(beats > 0)) throw new Error(`Bad length in "${t}"`);
+    if (sym !== '-') out.push({ beat, beats, notes: chordNotes(sym), symbol: sym, chord: parseChordSymbol(sym) });
     beat += beats;
   }
   return out;
 }
 
-/** Simple drum parts so drummers can learn along too. Hits: [beatInBar, note, velocity]. */
+/**
+ * A chord chart as you'd write it for the band -> the chord string above.
+ *   | G | D/F# | Em C |      bars between bars lines; chords in a bar share it
+ *   G D/F# Em C              without bar lines, each chord is one bar
+ *   G:2 D:2                  or give beats yourself
+ *   %  (or /)                repeat the last chord;  -  or N.C. for no chord
+ *   Verse:  [Chorus]         section names are ignored;  x2 at the end repeats a line
+ * Returns { chords, bars, errors }.
+ */
+export function chartToChords(chart, beatsPerBar = 4) {
+  const parts = [];
+  const errors = [];
+  let bars = 0;
+  let last = null;
+  (chart || '').split(/\n/).forEach((raw, lineNo) => {
+    // Drop [section] tags and "Verse 1:" style labels (a colon not followed by a beat count).
+    let line = raw.replace(/\[[^\]]*\]/g, ' ').replace(/^\s*[A-Za-z][A-Za-z0-9 '-]*?\s*:(?!\d)/, ' ');
+    let repeat = 1;
+    line = line.replace(/\(?\s*x\s*(\d+)\s*\)?\s*$/i, (_, n) => {
+      repeat = Math.max(1, Math.min(16, Number(n)));
+      return '';
+    });
+    if (!line.trim()) return;
+    const barTexts = line.includes('|') ? line.split('|').filter((b) => b.trim()) : line.trim().split(/\s+/);
+    const lineParts = [];
+    for (const barText of barTexts) {
+      const items = barText.trim().split(/\s+/).filter(Boolean);
+      if (!items.length) continue;
+      const explicit = items.filter((i) => i.includes(':'));
+      const free = items.length - explicit.length;
+      const used = explicit.reduce((sum, i) => sum + Number(i.split(':')[1]) || 0, 0);
+      const each = free ? Math.max(0.5, (beatsPerBar - used) / free) : 0;
+      let barBeats = 0;
+      for (const item of items) {
+        let [sym, d] = item.split(':');
+        const beats = d ? Number(d) : each;
+        if (sym === '%' || sym === '/') sym = last || '-';
+        if (/^n\.?c\.?$/i.test(sym)) sym = '-';
+        if (sym !== '-') {
+          try {
+            parseChordSymbol(sym);
+            last = sym;
+          } catch {
+            errors.push(`Line ${lineNo + 1}: "${sym}" isn't a chord name I know`);
+            sym = '-';
+          }
+        }
+        if (!(beats > 0)) {
+          errors.push(`Line ${lineNo + 1}: "${item}" has no length`);
+          continue;
+        }
+        lineParts.push(`${sym}:${Math.round(beats * 1000) / 1000}`);
+        barBeats += beats;
+      }
+      bars += barBeats / beatsPerBar;
+    }
+    for (let r = 0; r < repeat; r++) parts.push(...lineParts);
+    if (repeat > 1) bars += (repeat - 1) * (lineParts.length ? lineParts.reduce((s2, x) => s2 + Number(x.split(':')[1]), 0) / beatsPerBar : 0);
+  });
+  return { chords: parts.join(' '), bars: Math.round(bars * 100) / 100, errors };
+}
+
+// ---- Drums ------------------------------------------------------------------
+
+/** Drum grooves. Hits: [beatInBar, note, velocity]; `pro` is the busier Advanced version. */
+const hats = (step, beats, accent = 60, soft = 45) => Array.from({ length: Math.round(beats / step) }, (_, i) => [i * step, 42, (i * step) % 1 ? soft : accent]);
 const DRUM_STYLES = {
-  straight: { beats: 4, hits: [[0, 36, 90], [1, 38, 80], [2, 36, 85], [3, 38, 80], ...[0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5].map((b) => [b, 42, b % 1 ? 45 : 60])] },
-  twostep: { beats: 4, hits: [[0, 36, 95], [1, 38, 85], [2, 36, 90], [3, 38, 85], [1, 54, 60], [3, 54, 60], ...[0, 1, 2, 3].map((b) => [b, 42, 55])] },
-  waltz: { beats: 3, hits: [[0, 36, 85], [1, 42, 50], [2, 42, 50], [1, 37, 55], [2, 37, 55]] },
+  straight: {
+    beats: 4,
+    hits: [[0, 36, 90], [1, 38, 80], [2, 36, 85], [3, 38, 80], ...hats(0.5, 4)],
+    pro: [[0, 36, 95], [1.5, 36, 70], [2, 36, 88], [1, 38, 88], [3, 38, 88], [0.75, 38, 26], [2.75, 38, 26], [3.25, 38, 24], ...hats(0.5, 3.5, 70, 48), [3.5, 46, 70]],
+  },
+  twostep: {
+    beats: 4,
+    hits: [[0, 36, 95], [1, 38, 85], [2, 36, 90], [3, 38, 85], [1, 54, 60], [3, 54, 60], ...[0, 1, 2, 3].map((b) => [b, 42, 55])],
+    pro: [[0, 36, 100], [1.5, 36, 75], [2, 36, 92], [1, 38, 95], [3, 38, 95], [1.75, 38, 30], [3.75, 38, 30], [1, 54, 65], [3, 54, 65], ...hats(0.5, 4, 65, 40)],
+  },
+  shuffle: {
+    beats: 4,
+    hits: [[0, 36, 90], [2, 36, 85], [1, 38, 85], [3, 38, 85], ...[0, 1, 2, 3].flatMap((b) => [[b, 42, 60], [b + 2 / 3, 42, 40]])],
+    pro: [[0, 36, 95], [2, 36, 90], [2 + 2 / 3, 36, 70], [1, 38, 92], [3, 38, 92], [1 / 3, 38, 22], [2 + 1 / 3, 38, 22], [3 + 2 / 3, 38, 30], ...[0, 1, 2, 3].flatMap((b) => [[b, 51, 70], [b + 2 / 3, 51, 50]])],
+  },
+  waltz: {
+    beats: 3,
+    hits: [[0, 36, 85], [1, 42, 50], [2, 42, 50], [1, 37, 55], [2, 37, 55]],
+    pro: [[0, 36, 90], [2.5, 36, 60], [0, 51, 70], [1, 51, 55], [2, 51, 55], [1, 37, 65], [2, 37, 65], [0, 44, 50]],
+  },
+  ballad68: {
+    beats: 3,
+    hits: [[0, 36, 85], [1.5, 37, 70], ...hats(0.5, 3, 55, 40)],
+    pro: [[0, 36, 90], [2.5, 36, 65], [1.5, 38, 85], [1, 38, 24], [2.75, 38, 26], ...hats(0.5, 3, 60, 42), [2.5, 46, 55]],
+  },
 };
+export const DRUM_STYLE_NAMES = { straight: 'Straight (rock / pop / worship)', twostep: 'Gospel two-step', shuffle: 'Gospel shuffle', waltz: '3/4 waltz', ballad68: '6/8 ballad', '': 'No drums' };
 
-/** Build a format-0 MIDI file for a library song. */
-export function songToMidi(song) {
-  const spb = 60 / song.bpm; // seconds per beat
-  const ev = [];
-  const add = (beat, bytes) => ev.push({ time: beat * spb, bytes });
-  add(0, [0xff, 0x59, 0x02, song.key & 0xff, 0x00]);
-  add(0, [0xff, 0x58, 0x04, song.time[0], Math.log2(song.time[1]), 0x18, 0x08]);
-  add(0, [0xc0, 0]); // melody: piano
-  add(0, [0xc1, 0]); // chords: piano
-  add(0, [0xb1, 7, 92]); // chords a little softer in the mix
-
-  const melody = parseMelody(song.melody);
-  for (const n of melody) {
-    add(n.beat, [0x90, n.note, 92]);
-    add(n.beat + n.beats * 0.95, [0x80, n.note, 0]);
+/** A fill on the last beat (or two) of a bar, ending into a crash on the next bar. */
+function fillHits(beats, big) {
+  const len = big ? 2 : 1;
+  const start = beats - len;
+  const toms = [50, 48, 45, 43, 41];
+  const out = [];
+  const n = len * 4;
+  for (let i = 0; i < n; i++) {
+    const note = i < n / 2 ? 38 : toms[Math.min(toms.length - 1, Math.floor(((i - n / 2) / (n / 2)) * toms.length))];
+    out.push([start + i * 0.25, note, 70 + Math.round((i / n) * 40)]);
   }
-  for (const c of parseChords(song.chords)) {
-    for (const note of c.notes) {
-      add(c.beat, [0x91, note, 62]);
-      add(c.beat + c.beats * 0.97, [0x81, note, 0]);
+  out.push([start, 36, 80]);
+  return out;
+}
+
+// ---- Arranging --------------------------------------------------------------
+
+const chordAt = (chords, beat) => chords.find((c) => beat >= c.beat - 1e-9 && beat < c.beat + c.beats - 1e-9);
+const pcsOf = (c) => c.chord.intervals.map((i) => (c.chord.root + i) % 12);
+
+/** Chord tones below `note` for the right hand (a third or more below, within an octave). */
+function harmonyBelow(note, chord, count) {
+  if (!chord) return [];
+  const pcs = new Set(pcsOf(chord));
+  const out = [];
+  let top = note;
+  for (let n = note - 3; n >= Math.max(note - 12, 53) && out.length < count; n--) {
+    if (pcs.has(((n % 12) + 12) % 12) && top - n >= 3) {
+      out.push(n);
+      top = n;
     }
   }
-  const end = Math.max(...melody.map((n) => n.beat + n.beats));
+  return out;
+}
+
+/** Right-hand chord voicing near `center` (close position, voice-led). */
+function voicing(pcs, center) {
+  const notes = pcs.map((pc) => {
+    let n = 60 + pc;
+    while (n - center > 6) n -= 12;
+    while (center - n > 6) n += 12;
+    return n;
+  });
+  return [...new Set(notes)].sort((a, b) => a - b);
+}
+
+/** Gospel color for the Advanced right hand: 9ths on major and minor chords, 9ths on dominants. */
+function colorPcs(c) {
+  const { root, quality, intervals } = c.chord;
+  const add = (ints) => ints.map((i) => (root + i) % 12);
+  if (quality === '' || quality === 'add9') return add([4, 7, 11, 14]); // maj9 sound (no root)
+  if (quality === 'm' || quality === 'm7' || quality === 'm9') return add([3, 7, 10, 14]);
+  if (quality === '7' || quality === '9') return add([4, 10, 14]);
+  return add(intervals.filter((i) => i !== 0));
+}
+
+/**
+ * Build a MIDI file for a library song or one of your songs.
+ * level: 'beginner' (as written), 'intermediate' (harmony, bass + chords, fills)
+ * or 'advanced' (fuller voicings, octave bass with walk-ups, gospel grooves).
+ * Songs without a melody (chord charts) get the chords in the right hand and
+ * the bass in the left hand, like a church keys player.
+ */
+export function songToMidi(song, { level = 'beginner' } = {}) {
+  const L = Math.max(0, LEVELS.indexOf(level));
+  const spb = 60 / song.bpm; // seconds per beat
+  const beatsPerBar = (song.time[0] * 4) / song.time[1];
+  const ev = [];
+  const add = (beat, bytes) => ev.push({ time: beat * spb, bytes });
+  const note = (ch, beat, beats, n, vel) => {
+    if (n < 21 || n > 108) return;
+    add(beat, [0x90 | ch, n, vel]);
+    add(beat + beats * 0.95, [0x80 | ch, n, 0]);
+  };
+  add(0, [0xff, 0x59, 0x02, song.key & 0xff, song.minor ? 1 : 0]);
+  add(0, [0xff, 0x58, 0x04, song.time[0], Math.log2(song.time[1]), 0x18, 0x08]);
+  add(0, [0xc0, 0]); // right hand: piano
+  add(0, [0xc1, 0]); // left hand: piano
+  add(0, [0xb1, 7, 92]); // left hand a little softer in the mix
+
+  const melody = parseMelody(song.melody);
+  const chords = parseChords(song.chords);
+  const end = Math.max(0, ...melody.map((n) => n.beat + n.beats), ...chords.map((c) => c.beat + c.beats));
+
+  // Right hand
+  if (melody.length) {
+    for (const n of melody) {
+      note(0, n.beat, n.beats, n.note, 92);
+      const harmony = L === 1 && n.beats >= 1 ? 1 : L === 2 && n.beats >= 0.5 ? 2 : 0;
+      for (const h of harmonyBelow(n.note, chordAt(chords, n.beat), harmony)) note(0, n.beat, n.beats, h, 70);
+    }
+  } else {
+    let center = 64;
+    for (const c of chords) {
+      const v = voicing(L === 2 ? colorPcs(c) : pcsOf(c).filter((pc, i, a) => a.length < 4 || i < 4), center);
+      center = Math.round(v.reduce((a, b) => a + b, 0) / v.length);
+      if (L === 0) v.forEach((n) => note(0, c.beat, c.beats, n, 78));
+      else {
+        // Intermediate: on every beat. Advanced: a push rhythm (1, the "and" of 2, 4 in 4/4).
+        const pattern = L === 1 ? Array.from({ length: Math.ceil(c.beats) }, (_, i) => [i, 1]) : beatsPerBar === 3 ? [[0, 1.5], [1.5, 1.5]] : [[0, 1.5], [1.5, 1.5], [3, 1]];
+        for (let bar = 0; bar < c.beats - 1e-9; bar += beatsPerBar) {
+          for (const [b, d] of pattern) {
+            if (bar + b >= c.beats - 1e-9) continue;
+            v.forEach((n) => note(0, c.beat + bar + b, Math.min(d, c.beats - bar - b), n, b === 0 ? 82 : 70));
+          }
+        }
+      }
+    }
+  }
+
+  // Left hand
+  chords.forEach((c, i) => {
+    const bassPc = c.chord.bass;
+    let bass = 36 + bassPc; // C2..B2
+    if (bass > 43) bass -= 12;
+    if (L === 0) {
+      if (melody.length) c.notes.forEach((n) => note(1, c.beat, c.beats * 1.02, n, 62));
+      else note(1, c.beat, c.beats, bass + 12, 70); // charts: the root, one note
+      return;
+    }
+    const next = chords[i + 1];
+    if (L === 1) {
+      const first = Math.min(c.beats, beatsPerBar >= 4 ? 2 : 1);
+      note(1, c.beat, melody.length ? first : c.beats, bass, 75);
+      if (melody.length && c.beats > first) c.notes.filter((n) => n > bass).forEach((n) => note(1, c.beat + first, c.beats - first, n, 60));
+      else if (!melody.length) note(1, c.beat, c.beats, bass + 12, 62);
+      return;
+    }
+    // Advanced: octave bass, shell voicing (3rd + 7th) with a melody, and a walk into the next chord.
+    const walk = next && next.beat - (c.beat + c.beats) < 1e-9 && c.beats >= 2;
+    const hold = walk ? c.beats - 1 : c.beats;
+    note(1, c.beat, hold, bass, 82);
+    note(1, c.beat, hold, bass + 12, 70);
+    if (melody.length) {
+      const third = c.chord.intervals.find((x) => x === 3 || x === 4 || x === 5) ?? 4;
+      const seventh = c.chord.intervals.find((x) => x === 10 || x === 11) ?? 7;
+      [third, seventh].forEach((x) => note(1, c.beat, hold, 48 + ((c.chord.root + x) % 12), 58));
+    }
+    if (walk) {
+      let target = 36 + next.chord.bass;
+      if (target > 43) target -= 12;
+      const approach = target - 1 >= 28 ? target - 1 : target + 1; // chromatic step into the next root
+      note(1, c.beat + c.beats - 1, 1, approach, 72);
+    }
+  });
+
+  // Drums
   const style = DRUM_STYLES[song.drums];
   if (style) {
-    // Drums start on the first full bar (after any pickup) and stop at the last bar.
-    const firstNote = melody[0].beat;
-    const start = Math.ceil(firstNote / style.beats - 1e-9) * style.beats;
-    for (let bar = start; bar < end - 0.01; bar += style.beats) {
-      for (const [b, note, vel] of style.hits) {
-        if (bar + b >= end) continue;
-        add(bar + b, [0x99, note, vel]);
-        add(bar + b + 0.1, [0x89, note, 0]);
+    const firstBeat = Math.min(melody[0]?.beat ?? Infinity, chords[0]?.beat ?? Infinity);
+    const start = Math.ceil(firstBeat / style.beats - 1e-9) * style.beats;
+    const hits = L === 2 ? style.pro : style.hits;
+    let barNo = 0;
+    for (let bar = start; bar < end - 0.01; bar += style.beats, barNo++) {
+      const lastBar = bar + style.beats >= end - 0.01;
+      const fill = L > 0 && !lastBar && barNo % 4 === 3;
+      const crash = L > 0 && barNo % 4 === 0 && barNo > 0;
+      const fillFrom = fill ? style.beats - (L === 2 ? 2 : 1) : Infinity;
+      for (const [b, n, vel] of hits) {
+        if (bar + b >= end || b >= fillFrom - 1e-9) continue;
+        if (crash && b === 0 && (n === 42 || n === 51)) continue; // the crash replaces the first hat
+        add(bar + b, [0x99, n, vel]);
+        add(bar + b + 0.1, [0x89, n, 0]);
+      }
+      if (crash) {
+        add(bar, [0x99, 49, 100]);
+        add(bar + 0.1, [0x89, 49, 0]);
+      }
+      if (fill) {
+        for (const [b, n, vel] of fillHits(style.beats, L === 2)) {
+          add(bar + b, [0x99, n, vel]);
+          add(bar + b + 0.1, [0x89, n, 0]);
+        }
       }
     }
   }
   return writeMidi(ev, { bpm: song.bpm, name: song.title });
+}
+
+// ---- Your songs ---------------------------------------------------------------
+
+const MY_KEY = 'kk.mysongs';
+
+/** Songs you entered (chord charts) or saved (MIDI files). */
+export function loadMySongs(storage = globalThis.localStorage) {
+  try {
+    const list = JSON.parse(storage?.getItem(MY_KEY) || '[]');
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveMySongs(list, storage = globalThis.localStorage) {
+  try {
+    storage?.setItem(MY_KEY, JSON.stringify(list));
+    return true;
+  } catch {
+    return false; // full or unavailable
+  }
+}
+
+/** Check a song from the Song Builder; returns a list of problems (empty = good). */
+export function validateSong(song) {
+  const errors = [];
+  if (!song.title?.trim()) errors.push('Give the song a title.');
+  if (!(song.bpm >= 30 && song.bpm <= 260)) errors.push('Tempo should be between 30 and 260 BPM.');
+  try {
+    if (!parseChords(song.chords).length && !parseMelody(song.melody).length) errors.push('Enter some chords (or a melody).');
+  } catch (e) {
+    errors.push(e.message);
+  }
+  try {
+    parseMelody(song.melody);
+  } catch (e) {
+    errors.push(`Melody: ${e.message}`);
+  }
+  return errors;
 }

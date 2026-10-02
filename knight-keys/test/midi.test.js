@@ -246,16 +246,20 @@ test('transcribed notes become a playable MIDI file', () => {
   for (const p of Object.values(TRANSCRIBE_PRESETS)) assert.ok(p.lo < p.hi && p.onset > 0 && p.frame > 0);
 });
 
-import { SONGS, songToMidi, parseMelody, parseChords, chordNotes, parsePitch } from '../js/songs.js';
+import { SONGS, LEVELS, songToMidi, parseMelody, parseChords, chordNotes, parsePitch, chartToChords, parseChordSymbol, validateSong, loadMySongs, saveMySongs } from '../js/songs.js';
 
 test('library songs parse, line up and become MIDI', () => {
   const total = (items) => Math.max(...items.map((i) => i.beat + i.beats));
   for (const s of SONGS) {
     const melody = parseMelody(s.melody);
     const chords = parseChords(s.chords);
-    assert.ok(Math.abs(total(melody) - total(chords)) < 1e-9, `${s.id}: melody and chords end together`);
+    const barBeats = (s.time[0] * 4) / s.time[1];
+    if (melody.length) assert.ok(Math.abs(total(melody) - total(chords)) < 1e-9, `${s.id}: melody and chords end together`);
+    if (!melody.length) assert.ok(Math.abs(total(chords) / barBeats - Math.round(total(chords) / barBeats)) < 1e-9, `${s.id}: whole bars`);
+    assert.ok(['church', 'starter'].includes(s.category), `${s.id}: has a category`);
     const song = buildSong(parseMidi(songToMidi(s)));
-    assert.equal(song.notes.filter((n) => n.ch === 0).length, melody.length, `${s.id}: every melody note`);
+    if (melody.length) assert.equal(song.notes.filter((n) => n.ch === 0).length, melody.length, `${s.id}: every melody note`);
+    else assert.ok(song.notes.some((n) => n.ch === 0) && song.notes.some((n) => n.ch === 1), `${s.id}: chords in the right hand, bass in the left`);
     assert.deepEqual(song.keySig, { sf: s.key, minor: false });
     assert.ok(Math.abs(song.bpm - s.bpm) < 0.01);
   }
@@ -264,6 +268,54 @@ test('library songs parse, line up and become MIDI', () => {
   assert.deepEqual(chordNotes('G'), [55, 59, 62]);
   assert.deepEqual(chordNotes('Em'), [52, 55, 59]);
   assert.deepEqual(chordNotes('C7'), [48, 52, 55, 58]);
+});
+
+test('worship chord names: sus, add9, slash chords and more', () => {
+  assert.deepEqual(parseChordSymbol('D/F#'), { root: 2, intervals: [0, 4, 7], quality: '', bass: 6 });
+  assert.deepEqual(chordNotes('D/F#'), [42, 50, 54, 57], 'F# in the bass under the D chord');
+  assert.deepEqual(chordNotes('Csus4'), [48, 53, 55]);
+  assert.equal(parseChordSymbol('Gadd9').intervals.includes(14), true);
+  assert.equal(parseChordSymbol('Bbmaj7').root, 10);
+  assert.equal(parseChordSymbol('F#m7b5').quality, 'm7b5');
+  assert.equal(parseChordSymbol('CM7').quality, 'maj7', 'alias');
+  assert.throws(() => parseChordSymbol('H7'));
+});
+
+test('chord charts become songs', () => {
+  const chart = `Verse:
+| G | D/F# | Em C |
+[Chorus] G D Em C x2
+| C:2 D:2 | % | N.C. |`;
+  const { chords, bars, errors } = chartToChords(chart, 4);
+  assert.deepEqual(errors, []);
+  assert.equal(bars, 14);
+  assert.ok(chords.startsWith('G:4 D/F#:4 Em:2 C:2 G:4 D:4 Em:4 C:4 G:4'));
+  assert.ok(chords.endsWith('C:2 D:2 D:4 -:4'), '% repeats the last chord');
+  assert.equal(chartToChords('Bm G | D A', 3).chords, 'Bm:1.5 G:1.5 D:1.5 A:1.5', '6/8: two chords share a bar');
+  assert.match(chartToChords('G Hm').errors[0], /Hm/);
+});
+
+test('arrangement levels add parts but keep the song the same length', () => {
+  for (const id of ['jesusloves', 'worshipflow', 'silentnight']) {
+    const s = SONGS.find((x) => x.id === id);
+    const songs = LEVELS.map((level) => buildSong(parseMidi(songToMidi(s, { level }))));
+    const count = (song, ch) => song.notes.filter((n) => n.ch === ch).length;
+    assert.ok(Math.abs(songs[0].duration - songs[2].duration) < 0.5, `${id}: same length`);
+    assert.ok(count(songs[1], 0) > count(songs[0], 0) && count(songs[2], 0) >= count(songs[1], 0) * 0.6, `${id}: fuller right hand`);
+    assert.ok(Math.min(...songs[2].notes.filter((n) => n.ch === 1).map((n) => n.note)) < 44, `${id}: advanced has a low octave bass`);
+    assert.ok(count(songs[2], 9) > count(songs[0], 9), `${id}: busier drums`);
+  }
+});
+
+test('your songs are checked and saved', () => {
+  assert.deepEqual(validateSong({ title: 'Way', bpm: 70, chords: 'G:4 C:4' }), []);
+  assert.ok(validateSong({ title: '', bpm: 70, chords: 'G:4' }).length);
+  assert.ok(validateSong({ title: 'X', bpm: 70, chords: '' }).length);
+  const mem = new Map();
+  const storage = { getItem: (k) => mem.get(k) ?? null, setItem: (k, v) => mem.set(k, v) };
+  saveMySongs([{ id: 'my-1', title: 'Sunday', chords: 'G:4' }], storage);
+  assert.equal(loadMySongs(storage)[0].title, 'Sunday');
+  assert.deepEqual(loadMySongs({ getItem: () => 'nope' }), []);
 });
 
 test('learn mode waits for the target part and lets the rest play', () => {
