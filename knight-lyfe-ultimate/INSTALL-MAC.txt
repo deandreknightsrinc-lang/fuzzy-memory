@@ -225,3 +225,11 @@ Unzip the files first (double-click each .zip).
    band and the words on screen. "Open stream screen" opens a clean window:
    put it on the projector, or capture it in OBS (free) to go live on
    YouTube or Facebook. Arrow keys move through the service.
+
+21. ASK THE TEACHER (AI ON KL-ORACLE)
+   1. Run the AI Studio setup again on kl-oracle (it adds HTTPS for the AI).
+   2. On the Mac, once: open http://<kl-oracle-ip>:8089, download root.crt,
+      double-click it, set it to "Always Trust" in Keychain Access.
+   3. Open https://<kl-oracle-ip>:8443 in Safari or Chrome (Knight Keys with
+      the AI ready), or in the website/plug-in press Ask > ⚙ and enter that
+      address. In a lesson press "💬 Ask" and talk to your teacher.

@@ -502,6 +502,7 @@ Every evening I will sing"></textarea>
       <section id="lpLesson" class="lp-lesson" hidden>
         <div class="lp-top">
           <button id="lpBack" class="mini">◀ Lessons</button>
+          <button id="lpAsk" class="mini ask-btn" title="Ask your teacher anything about this lesson">💬 Ask</button>
           <span id="lpTitle" class="lp-title"></span>
           <span id="lpDots" class="lp-dots"></span>
         </div>
@@ -536,6 +537,44 @@ Every evening I will sing"></textarea>
           <button id="lpDoneMap">All lessons</button>
         </div>
       </section>
+    </div>
+  </dialog>
+
+  <dialog id="askDlg" class="tool-window ask-window" aria-labelledby="askTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="askTitle">💬 Ask the teacher</h2>
+      <select id="askTeacher" title="Who to ask"></select>
+      <button id="askVoice" class="mini" title="The teacher speaks the answers out loud">🔊 Voice on</button>
+      <button id="askSetup" class="mini" title="AI server settings">⚙</button>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="tool-body">
+      <div class="ask-top">
+        <div id="askFace" class="ask-face"></div>
+        <div class="ask-intro">
+          <div id="askName" class="ask-name"></div>
+          <div id="askContext" class="small"></div>
+          <div class="small ask-ai-note">An AI character, running on your own AI server. Grown-ups: conversations are saved under 🗂.</div>
+        </div>
+      </div>
+      <section id="askSettings" class="ask-settings" hidden>
+        <div class="row wrap">
+          <label class="grow">AI server <input id="askServer" type="text" placeholder="https://192.168.1.50:8443  (kl-oracle)" /></label>
+          <label>Model <select id="askModel"></select></label>
+          <button id="askTest" class="mini">Test</button>
+        </div>
+        <div id="askStatus" class="small"></div>
+        <p class="small">The teachers' brain is Ollama on kl-oracle. Run the AI Studio setup there (it sets up HTTPS), trust its certificate on this Mac once, then put its address here. Opening Knight Keys from kl-oracle (https://&lt;kl-oracle&gt;:8443) needs no address at all.</p>
+      </section>
+      <div id="askLog" class="ask-log"></div>
+      <div id="askQuick" class="ask-quick"></div>
+      <div class="row ask-input">
+        <button id="askMic" class="mini" title="Ask out loud">🎤</button>
+        <input id="askText" type="text" class="grow" placeholder="Ask anything about your lesson…" maxlength="500" />
+        <button id="askSend" class="primary">Send</button>
+        <button id="askStop" class="mini" hidden title="Stop">■</button>
+        <button id="askHistory" class="mini" title="Past conversations">🗂</button>
+      </div>
     </div>
   </dialog>
 
