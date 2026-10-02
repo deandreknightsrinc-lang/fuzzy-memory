@@ -722,6 +722,10 @@ export class Synth {
     for (const n of notes) this.kitSamples.delete(n);
   }
 
+  /** Multi-output routing only matters in the plug-in (the page has one output). */
+  setRoutes(rows) { // eslint-disable-line no-unused-vars
+  }
+
   // ---- Drums (GM channel 10) -------------------------------------------------
 
   drum(note, vel, time, ch = DRUM_CHANNEL) {

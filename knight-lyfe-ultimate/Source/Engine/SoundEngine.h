@@ -53,11 +53,16 @@ public:
     /** Applies a batch the interface sent with emitEvent("kk", { batch: [...] }).
         Items: { m: [ch, status, d1, d2, delayMs] }, { g: [ch, gain] }, { off: delayMs },
         { cancel: ch, at: delayMs }, { panic: 1 }, { v: volume },
-        { kit: [[note, tuneSemitones, decay, level], ...] }. See knight-keys/js/host.js. */
+        { kit: [[note, tuneSemitones, decay, level], ...] },
+        { route: [[note, output], ...] } (output: -1 its group's, 0 main, 1-15 a drum output).
+        See knight-keys/js/host.js. */
     void handleInterfaceBatch (const juce::var& batch);
 
     // ---- Kit Rack: custom drum sounds (message thread) ---------------------------
     void setDrumPiece (int note, float tuneSemitones, float decay, float level) { drums.setPiece (note, tuneSemitones, decay, level); }
+    /** Multi-output routing for one drum note (see DrumSynth::setRoute). */
+    void setDrumRoute (int note, int route) { drums.setRoute (note, route); }
+    int getDrumRoute (int note) const { return drums.getRoute (note); }
     /** Decodes an audio file (WAV, AIFF, MP3, FLAC...) and plays it for `note` from now on. */
     bool loadDrumSample (int note, const void* fileData, size_t size);
     /** Back to the synthesized sound for `note`. */
@@ -126,6 +131,7 @@ private:
     std::array<const DrumSynth::Sample*, 128> activeSamples {};
     std::array<juce::String, 128> sampleNames;
     std::array<std::array<float, 3>, 128> kitValues {}; // tune, decay, level per note
+    void saveRoutes() const;
     juce::File kitFolder;
     void saveKitValues() const;
 

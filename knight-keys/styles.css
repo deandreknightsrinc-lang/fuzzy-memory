@@ -828,3 +828,15 @@ dialog.puppet-window { width: min(640px, calc(100vw - 24px)); left: 16px; top: 7
 .pp-note { opacity: .65; }
 @media (max-width: 600px) { .pp-top { grid-template-columns: 1fr; } .pp-gestures { grid-template-columns: repeat(2, 1fr); } }
 .church-badge { margin-left: 4px; padding: 3px 9px; border-radius: 999px; font-size: 13px; font-weight: 700; color: #fff; text-decoration: none; background: var(--church, #7c3aed); white-space: nowrap; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+
+/* Kit Rack: Logic outputs (per-drum routing) */
+.kit-outputs { padding: 10px 14px 12px; background: #15171c; border-top: 1px solid #000; }
+.kit-out-head { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; margin-bottom: 8px; }
+.kit-out-presets { display: flex; gap: 4px; margin-left: auto; flex-wrap: wrap; }
+.kit-routes { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 4px 10px; }
+.kit-route { display: grid; grid-template-columns: 96px 1fr; gap: 6px; align-items: center; padding: 2px 4px; border-radius: 6px; }
+.kit-route.sel { background: rgba(255, 122, 69, .14); }
+.kit-route-name { background: none; border: 0; color: inherit; text-align: left; padding: 2px 0; cursor: pointer; font: inherit; font-size: 13px; }
+.kit-route-name:hover { color: #ff7a45; }
+.kit-route select { min-width: 0; width: 100%; font-size: 12px; }
+.kit-route-sum { margin-top: 6px; opacity: .8; }

@@ -3,13 +3,16 @@
 
 #include <array>
 
-// Output 1 is the main mix. Outputs 2-7 are the drum groups for Logic's
-// "Multi-Output" version: turn them on and each drum gets its own mixer channel.
+// Output 1 is the main mix. Outputs 2-16 are drum outputs for Logic's "Multi-Output"
+// version: turn them on and each drum gets its own mixer channel. The first six carry
+// the drum groups unless the Kit Rack routes a drum somewhere else.
 juce::AudioProcessor::BusesProperties KnightLyfeProcessor::makeBuses()
 {
     auto buses = BusesProperties().withOutput ("Main", juce::AudioChannelSet::stereo(), true);
     for (const auto* name : { "Kick", "Snare", "Hi-Hat", "Toms", "Cymbals", "Percussion" })
         buses = buses.withOutput (name, juce::AudioChannelSet::stereo(), false);
+    for (int i = knightlyfe::numDrumGroups + 1; i <= knightlyfe::numDrumOutputs; ++i)
+        buses = buses.withOutput ("Drums " + juce::String (i), juce::AudioChannelSet::stereo(), false);
     return buses;
 }
 
@@ -73,10 +76,10 @@ void KnightLyfeProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
 
     // Main output (bus 0) and any drum outputs Logic has switched on.
     auto main = getBusBuffer (buffer, false, 0);
-    std::array<juce::AudioBuffer<float>, knightlyfe::numDrumGroups> drumBuses;
+    std::array<juce::AudioBuffer<float>, knightlyfe::numDrumOutputs> drumBuses;
     knightlyfe::DrumOutputs drumOuts {};
     bool anyDrumOut = false;
-    for (int g = 0; g < knightlyfe::numDrumGroups; ++g)
+    for (int g = 0; g < knightlyfe::numDrumOutputs; ++g)
     {
         const int bus = g + 1;
         if (bus < getBusCount (false) && getBus (false, bus)->isEnabled() && getBus (false, bus)->getNumberOfChannels() > 0)

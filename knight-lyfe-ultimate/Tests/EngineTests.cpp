@@ -272,14 +272,14 @@ int main()
     std::printf ("Multi-output drums\n");
     {
         r.run (1.0);
-        std::array<juce::AudioBuffer<float>, numDrumGroups> groupBufs;
+        std::array<juce::AudioBuffer<float>, numDrumOutputs> groupBufs;
         DrumOutputs outs {};
-        for (int g = 0; g < numDrumGroups; ++g)
+        for (int g = 0; g < numDrumOutputs; ++g)
         {
             groupBufs[(size_t) g].setSize (2, Render::block);
             outs[(size_t) g] = &groupBufs[(size_t) g];
         }
-        auto renderMulti = [&] (double seconds, std::array<float, numDrumGroups>& groupPeaks) {
+        auto renderMulti = [&] (double seconds, std::array<float, numDrumOutputs>& groupPeaks) {
             juce::AudioBuffer<float> main (2, Render::block);
             float mainPeak = 0.0f;
             groupPeaks.fill (0.0f);
@@ -287,13 +287,13 @@ int main()
             {
                 r.engine.process (main, {}, &outs);
                 mainPeak = juce::jmax (mainPeak, main.getMagnitude (0, Render::block));
-                for (int g = 0; g < numDrumGroups; ++g)
+                for (int g = 0; g < numDrumOutputs; ++g)
                     groupPeaks[(size_t) g] = juce::jmax (groupPeaks[(size_t) g], groupBufs[(size_t) g].getMagnitude (0, Render::block));
                 r.now += 1000.0 * Render::block / Render::sr;
             }
             return mainPeak;
         };
-        std::array<float, numDrumGroups> gp {};
+        std::array<float, numDrumOutputs> gp {};
         r.engine.postMidi (18, 0x99, 36, 110, 0.0);
         float mainPeak = renderMulti (0.3, gp);
         CHECK (gp[(size_t) DrumGroup::kick] > 0.1f && mainPeak < 0.001f && gp[(size_t) DrumGroup::snare] < 0.001f,
@@ -313,6 +313,56 @@ int main()
         CHECK (DrumSynth::groupFor (40) == DrumGroup::snare && DrumSynth::groupFor (59) == DrumGroup::cymbals
                    && DrumSynth::groupFor (58) == DrumGroup::toms && DrumSynth::groupFor (56) == DrumGroup::percussion,
                "e-kit notes map to the right outputs");
+
+        // Per-drum routing (Kit Rack): any drum to any output, or back to the main mix.
+        auto batch = [] (std::initializer_list<std::pair<int, int>> rows) {
+            juce::Array<juce::var> list;
+            for (auto [note, out] : rows)
+                list.add (juce::Array<juce::var> { note, out });
+            auto* item = new juce::DynamicObject();
+            item->setProperty ("route", list);
+            auto* wrap = new juce::DynamicObject();
+            wrap->setProperty ("batch", juce::Array<juce::var> { juce::var (item) });
+            return juce::var (wrap);
+        };
+        r.engine.handleInterfaceBatch (batch ({ { 36, 9 }, { 38, routeMain } }));
+        r.engine.postMidi (18, 0x99, 36, 110, 0.0);
+        mainPeak = renderMulti (0.3, gp);
+        CHECK (gp[8] > 0.1f && gp[(size_t) DrumGroup::kick] < 0.001f && mainPeak < 0.001f, "a kick routed to output 9 plays only there");
+        renderMulti (1.0, gp);
+        r.engine.postMidi (18, 0x99, 38, 110, 0.0);
+        mainPeak = renderMulti (0.3, gp);
+        CHECK (mainPeak > 0.05f && gp[(size_t) DrumGroup::snare] < 0.001f, "a snare routed to the main mix plays there");
+        renderMulti (1.0, gp);
+        r.engine.handleInterfaceBatch (batch ({ { 36, routeDefault }, { 38, 99 } }));
+        r.engine.postMidi (18, 0x99, 36, 110, 0.0);
+        renderMulti (0.3, gp);
+        CHECK (gp[(size_t) DrumGroup::kick] > 0.1f && gp[8] < 0.001f, "back to the default: the kick is on the Kick output again");
+        CHECK (r.engine.getDrumRoute (38) == routeDefault, "an output that doesn't exist means the default");
+        renderMulti (1.0, gp);
+        CHECK (DrumSynth::outputFor (36, routeDefault) == 1 && DrumSynth::outputFor (59, routeDefault) == 5
+                   && DrumSynth::outputFor (59, 15) == 15 && DrumSynth::outputFor (59, routeMain) == routeMain,
+               "output numbers for defaults and routes");
+
+        // Routing is kept in the Kit folder, like the tuning.
+        const auto folder = juce::File::getSpecialLocation (juce::File::tempDirectory).getChildFile ("kl-routing-test");
+        folder.deleteRecursively();
+        {
+            SoundEngine first;
+            first.setKitFolder (folder);
+            first.handleInterfaceBatch (batch ({ { 42, 7 }, { 46, 7 }, { 49, routeMain } }));
+            CHECK (folder.getChildFile ("routing.json").existsAsFile(), "routing is saved");
+            const auto state = first.getKitState();
+            CHECK ((int) state["routes"]["42"] == 7 && (int) state["routes"]["49"] == routeMain && ! state["routes"].hasProperty ("36"),
+                   "the Kit Rack can read the routing back");
+        }
+        {
+            SoundEngine b;
+            b.setKitFolder (folder);
+            CHECK (b.getDrumRoute (42) == 7 && b.getDrumRoute (46) == 7 && b.getDrumRoute (49) == routeMain && b.getDrumRoute (36) == routeDefault,
+                   "a new plug-in instance loads the routing");
+        }
+        folder.deleteRecursively();
     }
 
     std::printf ("Host transport\n");

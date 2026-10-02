@@ -104,7 +104,25 @@ void SoundEngine::handleInterfaceBatch (const juce::var& v)
             }
             saveKitValues();
         }
+        else if (const auto* route = item.getProperty ("route", {}).getArray(); route != nullptr)
+        {
+            for (const auto& r : *route)
+                if (const auto* p = r.getArray(); p != nullptr && p->size() >= 2)
+                    setDrumRoute ((int) (*p)[0], (int) (*p)[1]);
+            saveRoutes();
+        }
     }
+}
+
+void SoundEngine::saveRoutes() const
+{
+    if (kitFolder == juce::File())
+        return;
+    juce::Array<juce::var> rows;
+    for (int n = 0; n < 128; ++n)
+        if (const int r = getDrumRoute (n); r != routeDefault)
+            rows.add (juce::Array<juce::var> { n, r });
+    kitFolder.getChildFile ("routing.json").replaceWithText (juce::JSON::toString (rows));
 }
 
 //==============================================================================
@@ -235,6 +253,11 @@ void SoundEngine::setKitFolder (const juce::File& folder)
             setDrumPiece (note, kitValues[(size_t) note][0], kitValues[(size_t) note][1], kitValues[(size_t) note][2]);
         }
     }
+    const auto routes = juce::JSON::parse (kitFolder.getChildFile ("routing.json"));
+    if (const auto* rows = routes.getArray())
+        for (const auto& row : *rows)
+            if (const auto* p = row.getArray(); p != nullptr && p->size() >= 2)
+                setDrumRoute ((int) (*p)[0], (int) (*p)[1]);
     for (const auto& f : kitFolder.findChildFiles (juce::File::findFiles, false, "sample-*.bin"))
     {
         const int note = f.getFileNameWithoutExtension().fromFirstOccurrenceOf ("-", false, false).getIntValue();
@@ -250,8 +273,13 @@ juce::var SoundEngine::getKitState() const
     for (int n = 0; n < 128; ++n)
         if (activeSamples[(size_t) n] != nullptr)
             samplesObj->setProperty (juce::String (n), sampleNames[(size_t) n].isEmpty() ? juce::String ("sample") : sampleNames[(size_t) n]);
+    auto* routesObj = new juce::DynamicObject();
+    for (int n = 0; n < 128; ++n)
+        if (const int r = getDrumRoute (n); r != routeDefault)
+            routesObj->setProperty (juce::String (n), r);
     auto* state = new juce::DynamicObject();
     state->setProperty ("samples", juce::var (samplesObj));
+    state->setProperty ("routes", juce::var (routesObj));
     return juce::var (state);
 }
 

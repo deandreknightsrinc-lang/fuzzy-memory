@@ -16,6 +16,20 @@ DrumGroup DrumSynth::groupFor (int note) noexcept
     }
 }
 
+int DrumSynth::outputFor (int note, int route) noexcept
+{
+    if (route == routeMain || (route >= 1 && route <= numDrumOutputs))
+        return route;
+    return (int) groupFor (note) + 1;
+}
+
+void DrumSynth::setRoute (int note, int route) noexcept
+{
+    if (note < 0 || note > 127)
+        return;
+    pieceRoute[(size_t) note].store (route == routeMain || (route >= 1 && route <= numDrumOutputs) ? route : routeDefault);
+}
+
 DrumSynth::DrumSynth()
 {
     for (int n = 0; n < 128; ++n)
@@ -24,6 +38,7 @@ DrumSynth::DrumSynth()
         pieceDecay[(size_t) n] = 1.0f;
         pieceLevel[(size_t) n] = 1.0f;
         pieceSample[(size_t) n] = nullptr;
+        pieceRoute[(size_t) n] = routeDefault;
     }
 }
 
@@ -91,7 +106,7 @@ void DrumSynth::trigger (int note, int velocity127, float gain, int offset)
     h.delay = juce::jmax (0, offset);
     h.amp = 0.6f * std::pow ((float) velocity127 / 127.0f, 1.2f) * gain * level; // leaves headroom for the piano
     h.pan = 0.5f;
-    h.group = (int) groupFor (note);
+    h.output = outputFor (note, inRange ? pieceRoute[(size_t) note].load() : routeDefault);
 
     if (const auto* smp = inRange ? pieceSample[(size_t) note].load() : nullptr; smp != nullptr && smp->audio.getNumSamples() > 1)
     {
@@ -217,7 +232,9 @@ void DrumSynth::render (juce::AudioBuffer<float>& mainOut, const DrumOutputs* gr
     {
         if (! h.active)
             continue;
-        auto* dest = groups != nullptr && (*groups)[(size_t) h.group] != nullptr ? (*groups)[(size_t) h.group] : &mainOut;
+        auto* dest = &mainOut;
+        if (groups != nullptr && h.output >= 1 && h.output <= numDrumOutputs && (*groups)[(size_t) (h.output - 1)] != nullptr)
+            dest = (*groups)[(size_t) (h.output - 1)];
         float* outL = dest->getWritePointer (0);
         float* outR = dest->getNumChannels() > 1 ? dest->getWritePointer (1) : nullptr;
         if (h.sample != nullptr)
