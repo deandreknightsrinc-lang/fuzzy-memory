@@ -9,11 +9,13 @@ on:
     paths:
       - 'knight-lyfe-ultimate/**'
       - 'knight-keys/**'
+      - 'sound-library/**'
       - '.github/workflows/plugin.yml'
   pull_request:
     paths:
       - 'knight-lyfe-ultimate/**'
       - 'knight-keys/**'
+      - 'sound-library/**'
       - '.github/workflows/plugin.yml'
   workflow_dispatch:
 
@@ -45,6 +47,20 @@ jobs:
 
       - name: Engine tests
         run: build/KnightLyfeEngineTests_artefacts/Release/KnightLyfeEngineTests
+
+      - name: Sound library scripts (bash 3.2-safe, sorting rules)
+        run: |
+          T="$RUNNER_TEMP/lib"; export HOME="$T/home"; mkdir -p "$HOME" "$T/drive" "$T/pack"
+          bash sound-library/setup-library.sh "$T/drive"
+          touch "$T/pack/Big Kick.wav" "$T/pack/808 Bass C.wav" "$T/pack/Choir Ooh.wav" "$T/pack/Custom Thing.wav" "$T/pack/Hat Open.aif"
+          bash sound-library/organize-samples.sh "$T/pack"
+          L="$T/drive/Knight Lyfe Sound Library"
+          test -f "$L/Drums/Kicks/Big Kick.wav"
+          test -f "$L/Bass/808 Bass/808 Bass C.wav"
+          test -f "$L/Choir & Vocals/Choir/Choir Ooh.wav"
+          test -f "$L/Drums/Hi-Hats/Hat Open.aif"
+          test -f "$L/Inbox (drop new sounds here)/Unsorted/Custom Thing.wav"
+          test -L "$HOME/Music/Audio Music Apps/Patches/Instrument/Knight Lyfe"
 
       - name: Check it is universal and runs on macOS 11+
         run: |
@@ -79,6 +95,8 @@ jobs:
           ditto -c -k --keepParent "Standalone/Knight Lyfe Ultimate.app" "$GITHUB_WORKSPACE/dist/Knight Lyfe Ultimate (App).zip"
           cp "$GITHUB_WORKSPACE/knight-lyfe-ultimate/INSTALL-MAC.txt" "$GITHUB_WORKSPACE/dist/"
           cp "$GITHUB_WORKSPACE/knight-lyfe-ultimate/install.sh" "$GITHUB_WORKSPACE/dist/"
+          mkdir -p "$GITHUB_WORKSPACE/dist/Sound Library Tools"
+          cp "$GITHUB_WORKSPACE"/sound-library/*.sh "$GITHUB_WORKSPACE"/sound-library/README.md "$GITHUB_WORKSPACE/dist/Sound Library Tools/"
 
       - name: Test the installer the way a user runs it
         run: |

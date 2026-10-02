@@ -1,5 +1,5 @@
 // Knight Keys — app wiring: MIDI I/O, files, transport, panels and rendering.
-import { parseMidi, buildSong, writeMidi } from './midi-file.js';
+import { parseMidi, buildSong, writeMidi, splitHands } from './midi-file.js';
 import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_CHANNEL } from './synth.js';
 import { Player } from './player.js';
 import { KeyboardView, drawStaff, drawControllers, drawGroove, drawPianoRoll, drawDrumHighway } from './render.js';
@@ -2816,6 +2816,12 @@ function mapPartForSong(part) {
   if (state.librarySong || part === String(DRUM_CHANNEL)) return part;
   const melodic = (state.song?.channels || []).filter((ch) => ch !== DRUM_CHANNEL);
   if (!melodic.length) return part;
+  if (melodic.length >= 4) {
+    // A four-part hymn file (soprano, alto, tenor, bass): play it the way hymns are played on piano.
+    if (part === '0') return melodic.slice(0, 2).join(',');
+    if (part === '1') return melodic.slice(2, 4).join(',');
+    return melodic.slice(0, 4).join(',');
+  }
   if (part === '0') return String(melodic[0]);
   if (part === '1') return String(melodic[1] ?? melodic[0]);
   return melodic.slice(0, 2).join(',');
@@ -3040,7 +3046,12 @@ function initSongs() {
     if (!state.midiBytes || state.librarySong) return toast('Open a MIDI file first (Open…, or Audio → MIDI → Open MIDI only). Built-in songs are already in the library.');
     const title = prompt('Name for this song', (state.song?.title || state.midiName || 'My song').replace(/\.midi?$/i, ''));
     if (!title) return;
-    mySongs.push({ id: `my-${Date.now().toString(36)}`, type: 'midi', title: title.trim().slice(0, 80), midi: toB64(state.midiBytes) });
+    let bytes = state.midiBytes;
+    const melodic = state.song.channels.filter((ch) => ch !== DRUM_CHANNEL);
+    if (melodic.length === 1 && confirm('This file has both hands on one track. Split it at middle C into right hand and left hand for Learn and Stage?')) {
+      bytes = splitHands(state.song, 60);
+    }
+    mySongs.push({ id: `my-${Date.now().toString(36)}`, type: 'midi', title: title.trim().slice(0, 80), midi: toB64(bytes) });
     if (!saveMySongs(mySongs)) {
       mySongs.pop();
       return toast('That file is too big to keep in the browser.');

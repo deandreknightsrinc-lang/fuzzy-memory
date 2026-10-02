@@ -260,7 +260,7 @@ test('library songs parse, line up and become MIDI', () => {
     const song = buildSong(parseMidi(songToMidi(s)));
     if (melody.length) assert.equal(song.notes.filter((n) => n.ch === 0).length, melody.length, `${s.id}: every melody note`);
     else assert.ok(song.notes.some((n) => n.ch === 0) && song.notes.some((n) => n.ch === 1), `${s.id}: chords in the right hand, bass in the left`);
-    assert.deepEqual(song.keySig, { sf: s.key, minor: false });
+    assert.deepEqual(song.keySig, { sf: s.key, minor: !!s.minor });
     assert.ok(Math.abs(song.bpm - s.bpm) < 0.01);
   }
   assert.equal(parsePitch('F#4'), 66);
@@ -424,4 +424,21 @@ test('player follows Logic: song beats on Logic beats, ahead of time, and cycles
   tr.update({ playing: false, bpm: 60, ppq: 2.5 });
   frame();
   assert.equal(log[0][0], 'alloff');
+});
+
+import { splitHands } from '../js/midi-file.js';
+
+test('hymn files with both hands on one track split at middle C', () => {
+  const one = buildSong(parseMidi(writeMidi([
+    { time: 0, bytes: [0x90, 72, 90] }, { time: 0, bytes: [0x90, 48, 80] }, { time: 0, bytes: [0x99, 36, 100] },
+    { time: 0.5, bytes: [0x80, 72, 0] }, { time: 0.5, bytes: [0x80, 48, 0] }, { time: 0.1, bytes: [0x89, 36, 0] },
+    { time: 0.75, bytes: [0x90, 60, 90] }, { time: 1.25, bytes: [0x80, 60, 0] },
+  ], { bpm: 90 })));
+  const split = buildSong(parseMidi(splitHands(one, 60)));
+  const by = (ch) => split.notes.filter((n) => n.ch === ch).map((n) => n.note);
+  assert.deepEqual(by(0), [72, 60], 'middle C and up: right hand');
+  assert.deepEqual(by(1), [48], 'below: left hand');
+  assert.deepEqual(by(9), [36], 'drums stay drums');
+  const c = split.notes.find((n) => n.note === 60);
+  assert.ok(Math.abs(c.time - 0.75) < 0.01 && Math.abs(c.dur - 0.5) < 0.01, 'timing kept');
 });
