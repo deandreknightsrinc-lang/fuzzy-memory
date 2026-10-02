@@ -55,7 +55,8 @@
           </div>
         </div>
       </details>
-      <button id="btnLessons" class="lessons-btn" title="Piano Path: step-by-step piano lessons, like a teacher at your side">🎓 Lessons</button>
+      <button id="btnLessons" class="lessons-btn" title="Lessons: step-by-step piano and voice courses, like a teacher at your side">🎓 Lessons</button>
+      <button id="btnBooth" class="booth-btn" title="Vocal Booth: live pitch graph and tuner for singers, plus four-part choir parts for any song">🎙 Vocal</button>
       <button id="btnStage" class="stage-btn" title="Stage: play songs like a game, earn crowns, unlock songs, beat the family high score">🎸 Stage</button>
       <button id="btnSongs" title="Free songs to learn on keys or drums">Songs</button>
       <button id="btnConvert" title="Turn a recording into MIDI">Audio → MIDI</button>
@@ -477,13 +478,14 @@ G D/F# Em C x2"></textarea>
 
   <dialog id="lessonDlg" class="tool-window lesson-window" aria-labelledby="lessonTitle">
     <header class="dlg-head tool-head">
-      <h2 id="lessonTitle">🎓 Piano Path</h2>
+      <h2 id="lessonTitle">🎓 Lessons</h2>
       <span id="lpStreak" class="lp-streak"></span>
       <select id="lpPlayer" title="Who's learning?"></select>
-      <button id="lpMic" class="mini" title="No USB keyboard? Let Knight Keys listen to any piano or keyboard through the microphone (single notes)">🎤 Microphone</button>
+      <button id="lpMic" class="mini" title="Sing, or play any piano or keyboard without USB: Knight Keys listens through the microphone (single notes)">🎤 Microphone</button>
       <button class="mini" data-close aria-label="Close">✕</button>
     </header>
     <div class="tool-body">
+      <div id="lpCourses" class="lp-courses"></div>
       <section id="lpMap" class="lp-map"></section>
       <section id="lpLesson" class="lp-lesson" hidden>
         <div class="lp-top">
@@ -493,6 +495,14 @@ G D/F# Em C x2"></textarea>
         </div>
         <p id="lpText" class="lp-text"></p>
         <div id="lpTargets" class="lp-targets"></div>
+        <div id="lpSing" class="lp-sing" hidden>
+          <button id="lpHear" class="mini" title="Play the note to sing">🔊 Hear it</button>
+          <div class="sing-meter" title="Your note: the needle in the middle is right in tune">
+            <div class="sing-scale"><span class="sing-flat">♭</span><span class="sing-center"></span><span id="lpNeedle" class="sing-needle"></span><span class="sing-sharp">♯</span></div>
+            <div id="lpHeard" class="sing-heard">–</div>
+          </div>
+          <div class="sing-hold" title="Hold the note until this fills up"><div id="lpHold"></div></div>
+        </div>
         <div id="lpFeedback" class="lp-feedback"></div>
         <div class="row">
           <button id="lpRestart">↺ Start this step again</button>
@@ -509,6 +519,56 @@ G D/F# Em C x2"></textarea>
           <button id="lpDoneMap">All lessons</button>
         </div>
       </section>
+    </div>
+  </dialog>
+
+  <dialog id="boothDlg" class="tool-window booth-window" aria-labelledby="boothTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="boothTitle">🎙 Vocal Booth</h2>
+      <span id="boothVoice" class="small"></span>
+      <button id="boothMic" class="mini" title="Listen to your singing through the microphone">🎤 Microphone</button>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="tool-body">
+      <div class="booth-top">
+        <canvas id="boothCanvas" class="booth-canvas" width="760" height="300" title="Your pitch over time (the line) against the song's notes (the bars), like Melodyne"></canvas>
+        <div class="booth-tuner">
+          <div id="boothNote" class="booth-note">–</div>
+          <div id="boothCents" class="small">Sing a note</div>
+          <div class="booth-range">
+            <div>Range: <b id="boothRange">–</b></div>
+            <button id="boothRangeReset" class="mini" title="Forget the lowest and highest notes and start over">↺ Range</button>
+          </div>
+        </div>
+      </div>
+      <p id="boothNoMic" class="small" hidden>Singing needs a microphone: open Knight Keys in Safari or Chrome (the plug-in window can't use the mic). Choir parts and MIDI export work here too.</p>
+      <section class="booth-choir">
+        <h3>🎼 Choir parts (SATB)</h3>
+        <p class="small">Four-part harmony for the open song: soprano sings the melody, alto, tenor and bass get the chord under every note, hymn style. Learn your part, or export it for ACE Studio, a choir plug-in or Logic.</p>
+        <div class="row">
+          <label>Melody <select id="boothMelody" title="Which part of the song is the melody"></select></label>
+          <label>Sound <select id="boothVowel"><option value="52">Choir Aah</option><option value="53">Choir Ooh</option></select></label>
+          <button id="boothMake" class="primary">🎼 Make choir parts</button>
+        </div>
+        <div id="boothChoirInfo" class="small"></div>
+        <div class="row">
+          <button id="boothOpen" disabled title="Open the four parts as the song and play them with the choir sound">▶ Play the choir</button>
+          <label>My part <select id="boothPart"><option value="0">Soprano</option><option value="1">Alto</option><option value="2">Tenor</option><option value="3">Bass</option></select></label>
+          <button id="boothLearn" disabled title="The choir plays the other parts and waits for you to sing yours">🎤 Learn my part</button>
+          <button id="boothDownload" disabled title="One named track per part: drag into Logic, or import into ACE Studio">⬇ Choir MIDI</button>
+        </div>
+      </section>
+      <details class="booth-help">
+        <summary>Pitch tools: Flex Pitch, Melodyne, Auto-Tune, ACE Studio, OVox, AVOX</summary>
+        <ul class="small">
+          <li><b>Logic Flex Pitch</b> (built in, like Melodyne): Cmd-F, set the track to Flex Pitch, double-click the region and drag the note blobs.</li>
+          <li><b>Logic Pitch Correction</b> (built in, like Auto-Tune): set Root and Scale to the song's key; slow Response sounds natural, 0 is the robot effect.</li>
+          <li><b>Melodyne</b> (Celemony) opens right in Logic's track (ARA). <b>Auto-Tune</b> (Antares) for real-time tuning; <b>AVOX</b> (Antares) for harmonies, doubles and choir from one voice.</li>
+          <li><b>OVox</b> (Waves): vocoder, talkbox and synth harmonies that follow the chords you play.</li>
+          <li><b>ACE Studio</b>: import the choir MIDI, type the lyrics, pick a voice and it sings each part; bring the audio back into Logic.</li>
+          <li>The Voice course in 🎓 Lessons walks through each one. These are commercial apps from their makers, not part of Knight Keys.</li>
+        </ul>
+      </details>
     </div>
   </dialog>
 

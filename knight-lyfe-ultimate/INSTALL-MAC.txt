@@ -151,3 +151,17 @@ Unzip the files first (double-click each .zip).
    back daily to grow your practice streak.
    On the website you can also press "Microphone" to play a keyboard that
    has no USB (single notes; headphones help).
+
+13. SINGING: VOICE COURSE AND VOCAL BOOTH
+   Lessons > "Voice" tab: singing lessons with the microphone (find your
+   range and choir part, match notes, scales, church songs, four-part
+   "Amen", and vocal production in Logic: Flex Pitch, Pitch Correction,
+   Melodyne, Auto-Tune, AVOX, OVox, ACE Studio).
+   "Vocal" at the top opens the Vocal Booth: live pitch line and tuner,
+   and "Make choir parts" for the open song (soprano, alto, tenor, bass).
+   "Choir MIDI" saves four named tracks: drag the file into Logic (one
+   track per part) or import it into ACE Studio and type the lyrics.
+   Singing needs the microphone, so use the website (Safari or Chrome) for
+   the singing parts; choir parts and MIDI export work in the plug-in too.
+   The choir sound plays on the website; inside Logic use Logic's own
+   choir patches or your choir plug-in on the exported tracks.

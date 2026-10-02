@@ -317,3 +317,41 @@ export function splitHands(song, splitNote = 60) {
   }
   return writeMidi(ev, { bpm: song.bpm || 120, name: song.title || 'Knight Keys song' });
 }
+
+/**
+ * Write a format-1 MIDI file with one named track per part (Logic, ACE Studio and
+ * choir plug-ins put each track on its own instrument track).
+ * tracks: [{ name, events: [{ time: seconds, bytes }] }]; the tempo, key and time
+ * signature go in a conductor track first.
+ */
+export function writeMidiTracks(tracks, { ppq = 480, bpm = 120, name = 'Knight Keys', keySig = null, timeSig = null } = {}) {
+  const ticksPerSec = (ppq * bpm) / 60;
+  const ascii = (str) => [...str].map((c) => (c.charCodeAt(0) < 0x80 ? c.charCodeAt(0) : 0x2d));
+  const chunk = (events) => {
+    const body = [];
+    const vlq = (v) => {
+      const stack = [v & 0x7f];
+      while ((v >>= 7)) stack.unshift((v & 0x7f) | 0x80);
+      body.push(...stack);
+    };
+    let last = 0;
+    for (const e of [...events].sort((a, b) => a.time - b.time || (a.bytes[0] & 0xf0) - (b.bytes[0] & 0xf0))) {
+      const tick = Math.max(last, Math.round(Math.max(0, e.time) * ticksPerSec));
+      vlq(tick - last);
+      body.push(...e.bytes);
+      last = tick;
+    }
+    vlq(0);
+    body.push(0xff, 0x2f, 0x00);
+    const len = body.length;
+    return [0x4d, 0x54, 0x72, 0x6b, (len >>> 24) & 0xff, (len >> 16) & 0xff, (len >> 8) & 0xff, len & 0xff, ...body];
+  };
+  const meta = (type, data) => ({ time: 0, bytes: [0xff, type, data.length, ...data] });
+  const us = Math.round(60e6 / bpm);
+  const conductor = [meta(0x03, ascii(name)), meta(0x51, [(us >> 16) & 0xff, (us >> 8) & 0xff, us & 0xff])];
+  if (keySig) conductor.push(meta(0x59, [keySig.sf & 0xff, keySig.minor ? 1 : 0]));
+  if (timeSig) conductor.push(meta(0x58, [timeSig.num, Math.log2(timeSig.den), 0x18, 0x08]));
+  const out = [0x4d, 0x54, 0x68, 0x64, 0, 0, 0, 6, 0, 1, 0, tracks.length + 1, (ppq >> 8) & 0xff, ppq & 0xff, ...chunk(conductor)];
+  for (const t of tracks) out.push(...chunk([meta(0x03, ascii(t.name)), ...t.events]));
+  return new Uint8Array(out);
+}

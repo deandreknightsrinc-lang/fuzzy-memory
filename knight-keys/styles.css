@@ -603,7 +603,7 @@ dialog.lesson-window { width: min(760px, calc(100vw - 24px)); left: max(12px, ca
 .lesson-window .tool-head { display: flex; align-items: center; gap: 10px; }
 .lesson-window .tool-head h2 { margin: 0; flex: 1; }
 .lp-streak { font-weight: 700; color: #ffa940; }
-#lpMic.on { background: #ff4d4f; border-color: #ff4d4f; color: #fff; }
+#lpMic.on, #boothMic.on { background: #ff4d4f; border-color: #ff4d4f; color: #fff; }
 .lp-unit { margin: 6px 0 14px; }
 .lp-unit h3 { margin: 0 0 6px; font-size: 14px; }
 .lp-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -629,3 +629,31 @@ dialog.lesson-window { width: min(760px, calc(100vw - 24px)); left: max(12px, ca
 .lp-done { text-align: center; }
 .lp-stars-big { font-size: 52px; color: #fadb14; letter-spacing: 6px; }
 .lp-stars-big .off { color: #3a3d48; }
+
+/* Voice course and Vocal Booth */
+#btnBooth.booth-btn { background: linear-gradient(135deg, #9254de, #36cfc9); border-color: transparent; color: #fff; font-weight: 600; }
+.lp-courses { display: flex; gap: 6px; margin-bottom: 8px; }
+.lp-courses button.on { border-color: var(--accent); background: rgba(79, 140, 255, .18); font-weight: 700; }
+.lp-sing { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 10px 0; }
+.sing-meter { display: flex; align-items: center; gap: 10px; }
+.sing-scale { position: relative; width: 220px; height: 26px; border-radius: 13px; background: linear-gradient(90deg, #ff7875 0%, #ffd666 30%, #73d13d 42%, #73d13d 58%, #ffd666 70%, #ff7875 100%); opacity: .85; }
+.sing-flat, .sing-sharp { position: absolute; top: 3px; font-weight: 800; color: #1a1c22; }
+.sing-flat { left: 8px; } .sing-sharp { right: 8px; }
+.sing-center { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 2px; background: #fff; }
+.sing-needle { position: absolute; top: -5px; width: 6px; height: 36px; margin-left: -3px; left: 50%; border-radius: 3px; background: #1a1c22; border: 2px solid #fff; transition: left 60ms linear; }
+.sing-needle.off { opacity: .2; }
+.sing-heard { min-width: 70px; font-size: 22px; font-weight: 800; }
+.sing-hold { flex: 1 1 140px; height: 12px; border-radius: 6px; background: #2a2d36; overflow: hidden; }
+.sing-hold > div { height: 100%; width: 0; background: #73d13d; transition: width 60ms linear; }
+dialog.booth-window { width: min(1040px, calc(100vw - 24px)); left: max(12px, calc(50% - 520px)); top: 56px; max-height: calc(100vh - 70px); }
+.booth-window .tool-head { display: flex; align-items: center; gap: 10px; }
+.booth-window .tool-head h2 { margin: 0; flex: 1; }
+.booth-top { display: flex; gap: 12px; align-items: stretch; flex-wrap: wrap; }
+.booth-canvas { flex: 1 1 520px; width: 100%; max-width: 760px; height: 300px; background: #12141a; border: 1px solid var(--border); border-radius: 8px; }
+.booth-tuner { flex: 0 0 200px; display: flex; flex-direction: column; gap: 8px; align-items: center; justify-content: center; }
+.booth-note { font-size: 54px; font-weight: 800; line-height: 1; }
+.booth-note.good { color: #95de64; } .booth-note.near { color: #ffd666; } .booth-note.far { color: #ff7875; }
+.booth-range { text-align: center; display: flex; flex-direction: column; gap: 4px; align-items: center; }
+.booth-choir h3 { margin: 12px 0 4px; font-size: 15px; }
+.booth-choir .row { flex-wrap: wrap; align-items: center; }
+.booth-help ul { margin: 6px 0; padding-left: 18px; line-height: 1.5; }

@@ -1,10 +1,11 @@
 // Knight Keys — app wiring: MIDI I/O, files, transport, panels and rendering.
 import { parseMidi, buildSong, writeMidi, splitHands } from './midi-file.js';
+import { makeChoirParts, choirMidi, PARTS as CHOIR_PARTS } from './choir.js';
 import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_CHANNEL } from './synth.js';
 import { Player } from './player.js';
 import { KeyboardView, drawStaff, drawControllers, drawGroove, drawPianoRoll, drawDrumHighway } from './render.js';
-import { UNITS, pathState, lessonStars, starsForMistakes, starsForAccuracy, updateStreak, currentStreak } from './lessons.js';
-import { PitchListener } from './pitch.js';
+import { UNITS, COURSES, unitsFor, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from './lessons.js';
+import { PitchListener, SingJudge, RangeFinder, voiceType, freqToCents, midiToFreq } from './pitch.js';
 import { GameSession, crownsFor, loadStage, saveStage, recordScore, courseState, scoreKey, PLAYER_COLORS } from './game.js';
 import { LANES, laneOf, sameDrum, outputFor, OUTPUTS, PIECES, KITS, kitById, resolveKit, kitNoteParams, loadSavedSamples, saveSample, deleteSample } from './drumkit.js';
 import { detectChord, noteName, pcName, solfege, keyName } from './theory.js';
@@ -2283,13 +2284,24 @@ function renderLessonHeader() {
   setText($('lpStreak'), streak ? `🔥 ${streak}-day streak` : '');
 }
 
+let lessonCourse = 'piano';
 function renderLessonMap() {
   renderLessonHeader();
+  const tabs = $('lpCourses');
+  tabs.innerHTML = '';
+  for (const c of COURSES) {
+    const b = Object.assign(document.createElement('button'), { className: `mini${c.id === lessonCourse ? ' on' : ''}`, textContent: `${c.icon} ${c.name}` });
+    b.onclick = () => {
+      lessonCourse = c.id;
+      renderLessonMap();
+    };
+    tabs.append(b);
+  }
   const map = $('lpMap');
   map.innerHTML = '';
-  const state0 = pathState(lessonProgress());
+  const state0 = pathState(lessonProgress(), lessonCourse);
   const nextId = state0.find((x) => x.unlocked && !x.stars)?.lesson.id;
-  for (const unit of UNITS) {
+  for (const unit of unitsFor(lessonCourse)) {
     const sec = Object.assign(document.createElement('div'), { className: 'lp-unit' });
     sec.append(Object.assign(document.createElement('h3'), { textContent: `${unit.icon} ${unit.title}` }));
     const row = Object.assign(document.createElement('div'), { className: 'lp-row' });
@@ -2309,6 +2321,7 @@ function renderLessonMap() {
 
 function showLessonView(view) {
   $('lpMap').hidden = view !== 'map';
+  $('lpCourses').hidden = view !== 'map';
   $('lpLesson').hidden = view !== 'lesson';
   $('lpDone').hidden = view !== 'done';
 }
@@ -2322,6 +2335,7 @@ function startLesson(lesson) {
 }
 
 function stopLessonSong() {
+  stopSinging();
   if (lessonRun.step?.type === 'song') {
     player.pause();
     if (learn.enabled) setLearn(false);
@@ -2347,6 +2361,7 @@ function renderLessonTargets() {
   if (step.type === 'notes') step.notes.forEach((n, i) => chip(noteLetter(n), `finger ${step.fingers[i]}`, i < lessonRun.pos ? 'done' : i === lessonRun.pos ? 'now' : ''));
   else if (step.type === 'chords') step.chords.forEach((c, i) => chip(step.names[i], c.map(noteLetter).join(' '), i < lessonRun.pos ? 'done' : i === lessonRun.pos ? 'now' : ''));
   else if (step.type === 'info' && step.keys) step.keys.forEach((n) => chip(noteLetter(n), '', 'now'));
+  else if (step.type === 'sing') step.notes.forEach((n, i) => chip(step.names?.[i] || noteLetter(n), step.names ? noteLetter(n) : '', i < lessonRun.pos ? 'done' : i === lessonRun.pos && !lessonRun.done ? 'now' : ''));
   const dots = $('lpDots');
   dots.innerHTML = lessonRun.lesson.steps.map((_, i) => `<span class="${i < lessonRun.stepIdx ? 'done' : i === lessonRun.stepIdx ? 'now' : ''}"></span>`).join('');
   markDirty();
@@ -2360,6 +2375,7 @@ function setLessonTargets() {
     lessonRun.upcoming = step.notes[lessonRun.pos + 1] ?? null;
   } else if (step.type === 'chords') lessonRun.targets = new Set(step.chords[lessonRun.pos] || []);
   else if (step.type === 'info') lessonRun.targets = new Set(step.keys || []);
+  else if (step.type === 'sing') lessonRun.targets = new Set(lessonRun.pos < step.notes.length ? [step.notes[lessonRun.pos]] : []);
   else lessonRun.targets = new Set();
 }
 
@@ -2368,11 +2384,14 @@ function showLessonStep(i) {
   const step = lessonRun.lesson.steps[i];
   Object.assign(lessonRun, { stepIdx: i, step, pos: 0, mistakes: 0, done: step.type === 'info' });
   setText($('lpText'), step.text + (step.type === 'chords' && micListener?.active ? ' (Chords need a USB keyboard or the on-screen keys: the microphone hears one note at a time.)' : ''));
-  lessonFeedback(step.type === 'info' ? '' : step.type === 'song' ? 'The song is playing. The yellow keys are yours.' : 'Your turn: the yellow key is next.');
+  lessonFeedback(step.type === 'info' ? '' : step.type === 'song' ? (step.voice ? 'The song is playing. Sing the yellow notes.' : 'The song is playing. The yellow keys are yours.') : 'Your turn: the yellow key is next.');
+  $('lpSing').hidden = step.type !== 'sing' && step.type !== 'range';
+  $('lpHear').hidden = step.type !== 'sing';
   setLessonTargets();
   renderLessonTargets();
   $('lpNext').disabled = !lessonRun.done;
   $('lpNext').textContent = i === lessonRun.lesson.steps.length - 1 ? 'Finish ✓' : 'Next ▶';
+  if (step.type === 'sing' || step.type === 'range' || step.voice) startSinging(step);
   if (step.type === 'song') {
     const song = SONGS.find((s) => s.id === step.song);
     loadSongEntry(song, 'beginner');
@@ -2436,7 +2455,7 @@ function lessonSongDone() {
 }
 
 function finishLesson() {
-  const stars = lessonStars(lessonRun.lesson.steps.map((s, i) => (s.type === 'info' ? 0 : lessonRun.stars[i] || 1)));
+  const stars = lessonStars(lessonRun.lesson.steps.map((s, i) => (s.type === 'info' ? 0 : lessonRun.stars[i] ?? 1)));
   const prog = lessonProgress();
   const first = !prog[lessonRun.lesson.id];
   prog[lessonRun.lesson.id] = Math.max(prog[lessonRun.lesson.id] || 0, stars);
@@ -2451,7 +2470,7 @@ function finishLesson() {
   $('lpDoneStars').innerHTML = starsHtml(stars);
   const streak = stage.practice[stage.current].streak;
   setText($('lpDoneNote'), `${first ? 'The next lesson is open. ' : ''}🔥 ${streak}-day practice streak${streak > 1 ? ': keep it going tomorrow!' : '. Come back tomorrow to make it 2!'}`);
-  const all = UNITS.flatMap((u) => u.lessons);
+  const all = unitsFor(UNITS.find((u) => u.lessons.includes(lessonRun.lesson))?.course || 'piano').flatMap((u) => u.lessons);
   const next = all[all.findIndex((l) => l.id === lessonRun.lesson.id) + 1];
   $('lpDoneNext').hidden = !next;
   $('lpDoneNext').onclick = () => startLesson(next);
@@ -2472,18 +2491,34 @@ function leaveLesson() {
   markDirty();
 }
 
-// Microphone: notes heard from any piano or keyboard count like keys you played.
+// Microphone: notes heard from any piano, keyboard or singer count like keys you played.
 let micListener = null;
-async function toggleMic() {
+const micSupported = () => !IN_HOST && !!navigator.mediaDevices?.getUserMedia;
+const showMicOn = (on) => ['lpMic', 'boothMic'].forEach((id) => $(id).classList.toggle('on', on));
+
+/** Singers: a note in any octave counts as the one the song is waiting for. */
+function singingNow() {
+  return (lessonRun.active && lessonRun.step?.voice) || $('boothDlg').open;
+}
+function foldForSinger(midi) {
+  if (!singingNow() || !learn.enabled) return midi;
+  return [...learn.expected].find((n) => n % 12 === midi % 12) ?? midi;
+}
+
+async function toggleMic(force) {
   if (micListener?.active) {
+    if (force === true) return;
     micListener.stop();
-    $('lpMic').classList.remove('on');
+    showMicOn(false);
     toast('Microphone off.');
     return;
   }
   try {
     const ctx = synth.ensure();
-    micListener ??= new PitchListener((on, midi) => {
+    micListener ??= new PitchListener((on, heard) => {
+      const midi = on ? foldForSinger(heard) : (micHeld.get(heard) ?? heard);
+      if (on) micHeld.set(heard, midi);
+      else micHeld.delete(heard);
       if (on) {
         liveColor.set(midi, settings.inputColor);
         dNoteOn('in', midi);
@@ -2494,11 +2529,137 @@ async function toggleMic() {
       markDirty();
     });
     await micListener.start(ctx);
-    $('lpMic').classList.add('on');
-    toast('Listening 🎤 Play one note at a time. Headphones help, so the speakers don\'t confuse it.');
+    showMicOn(true);
+    for (const fn of pitchSubscribers) micListener.addPitchListener(fn);
+    toast(singingNow() || lessonRun.step?.type === 'sing' ? 'Listening 🎤 Sing! Headphones help, so the speakers don\'t sing for you.' : 'Listening 🎤 Play one note at a time. Headphones help, so the speakers don\'t confuse it.');
   } catch (err) {
     toast(`Couldn't use the microphone (${err.message || err.name}). Allow microphone access for this page.`);
   }
+}
+
+const micHeld = new Map(); // heard note -> note it counted as (folded octave), for the matching note-off
+
+// Anyone who wants the raw pitch (sing steps, the Vocal Booth) subscribes here,
+// before or after the mic starts.
+const pitchSubscribers = new Set();
+function onPitch(fn) {
+  pitchSubscribers.add(fn);
+  const off = micListener?.addPitchListener(fn);
+  return () => {
+    pitchSubscribers.delete(fn);
+    off?.();
+    micListener?.pitchListeners.delete(fn);
+  };
+}
+
+// ---- Singing steps (Voice course) ------------------------------------------
+
+const singRun = { judge: null, range: null, off: null, muteUntil: 0 };
+
+function playReference(note) {
+  synth.ensure();
+  synth.noteOn(LIVE_CHANNEL, note, 80, synth.now + 0.02);
+  synth.noteOff(LIVE_CHANNEL, note, synth.now + 0.9);
+  // Don't let the speakers "sing" the note for you.
+  singRun.muteUntil = performance.now() + 1300;
+}
+
+function showSingMeter(exact, target) {
+  const needle = $('lpNeedle');
+  if (exact === null) {
+    needle.classList.add('off');
+    setText($('lpHeard'), '–');
+    return;
+  }
+  const { midi, cents } = freqToCents(midiToFreq(exact));
+  // With a target: how far from it (any octave). Without: from the nearest note.
+  let off = cents;
+  if (target !== undefined) {
+    off = ((((exact - target) * 100 + 600) % 1200) + 1200) % 1200 - 600;
+    off = Math.max(-100, Math.min(100, off));
+  }
+  needle.classList.remove('off');
+  needle.style.left = `${50 + (target !== undefined ? off / 2 : off)}%`;
+  setText($('lpHeard'), `${noteLetter(midi)}${Math.floor(midi / 12) - 1}`);
+}
+
+function startSinging(step) {
+  stopSinging();
+  if (!micSupported()) {
+    if (step.type !== 'song') {
+      lessonRun.done = true;
+      lessonRun.stars[lessonRun.stepIdx] = 0;
+      $('lpNext').disabled = false;
+      lessonFeedback(IN_HOST ? 'Singing needs the microphone: open Knight Keys in Safari or Chrome for this step. Skip it for now with Next.' : 'This browser can\'t use a microphone. Skip this step with Next.', 'bad');
+    }
+    return;
+  }
+  toggleMic(true);
+  if (step.type === 'sing') {
+    singRun.judge = new SingJudge(step.notes, { hold: step.hold || 0.6 });
+    $('lpHold').style.width = '0%';
+    if (step.hear) setTimeout(() => lessonRun.step === step && playReference(step.notes[0]), 400);
+  }
+  if (step.type === 'range') {
+    singRun.range = new RangeFinder();
+    lessonFeedback('Sing low to high and back. Your range shows here.');
+  }
+  singRun.off = onPitch((exact, dt) => {
+    if (performance.now() < singRun.muteUntil) exact = null;
+    if (step.type === 'sing') singFrame(step, exact, dt);
+    else if (step.type === 'range') rangeFrame(exact);
+  });
+}
+
+function stopSinging() {
+  singRun.off?.();
+  Object.assign(singRun, { judge: null, range: null, off: null });
+}
+
+function singFrame(step, exact, dt) {
+  const judge = singRun.judge;
+  if (!judge || lessonRun.done) return;
+  showSingMeter(exact, judge.target);
+  const r = judge.push(exact, dt);
+  $('lpHold').style.width = `${Math.round(judge.progress * 100)}%`;
+  if (r === 'hit') {
+    lessonRun.pos = judge.pos;
+    setLessonTargets();
+    renderLessonTargets();
+    lessonFeedback('✓ In tune!', 'good');
+    if (step.hear) setTimeout(() => lessonRun.step === step && !lessonRun.done && playReference(judge.target), 350);
+  } else if (r === 'done') {
+    lessonRun.pos = judge.pos;
+    $('lpHold').style.width = '100%';
+    completeLessonStep(starsForSinging(judge.averageCents, judge.misses));
+  } else if (r === 'miss') {
+    const sharp = (judge.lastCents ?? 0) > 0;
+    lessonFeedback(`Not quite: you're ${sharp ? 'above' : 'below'} ${noteLetter(judge.target)}. Slide ${sharp ? 'down' : 'up'} until the needle is in the middle.`, 'bad');
+    if (step.hear) playReference(judge.target);
+  } else if (exact !== null && judge.lastCents !== null && Math.abs(judge.lastCents) > judge.tolerance) {
+    lessonFeedback(judge.lastCents > 0 ? 'A little high: come down ⬇' : 'A little low: go up ⬆');
+  }
+}
+
+function rangeFrame(exact) {
+  const rf = singRun.range;
+  if (!rf) return;
+  showSingMeter(exact);
+  rf.push(exact === null ? null : Math.round(exact));
+  if (rf.low === null) return;
+  const type = voiceType(rf.low, rf.high);
+  const name = (n) => `${noteLetter(n)}${Math.floor(n / 12) - 1}`;
+  if (rf.span >= 5) {
+    stage.voice ??= {};
+    stage.voice[stage.current] = { low: rf.low, high: rf.high, type: type.id };
+    saveStage(stage);
+    if (!lessonRun.done) {
+      lessonRun.stars[lessonRun.stepIdx] = 3;
+      lessonRun.done = true;
+      $('lpNext').disabled = false;
+    }
+    lessonFeedback(`Your range: ${name(rf.low)} to ${name(rf.high)}, about ${Math.round(rf.span / 12 * 10) / 10} octaves. That fits ${type.name}. Keep going to stretch it, or press Next.`, 'good');
+  } else lessonFeedback(`So far: ${name(rf.low)} to ${name(rf.high)}. Keep sliding up and down.`);
 }
 
 function initLessons() {
@@ -2512,8 +2673,12 @@ function initLessons() {
     dlg.close();
   };
   makeDraggable(dlg);
-  $('lpMic').hidden = IN_HOST || !navigator.mediaDevices?.getUserMedia;
-  $('lpMic').onclick = toggleMic;
+  $('lpMic').hidden = !micSupported();
+  $('lpMic').onclick = () => toggleMic();
+  $('lpHear').onclick = () => {
+    const t = singRun.judge?.target;
+    if (t !== undefined) playReference(t);
+  };
   $('lpPlayer').onchange = () => {
     stage.current = $('lpPlayer').value;
     saveStage(stage);
@@ -2531,6 +2696,228 @@ function initLessons() {
     else finishLesson();
   };
   $('lpDoneMap').onclick = () => renderLessonMap();
+}
+
+// ---- Vocal Booth -------------------------------------------------------------
+//
+// For singers: a live pitch line over the song's notes (like Melodyne's blobs),
+// a tuner and your range; plus four-part choir parts (SATB) for any song, to
+// learn your part with the mic or export for ACE Studio, a choir plug-in or Logic.
+
+const booth = { trace: [], range: new RangeFinder(), off: null, raf: 0, choir: null, last: null };
+const noteLabel = (n) => `${noteLetter(n)}${Math.floor(n / 12) - 1}`;
+
+function boothPitch(exact) {
+  const now = performance.now() / 1000;
+  booth.trace.push({ t: now, n: exact });
+  while (booth.trace.length && booth.trace[0].t < now - 12) booth.trace.shift();
+  booth.range.push(exact === null ? null : Math.round(exact));
+  booth.last = exact;
+}
+
+function boothMelodyChannels() {
+  const v = $('boothMelody').value;
+  return v === '' ? null : [Number(v)];
+}
+
+function renderBoothInfo() {
+  const prof = stage.voice?.[stage.current];
+  const rf = booth.range;
+  const low = rf.low ?? prof?.low;
+  const high = rf.high ?? prof?.high;
+  setText($('boothRange'), low != null && high > low ? `${noteLabel(low)} – ${noteLabel(high)} (${voiceType(low, high).name})` : '–');
+  setText($('boothVoice'), prof ? `${stagePlayer().name}: ${voiceType(prof.low, prof.high).name}` : '');
+  const sel = $('boothMelody');
+  const prev = sel.value;
+  sel.innerHTML = '';
+  const melodic = (state.song?.channels || []).filter((ch) => ch !== DRUM_CHANNEL);
+  for (const ch of melodic) sel.append(new Option(`Ch ${ch + 1}: ${channelName(ch)}`, String(ch)));
+  if ([...sel.options].some((o) => o.value === prev)) sel.value = prev;
+  $('boothMake').disabled = !melodic.length;
+  if (!melodic.length) setText($('boothChoirInfo'), 'Open a song first (Songs button, or any MIDI file), then make its choir parts.');
+}
+
+function drawBooth() {
+  const cv = $('boothCanvas');
+  const dpr = window.devicePixelRatio || 1;
+  const w = cv.clientWidth || 760;
+  const h = cv.clientHeight || 300;
+  if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) {
+    cv.width = Math.round(w * dpr);
+    cv.height = Math.round(h * dpr);
+  }
+  const g = cv.getContext('2d');
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.clearRect(0, 0, w, h);
+  // Pitch range: your voice (from your range) or a wide default.
+  const prof = stage.voice?.[stage.current];
+  const lo = Math.max(28, (booth.range.low ?? prof?.low ?? 45) - 5);
+  const hi = Math.min(96, Math.max(lo + 18, (booth.range.high ?? prof?.high ?? 76) + 5));
+  const rowH = h / (hi - lo + 1);
+  const y = (n) => h - (n - lo + 0.5) * rowH;
+  const left = 34;
+  for (let n = lo; n <= hi; n++) {
+    const black = [1, 3, 6, 8, 10].includes(n % 12);
+    g.fillStyle = black ? '#171a21' : '#1c2029';
+    g.fillRect(left, y(n) - rowH / 2, w - left, rowH);
+    if (n % 12 === 0 || n % 12 === 7) {
+      g.fillStyle = '#7d8597';
+      g.font = '11px system-ui';
+      g.fillText(noteLabel(n), 2, y(n) + 4);
+    }
+  }
+  const pxPerSec = (w - left) / 8;
+  const nowX = left + (w - left) * 0.7;
+  // The song's notes for the part you sing (or the melody).
+  if (state.song) {
+    const chs = learn.enabled && !learn.drums ? learn.channels : new Set(boothMelodyChannels() || [state.song.channels.find((c) => c !== DRUM_CHANNEL)]);
+    const t = player.time;
+    const rate = player.rate || 1;
+    for (const n of state.song.notes) {
+      if (!chs.has(n.ch)) continue;
+      const x0 = nowX + ((n.time - t) / rate) * pxPerSec;
+      const x1 = nowX + ((n.time + n.dur - t) / rate) * pxPerSec;
+      if (x1 < left || x0 > w) continue;
+      // Show the note in the octave you sing, if it's out of view.
+      let nn = n.note + player.transpose;
+      while (nn > hi) nn -= 12;
+      while (nn < lo) nn += 12;
+      const want = learn.expected.has(n.note + player.transpose);
+      g.fillStyle = want ? '#ffd60a' : 'rgba(79, 140, 255, .55)';
+      const bx = Math.max(left, x0);
+      g.beginPath();
+      if (g.roundRect) g.roundRect(bx, y(nn) - rowH * 0.45, Math.max(3, x1 - bx), rowH * 0.9, Math.min(6, rowH / 2));
+      else g.rect(bx, y(nn) - rowH * 0.45, Math.max(3, x1 - bx), rowH * 0.9);
+      g.fill();
+    }
+  }
+  // Your voice: green when you're within 25 cents of a note.
+  const now = performance.now() / 1000;
+  g.lineWidth = 3;
+  g.lineCap = 'round';
+  let prev = null;
+  for (const p of booth.trace) {
+    if (p.n === null || p.n < lo - 1 || p.n > hi + 1) {
+      prev = null;
+      continue;
+    }
+    const pt = { x: nowX - (now - p.t) * pxPerSec, y: h - (p.n - lo + 0.5) * rowH, n: p.n };
+    if (prev && pt.x >= left) {
+      const off = Math.abs(p.n - Math.round(p.n)) * 100;
+      g.strokeStyle = off <= 25 ? '#73d13d' : off <= 40 ? '#ffd666' : '#ff7875';
+      g.beginPath();
+      g.moveTo(prev.x, prev.y);
+      g.lineTo(pt.x, pt.y);
+      g.stroke();
+    }
+    prev = pt;
+  }
+  g.strokeStyle = 'rgba(255,255,255,.35)';
+  g.lineWidth = 1;
+  g.beginPath();
+  g.moveTo(nowX, 0);
+  g.lineTo(nowX, h);
+  g.stroke();
+
+  // Tuner.
+  const el = $('boothNote');
+  if (booth.last == null) {
+    el.className = 'booth-note';
+    setText(el, '–');
+    setText($('boothCents'), micListener?.active ? 'Sing a note' : 'Turn on the microphone');
+  } else {
+    const { midi, cents } = freqToCents(midiToFreq(booth.last));
+    el.className = `booth-note ${Math.abs(cents) <= 15 ? 'good' : Math.abs(cents) <= 30 ? 'near' : 'far'}`;
+    setText(el, noteLabel(midi));
+    setText($('boothCents'), cents === 0 ? 'In tune' : `${cents > 0 ? '+' : ''}${cents} cents ${cents > 0 ? '(sharp)' : '(flat)'}`);
+  }
+  if (booth.range.low !== null) renderBoothRangeOnly();
+}
+
+let boothRangeShown = '';
+function renderBoothRangeOnly() {
+  const key = `${booth.range.low}-${booth.range.high}`;
+  if (key === boothRangeShown) return;
+  boothRangeShown = key;
+  renderBoothInfo();
+  if (booth.range.span >= 5) {
+    stage.voice ??= {};
+    stage.voice[stage.current] = { low: booth.range.low, high: booth.range.high, type: voiceType(booth.range.low, booth.range.high).id };
+    saveStage(stage);
+  }
+}
+
+function boothLoop() {
+  if (!$('boothDlg').open) {
+    booth.raf = 0;
+    return;
+  }
+  drawBooth();
+  booth.raf = requestAnimationFrame(boothLoop);
+}
+
+function openBooth() {
+  const dlg = $('boothDlg');
+  if (!dlg.open) dlg.show();
+  booth.off ??= onPitch(boothPitch);
+  renderBoothInfo();
+  if (!booth.raf) booth.raf = requestAnimationFrame(boothLoop);
+}
+
+function makeChoir() {
+  if (!state.song) return toast('Open a song first.');
+  const parts = makeChoirParts(state.song, { melodyChannels: boothMelodyChannels() });
+  if (!parts.soprano.length) return toast('No melody notes in that part. Pick another part as the melody.');
+  const title = `${state.song.title || state.midiName || 'Song'} - choir`;
+  const bytes = choirMidi(parts, { bpm: state.song.bpm, title, keySig: state.song.keySig, timeSig: state.song.timeSig, program: Number($('boothVowel').value) });
+  booth.choir = { parts, bytes, title };
+  ['boothOpen', 'boothLearn', 'boothDownload'].forEach((id) => ($(id).disabled = false));
+  setText($('boothChoirInfo'), `✓ ${parts.soprano.length} chords in four parts: ${CHOIR_PARTS.map((p) => `${p.name} ${noteLabel(Math.min(...parts[p.id].map((n) => n.note)))}–${noteLabel(Math.max(...parts[p.id].map((n) => n.note)))}`).join(', ')}. Check it by ear: it's a starting point, not a hymnal.`);
+  // Start on your own part if we know your voice.
+  const prof = stage.voice?.[stage.current];
+  if (prof) $('boothPart').value = String({ soprano: 0, mezzo: 0, alto: 1, tenor: 2, baritone: 3, bass: 3 }[prof.type] ?? 0);
+}
+
+function openChoirSong() {
+  if (!booth.choir) return false;
+  if (state.midiName !== booth.choir.title) {
+    if (learn.enabled) setLearn(false);
+    loadMidiBytes(booth.choir.bytes, `${booth.choir.title}.mid`);
+  }
+  return true;
+}
+
+function initBooth() {
+  const dlg = $('boothDlg');
+  $('btnBooth').onclick = openBooth;
+  dlg.querySelector('[data-close]').onclick = () => dlg.close();
+  makeDraggable(dlg);
+  $('boothMic').hidden = !micSupported();
+  $('boothNoMic').hidden = micSupported();
+  $('boothMic').onclick = () => toggleMic();
+  $('boothRangeReset').onclick = () => {
+    booth.range = new RangeFinder();
+    boothRangeShown = '';
+    renderBoothInfo();
+  };
+  $('boothMake').onclick = makeChoir;
+  $('boothVowel').onchange = () => booth.choir && makeChoir();
+  $('boothOpen').onclick = () => {
+    if (!openChoirSong()) return;
+    player.seek(0);
+    player.play();
+    renderBoothInfo();
+  };
+  $('boothLearn').onclick = () => {
+    if (!openChoirSong()) return;
+    $('learnPart').value = $('boothPart').value;
+    setLearn(true);
+    if (micSupported()) toggleMic(true);
+    player.seek(0);
+    player.play();
+    toast(`Sing the ${CHOIR_PARTS[Number($('boothPart').value)].name.toLowerCase()} part: the choir waits for each of your notes (any octave counts).`, [], 5000);
+  };
+  $('boothDownload').onclick = () => booth.choir && download(booth.choir.bytes, `${booth.choir.title}.mid`, 'audio/midi');
 }
 
 // ---- Stage (game mode) ---------------------------------------------------
@@ -3078,7 +3465,7 @@ function renderLearn(sf, spelling) {
   const names = learn.drums
     ? want.map((n) => PADS.find(([p]) => p === (PAD_ALIAS[n] ?? n))?.[1] || `#${n}`)
     : want.sort((a, b) => a - b).map((n) => noteName(n, sf, spelling));
-  const status = player.waiting ? `Play ${names.join(' + ')}` : player.playing ? 'Listening…' : 'Press ▶ to start';
+  const status = player.waiting ? `${!learn.drums && singingNow() ? 'Sing' : 'Play'} ${names.join(' + ')}` : player.playing ? 'Listening…' : 'Press ▶ to start';
   setText(el, `${status} · ✓${learn.correct} ✗${learn.wrong}`);
   const wantPads = new Set(learn.drums ? want.map((n) => PAD_ALIAS[n] ?? n) : []);
   padEls.forEach((p, note) => p.classList.toggle('want', wantPads.has(note)));
@@ -3729,6 +4116,7 @@ initDrums();
 initKitRack();
 initStage();
 initLessons();
+initBooth();
 initConverter();
 initSongs();
 applyLayout();
