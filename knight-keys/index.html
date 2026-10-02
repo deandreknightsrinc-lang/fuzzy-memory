@@ -57,6 +57,7 @@
       </details>
       <button id="btnLessons" class="lessons-btn" title="Lessons: step-by-step piano and voice courses, like a teacher at your side">🎓 Lessons</button>
       <button id="btnBooth" class="booth-btn" title="Vocal Booth: live pitch graph and tuner for singers, plus four-part choir parts for any song">🎙 Vocal</button>
+      <button id="btnChurch" class="church-btn" title="Virtual church: plan and run a worship service with big slides, worship with lyrics and a stream screen for YouTube or Facebook Live">⛪ Church</button>
       <button id="btnLyrics" title="Lyrics: sing along, the words light up as the song plays">🎤 Lyrics</button>
       <button id="btnBand" class="band-btn" title="Band Room: rehearse as a worship band or choir; AI musicians and an AI choir fill every part nobody is playing">🎶 Band</button>
       <button id="btnStage" class="stage-btn" title="Stage: play songs like a game, earn crowns, unlock songs, beat the family high score">🎸 Stage</button>
@@ -490,11 +491,13 @@ Every evening I will sing"></textarea>
       <h2 id="lessonTitle">🎓 Lessons</h2>
       <span id="lpStreak" class="lp-streak"></span>
       <select id="lpPlayer" title="Who's learning?"></select>
+      <button id="lpStudio" class="mini" title="Course Studio: make your own courses (any subject) with AI-teacher videos, quizzes and lessons">🛠 Course Studio</button>
       <button id="lpMic" class="mini" title="Sing, or play any piano or keyboard without USB: Knight Keys listens through the microphone (single notes)">🎤 Microphone</button>
       <button class="mini" data-close aria-label="Close">✕</button>
     </header>
     <div class="tool-body">
       <div id="lpCourses" class="lp-courses"></div>
+      <div id="lpCourseInfo" class="lp-course-info"></div>
       <section id="lpMap" class="lp-map"></section>
       <section id="lpLesson" class="lp-lesson" hidden>
         <div class="lp-top">
@@ -502,7 +505,10 @@ Every evening I will sing"></textarea>
           <span id="lpTitle" class="lp-title"></span>
           <span id="lpDots" class="lp-dots"></span>
         </div>
+        <div id="lpTeacher" class="lp-teacher" hidden></div>
+        <div id="lpVideo" class="lp-video" hidden></div>
         <p id="lpText" class="lp-text"></p>
+        <div id="lpQuiz" class="lp-quiz" hidden></div>
         <canvas id="lpStaff" class="lp-staff" width="520" height="190" hidden></canvas>
         <canvas id="lpFret" class="lp-fret" width="560" height="190" hidden></canvas>
         <div id="lpTargets" class="lp-targets"></div>
@@ -529,6 +535,137 @@ Every evening I will sing"></textarea>
           <button id="lpDoneAgain">↺ Again</button>
           <button id="lpDoneMap">All lessons</button>
         </div>
+      </section>
+    </div>
+  </dialog>
+
+  <dialog id="churchDlg" class="tool-window church-window" aria-labelledby="churchTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="churchTitle">⛪ Virtual Church</h2>
+      <select id="chService" title="Your services"></select>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="tool-body">
+      <div id="chTabs" class="lp-courses">
+        <button class="mini on" data-tab="plan">📝 Plan the service</button>
+        <button class="mini" data-tab="run">▶ Run the service</button>
+      </div>
+      <section id="chPlan">
+        <div class="row wrap ch-brand">
+          <label>Church <input id="chName" type="text" maxlength="60" /></label>
+          <label class="grow">Tagline <input id="chTagline" type="text" maxlength="100" /></label>
+          <label>Color <input id="chColor" type="color" /></label>
+        </div>
+        <div class="row wrap ch-brand">
+          <label class="grow">Logo link <input id="chLogo" type="text" placeholder="https://…/logo.png" /></label>
+          <label class="grow">Giving link <input id="chGiving" type="text" placeholder="e.g. your Cash App, PayPal or giving page" /></label>
+        </div>
+        <div class="row wrap ch-brand">
+          <label class="grow">Website <input id="chWebsite" type="text" /></label>
+          <label class="grow">Social <input id="chSocial" type="text" placeholder="@yourchurch on Facebook / YouTube / Instagram" /></label>
+          <label title="A small credit on the stream screen"><input id="chPowered" type="checkbox" /> Powered by BAC Ministries</label>
+        </div>
+        <label class="row">Service <input id="chTitle" type="text" maxlength="80" class="grow" /></label>
+        <div class="ch-cols">
+          <div>
+            <h4>Order of service</h4>
+            <div id="chSegs" class="ch-segs"></div>
+            <div class="row wrap"><select id="chAddType"></select><button id="chAdd" class="mini">+ Add</button></div>
+          </div>
+          <div id="chEdit" class="ch-edit"></div>
+        </div>
+        <div id="chStatus" class="small cs-status"></div>
+        <div class="row wrap">
+          <button id="chSave" class="primary">💾 Save</button>
+          <button id="chNew">+ New service</button>
+          <button id="chInvite" title="A post to share on social media">📋 Invite post</button>
+          <button id="chExport">⬇ Service file</button>
+          <button id="chImport">📂 Import</button>
+          <input id="chFile" type="file" hidden accept=".kservice,.json,application/json" />
+          <button id="chDelete" class="danger">🗑 Delete</button>
+        </div>
+      </section>
+      <section id="chRun" hidden>
+        <div id="chPreview" class="stage ch-preview" title="Double-click for full screen"></div>
+        <div class="row wrap ch-controls">
+          <button id="chPrev">◀ Back</button>
+          <button id="chNext" class="primary">Next ▶</button>
+          <button id="chSongPlay" title="Play / pause the worship song">⏯ Song</button>
+          <button id="chStage" title="A clean screen for the projector, or for OBS to stream to YouTube / Facebook Live">📺 Open stream screen</button>
+          <button id="chFull">⛶ Full screen</button>
+          <span id="chNow" class="small"></span>
+        </div>
+        <div id="chRunList" class="ch-runlist"></div>
+        <p class="small">Going live: open the stream screen, capture that window in OBS (free) and stream to YouTube or Facebook; songs play from this app with their words on screen. Arrow keys move through the service while this window is open.</p>
+      </section>
+    </div>
+  </dialog>
+
+  <dialog id="studioDlg" class="tool-window studio-window" aria-labelledby="studioTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="studioTitle">🛠 Course Studio</h2>
+      <span class="small">Make a course for any subject: music, Bible study, any class</span>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="tool-body studio">
+      <aside class="studio-list">
+        <div class="row wrap">
+          <button id="csNew" class="primary">+ New course</button>
+          <button id="csImport" title="Open a course pack (.kcourse) someone shared">📂 Import</button>
+          <input id="csFile" type="file" hidden accept=".kcourse,.json,application/json" />
+        </div>
+        <h4>Your courses</h4>
+        <div id="csCourses" class="cs-courses"></div>
+        <h4>Start from a Knight Lyfe course</h4>
+        <div id="csTemplates" class="cs-courses"></div>
+        <h4>The teachers</h4>
+        <div id="csTeachers" class="cs-teachers"></div>
+      </aside>
+      <section id="csMain" class="studio-main" hidden>
+        <div class="row wrap">
+          <label>Title <input id="csTitle" type="text" maxlength="80" /></label>
+          <label>Icon <input id="csIcon" type="text" maxlength="4" size="3" /></label>
+          <label>Subject <input id="csSubject" type="text" maxlength="40" placeholder="Music, Bible, Math..." /></label>
+          <label>By <input id="csBy" type="text" maxlength="60" /></label>
+        </div>
+        <div class="row wrap">
+          <label>Teacher <select id="csTeacher"></select></label>
+          <span id="csTeacherRole" class="small"></span>
+        </div>
+        <textarea id="csDesc" rows="2" placeholder="What students will learn in this course"></textarea>
+        <div class="studio-cols">
+          <div class="cs-tree-col">
+            <h4>Units and lessons</h4>
+            <div id="csTree" class="cs-tree"></div>
+            <div class="row wrap"><button id="csAddUnit" class="mini">+ Unit</button><button id="csAddLesson" class="mini">+ Lesson</button></div>
+          </div>
+          <div class="cs-lesson-col">
+            <div class="row"><label class="grow">Lesson <input id="csLessonName" type="text" maxlength="80" /></label><button id="csDelLesson" class="mini" title="Delete this lesson">🗑</button></div>
+            <div id="csSteps" class="cs-steps"></div>
+            <div class="row wrap"><select id="csStepType"></select><button id="csAddStep">+ Add step</button></div>
+            <h4>🎬 Teacher video for this lesson</h4>
+            <div class="row wrap">
+              <input id="csVideoUrl" type="text" placeholder="Link: YouTube, Vimeo or an .mp4" class="grow" />
+              <button id="csVideoFile" title="Use a video file from this computer">📁 File</button>
+              <input id="csVideoPick" type="file" hidden accept="video/*" />
+            </div>
+            <div class="row wrap"><button id="csScript">📝 Video script for this lesson</button><span id="csVideoNote" class="small"></span></div>
+            <details><summary>Edit this lesson as JSON (advanced)</summary><textarea id="csJson" rows="8" spellcheck="false"></textarea><button id="csJsonApply" class="mini">Apply</button></details>
+          </div>
+        </div>
+        <div id="csStatus" class="small cs-status"></div>
+        <div class="row wrap">
+          <button id="csSave" class="primary" title="Save and add it to the Lessons window">💾 Save to Lessons</button>
+          <button id="csTry">▶ Try the lesson</button>
+          <button id="csExport" title="One file with the whole course, to share or run on another copy">⬇ Course pack (.kcourse)</button>
+          <button id="csScripts" title="Every lesson's video script, ready for HeyGen, Synthesia, D-ID...">⬇ All video scripts</button>
+          <button id="csCsv" title="One row per lesson, for bulk video tools">⬇ Scripts CSV</button>
+          <button id="csDelete" class="danger">🗑 Delete course</button>
+        </div>
+      </section>
+      <section id="csScriptBox" class="cs-script" hidden>
+        <div class="row"><b id="csScriptTitle" class="grow"></b><button id="csScriptCopy" class="mini">📋 Copy</button><button id="csScriptClose" class="mini">✕</button></div>
+        <pre id="csScriptText"></pre>
       </section>
     </div>
   </dialog>
