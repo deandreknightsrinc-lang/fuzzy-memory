@@ -1,10 +1,12 @@
 // Knight Keys — app wiring: MIDI I/O, files, transport, panels and rendering.
-import { parseMidi, buildSong, writeMidi } from './midi-file.js';
+import { parseMidi, buildSong, writeMidi, splitHands } from './midi-file.js';
 import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_CHANNEL } from './synth.js';
 import { Player } from './player.js';
 import { KeyboardView, drawStaff, drawControllers, drawGroove, drawPianoRoll, drawDrumHighway } from './render.js';
+import { UNITS, pathState, lessonStars, starsForMistakes, starsForAccuracy, updateStreak, currentStreak } from './lessons.js';
+import { PitchListener } from './pitch.js';
 import { GameSession, crownsFor, loadStage, saveStage, recordScore, courseState, scoreKey, PLAYER_COLORS } from './game.js';
-import { LANES, laneOf, sameDrum, PIECES, KITS, kitById, resolveKit, kitNoteParams, loadSavedSamples, saveSample, deleteSample } from './drumkit.js';
+import { LANES, laneOf, sameDrum, outputFor, OUTPUTS, PIECES, KITS, kitById, resolveKit, kitNoteParams, loadSavedSamples, saveSample, deleteSample } from './drumkit.js';
 import { detectChord, noteName, pcName, solfege, keyName } from './theory.js';
 import { createDemoMidi } from './demo.js';
 import { GROOVES, GroovePlayer } from './grooves.js';
@@ -254,6 +256,10 @@ const LEARN_COLOR = '#ffd60a';
 function keyState(note) {
   const live = sourceOf('in');
   if (live.down.has(note)) return { color: liveColor.get(note) || settings.inputColor };
+  if (lessonRun.targets.size) {
+    if (lessonRun.targets.has(note)) return { color: LEARN_COLOR };
+    if (lessonRun.upcoming === note) return { color: LEARN_COLOR, faded: true };
+  }
   if (learn.enabled && !learn.drums) {
     if (learn.expected.has(note)) return { color: LEARN_COLOR };
     if (learn.next.includes(note)) return { color: LEARN_COLOR, faded: true };
@@ -391,6 +397,7 @@ const player = new Player({
     if (groove.locked && state.song) groove.scheduleSpan(from, to, ctxAt, state.song);
   },
   onEnd() {
+    if (lessonRun.active && lessonRun.step?.type === 'song') return lessonSongDone();
     if (stageRun.phase === 'play') return finishStage();
     if (learn.enabled && learn.total) {
       const pct = Math.round((100 * learn.correct) / Math.max(1, learn.correct + learn.wrong));
@@ -462,6 +469,7 @@ function liveOn(n, vel) {
   dNoteOn('in', note);
   learnCheck(note, false);
   stageHit(note, false);
+  lessonHit(note);
 }
 
 function liveOff(n) {
@@ -2094,7 +2102,8 @@ function renderKitRack() {
   const piece = PIECES.find((p) => p.id === kitPiece);
   const v = resolved[kitPiece];
   setText($('kitPieceName'), piece.name);
-  setText($('kitPieceNotes'), `Notes ${piece.notes.join(', ')}`);
+  const out = outputFor(piece.notes[0]);
+  setText($('kitPieceNotes'), `Notes ${piece.notes.join(', ')}${IN_HOST ? ` · Logic multi-output: ${out} (outputs ${3 + 2 * OUTPUTS.indexOf(out)}-${4 + 2 * OUTPUTS.indexOf(out)})` : ''}`);
   setKnob($('knobTune'), v.tune);
   setKnob($('knobDecay'), v.decay);
   setKnob($('knobLevel'), v.level);
@@ -2247,6 +2256,281 @@ function initKitRack() {
       if (dlg.open) renderKitRack();
     });
   });
+}
+
+// ---- Piano Path (guided lessons) -----------------------------------------
+//
+// Step-by-step lessons: read a tip, play notes or chords with live feedback,
+// then a song in Learn mode. Stars per lesson, the next one opens when you
+// pass, and a daily practice streak, per player (the Stage players).
+
+const lessonRun = { active: false, lesson: null, stepIdx: 0, step: null, pos: 0, mistakes: 0, stars: [], targets: new Set(), upcoming: null, done: false };
+const NOTE_LETTERS = ['C', 'C♯', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'A♭', 'A', 'B♭', 'B'];
+const noteLetter = (n) => NOTE_LETTERS[n % 12];
+const todayStr = () => {
+  const d = new Date();
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+};
+const starsHtml = (n) => Array.from({ length: 3 }, (_, i) => `<span class="${i < n ? '' : 'off'}">★</span>`).join('');
+const lessonProgress = () => ((stage.lessons ??= {})[stage.current] ??= {});
+
+function renderLessonHeader() {
+  const sel = $('lpPlayer');
+  sel.innerHTML = '';
+  for (const p of stage.players) sel.append(new Option(p.name, p.id));
+  sel.value = stage.current;
+  const streak = currentStreak(stage.practice?.[stage.current], todayStr());
+  setText($('lpStreak'), streak ? `🔥 ${streak}-day streak` : '');
+}
+
+function renderLessonMap() {
+  renderLessonHeader();
+  const map = $('lpMap');
+  map.innerHTML = '';
+  const state0 = pathState(lessonProgress());
+  const nextId = state0.find((x) => x.unlocked && !x.stars)?.lesson.id;
+  for (const unit of UNITS) {
+    const sec = Object.assign(document.createElement('div'), { className: 'lp-unit' });
+    sec.append(Object.assign(document.createElement('h3'), { textContent: `${unit.icon} ${unit.title}` }));
+    const row = Object.assign(document.createElement('div'), { className: 'lp-row' });
+    for (const lesson of unit.lessons) {
+      const st = state0.find((x) => x.lesson.id === lesson.id);
+      const b = Object.assign(document.createElement('button'), { className: `lp-card${st.unlocked ? '' : ' locked'}${lesson.id === nextId ? ' next' : ''}` });
+      b.innerHTML = `<div class="lp-name"></div><div class="lp-stars">${st.unlocked ? starsHtml(st.stars) : '🔒'}</div>`;
+      b.querySelector('.lp-name').textContent = lesson.title;
+      b.onclick = () => (st.unlocked || stage.unlockAll ? startLesson(lesson) : toast('Finish the lesson before this one to open it.'));
+      row.append(b);
+    }
+    sec.append(row);
+    map.append(sec);
+  }
+  showLessonView('map');
+}
+
+function showLessonView(view) {
+  $('lpMap').hidden = view !== 'map';
+  $('lpLesson').hidden = view !== 'lesson';
+  $('lpDone').hidden = view !== 'done';
+}
+
+function startLesson(lesson) {
+  stopLessonSong();
+  Object.assign(lessonRun, { active: true, lesson, stars: [], stepIdx: 0 });
+  setText($('lpTitle'), lesson.title);
+  showLessonView('lesson');
+  showLessonStep(0);
+}
+
+function stopLessonSong() {
+  if (lessonRun.step?.type === 'song') {
+    player.pause();
+    if (learn.enabled) setLearn(false);
+  }
+}
+
+function lessonFeedback(text, kind = '') {
+  const el = $('lpFeedback');
+  el.textContent = text;
+  el.className = `lp-feedback ${kind}`;
+}
+
+function renderLessonTargets() {
+  const step = lessonRun.step;
+  const box = $('lpTargets');
+  box.innerHTML = '';
+  const chip = (label, sub, cls) => {
+    const c = Object.assign(document.createElement('div'), { className: `lp-chip ${cls}` });
+    c.textContent = label;
+    if (sub) c.append(Object.assign(document.createElement('small'), { textContent: sub }));
+    box.append(c);
+  };
+  if (step.type === 'notes') step.notes.forEach((n, i) => chip(noteLetter(n), `finger ${step.fingers[i]}`, i < lessonRun.pos ? 'done' : i === lessonRun.pos ? 'now' : ''));
+  else if (step.type === 'chords') step.chords.forEach((c, i) => chip(step.names[i], c.map(noteLetter).join(' '), i < lessonRun.pos ? 'done' : i === lessonRun.pos ? 'now' : ''));
+  else if (step.type === 'info' && step.keys) step.keys.forEach((n) => chip(noteLetter(n), '', 'now'));
+  const dots = $('lpDots');
+  dots.innerHTML = lessonRun.lesson.steps.map((_, i) => `<span class="${i < lessonRun.stepIdx ? 'done' : i === lessonRun.stepIdx ? 'now' : ''}"></span>`).join('');
+  markDirty();
+}
+
+function setLessonTargets() {
+  const step = lessonRun.step;
+  lessonRun.upcoming = null;
+  if (step.type === 'notes') {
+    lessonRun.targets = new Set(lessonRun.pos < step.notes.length ? [step.notes[lessonRun.pos]] : []);
+    lessonRun.upcoming = step.notes[lessonRun.pos + 1] ?? null;
+  } else if (step.type === 'chords') lessonRun.targets = new Set(step.chords[lessonRun.pos] || []);
+  else if (step.type === 'info') lessonRun.targets = new Set(step.keys || []);
+  else lessonRun.targets = new Set();
+}
+
+function showLessonStep(i) {
+  stopLessonSong();
+  const step = lessonRun.lesson.steps[i];
+  Object.assign(lessonRun, { stepIdx: i, step, pos: 0, mistakes: 0, done: step.type === 'info' });
+  setText($('lpText'), step.text + (step.type === 'chords' && micListener?.active ? ' (Chords need a USB keyboard or the on-screen keys: the microphone hears one note at a time.)' : ''));
+  lessonFeedback(step.type === 'info' ? '' : step.type === 'song' ? 'The song is playing. The yellow keys are yours.' : 'Your turn: the yellow key is next.');
+  setLessonTargets();
+  renderLessonTargets();
+  $('lpNext').disabled = !lessonRun.done;
+  $('lpNext').textContent = i === lessonRun.lesson.steps.length - 1 ? 'Finish ✓' : 'Next ▶';
+  if (step.type === 'song') {
+    const song = SONGS.find((s) => s.id === step.song);
+    loadSongEntry(song, 'beginner');
+    $('learnPart').value = mapPartForSong(step.part);
+    setLearn(true);
+    player.seek(0);
+    player.play();
+  }
+}
+
+function completeLessonStep(stars) {
+  lessonRun.stars[lessonRun.stepIdx] = stars;
+  lessonRun.done = true;
+  lessonRun.targets = new Set();
+  lessonRun.upcoming = null;
+  renderLessonTargets();
+  lessonFeedback(`Step done! ${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}`, 'good');
+  $('lpNext').disabled = false;
+  synth.noteOn(LIVE_CHANNEL, 84, 60, synth.now + 0.02);
+  synth.noteOff(LIVE_CHANNEL, 84, synth.now + 0.3);
+}
+
+function lessonHit(note) {
+  if (!lessonRun.active || lessonRun.done || !$('lessonDlg').open) return;
+  const step = lessonRun.step;
+  if (step.type === 'notes') {
+    const want = step.notes[lessonRun.pos];
+    if (note === want) {
+      lessonRun.pos++;
+      if (lessonRun.pos >= step.notes.length) return completeLessonStep(starsForMistakes(lessonRun.mistakes, step.notes.length));
+      lessonFeedback('✓', 'good');
+    } else {
+      lessonRun.mistakes++;
+      lessonFeedback(`That was ${noteLetter(note)}. Find ${noteLetter(want)} (the yellow key).`, 'bad');
+    }
+    setLessonTargets();
+    renderLessonTargets();
+  } else if (step.type === 'chords') {
+    const chord = step.chords[lessonRun.pos];
+    if (!chord.includes(note)) {
+      lessonRun.mistakes++;
+      lessonFeedback(`${noteLetter(note)} isn't in ${step.names[lessonRun.pos]}: play ${chord.map(noteLetter).join(', ')} together.`, 'bad');
+      return;
+    }
+    const down = liveNotesDown();
+    if (chord.every((n) => down.has(n))) {
+      lessonRun.pos++;
+      if (lessonRun.pos >= step.chords.length) return completeLessonStep(starsForMistakes(lessonRun.mistakes, step.chords.length * 3));
+      lessonFeedback(`✓ ${step.names[lessonRun.pos - 1]}! Now ${step.names[lessonRun.pos]}.`, 'good');
+      setLessonTargets();
+      renderLessonTargets();
+    }
+  }
+}
+
+function lessonSongDone() {
+  const acc = Math.round((100 * learn.correct) / Math.max(1, learn.correct + learn.wrong));
+  if (learn.enabled) setLearn(false);
+  completeLessonStep(starsForAccuracy(acc));
+  lessonFeedback(`Song done: ${acc}% of your notes right. ${'★'.repeat(starsForAccuracy(acc))}`, 'good');
+}
+
+function finishLesson() {
+  const stars = lessonStars(lessonRun.lesson.steps.map((s, i) => (s.type === 'info' ? 0 : lessonRun.stars[i] || 1)));
+  const prog = lessonProgress();
+  const first = !prog[lessonRun.lesson.id];
+  prog[lessonRun.lesson.id] = Math.max(prog[lessonRun.lesson.id] || 0, stars);
+  stage.practice ??= {};
+  stage.practice[stage.current] = updateStreak(stage.practice[stage.current], todayStr());
+  saveStage(stage);
+  renderLessonHeader();
+  lessonRun.active = false;
+  lessonRun.targets = new Set();
+  const me = stagePlayer();
+  setText($('lpDoneTitle'), `${['', 'Lesson passed', 'Great job', 'Perfect'][stars]}, ${me.name}!`);
+  $('lpDoneStars').innerHTML = starsHtml(stars);
+  const streak = stage.practice[stage.current].streak;
+  setText($('lpDoneNote'), `${first ? 'The next lesson is open. ' : ''}🔥 ${streak}-day practice streak${streak > 1 ? ': keep it going tomorrow!' : '. Come back tomorrow to make it 2!'}`);
+  const all = UNITS.flatMap((u) => u.lessons);
+  const next = all[all.findIndex((l) => l.id === lessonRun.lesson.id) + 1];
+  $('lpDoneNext').hidden = !next;
+  $('lpDoneNext').onclick = () => startLesson(next);
+  $('lpDoneAgain').onclick = () => startLesson(lessonRun.lesson);
+  [60, 64, 67, 72].forEach((n, i) => {
+    synth.noteOn(LIVE_CHANNEL, n, 85, synth.now + 0.1 * i + 0.05);
+    synth.noteOff(LIVE_CHANNEL, n, synth.now + 1.2);
+  });
+  showLessonView('done');
+  markDirty();
+}
+
+function leaveLesson() {
+  stopLessonSong();
+  lessonRun.active = false;
+  lessonRun.targets = new Set();
+  lessonRun.upcoming = null;
+  markDirty();
+}
+
+// Microphone: notes heard from any piano or keyboard count like keys you played.
+let micListener = null;
+async function toggleMic() {
+  if (micListener?.active) {
+    micListener.stop();
+    $('lpMic').classList.remove('on');
+    toast('Microphone off.');
+    return;
+  }
+  try {
+    const ctx = synth.ensure();
+    micListener ??= new PitchListener((on, midi) => {
+      if (on) {
+        liveColor.set(midi, settings.inputColor);
+        dNoteOn('in', midi);
+        learnCheck(midi, false);
+        stageHit(midi, false);
+        lessonHit(midi);
+      } else dNoteOff('in', midi);
+      markDirty();
+    });
+    await micListener.start(ctx);
+    $('lpMic').classList.add('on');
+    toast('Listening 🎤 Play one note at a time. Headphones help, so the speakers don\'t confuse it.');
+  } catch (err) {
+    toast(`Couldn't use the microphone (${err.message || err.name}). Allow microphone access for this page.`);
+  }
+}
+
+function initLessons() {
+  const dlg = $('lessonDlg');
+  $('btnLessons').onclick = () => {
+    if (!dlg.open) dlg.show();
+    if (!lessonRun.active) renderLessonMap();
+  };
+  dlg.querySelector('[data-close]').onclick = () => {
+    leaveLesson();
+    dlg.close();
+  };
+  makeDraggable(dlg);
+  $('lpMic').hidden = IN_HOST || !navigator.mediaDevices?.getUserMedia;
+  $('lpMic').onclick = toggleMic;
+  $('lpPlayer').onchange = () => {
+    stage.current = $('lpPlayer').value;
+    saveStage(stage);
+    if (!lessonRun.active) renderLessonMap();
+    else renderLessonHeader();
+  };
+  $('lpBack').onclick = () => {
+    leaveLesson();
+    renderLessonMap();
+  };
+  $('lpRestart').onclick = () => showLessonStep(lessonRun.stepIdx);
+  $('lpNext').onclick = () => {
+    if (!lessonRun.done) return;
+    if (lessonRun.stepIdx + 1 < lessonRun.lesson.steps.length) showLessonStep(lessonRun.stepIdx + 1);
+    else finishLesson();
+  };
+  $('lpDoneMap').onclick = () => renderLessonMap();
 }
 
 // ---- Stage (game mode) ---------------------------------------------------
@@ -2816,6 +3100,12 @@ function mapPartForSong(part) {
   if (state.librarySong || part === String(DRUM_CHANNEL)) return part;
   const melodic = (state.song?.channels || []).filter((ch) => ch !== DRUM_CHANNEL);
   if (!melodic.length) return part;
+  if (melodic.length >= 4) {
+    // A four-part hymn file (soprano, alto, tenor, bass): play it the way hymns are played on piano.
+    if (part === '0') return melodic.slice(0, 2).join(',');
+    if (part === '1') return melodic.slice(2, 4).join(',');
+    return melodic.slice(0, 4).join(',');
+  }
   if (part === '0') return String(melodic[0]);
   if (part === '1') return String(melodic[1] ?? melodic[0]);
   return melodic.slice(0, 2).join(',');
@@ -3040,7 +3330,12 @@ function initSongs() {
     if (!state.midiBytes || state.librarySong) return toast('Open a MIDI file first (Open…, or Audio → MIDI → Open MIDI only). Built-in songs are already in the library.');
     const title = prompt('Name for this song', (state.song?.title || state.midiName || 'My song').replace(/\.midi?$/i, ''));
     if (!title) return;
-    mySongs.push({ id: `my-${Date.now().toString(36)}`, type: 'midi', title: title.trim().slice(0, 80), midi: toB64(state.midiBytes) });
+    let bytes = state.midiBytes;
+    const melodic = state.song.channels.filter((ch) => ch !== DRUM_CHANNEL);
+    if (melodic.length === 1 && confirm('This file has both hands on one track. Split it at middle C into right hand and left hand for Learn and Stage?')) {
+      bytes = splitHands(state.song, 60);
+    }
+    mySongs.push({ id: `my-${Date.now().toString(36)}`, type: 'midi', title: title.trim().slice(0, 80), midi: toB64(bytes) });
     if (!saveMySongs(mySongs)) {
       mySongs.pop();
       return toast('That file is too big to keep in the browser.');
@@ -3433,6 +3728,7 @@ syncSettingsUI();
 initDrums();
 initKitRack();
 initStage();
+initLessons();
 initConverter();
 initSongs();
 applyLayout();

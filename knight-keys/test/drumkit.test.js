@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { LANES, laneOf, sameDrum, PIECES, KITS, resolveKit, kitNoteParams } from '../js/drumkit.js';
+import { LANES, laneOf, sameDrum, PIECES, KITS, resolveKit, kitNoteParams, outputFor } from '../js/drumkit.js';
 
 test('e-kit notes land in the right highway lane (Alesis Nitro Max and General MIDI)', () => {
   const lane = (n) => LANES[laneOf(n)]?.id;
@@ -41,4 +41,8 @@ test('kits resolve to per-note settings for the sound engines', () => {
   assert.deepEqual(rows.find((r) => r[0] === 40), [40, 3, 0.6, 0.5], 'snare rim follows the snare');
   assert.ok(KITS.length >= 5);
   assert.equal(resolveKit('nope').kick.tune, 0, 'unknown kit falls back to the stock kit');
+});
+
+test('multi-output names match the plug-in groups', () => {
+  assert.deepEqual([36, 40, 46, 58, 59, 56].map(outputFor), ['Kick', 'Snare', 'Hi-Hat', 'Toms', 'Cymbals', 'Percussion']);
 });

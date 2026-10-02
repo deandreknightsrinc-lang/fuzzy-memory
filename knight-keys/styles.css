@@ -105,6 +105,7 @@ input[type="range"] { accent-color: var(--accent); }
 }
 .song-title { color: var(--muted); max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (max-width: 1600px) {
+  .brand > span:not(.logo) { display: none; } /* the logo stays; room for Lessons and Stage */
   .song-title { max-width: 130px; }
   .master input { width: 64px; }
 }
@@ -595,3 +596,36 @@ dialog.stage-window { width: min(1100px, calc(100vw - 24px)); left: max(12px, ca
 .builder-status.ok { color: #95de64; }
 .builder-status.err { color: #ff7875; }
 .stage-tabs { margin-top: 4px; }
+
+/* Piano Path (guided lessons) */
+#btnLessons.lessons-btn { background: linear-gradient(135deg, #36cfc9, #4f8cff); border-color: transparent; color: #fff; font-weight: 600; }
+dialog.lesson-window { width: min(760px, calc(100vw - 24px)); left: max(12px, calc(50% - 380px)); top: 56px; max-height: calc(100vh - 300px); }
+.lesson-window .tool-head { display: flex; align-items: center; gap: 10px; }
+.lesson-window .tool-head h2 { margin: 0; flex: 1; }
+.lp-streak { font-weight: 700; color: #ffa940; }
+#lpMic.on { background: #ff4d4f; border-color: #ff4d4f; color: #fff; }
+.lp-unit { margin: 6px 0 14px; }
+.lp-unit h3 { margin: 0 0 6px; font-size: 14px; }
+.lp-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.lp-card { flex: 1 1 200px; text-align: left; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: linear-gradient(160deg, #23303a, #181a22); cursor: pointer; }
+.lp-card:hover { border-color: var(--accent); }
+.lp-card.locked { opacity: .45; cursor: not-allowed; }
+.lp-card.next { border-color: #36cfc9; box-shadow: 0 0 0 1px #36cfc9 inset; }
+.lp-card .lp-name { font-weight: 700; }
+.lp-card .lp-stars { font-size: 14px; letter-spacing: 1px; color: #fadb14; }
+.lp-card .lp-stars .off { color: #3a3d48; }
+.lp-top { display: flex; align-items: center; gap: 10px; }
+.lp-title { font-weight: 700; flex: 1; }
+.lp-dots span { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #3a3d48; margin-left: 4px; }
+.lp-dots span.done { background: #73d13d; } .lp-dots span.now { background: #36cfc9; }
+.lp-text { font-size: 17px; line-height: 1.45; margin: 14px 0; }
+.lp-targets { display: flex; gap: 8px; flex-wrap: wrap; min-height: 56px; align-items: center; }
+.lp-chip { min-width: 48px; padding: 6px 10px; border-radius: 10px; background: #1f222b; border: 2px solid #3a3d48; text-align: center; font-size: 20px; font-weight: 800; }
+.lp-chip small { display: block; font-size: 11px; font-weight: 500; color: var(--muted); }
+.lp-chip.now { border-color: #ffd60a; background: rgba(255, 214, 10, .12); }
+.lp-chip.done { border-color: #73d13d; color: #95de64; }
+.lp-feedback { min-height: 1.6em; font-size: 15px; margin: 8px 0; }
+.lp-feedback.good { color: #95de64; } .lp-feedback.bad { color: #ff7875; }
+.lp-done { text-align: center; }
+.lp-stars-big { font-size: 52px; color: #fadb14; letter-spacing: 6px; }
+.lp-stars-big .off { color: #3a3d48; }

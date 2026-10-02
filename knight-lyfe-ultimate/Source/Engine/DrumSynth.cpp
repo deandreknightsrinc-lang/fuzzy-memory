@@ -3,6 +3,19 @@
 namespace knightlyfe
 {
 
+DrumGroup DrumSynth::groupFor (int note) noexcept
+{
+    switch (note)
+    {
+        case 35: case 36: return DrumGroup::kick;
+        case 37: case 38: case 40: return DrumGroup::snare;
+        case 22: case 26: case 42: case 44: case 46: return DrumGroup::hihat;
+        case 41: case 43: case 45: case 47: case 48: case 50: case 58: return DrumGroup::toms;
+        case 49: case 51: case 52: case 53: case 55: case 57: case 59: return DrumGroup::cymbals;
+        default: return DrumGroup::percussion;
+    }
+}
+
 DrumSynth::DrumSynth()
 {
     for (int n = 0; n < 128; ++n)
@@ -78,6 +91,7 @@ void DrumSynth::trigger (int note, int velocity127, float gain, int offset)
     h.delay = juce::jmax (0, offset);
     h.amp = 0.6f * std::pow ((float) velocity127 / 127.0f, 1.2f) * gain * level; // leaves headroom for the piano
     h.pan = 0.5f;
+    h.group = (int) groupFor (note);
 
     if (const auto* smp = inRange ? pieceSample[(size_t) note].load() : nullptr; smp != nullptr && smp->audio.getNumSamples() > 1)
     {
@@ -195,16 +209,17 @@ void DrumSynth::stopAll()
     }
 }
 
-void DrumSynth::render (juce::AudioBuffer<float>& out, int startSample, int numSamples)
+void DrumSynth::render (juce::AudioBuffer<float>& mainOut, const DrumOutputs* groups, int startSample, int numSamples)
 {
-    float* outL = out.getWritePointer (0);
-    float* outR = out.getNumChannels() > 1 ? out.getWritePointer (1) : nullptr;
     const float twoPiOverSr = juce::MathConstants<float>::twoPi / (float) sampleRate;
 
     for (auto& h : hits)
     {
         if (! h.active)
             continue;
+        auto* dest = groups != nullptr && (*groups)[(size_t) h.group] != nullptr ? (*groups)[(size_t) h.group] : &mainOut;
+        float* outL = dest->getWritePointer (0);
+        float* outR = dest->getNumChannels() > 1 ? dest->getWritePointer (1) : nullptr;
         if (h.sample != nullptr)
         {
             renderSample (h, outL, outR, startSample, numSamples);

@@ -293,3 +293,27 @@ export function writeMidi(events, { ppq = 480, bpm = 120, name = 'Knight Keys re
   const trackHeader = [0x4d, 0x54, 0x72, 0x6b, (len >>> 24) & 0xff, (len >> 16) & 0xff, (len >> 8) & 0xff, len & 0xff];
   return new Uint8Array([...header, ...trackHeader, ...body]);
 }
+
+/**
+ * Hymn and piano files often put both hands on one channel. This rewrites the
+ * melodic notes so everything from `splitNote` up is the right hand (channel 1)
+ * and everything below it the left hand (channel 2); drums stay on channel 10.
+ * Timing is kept exactly (tempo changes are folded into one steady tempo).
+ */
+export function splitHands(song, splitNote = 60) {
+  const ev = [];
+  const add = (time, bytes) => ev.push({ time, bytes });
+  if (song.keySig) add(0, [0xff, 0x59, 0x02, song.keySig.sf & 0xff, song.keySig.minor ? 1 : 0]);
+  if (song.timeSig) add(0, [0xff, 0x58, 0x04, song.timeSig.num, Math.log2(song.timeSig.den), 0x18, 0x08]);
+  add(0, [0xc0, 0]);
+  add(0, [0xc1, 0]);
+  for (const n of song.notes) {
+    const ch = n.ch === 9 ? 9 : n.note >= splitNote ? 0 : 1;
+    add(n.time, [0x90 | ch, n.note, n.vel]);
+    add(n.time + n.dur, [0x80 | ch, n.note, 0]);
+  }
+  for (const e of song.events) {
+    if (e.type === 'cc' && e.ch !== 9) for (const ch of [0, 1]) add(e.time, [0xb0 | ch, e.cc, e.value]);
+  }
+  return writeMidi(ev, { bpm: song.bpm || 120, name: song.title || 'Knight Keys song' });
+}

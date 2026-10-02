@@ -52,6 +52,17 @@ export const PIECES = [
 
 export const pieceOf = (note) => PIECES.find((p) => p.notes.includes(note));
 
+/** The plug-in's multi-output channel for a drum note (matches DrumSynth::groupFor). */
+export const OUTPUTS = ['Kick', 'Snare', 'Hi-Hat', 'Toms', 'Cymbals', 'Percussion'];
+export function outputFor(note) {
+  if ([35, 36].includes(note)) return 'Kick';
+  if ([37, 38, 40].includes(note)) return 'Snare';
+  if ([22, 26, 42, 44, 46].includes(note)) return 'Hi-Hat';
+  if ([41, 43, 45, 47, 48, 50, 58].includes(note)) return 'Toms';
+  if ([49, 51, 52, 53, 55, 57, 59].includes(note)) return 'Cymbals';
+  return 'Percussion';
+}
+
 export const DEFAULT_PIECE = { tune: 0, decay: 1, level: 1 };
 
 /** Built-in kits: the synthesized drums, tuned and shaped differently. */

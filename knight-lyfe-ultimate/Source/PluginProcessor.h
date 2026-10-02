@@ -42,6 +42,7 @@ public:
 
 private:
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
+    static BusesProperties makeBuses();
 
     knightlyfe::SoundEngine engine;
     juce::dsp::Reverb reverb;
