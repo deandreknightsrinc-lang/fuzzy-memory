@@ -451,7 +451,7 @@ export function chartToChords(chart, beatsPerBar = 4) {
 
 /** Drum grooves. Hits: [beatInBar, note, velocity]; `pro` is the busier Advanced version. */
 const hats = (step, beats, accent = 60, soft = 45) => Array.from({ length: Math.round(beats / step) }, (_, i) => [i * step, 42, (i * step) % 1 ? soft : accent]);
-const DRUM_STYLES = {
+export const DRUM_STYLES = {
   straight: {
     beats: 4,
     hits: [[0, 36, 90], [1, 38, 80], [2, 36, 85], [3, 38, 80], ...hats(0.5, 4)],
@@ -481,7 +481,7 @@ const DRUM_STYLES = {
 export const DRUM_STYLE_NAMES = { straight: 'Straight (rock / pop / worship)', twostep: 'Gospel two-step', shuffle: 'Gospel shuffle', waltz: '3/4 waltz', ballad68: '6/8 ballad', '': 'No drums' };
 
 /** A fill on the last beat (or two) of a bar, ending into a crash on the next bar. */
-function fillHits(beats, big) {
+export function fillHits(beats, big) {
   const len = big ? 2 : 1;
   const start = beats - len;
   const toms = [50, 48, 45, 43, 41];

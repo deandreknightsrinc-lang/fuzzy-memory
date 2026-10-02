@@ -2,6 +2,7 @@
 import { parseMidi, buildSong, writeMidi, splitHands } from './midi-file.js';
 import { makeChoirParts, choirMidi, PARTS as CHOIR_PARTS } from './choir.js';
 import { songToScore, scoreToMusicXML, musicXmlToMidi, scoreFileText } from './notation.js';
+import { ROLES as BAND_ROLES, arrangeBand, bandMidi, chordsFromChart, songInBeats, transposeSymbol } from './band.js';
 import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_CHANNEL } from './synth.js';
 import { Player } from './player.js';
 import { KeyboardView, drawStaff, drawControllers, drawGroove, drawPianoRoll, drawDrumHighway, drawFretboard } from './render.js';
@@ -1099,6 +1100,7 @@ function presetOptions(select, value, withAuto) {
 }
 
 function channelName(ch) {
+  if (state.channelLabels && state.channelLabels.for === state.midiName && state.channelLabels[ch]) return state.channelLabels[ch];
   if (ch === DRUM_CHANNEL) return 'Drums';
   if (state.librarySong && ch <= 1) return state.libraryChart ? (ch === 0 ? 'Chords (right hand)' : 'Bass (left hand)') : ch === 0 ? 'Melody (right hand)' : 'Chords (left hand)';
   return GM_NAMES[state.chan[ch].program] || `Program ${state.chan[ch].program}`;
@@ -3011,6 +3013,229 @@ function initLessons() {
   $('lpDoneMap').onclick = () => renderLessonMap();
 }
 
+// ---- Band Room ----------------------------------------------------------------
+//
+// Rehearse as a worship band or a choir with whoever showed up: every part is a
+// channel of an arrangement made for the song, played by the AI, played quietly
+// as a guide, played by one of you (the AI drops out), or off.
+
+const band = { mode: 'band', arr: null, bytes: null, raf: 0, assign: { band: {}, choir: {} } };
+const CHOIR_IDS = ['soprano', 'alto', 'tenor', 'choirbass'];
+const BAND_IDS = ['keys', 'guitar', 'bass', 'organ', 'drums'];
+const BAND_ROWS = {
+  band: [...['lead', ...BAND_IDS].map((id) => ({ id, roles: [id] })), { id: 'choir', name: 'Choir (S A T B)', icon: '⛪', roles: CHOIR_IDS }, { id: 'click', roles: ['click'] }],
+  choir: [...CHOIR_IDS.map((id) => ({ id, roles: [id] })), { id: 'accomp', name: 'Accompaniment', icon: '🎹', roles: BAND_IDS, accomp: true }, { id: 'lead', roles: ['lead'] }, { id: 'click', roles: ['click'] }],
+};
+const BAND_DEFAULTS = {
+  band: { lead: 'guide', keys: 'ai', guitar: 'ai', bass: 'ai', organ: 'off', drums: 'ai', choir: 'off', click: 'off' },
+  choir: { soprano: 'ai', alto: 'ai', tenor: 'ai', choirbass: 'ai', accomp: 'keys', lead: 'off', click: 'off' },
+};
+const roleInfo = (id) => BAND_ROLES.find((r) => r.id === id);
+
+function bandSongOptions() {
+  const sel = $('bandSong');
+  const prev = sel.value;
+  sel.innerHTML = '';
+  sel.append(new Option('The song that\'s open', 'open'));
+  const group = (label, list, prefix) => {
+    if (!list.length) return;
+    const g = Object.assign(document.createElement('optgroup'), { label });
+    for (const x of list) g.append(new Option(x.title, `${prefix}${x.id}`));
+    sel.append(g);
+  };
+  group('Church & worship', SONGS.filter((x) => x.category === 'church'), 'lib:');
+  group('My songs', mySongs, 'my:');
+  group('Starter songs', SONGS.filter((x) => x.category !== 'church'), 'lib:');
+  sel.value = [...sel.options].some((o) => o.value === prev) ? prev : state.librarySong ? `lib:${state.librarySong}` : 'open';
+  const drums = $('bandDrums');
+  if (drums.options.length <= 1) for (const [id, name] of Object.entries(DRUM_STYLE_NAMES)) drums.append(new Option(name, id));
+}
+
+/** The song to arrange: { song (beats), melody, chords, drums, title }. */
+function bandSource() {
+  const v = $('bandSong').value;
+  let entry = null;
+  if (v.startsWith('lib:')) entry = SONGS.find((x) => x.id === v.slice(4));
+  else if (v.startsWith('my:')) entry = mySongs.find((x) => x.id === v.slice(3));
+  else if (state.librarySong) entry = SONGS.find((x) => x.id === state.librarySong) || mySongs.find((x) => x.id === state.librarySong);
+  if (entry) {
+    const song = buildSong(parseMidi(entryMidi(entry)));
+    song.title = entry.title;
+    const chart = entry.type !== 'midi' && entry.chords;
+    const { song: sb, melody } = songInBeats(song, entry.type === 'midi' ? song.channels.find((c) => c !== DRUM_CHANNEL) ?? null : entry.melody ? 0 : null);
+    return { song: sb, melody, chords: chart ? chordsFromChart(entry.chords) : null, drums: entry.drums, title: entry.title };
+  }
+  if (!state.song) return null;
+  // Any MIDI file: the first melodic part is the melody, the chords come from the notes.
+  const song = state.song;
+  const mel = song.channels.find((c) => c !== DRUM_CHANNEL);
+  const { song: sb, melody } = songInBeats({ ...song, title: song.title || state.midiName }, mel ?? null);
+  return { song: sb, melody, chords: null, drums: undefined, title: song.title || state.midiName || 'Song' };
+}
+
+function buildBand() {
+  const src = bandSource();
+  if (!src) return toast('Open a song first, or pick one from the list.');
+  const drumSel = $('bandDrums').value;
+  const arr = arrangeBand(src.song, {
+    chords: src.chords,
+    melody: src.melody,
+    level: Number($('bandLevel').value),
+    drums: drumSel === 'auto' ? src.drums ?? undefined : drumSel || null,
+  });
+  arr.title = src.title;
+  const vowel = Number($('bandVowel').value);
+  for (const t of arr.tracks) if (CHOIR_IDS.includes(t.role)) t.program = vowel;
+  band.arr = arr;
+  band.bytes = bandMidi(arr);
+  if (learn.enabled) setLearn(false);
+  loadMidiBytes(band.bytes, `${src.title} (band).mid`);
+  state.channelLabels = { for: state.midiName };
+  for (const r of BAND_ROLES) state.channelLabels[r.ch] = r.name;
+  state.channelLabels[12] = 'Count-in';
+  applyBand();
+  setText($('bandInfo'), `${src.title} · ${arr.chords.length} chord changes · ${Math.round((arr.beats - arr.offset) / ((arr.timeSig.num * 4) / arr.timeSig.den))} bars`);
+  player.seek(0);
+  player.play();
+}
+
+/** What each part is set to in the tab that's showing. */
+function bandAssign(mode = band.mode) {
+  return { ...BAND_DEFAULTS[mode], ...band.assign[mode] };
+}
+
+/** Mute / volume every band channel from the assignments. */
+function applyBand() {
+  if (!band.arr || state.midiName !== state.channelLabels?.for) return;
+  const a = bandAssign();
+  const level = {};
+  for (const row of BAND_ROWS[band.mode]) {
+    const v = a[row.id];
+    for (const id of row.roles) {
+      if (row.accomp) level[id] = v === 'band' || (v === 'keys' && id === 'keys') || (v === 'organ' && id === 'organ') ? 1 : 0;
+      else level[id] = v === 'ai' ? 1 : v === 'guide' ? 0.3 : 0;
+    }
+  }
+  // Parts this tab doesn't show stay as the other tab left them, except the choir/band split.
+  for (const r of BAND_ROLES) {
+    const c = state.chan[r.ch];
+    const v = level[r.id] ?? 0;
+    c.mute = v === 0;
+    c.mix = v || 1;
+    synth.setMix(r.ch, c.mix);
+  }
+  applyMutes();
+  buildMixer();
+  renderBandRoles();
+}
+
+function renderBandRoles() {
+  const box = $('bandRoles');
+  box.innerHTML = '';
+  const a = bandAssign();
+  const choirTab = band.mode === 'choir';
+  for (const row of BAND_ROWS[band.mode]) {
+    const info = roleInfo(row.id) || {};
+    const el = Object.assign(document.createElement('div'), { className: 'band-role' });
+    const v = a[row.id];
+    if (v === 'off' || v === 'none') el.classList.add('off');
+    if (v === 'live' || String(v).startsWith('p:')) el.classList.add('live');
+    const icon = Object.assign(document.createElement('span'), { className: 'icon', textContent: row.icon || info.icon || '' });
+    const nm = Object.assign(document.createElement('span'), { className: 'nm', textContent: row.name || info.name });
+    // Choir parts: show their range so singers know which one is theirs.
+    if (band.arr && row.roles.length === 1 && CHOIR_IDS.includes(row.id)) {
+      const t = band.arr.tracks.find((x) => x.role === row.id);
+      if (t?.notes.length) nm.append(Object.assign(document.createElement('small'), { textContent: `${noteLabel(Math.min(...t.notes.map((n) => n.note)))} – ${noteLabel(Math.max(...t.notes.map((n) => n.note)))}` }));
+    }
+    const sel = document.createElement('select');
+    if (row.accomp) {
+      for (const [val, label] of [['band', '🤖 Full AI band'], ['keys', '🎹 AI keys only'], ['organ', '⛪ AI organ only'], ['none', 'A cappella (none)']]) sel.append(new Option(label, val));
+    } else {
+      const sing = choirTab || CHOIR_IDS.includes(row.id) || row.id === 'choir' || row.id === 'lead';
+      sel.append(new Option(sing ? '🤖 AI sings it' : '🤖 AI plays it', 'ai'));
+      sel.append(new Option(sing ? '🔉 Quiet guide' : '🔉 AI quietly', 'guide'));
+      if (row.id !== 'click') {
+        if (sing) sel.append(new Option('🙋 We sing it (AI off)', 'live'));
+        for (const p of stage.players) sel.append(new Option(`🙋 ${p.name} ${sing ? 'sings' : 'plays'} it`, `p:${p.id}`));
+      }
+      sel.append(new Option('Off', 'off'));
+    }
+    sel.value = [...sel.options].some((o) => o.value === v) ? v : sel.options[0].value;
+    sel.onchange = () => {
+      band.assign[band.mode][row.id] = sel.value;
+      applyBand();
+      renderBandRoles();
+    };
+    el.append(icon, nm, sel);
+    box.append(el);
+  }
+}
+
+// Big "now / next" chord display, transposed like the music.
+function bandLoop() {
+  if (!$('bandDlg').open) {
+    band.raf = 0;
+    return;
+  }
+  band.raf = requestAnimationFrame(bandLoop);
+  const arr = band.arr;
+  if (!arr || !state.song || state.midiName !== state.channelLabels?.for) return;
+  const beat = state.song.beatAt(player.time);
+  const barLen = (arr.timeSig.num * 4) / arr.timeSig.den;
+  const i = arr.chords.findIndex((c) => beat >= c.beat - 0.02 && beat < c.beat + c.beats - 0.02);
+  const cur = arr.chords[i];
+  const next = arr.chords[i >= 0 ? i + 1 : arr.chords.findIndex((c) => c.beat > beat)];
+  const tr = state.transpose || 0;
+  setText($('bandChord'), cur ? transposeSymbol(cur.symbol, tr) : beat < arr.offset ? '…' : '–');
+  setText($('bandNext'), next ? transposeSymbol(next.symbol, tr) : '');
+  if (beat < arr.offset) setText($('bandBar'), `Count-in: ${Math.floor(beat) + 1}`);
+  else setText($('bandBar'), `Bar ${Math.floor((beat - arr.offset) / barLen) + 1} of ${Math.round((arr.beats - arr.offset) / barLen)} · beat ${Math.floor((beat - arr.offset) % barLen) + 1}`);
+}
+
+function openBand() {
+  const dlg = $('bandDlg');
+  if (!dlg.open) dlg.show();
+  bandSongOptions();
+  renderBandRoles();
+  setText($('bandKey'), String(state.transpose || 0));
+  if (!band.raf) band.raf = requestAnimationFrame(bandLoop);
+}
+
+function initBand() {
+  const dlg = $('bandDlg');
+  $('btnBand').onclick = openBand;
+  dlg.querySelector('[data-close]').onclick = () => dlg.close();
+  makeDraggable(dlg);
+  $('bandDrums').append(new Option('Song\'s own groove', 'auto'));
+  $('bandDrums').value = 'auto';
+  for (const b of $('bandTabs').querySelectorAll('button')) {
+    b.onclick = () => {
+      band.mode = b.dataset.mode;
+      $('bandTabs').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+      applyBand();
+      renderBandRoles();
+    };
+  }
+  $('bandBuild').onclick = buildBand;
+  for (const id of ['bandLevel', 'bandDrums', 'bandVowel']) $(id).onchange = () => band.arr && buildBand();
+  $('bandTempo').oninput = () => {
+    setText($('bandTempoVal'), `${$('bandTempo').value}%`);
+    setRate($('bandTempo').value / 100);
+  };
+  const key = (d) => {
+    state.transpose = Math.max(-6, Math.min(6, (state.transpose || 0) + d));
+    updateTransposeUI();
+    setText($('bandKey'), `${state.transpose > 0 ? '+' : ''}${state.transpose}`);
+  };
+  $('bandKeyDown').onclick = () => key(-1);
+  $('bandKeyUp').onclick = () => key(1);
+  $('bandPlay').onclick = () => togglePlay();
+  $('bandMidi').onclick = () => {
+    if (!band.bytes) return toast('Start a rehearsal first.');
+    download(band.bytes, `${band.arr.title} - band.mid`, 'audio/midi');
+  };
+}
+
 // ---- Full score (sheet music) ---------------------------------------------------
 //
 // Every instrument of the open song on its own staff, engraved by
@@ -4619,6 +4844,7 @@ initStage();
 initLessons();
 initBooth();
 initScore();
+initBand();
 initConverter();
 initSongs();
 applyLayout();

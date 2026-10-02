@@ -192,3 +192,13 @@ Unzip the files first (double-click each .zip).
    picture, then strum (or play roots on bass) along with a click to
    Worship Flow and Amazing Grace. It hears single notes and strummed
    chords. Headphones help, so the speakers don't play for you.
+
+17. BAND ROOM (REHEARSE AS A BAND OR CHOIR)
+   "Band" at the top: pick a song and press Start rehearsal. Every part
+   (lead vocal, keys, guitar, bass, organ, drums, and the choir's soprano,
+   alto, tenor, bass) is played by an AI musician until you set it to one
+   of you; then the AI drops out of that part. "Choir rehearsal" does the
+   same for the choir sections: mark who is here, the AI choir sings the
+   rest. Works with 1 person or the whole family.
+   In Logic, the plug-in plays piano and drums only: use "Band MIDI" and
+   drag it into Logic to give each part its own Logic instrument.

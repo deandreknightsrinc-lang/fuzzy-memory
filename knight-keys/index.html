@@ -57,6 +57,7 @@
       </details>
       <button id="btnLessons" class="lessons-btn" title="Lessons: step-by-step piano and voice courses, like a teacher at your side">🎓 Lessons</button>
       <button id="btnBooth" class="booth-btn" title="Vocal Booth: live pitch graph and tuner for singers, plus four-part choir parts for any song">🎙 Vocal</button>
+      <button id="btnBand" class="band-btn" title="Band Room: rehearse as a worship band or choir; AI musicians and an AI choir fill every part nobody is playing">🎶 Band</button>
       <button id="btnStage" class="stage-btn" title="Stage: play songs like a game, earn crowns, unlock songs, beat the family high score">🎸 Stage</button>
       <button id="btnScore" title="Full score: sheet music for every instrument in the song (print, PDF, MusicXML), and open sheet music (MusicXML) as MIDI">📜 Score</button>
       <button id="btnSongs" title="Free songs to learn on keys or drums">Songs</button>
@@ -522,6 +523,40 @@ G D/F# Em C x2"></textarea>
           <button id="lpDoneMap">All lessons</button>
         </div>
       </section>
+    </div>
+  </dialog>
+
+  <dialog id="bandDlg" class="tool-window band-window" aria-labelledby="bandTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="bandTitle">🎶 Band Room</h2>
+      <span id="bandInfo" class="small"></span>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="tool-body">
+      <div id="bandTabs" class="lp-courses">
+        <button class="mini on" data-mode="band" title="Everyone plays together; AI musicians fill in the rest">🎸 Worship band</button>
+        <button class="mini" data-mode="choir" title="Choir practice with an AI choir singing every part that's missing">⛪ Choir rehearsal</button>
+      </div>
+      <div class="row band-setup">
+        <label>Song <select id="bandSong"></select></label>
+        <label title="How much the AI musicians play">AI musicians <select id="bandLevel"><option value="0">Simple</option><option value="1" selected>Full</option><option value="2">Gospel (busy)</option></select></label>
+        <label>Drums <select id="bandDrums"></select></label>
+        <label>Choir <select id="bandVowel"><option value="52">Aah</option><option value="53">Ooh</option></select></label>
+        <button id="bandBuild" class="primary">▶ Start rehearsal</button>
+      </div>
+      <div class="band-now">
+        <div><div class="small">Now</div><div id="bandChord" class="band-chord">–</div></div>
+        <div><div class="small">Next</div><div id="bandNext" class="band-next">–</div></div>
+        <div id="bandBar" class="band-bar small">Pick a song and press Start.</div>
+      </div>
+      <div id="bandRoles" class="band-roles"></div>
+      <div class="row band-tools">
+        <label>Tempo <input id="bandTempo" type="range" min="50" max="125" value="100" /> <span id="bandTempoVal">100%</span></label>
+        <span>Key <button id="bandKeyDown" class="mini">−</button> <b id="bandKey">0</b> <button id="bandKeyUp" class="mini">+</button></span>
+        <button id="bandPlay" title="Play / pause (Space)">⏯</button>
+        <button id="bandMidi" title="Every part as its own named track: drag it into Logic">⬇ Band MIDI</button>
+      </div>
+      <p class="small band-tip">Set who is here: each part is played by 🤖 the AI, quietly as a 🔉 guide, by one of you (🙋 the AI drops out), or turned off. Rehearse with 1, 2, 3 people or the whole family: the AI fills whatever is missing. Headphones or a speaker everyone can hear both work.</p>
     </div>
   </dialog>
 
