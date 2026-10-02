@@ -3,6 +3,10 @@
 #
 #   bash organize-samples.sh                      sort the library's Inbox
 #   bash organize-samples.sh "/path/to/Sample Pack"   sort another folder (copies)
+#   bash organize-samples.sh --pack "/path/to/Pack Name"   install a sound pack:
+#                                                files keep the pack's name as a subfolder
+#                                                (Drums/Kicks/Pack Name/...), and files
+#                                                already installed are skipped
 #   options:  --move      move instead of copy
 #             --dry-run   only show what would happen
 #
@@ -15,10 +19,12 @@ CONF="$HOME/.knightlyfe-library"
 SRC=""
 MOVE=0
 DRY=0
+PACK=0
 for a in "$@"; do
     case "$a" in
         --move) MOVE=1 ;;
         --dry-run) DRY=1 ;;
+        --pack) PACK=1 ;;
         *) SRC="$a" ;;
     esac
 done
@@ -32,6 +38,8 @@ if [[ -z "$SRC" ]]; then
     MOVE=1 # sorting the inbox empties it
 fi
 [[ -d "$SRC" ]] || { echo "No folder: $SRC"; exit 1; }
+SRC="${SRC%/}"
+PACK_NAME="$(basename "$SRC")"
 
 # Where a file belongs, from its name (and its folder's name).
 category() {
@@ -90,9 +98,11 @@ while IFS= read -r -d '' f; do
     rel="${f#"$SRC"/}"
     case "$rel" in "Unsorted/"*) [[ "$SRC" == "$INBOX" ]] && continue ;; esac
     dest_dir="$ROOT/$(category "$rel")"
+    [[ $PACK -eq 1 ]] && dest_dir="$dest_dir/$PACK_NAME"
     base="$(basename "$f")"
     dest="$dest_dir/$base"
     if [[ "$f" == "$dest" ]]; then skipped=$((skipped + 1)); continue; fi
+    if [[ $PACK -eq 1 && -e "$dest" ]]; then skipped=$((skipped + 1)); continue; fi # already installed
     i=2
     while [[ -e "$dest" ]]; do
         dest="$dest_dir/${base%.*} ($i).${base##*.}"

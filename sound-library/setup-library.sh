@@ -141,11 +141,27 @@ if [[ "$ROOT" != "$HOME/Music/$NAME" ]]; then
     fi
 fi
 
+# Sound packs that came with these tools (Knight Lyfe Drums, Gospel MIDI, ...).
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -d "$HERE/Sound Packs" ]]; then
+    bold "Installing the sound packs"
+    for pack in "$HERE/Sound Packs"/*/; do
+        [[ -d "$pack" ]] || continue
+        name="$(basename "$pack")"
+        bash "$HERE/organize-samples.sh" --pack "$pack" >/dev/null && ok "$name"
+        if [[ -f "$pack/LICENSE.txt" ]]; then
+            mkdir -p "$ROOT/Licenses" && cp -p "$pack/LICENSE.txt" "$ROOT/Licenses/$name.txt"
+        fi
+    done
+fi
+
 report
 
 bold "Done"
 cat <<EOF
   * Restart Logic Pro so it sees the new folders.
+  * The sound packs are in their folders under the pack's name, e.g.
+    Drums/Kicks/Knight Lyfe Drums Vol 1 and MIDI/Chord Progressions/Knight Lyfe Gospel MIDI.
   * Drop sounds into "Inbox (drop new sounds here)" and run:
         bash "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/organize-samples.sh"
   * Logic's own sounds: Logic Pro > Sound Library > Relocate Sound Library...
