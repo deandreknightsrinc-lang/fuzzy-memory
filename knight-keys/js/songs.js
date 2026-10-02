@@ -41,24 +41,6 @@ export const SONGS = [
              C:4 F:2 C:2 F:2 C:2 G:2 C:2`,
   },
   {
-    id: 'joyful',
-    category: 'church',
-    title: 'Joyful, Joyful (Ode to Joy)',
-    level: 'Beginner',
-    key: 0,
-    time: [4, 4],
-    bpm: 108,
-    drums: 'straight',
-    about: 'Beethoven\'s melody, sung in church as "Joyful, Joyful, We Adore Thee". Five fingers, one hand position.',
-    melody: `E4 E4 F4 G4 | G4 F4 E4 D4 | C4 C4 D4 E4 | E4:1.5 D4:0.5 D4:2 |
-             E4 E4 F4 G4 | G4 F4 E4 D4 | C4 C4 D4 E4 | D4:1.5 C4:0.5 C4:2 |
-             D4 D4 E4 C4 | D4 E4:0.5 F4:0.5 E4 C4 | D4 E4:0.5 F4:0.5 E4 D4 | C4 D4 G3:2 |
-             E4 E4 F4 G4 | G4 F4 E4 D4 | C4 C4 D4 E4 | D4:1.5 C4:0.5 C4:2`,
-    chords: `C:4 G:4 C:4 C:2 G:2 C:4 G:4 C:4 G:2 C:2
-             G:2 C:2 G:2 C:2 G:4 C:2 G:2
-             C:4 G:4 C:4 G:2 C:2`,
-  },
-  {
     id: 'saints',
     category: 'church',
     title: 'When the Saints Go Marching In',
@@ -154,6 +136,24 @@ export const SONGS = [
              E4 G4 G4:2 | E4 F4 E4:2 | D4:4 | C4 D4 E4:2 | D4:2 C4:2`,
     chords: `C:4 C:4 C:4 F:4 C:4 C:4 C:4 G:4 C:4 G:2 C:2
              C:4 C:4 C:4 F:4 C:4 C:4 C:4 G:4 C:4 G:2 C:2`,
+  },
+  {
+    id: 'joyful',
+    category: 'church',
+    title: 'Joyful, Joyful (Ode to Joy)',
+    level: 'Beginner',
+    key: 0,
+    time: [4, 4],
+    bpm: 108,
+    drums: 'straight',
+    about: 'Beethoven\'s melody, sung in church as "Joyful, Joyful, We Adore Thee". Five fingers, one hand position.',
+    melody: `E4 E4 F4 G4 | G4 F4 E4 D4 | C4 C4 D4 E4 | E4:1.5 D4:0.5 D4:2 |
+             E4 E4 F4 G4 | G4 F4 E4 D4 | C4 C4 D4 E4 | D4:1.5 C4:0.5 C4:2 |
+             D4 D4 E4 C4 | D4 E4:0.5 F4:0.5 E4 C4 | D4 E4:0.5 F4:0.5 E4 D4 | C4 D4 G3:2 |
+             E4 E4 F4 G4 | G4 F4 E4 D4 | C4 C4 D4 E4 | D4:1.5 C4:0.5 C4:2`,
+    chords: `C:4 G:4 C:4 C:2 G:2 C:4 G:4 C:4 G:2 C:2
+             G:2 C:2 G:2 C:2 G:4 C:2 G:2
+             C:4 G:4 C:4 G:2 C:2`,
   },
   {
     id: 'silentnight',
