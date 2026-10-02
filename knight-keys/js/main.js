@@ -4290,10 +4290,17 @@ function churchTab(tab) {
   } else stopChurchMedia();
 }
 
+/** A new service, with this church's name, colors and links when opened from its page. */
+function brandedService() {
+  const svc = newService(appChurch?.name || 'BAC Ministries');
+  if (appChurch) Object.assign(svc.church, Object.fromEntries(Object.entries(appChurch).filter(([, v]) => v)));
+  return svc;
+}
+
 function openChurch() {
   const dlg = $('churchDlg');
   if (!dlg.open) dlg.show();
-  if (!church.svc) openService(church.list[0] ? JSON.parse(JSON.stringify(church.list[0])) : newService());
+  if (!church.svc) openService(church.list[0] ? JSON.parse(JSON.stringify(church.list[0])) : brandedService());
   if (!church.raf) church.raf = requestAnimationFrame(churchLoop);
 }
 
@@ -4336,7 +4343,7 @@ function initChurch() {
     churchServiceList();
     toast(`Saved: ${church.svc.title}`);
   };
-  $('chNew').onclick = () => openService(newService($('chName').value.trim() || 'BAC Ministries'));
+  $('chNew').onclick = () => openService(appChurch ? brandedService() : newService($('chName').value.trim() || 'BAC Ministries'));
   $('chInvite').onclick = () => {
     readChurchFields();
     const post = invitePost(church.svc);
@@ -5948,6 +5955,56 @@ function initSongs() {
 }
 
 /** Floating tool windows move by their title bar. */
+// ---- Your church (church platform) ---------------------------------------------------
+//
+// Opened from a church's page (church/?c=<id>) as knight-keys/?church=<id>#lessons=piano:
+// the app shows the church's name, new services start with its name, colors, logo
+// and giving link, and the link opens the right place (lessons, band, church, ask,
+// puppet). The church platform isn't in the plug-in, so this loads only when asked.
+
+let appChurch = null; // the Virtual Church "church" block for this church
+
+async function loadAppChurch() {
+  const id = new URLSearchParams(location.search).get('church');
+  if (!id) return;
+  try {
+    const P = await import('../../church/js/profile.js');
+    let raw;
+    if (id === 'local') raw = JSON.parse(localStorage.getItem('kc.local') || 'null');
+    else {
+      const r = await fetch(`../church/churches/${P.slugify(id)}.json`, { cache: 'no-cache' });
+      if (!r.ok) throw new Error(String(r.status));
+      raw = await r.json();
+    }
+    if (P.validateChurch(raw).length) throw new Error('not a church file');
+    const c = P.normalizeChurch(raw);
+    appChurch = P.serviceBrand(c);
+    document.title = `${c.name} · Knight Keys`;
+    const home = Object.assign(document.createElement('a'), { className: 'church-badge', href: `../church/?c=${encodeURIComponent(id === 'local' ? 'local' : c.id)}`, textContent: `⛪ ${c.name}`, title: `Back to ${c.name}` });
+    home.style.setProperty('--church', c.color);
+    document.querySelector('.topbar .brand').append(home);
+    if (church.svc && !church.list.length) Object.assign(church.svc.church, appChurch);
+  } catch (err) {
+    console.warn('Church not loaded', err);
+  }
+}
+
+/** Open the place a link points at: #lessons, #lessons=<course>, #band, #church, #ask, #puppet, #lyrics, #vocal. */
+function openFromHash() {
+  const [where, arg] = decodeURIComponent(location.hash.slice(1)).split('=');
+  if (!where) return;
+  if (where === 'lessons') {
+    if (arg && COURSES.some((c) => c.id === arg)) lessonCourse = arg;
+    $('btnLessons').click();
+    renderLessonMap();
+  } else if (where === 'band') openBand();
+  else if (where === 'church') openChurch();
+  else if (where === 'ask') openAsk();
+  else if (where === 'puppet') openPuppet();
+  else if (where === 'lyrics') openLyrics();
+  else if (where === 'vocal') openBooth();
+}
+
 // The tool window you open or click comes to the front.
 function windowToFront(dlg) {
   for (const d of document.querySelectorAll('dialog.tool-window.front')) d.classList.remove('front');
@@ -6360,3 +6417,5 @@ document.addEventListener('fullscreenchange', markDirty);
 window.addEventListener('pointerdown', () => synth.ensure(), { once: true });
 window.addEventListener('keydown', () => synth.ensure(), { once: true });
 requestAnimationFrame(frame);
+loadAppChurch().then(openFromHash);
+window.addEventListener('hashchange', openFromHash);

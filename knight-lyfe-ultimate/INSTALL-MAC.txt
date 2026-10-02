@@ -245,3 +245,12 @@ Unzip the files first (double-click each .zip).
    Chroma Key filter, then go live. Face tracking runs on the Mac (no video
    leaves it) and needs Safari or Chrome on the website; the plug-in has
    the keys only.
+
+23. CHURCH PLATFORM (BAC MINISTRIES AND OTHER CHURCHES, WEBSITE)
+   The website's front page leads to BAC Ministries' church home: online
+   church, free music lessons with the AI teachers, band and choir
+   rehearsal, kids and giving. To fill in BAC's details, open "Free church
+   platform", press "Edit BAC Ministries", fill in the form, download
+   church.json and replace church/churches/bac-ministries.json. Another
+   church uses the same form ("New church") to get its own page, powered
+   by BAC Ministries.
