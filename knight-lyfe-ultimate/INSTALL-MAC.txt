@@ -178,3 +178,10 @@ Unzip the files first (double-click each .zip).
    kl-oracle (or use Audiveris on the Mac); you get a .mxl and a .mid back.
    Lessons > "Read music": learn the staff, both clefs, sharps and flats,
    key signatures and rhythm, then read songs with no lit keys.
+
+15. DRUM LESSONS
+   Lessons > "Drums": a step-by-step drum course for the Alesis Nitro Max
+   (or the pads on screen): the parts of the kit, first beats, crashes and
+   fills, and church grooves (hymn 3/4, gospel shuffle, two-step). Each
+   beat: first it waits for every hit, then you play it in time with a
+   click and get a timing score.

@@ -1,9 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { UNITS, COURSES, ALL_LESSONS, unitsFor, readNotes, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from '../js/lessons.js';
+import { UNITS, COURSES, ALL_LESSONS, unitsFor, readNotes, grooveHits, grooveMidi, DrumJudge, GROOVE_ROWS, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from '../js/lessons.js';
 import { SONGS, songToMidi } from '../js/songs.js';
 import { detectPitch, freqToMidi, freqToCents, centsFromTarget, midiToFreq, NoteTracker, SingJudge, RangeFinder, voiceType } from '../js/pitch.js';
 import { parseMidi, buildSong } from '../js/midi-file.js';
+import { laneOf, sameDrum } from '../js/drumkit.js';
 import { makeChoirParts, choirMidi, guessChord, diatonicChord, PARTS } from '../js/choir.js';
 
 test('every lesson step is valid and points at real songs', () => {
@@ -13,7 +14,20 @@ test('every lesson step is valid and points at real songs', () => {
     ids.add(lesson.id);
     assert.ok(lesson.steps.length > 0);
     for (const step of lesson.steps) {
-      assert.ok(['info', 'notes', 'chords', 'song', 'sing', 'range', 'read'].includes(step.type), step.type);
+      assert.ok(['info', 'notes', 'chords', 'song', 'sing', 'range', 'read', 'hits', 'groove'].includes(step.type), step.type);
+      if (step.type === 'hits') {
+        for (const h of step.hits) for (const n of [].concat(h)) assert.ok(laneOf(n) >= 0, `${lesson.id}: ${n} is a drum on the highway`);
+        if (step.sticking) assert.equal(step.sticking.length, step.hits.length);
+      }
+      if (step.type === 'groove') {
+        assert.ok(['learn', 'time'].includes(step.mode), `${lesson.id}: groove mode`);
+        assert.ok(step.bpm >= 40 && step.bpm <= 140);
+        for (const bar of step.bars) {
+          assert.ok(Object.keys(bar).every((k) => k === 'steps' || k in GROOVE_ROWS), `${lesson.id}: known drum rows`);
+          for (const k of Object.keys(GROOVE_ROWS)) assert.ok(!bar[k] || bar[k].replace(/\s/g, '').length <= bar.steps, `${lesson.id}: ${k} fits in ${bar.steps} steps`);
+        }
+        assert.ok(grooveHits(step).length > 0, `${lesson.id}: the groove has hits`);
+      }
       if (step.type === 'read') {
         assert.ok(step.notes || (step.pool?.length && step.count > 0), `${lesson.id}: notes or a pool to read`);
         const list = readNotes(step);
@@ -51,7 +65,9 @@ test('each course opens its own lessons', () => {
   assert.ok(voice[0].unlocked && !voice[1].unlocked, 'the first voice lesson is open without any piano lessons');
   const reading = pathState({}, 'reading');
   assert.ok(reading[0].unlocked && reading.length >= 10, 'a reading course');
-  assert.equal(piano.length + voice.length + reading.length, ALL_LESSONS.length);
+  const drums = pathState({}, 'drums');
+  assert.ok(drums[0].unlocked && drums.length >= 12, 'a drum course');
+  assert.equal(piano.length + voice.length + reading.length + drums.length, ALL_LESSONS.length);
 });
 
 test('the path opens one lesson at a time', () => {
@@ -185,4 +201,31 @@ test('reading drills: random notes from the pool, never twice in a row', () => {
   assert.equal(list.length, 30);
   assert.ok(list.every((n, i) => [60, 62, 64].includes(n) && n !== list[i - 1]));
   assert.deepEqual(readNotes({ notes: [60, 67] }), [60, 67]);
+});
+
+test('drum grooves: grid -> hits -> MIDI with a count-in bar', () => {
+  const step = { bpm: 60, bars: [{ steps: 8, hh: 'xxxxxxxx', kk: 'x...x...', sn: '..x...x.' }], repeat: 2 };
+  const hits = grooveHits(step);
+  assert.equal(hits.length, (8 + 2 + 2) * 2);
+  assert.deepEqual(hits.filter((h) => h.note === 38).map((h) => h.beat), [1, 3, 5, 7]);
+  const g = grooveMidi(step);
+  assert.equal(g.countIn, 4, 'one bar of 4 clicks at 60 bpm');
+  const song = buildSong(parseMidi(g.bytes));
+  const drums = song.notes.filter((n) => n.ch === 9);
+  assert.equal(drums.length, hits.length);
+  assert.ok(Math.abs(drums.find((n) => n.note === 38).time - 5) < 0.01, 'the first snare is on beat 2 after the count-in');
+  assert.equal(song.notes.filter((n) => n.ch === 0).length, 12, 'a click on every beat, count-in included');
+  // 3/4 and triplet grids
+  assert.deepEqual(grooveHits({ time: [3, 4], bars: [{ steps: 3, kk: 'x..' }] }).map((h) => h.beat), [0]);
+  assert.deepEqual(grooveHits({ bars: [{ steps: 12, hh: 'x.x' }] }).map((h) => +h.beat.toFixed(3)), [0, 0.667]);
+});
+
+test('drum timing judge', () => {
+  const j = new DrumJudge([{ time: 1, note: 36 }, { time: 1.5, note: 38 }, { time: 2, note: 42 }], sameDrum);
+  assert.equal(j.hit(35, 1.02), 'perfect', 'any kick note counts');
+  assert.equal(j.hit(40, 1.6), 'good', 'snare rim, 100 ms late');
+  assert.equal(j.hit(38, 1.6), 'extra', 'each note only once');
+  assert.equal(j.missedBy(2.5), 1);
+  assert.equal(j.accuracy, Math.round((100 * (2 - 0.5)) / 3));
+  assert.equal(j.averageOffsetMs, 60);
 });
