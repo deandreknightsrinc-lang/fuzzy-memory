@@ -319,14 +319,11 @@ export function splitHands(song, splitNote = 60) {
 }
 
 /**
- * Write a format-1 MIDI file with one named track per part (Logic, ACE Studio and
- * choir plug-ins put each track on its own instrument track).
- * tracks: [{ name, events: [{ time: seconds, bytes }] }]; the tempo, key and time
- * signature go in a conductor track first.
+ * Write a format-1 MIDI file from tracks of tick-timed events:
+ * tracks: [{ events: [{ tick, bytes }] }]. The first track is usually the
+ * conductor (tempo, key, time signature).
  */
-export function writeMidiTracks(tracks, { ppq = 480, bpm = 120, name = 'Knight Keys', keySig = null, timeSig = null } = {}) {
-  const ticksPerSec = (ppq * bpm) / 60;
-  const ascii = (str) => [...str].map((c) => (c.charCodeAt(0) < 0x80 ? c.charCodeAt(0) : 0x2d));
+export function writeMidiTickTracks(tracks, ppq = 480) {
   const chunk = (events) => {
     const body = [];
     const vlq = (v) => {
@@ -334,9 +331,11 @@ export function writeMidiTracks(tracks, { ppq = 480, bpm = 120, name = 'Knight K
       while ((v >>= 7)) stack.unshift((v & 0x7f) | 0x80);
       body.push(...stack);
     };
+    // Metas first, then note-offs before note-ons at the same tick.
+    const rank = (b) => (b[0] === 0xff ? 0 : (b[0] & 0xf0) === 0x80 ? 1 : (b[0] & 0xf0) === 0x90 ? 3 : 2);
     let last = 0;
-    for (const e of [...events].sort((a, b) => a.time - b.time || (a.bytes[0] & 0xf0) - (b.bytes[0] & 0xf0))) {
-      const tick = Math.max(last, Math.round(Math.max(0, e.time) * ticksPerSec));
+    for (const e of [...events].sort((a, b) => a.tick - b.tick || rank(a.bytes) - rank(b.bytes))) {
+      const tick = Math.max(last, Math.round(e.tick));
       vlq(tick - last);
       body.push(...e.bytes);
       last = tick;
@@ -346,12 +345,37 @@ export function writeMidiTracks(tracks, { ppq = 480, bpm = 120, name = 'Knight K
     const len = body.length;
     return [0x4d, 0x54, 0x72, 0x6b, (len >>> 24) & 0xff, (len >> 16) & 0xff, (len >> 8) & 0xff, len & 0xff, ...body];
   };
-  const meta = (type, data) => ({ time: 0, bytes: [0xff, type, data.length, ...data] });
-  const us = Math.round(60e6 / bpm);
-  const conductor = [meta(0x03, ascii(name)), meta(0x51, [(us >> 16) & 0xff, (us >> 8) & 0xff, us & 0xff])];
-  if (keySig) conductor.push(meta(0x59, [keySig.sf & 0xff, keySig.minor ? 1 : 0]));
-  if (timeSig) conductor.push(meta(0x58, [timeSig.num, Math.log2(timeSig.den), 0x18, 0x08]));
-  const out = [0x4d, 0x54, 0x68, 0x64, 0, 0, 0, 6, 0, 1, 0, tracks.length + 1, (ppq >> 8) & 0xff, ppq & 0xff, ...chunk(conductor)];
-  for (const t of tracks) out.push(...chunk([meta(0x03, ascii(t.name)), ...t.events]));
+  const out = [0x4d, 0x54, 0x68, 0x64, 0, 0, 0, 6, 0, 1, (tracks.length >> 8) & 0xff, tracks.length & 0xff, (ppq >> 8) & 0xff, ppq & 0xff];
+  for (const t of tracks) out.push(...chunk(t.events));
   return new Uint8Array(out);
+}
+
+const asciiBytes = (str) => [...str].map((c) => (c.charCodeAt(0) < 0x80 ? c.charCodeAt(0) : 0x2d));
+/** A meta event (text, tempo, key...): [0xff, type, length..., data]. Text is kept ASCII. */
+export function metaEvent(type, data) {
+  const d = typeof data === 'string' ? asciiBytes(data) : data;
+  const len = [d.length & 0x7f];
+  for (let v = d.length >> 7; v; v >>= 7) len.unshift((v & 0x7f) | 0x80);
+  return [0xff, type, ...len, ...d];
+}
+
+/**
+ * Write a format-1 MIDI file with one named track per part (Logic, ACE Studio and
+ * choir plug-ins put each track on its own instrument track).
+ * tracks: [{ name, events: [{ time: seconds, bytes }] }]; the tempo, key and time
+ * signature go in a conductor track first.
+ */
+export function writeMidiTracks(tracks, { ppq = 480, bpm = 120, name = 'Knight Keys', keySig = null, timeSig = null } = {}) {
+  const ticksPerSec = (ppq * bpm) / 60;
+  const us = Math.round(60e6 / bpm);
+  const conductor = [metaEvent(0x03, name), metaEvent(0x51, [(us >> 16) & 0xff, (us >> 8) & 0xff, us & 0xff])];
+  if (keySig) conductor.push(metaEvent(0x59, [keySig.sf & 0xff, keySig.minor ? 1 : 0]));
+  if (timeSig) conductor.push(metaEvent(0x58, [timeSig.num, Math.log2(timeSig.den), 0x18, 0x08]));
+  return writeMidiTickTracks(
+    [
+      { events: conductor.map((bytes) => ({ tick: 0, bytes })) },
+      ...tracks.map((t) => ({ events: [{ tick: 0, bytes: metaEvent(0x03, t.name) }, ...t.events.map((e) => ({ tick: Math.max(0, e.time) * ticksPerSec, bytes: e.bytes }))] })),
+    ],
+    ppq,
+  );
 }

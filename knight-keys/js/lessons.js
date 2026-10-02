@@ -7,6 +7,10 @@
 //             with `voice: true` you sing it into the microphone, any octave
 //   sing    - sing these notes into the microphone, holding each one in tune
 //   range   - sing your lowest and highest notes to find your choir part
+//   read    - a note appears on the staff (no keys lit): play or sing it.
+//             `notes` in order, or `pool` + `count` for a random drill
+// Info steps can show notes on the staff too (`staff: [...]`); song steps with
+// `noHints` don't light the keys, so you read the music instead.
 // Stars: 3 for a clean step, fewer for mistakes. Pass a lesson to open the next.
 // Each course (piano, voice) opens its own lessons one at a time.
 
@@ -17,7 +21,11 @@ const C3 = 48, D3 = 50, E3 = 52, F3 = 53, G3 = 55, A3 = 57, C5 = 72;
 export const COURSES = [
   { id: 'piano', name: 'Piano', icon: '🎹' },
   { id: 'voice', name: 'Voice', icon: '🎤' },
+  { id: 'reading', name: 'Read music', icon: '📖' },
 ];
+
+// White keys in a range, for the reading drills.
+const whites = (lo, hi) => Array.from({ length: hi - lo + 1 }, (_, i) => lo + i).filter((n) => ![1, 3, 6, 8, 10].includes(n % 12));
 
 export const UNITS = [
   {
@@ -330,6 +338,127 @@ export const UNITS = [
       },
     ],
   },
+
+  // ---- Reading music -----------------------------------------------------------
+  // A note shows on the staff and the keys stay dark: you find it by reading.
+  {
+    id: 'read-treble',
+    course: 'reading',
+    title: 'The treble clef (right hand)',
+    icon: '🎼',
+    lessons: [
+      {
+        id: 'r-staff',
+        title: 'The staff and middle C',
+        steps: [
+          { type: 'info', text: 'Music is written on a staff: 5 lines and the 4 spaces between them. The higher a note sits on the staff, the higher it sounds. Each line and each space is one white key.' },
+          { type: 'info', staff: [C4, G4, C5], text: 'The treble clef (top staff, the curly sign) is for the right hand. Its curl wraps around the second line from the bottom: that line is G. Middle C sits on its own short line below the staff. High C is in the third space.' },
+          { type: 'read', notes: [C4, G4, C5, G4, C4], text: 'Play the note you see on the staff. The keys won\'t light up: read it!' },
+        ],
+      },
+      {
+        id: 'r-lines',
+        title: 'Lines: Every Good Boy Does Fine',
+        steps: [
+          { type: 'info', staff: [E4, G4, B4, D4 + 12, F4 + 12], text: 'The five lines of the treble staff, bottom to top, are E, G, B, D, F: "Every Good Boy Does Fine".' },
+          { type: 'read', notes: [E4, G4, B4, D4 + 12, F4 + 12], text: 'Up the lines: E G B D F.' },
+          { type: 'read', pool: [E4, G4, B4, D4 + 12, F4 + 12], count: 8, text: 'Mixed up. Count lines from the bottom if you need to.' },
+        ],
+      },
+      {
+        id: 'r-spaces',
+        title: 'Spaces spell FACE',
+        steps: [
+          { type: 'info', staff: [F4, A4, C5, E4 + 12], text: 'The four spaces, bottom to top, spell F A C E: "FACE".' },
+          { type: 'read', notes: [F4, A4, C5, E4 + 12], text: 'Up the spaces: F A C E.' },
+          { type: 'read', pool: [F4, A4, C5, E4 + 12], count: 8, text: 'Mixed up.' },
+        ],
+      },
+      {
+        id: 'r-treble-mix',
+        title: 'Treble clef drill',
+        steps: [{ type: 'read', pool: whites(C4, G4 + 12), count: 12, text: 'Lines and spaces together, from middle C to high G. Take your time: accuracy first, speed later.' }],
+      },
+    ],
+  },
+  {
+    id: 'read-bass',
+    course: 'reading',
+    title: 'The bass clef (left hand)',
+    icon: '🎼',
+    lessons: [
+      {
+        id: 'r-bass',
+        title: 'Bass clef landmarks',
+        steps: [
+          { type: 'info', staff: [F3, C3, C4], clef: 'bass', text: 'The bass clef (bottom staff) is for the left hand. Its two dots surround the fourth line: that line is F, below middle C. C is in the second space. Middle C sits on a short line above the bass staff.' },
+          { type: 'read', notes: [F3, C3, F3, C3], clef: 'bass', text: 'Play F and C from the bass staff.' },
+        ],
+      },
+      {
+        id: 'r-bass-lines',
+        title: 'Lines: Good Boys Do Fine Always',
+        steps: [
+          { type: 'info', staff: [43, 47, D3, F3, A3], clef: 'bass', text: 'Bass staff lines, bottom to top: G, B, D, F, A: "Good Boys Do Fine Always".' },
+          { type: 'read', notes: [43, 47, D3, F3, A3], clef: 'bass', text: 'Up the lines.' },
+          { type: 'read', pool: [43, 47, D3, F3, A3], count: 8, clef: 'bass', text: 'Mixed up.' },
+        ],
+      },
+      {
+        id: 'r-bass-spaces',
+        title: 'Spaces: All Cows Eat Grass',
+        steps: [
+          { type: 'info', staff: [45, C3, E3, G3], clef: 'bass', text: 'Bass staff spaces, bottom to top: A, C, E, G: "All Cows Eat Grass".' },
+          { type: 'read', notes: [45, C3, E3, G3], clef: 'bass', text: 'Up the spaces.' },
+          { type: 'read', pool: whites(43, 57), count: 12, clef: 'bass', text: 'The whole bass staff, lines and spaces.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'read-more',
+    course: 'reading',
+    title: 'Sharps, flats and rhythm',
+    icon: '♯',
+    lessons: [
+      {
+        id: 'r-sharps',
+        title: 'Sharps and flats',
+        steps: [
+          { type: 'info', staff: [F4 + 1, B4 - 1], text: 'A sharp (♯) means the very next key up, usually a black key: F♯ is just right of F. A flat (♭) is the very next key down: B♭ is just left of B.' },
+          { type: 'read', notes: [F4 + 1, B4 - 1, C4 + 1, E4 - 1, G4 + 1], text: 'Play the sharps and flats you see.' },
+        ],
+      },
+      {
+        id: 'r-keysig',
+        title: 'Key signatures',
+        steps: [
+          { type: 'info', staff: [G4, F4 + 1], sf: 1, text: 'A sharp at the start of every line is the key signature: here one sharp on the F line means every F in the song is F♯ (the key of G, like Amazing Grace), even with no sign beside the note.' },
+          { type: 'read', notes: [G4, A4, B4, C5, D4 + 12, F4 + 13, G4 + 12], sf: 1, text: 'The G major scale, reading with the key signature: remember F♯!' },
+        ],
+      },
+      {
+        id: 'r-rhythm',
+        title: 'Note lengths and counting',
+        steps: [
+          { type: 'info', text: 'The shape of a note shows how long it lasts. Whole note (open, no stem): 4 beats. Half note (open, with a stem): 2 beats. Quarter note (filled in): 1 beat. Eighth notes (with a flag or a beam): half a beat each.' },
+          { type: 'info', text: 'The time signature at the start says how to count: 4/4 is 4 quarter-note beats in every bar ("1 2 3 4"); 3/4 is 3 ("1 2 3", like Amazing Grace and Silent Night). A dot after a note adds half its length. A curved line (a tie) joins two notes into one long one.' },
+          { type: 'info', text: 'Rests are silences of the same lengths. Open the 📜 Score window with any song to see all of this in real music; it follows along while the song plays.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'read-songs',
+    course: 'reading',
+    title: 'Read and play songs',
+    icon: '📜',
+    lessons: [
+      { id: 'r-mary', title: 'Read: Mary Had a Little Lamb', steps: [{ type: 'song', song: 'mary', part: '0', noHints: true, text: 'No lit keys this time: read the notes on the score panel and play them. The song waits for you.' }] },
+      { id: 'r-joyful', title: 'Read: Joyful, Joyful', steps: [{ type: 'song', song: 'joyful', part: '0', noHints: true, text: 'Read the melody from the staff. Tip: open 📜 Score to see the whole song as sheet music.' }] },
+      { id: 'r-jesus-lh', title: 'Read: bass clef chords', steps: [{ type: 'song', song: 'jesusloves', part: '1', noHints: true, text: 'Left hand, read from the bass staff: the chords of Jesus Loves Me.' }] },
+    ],
+  },
 ];
 
 for (const u of UNITS) u.course ??= 'piano';
@@ -346,6 +475,17 @@ export function lessonStars(stepStars) {
   const scored = stepStars.filter((s) => s > 0);
   if (!scored.length) return 3;
   return Math.max(1, Math.floor(scored.reduce((a, b) => a + b, 0) / scored.length));
+}
+
+/** The notes of a reading drill: its fixed notes, or `count` random ones from its pool (never the same twice in a row). */
+export function readNotes(step, rand = Math.random) {
+  if (step.notes) return step.notes;
+  const out = [];
+  while (out.length < step.count) {
+    const n = step.pool[Math.floor(rand() * step.pool.length)];
+    if (n !== out[out.length - 1] || step.pool.length === 1) out.push(n);
+  }
+  return out;
 }
 
 /** Stars for a singing step from the average distance off center of your notes (cents) and misses. */

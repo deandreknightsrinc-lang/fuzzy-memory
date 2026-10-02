@@ -1,10 +1,11 @@
 // Knight Keys — app wiring: MIDI I/O, files, transport, panels and rendering.
 import { parseMidi, buildSong, writeMidi, splitHands } from './midi-file.js';
 import { makeChoirParts, choirMidi, PARTS as CHOIR_PARTS } from './choir.js';
+import { songToScore, scoreToMusicXML, musicXmlToMidi, scoreFileText } from './notation.js';
 import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_CHANNEL } from './synth.js';
 import { Player } from './player.js';
 import { KeyboardView, drawStaff, drawControllers, drawGroove, drawPianoRoll, drawDrumHighway } from './render.js';
-import { UNITS, COURSES, unitsFor, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from './lessons.js';
+import { UNITS, COURSES, unitsFor, readNotes, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from './lessons.js';
 import { PitchListener, SingJudge, RangeFinder, voiceType, freqToCents, midiToFreq } from './pitch.js';
 import { GameSession, crownsFor, loadStage, saveStage, recordScore, courseState, scoreKey, PLAYER_COLORS } from './game.js';
 import { LANES, laneOf, sameDrum, outputFor, OUTPUTS, PIECES, KITS, kitById, resolveKit, kitNoteParams, loadSavedSamples, saveSample, deleteSample } from './drumkit.js';
@@ -261,7 +262,7 @@ function keyState(note) {
     if (lessonRun.targets.has(note)) return { color: LEARN_COLOR };
     if (lessonRun.upcoming === note) return { color: LEARN_COLOR, faded: true };
   }
-  if (learn.enabled && !learn.drums) {
+  if (learn.enabled && !learn.drums && !(lessonRun.active && lessonRun.step?.noHints)) {
     if (learn.expected.has(note)) return { color: LEARN_COLOR };
     if (learn.next.includes(note)) return { color: LEARN_COLOR, faded: true };
   }
@@ -657,17 +658,19 @@ $('keysCanvas').addEventListener('pointercancel', pointerEnd);
 const MIDI_EXT = /\.(mid|midi|kar|rmi|smf)$/i;
 const LESSON_EXT = /\.(klesson|json)$/i;
 const MEDIA_EXT = /\.(mp3|wav|m4a|aac|ogg|oga|opus|flac|mp4|m4v|mov|webm|mkv)$/i;
+const SCORE_EXT = /\.(musicxml|mxl|xml)$/i;
 
 async function handleFiles(files) {
   for (const file of files) {
     try {
-      if (LESSON_EXT.test(file.name)) await loadLesson(JSON.parse(await file.text()));
+      if (SCORE_EXT.test(file.name)) await openScoreFile(file);
+      else if (LESSON_EXT.test(file.name)) await loadLesson(JSON.parse(await file.text()));
       else if (MIDI_EXT.test(file.name) || file.type === 'audio/midi' || file.type === 'audio/x-midi') {
         loadMidiBytes(new Uint8Array(await file.arrayBuffer()), file.name);
       } else if (file.type.startsWith('audio/') || file.type.startsWith('video/') || MEDIA_EXT.test(file.name)) {
         loadMedia(file);
       } else {
-        toast(`Can't open ${file.name} — use MIDI, audio, video or .klesson files.`);
+        toast(`Can't open ${file.name} — use MIDI, MusicXML, audio, video or .klesson files.`);
       }
     } catch (err) {
       console.error(err);
@@ -706,6 +709,8 @@ function loadMidiBytes(bytes, name, { keepLoops = false } = {}) {
   player.transpose = state.transpose;
   player.setRate(state.rate);
   updateLessonMode();
+  scoreView.hidden.clear();
+  if ($('scoreDlg').open) setTimeout(renderScore);
   buildMixer();
   renderLoops();
   updateTitle();
@@ -2265,7 +2270,7 @@ function initKitRack() {
 // then a song in Learn mode. Stars per lesson, the next one opens when you
 // pass, and a daily practice streak, per player (the Stage players).
 
-const lessonRun = { active: false, lesson: null, stepIdx: 0, step: null, pos: 0, mistakes: 0, stars: [], targets: new Set(), upcoming: null, done: false };
+const lessonRun = { active: false, lesson: null, stepIdx: 0, step: null, pos: 0, mistakes: 0, stars: [], targets: new Set(), upcoming: null, done: false, readList: [], hint: false, missesHere: 0 };
 const NOTE_LETTERS = ['C', 'C♯', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'A♭', 'A', 'B♭', 'B'];
 const noteLetter = (n) => NOTE_LETTERS[n % 12];
 const todayStr = () => {
@@ -2361,9 +2366,11 @@ function renderLessonTargets() {
   if (step.type === 'notes') step.notes.forEach((n, i) => chip(noteLetter(n), `finger ${step.fingers[i]}`, i < lessonRun.pos ? 'done' : i === lessonRun.pos ? 'now' : ''));
   else if (step.type === 'chords') step.chords.forEach((c, i) => chip(step.names[i], c.map(noteLetter).join(' '), i < lessonRun.pos ? 'done' : i === lessonRun.pos ? 'now' : ''));
   else if (step.type === 'info' && step.keys) step.keys.forEach((n) => chip(noteLetter(n), '', 'now'));
+  else if (step.type === 'read') lessonRun.readList.forEach((n, i) => chip(i < lessonRun.pos ? noteLetter(n) : '?', '', i < lessonRun.pos ? 'done' : i === lessonRun.pos && !lessonRun.done ? 'now' : ''));
   else if (step.type === 'sing') step.notes.forEach((n, i) => chip(step.names?.[i] || noteLetter(n), step.names ? noteLetter(n) : '', i < lessonRun.pos ? 'done' : i === lessonRun.pos && !lessonRun.done ? 'now' : ''));
   const dots = $('lpDots');
   dots.innerHTML = lessonRun.lesson.steps.map((_, i) => `<span class="${i < lessonRun.stepIdx ? 'done' : i === lessonRun.stepIdx ? 'now' : ''}"></span>`).join('');
+  drawLessonStaff();
   markDirty();
 }
 
@@ -2376,15 +2383,16 @@ function setLessonTargets() {
   } else if (step.type === 'chords') lessonRun.targets = new Set(step.chords[lessonRun.pos] || []);
   else if (step.type === 'info') lessonRun.targets = new Set(step.keys || []);
   else if (step.type === 'sing') lessonRun.targets = new Set(lessonRun.pos < step.notes.length ? [step.notes[lessonRun.pos]] : []);
+  else if (step.type === 'read') lessonRun.targets = new Set(lessonRun.hint && lessonRun.pos < lessonRun.readList.length ? [lessonRun.readList[lessonRun.pos]] : []);
   else lessonRun.targets = new Set();
 }
 
 function showLessonStep(i) {
   stopLessonSong();
   const step = lessonRun.lesson.steps[i];
-  Object.assign(lessonRun, { stepIdx: i, step, pos: 0, mistakes: 0, done: step.type === 'info' });
+  Object.assign(lessonRun, { stepIdx: i, step, pos: 0, mistakes: 0, done: step.type === 'info', hint: false, missesHere: 0, readList: step.type === 'read' ? readNotes(step) : [] });
   setText($('lpText'), step.text + (step.type === 'chords' && micListener?.active ? ' (Chords need a USB keyboard or the on-screen keys: the microphone hears one note at a time.)' : ''));
-  lessonFeedback(step.type === 'info' ? '' : step.type === 'song' ? (step.voice ? 'The song is playing. Sing the yellow notes.' : 'The song is playing. The yellow keys are yours.') : 'Your turn: the yellow key is next.');
+  lessonFeedback(step.type === 'info' ? '' : step.type === 'song' ? (step.voice ? 'The song is playing. Sing the yellow notes.' : step.noHints ? 'The song is playing. Read the staff and play.' : 'The song is playing. The yellow keys are yours.') : step.type === 'read' ? 'Which note is it? Play it.' : 'Your turn: the yellow key is next.');
   $('lpSing').hidden = step.type !== 'sing' && step.type !== 'range';
   $('lpHear').hidden = step.type !== 'sing';
   setLessonTargets();
@@ -2414,9 +2422,46 @@ function completeLessonStep(stars) {
   synth.noteOff(LIVE_CHANNEL, 84, synth.now + 0.3);
 }
 
+/** The lesson's staff: the note to read, or the notes an info step shows. */
+function drawLessonStaff() {
+  const step = lessonRun.step;
+  const cv = $('lpStaff');
+  let notes = [];
+  if (step?.type === 'read') {
+    const n = lessonRun.readList[Math.min(lessonRun.pos, lessonRun.readList.length - 1)];
+    if (n !== undefined) notes = [{ midi: n, color: lessonRun.done ? '#73d13d' : '#e6e6e6' }];
+  } else if (step?.staff) notes = step.staff.map((midi) => ({ midi, color: '#ffd60a' }));
+  cv.hidden = !notes.length && step?.type !== 'read';
+  if (cv.hidden) return;
+  drawStaff(cv, notes, { sf: step.sf || 0, spelling: 'auto', splitPoint: step.clef === 'bass' ? 61 : 60, fg: '#ddd' });
+}
+
 function lessonHit(note) {
   if (!lessonRun.active || lessonRun.done || !$('lessonDlg').open) return;
   const step = lessonRun.step;
+  if (step.type === 'read') {
+    const want = lessonRun.readList[lessonRun.pos];
+    // Singers and the mic may be in another octave: the letter is what counts when reading by voice.
+    const ok = note === want || (micListener?.active && note % 12 === want % 12);
+    if (ok) {
+      lessonRun.pos++;
+      lessonRun.hint = false;
+      lessonRun.missesHere = 0;
+      if (lessonRun.pos >= lessonRun.readList.length) {
+        setLessonTargets();
+        return completeLessonStep(starsForMistakes(lessonRun.mistakes, lessonRun.readList.length));
+      }
+      lessonFeedback(`✓ ${noteLetter(want)}! Next note…`, 'good');
+    } else {
+      lessonRun.mistakes++;
+      lessonRun.missesHere++;
+      if (lessonRun.missesHere >= 2) lessonRun.hint = true;
+      lessonFeedback(lessonRun.hint ? `It's ${noteLetter(want)}: the yellow key. Look at where it sits on the staff.` : `That was ${noteLetter(note)}. Look again: count the lines and spaces.`, 'bad');
+    }
+    setLessonTargets();
+    renderLessonTargets();
+    return;
+  }
   if (step.type === 'notes') {
     const want = step.notes[lessonRun.pos];
     if (note === want) {
@@ -2696,6 +2741,193 @@ function initLessons() {
     else finishLesson();
   };
   $('lpDoneMap').onclick = () => renderLessonMap();
+}
+
+// ---- Full score (sheet music) ---------------------------------------------------
+//
+// Every instrument of the open song on its own staff, engraved by
+// OpenSheetMusicDisplay (vendor/osmd); print it, save it as PDF or MusicXML.
+// Sheet music saved as MusicXML opens as a song (score -> MIDI).
+
+const scoreView = { osmd: null, lib: null, xml: '', key: '', zoom: 0.85, cursorAt: -1, raf: 0, hidden: new Set() };
+
+function loadOsmd() {
+  if (window.opensheetmusicdisplay) return Promise.resolve(window.opensheetmusicdisplay);
+  scoreView.lib ??= new Promise((resolve, reject) => {
+    const el = document.createElement('script');
+    el.src = 'vendor/osmd/opensheetmusicdisplay.min.js';
+    el.onload = () => resolve(window.opensheetmusicdisplay);
+    el.onerror = () => reject(new Error('the score engraver did not load'));
+    document.head.append(el);
+  });
+  return scoreView.lib;
+}
+
+/** Score -> MIDI: open a MusicXML / .mxl file as the song, and keep the original score to show. */
+async function openScoreFile(file) {
+  const xml = await scoreFileText(file.name, new Uint8Array(await file.arrayBuffer()));
+  const res = musicXmlToMidi(xml);
+  if (!res.notes) throw new Error('no notes in that score');
+  const name = (res.title || file.name.replace(/\.[^.]+$/, '')).trim();
+  loadMidiBytes(res.bytes, `${name}.mid`);
+  state.scoreXml = { xml, for: state.midiName };
+  if ($('scoreDlg').open) renderScore();
+  toast(`Score → MIDI: ${name} (${res.parts.length} part${res.parts.length > 1 ? 's' : ''}, ${res.measures} bars, ${res.notes} notes).`, [
+    ['⬇ Save as MIDI', () => download(res.bytes, `${name}.mid`, 'audio/midi')],
+    ['📜 Show score', () => openScore()],
+  ], 8000);
+}
+
+function currentScoreXml() {
+  const song = state.song;
+  if (!song) return null;
+  const original = state.scoreXml?.for === state.midiName && $('scoreSource').value === 'original';
+  if (original) return { xml: state.scoreXml.xml, key: `orig:${state.midiName}`, original: true };
+  const melodic = song.channels.filter((ch) => !scoreView.hidden.has(ch));
+  const gridVal = $('scoreGrid').value;
+  const key = `${state.midiName}|${song.notes.length}|${gridVal}|${melodic.join(',')}|${state.chan.map((c) => c.program).join(',')}`;
+  if (key === scoreView.key && scoreView.xml) return { xml: scoreView.xml, key };
+  const score = songToScore(song, {
+    grid: gridVal === 'auto' ? 'auto' : Number(gridVal),
+    title: song.title || state.librarySong && SONGS.find((x) => x.id === state.librarySong)?.title || state.midiName || 'Score',
+    nameFor: (ch) => channelName(ch),
+    channels: melodic,
+  });
+  return { xml: scoreToMusicXML(score), key, score };
+}
+
+function renderScoreParts() {
+  const box = $('scoreParts');
+  box.innerHTML = '';
+  const song = state.song;
+  const original = state.scoreXml?.for === state.midiName && $('scoreSource').value === 'original';
+  if (!song || original) return;
+  for (const ch of song.channels) {
+    const label = document.createElement('label');
+    const cb = Object.assign(document.createElement('input'), { type: 'checkbox', checked: !scoreView.hidden.has(ch) });
+    cb.onchange = () => {
+      if (cb.checked) scoreView.hidden.delete(ch);
+      else if (song.channels.filter((c) => !scoreView.hidden.has(c)).length > 1) scoreView.hidden.add(ch);
+      else cb.checked = true; // keep at least one part
+      renderScore();
+    };
+    label.append(cb, ` ${channelName(ch)}`);
+    box.append(label);
+  }
+}
+
+async function renderScore() {
+  const view = $('scoreView');
+  $('scoreSourceWrap').hidden = state.scoreXml?.for !== state.midiName;
+  const original = state.scoreXml?.for === state.midiName && $('scoreSource').value === 'original';
+  $('scoreGrid').disabled = original;
+  renderScoreParts();
+  const cur = currentScoreXml();
+  if (!cur) {
+    view.innerHTML = '<p class="score-empty">Open a song (Songs, Open…, or Audio → MIDI) to see its full score.</p>';
+    setText($('scoreInfo'), '');
+    return;
+  }
+  scoreView.xml = cur.xml;
+  scoreView.key = cur.key;
+  setText($('scoreInfo'), cur.score ? `${cur.score.parts.length} part${cur.score.parts.length > 1 ? 's' : ''} · ${cur.score.measures} bars` : 'Original score');
+  try {
+    const lib = await loadOsmd();
+    if (!scoreView.osmd) {
+      view.innerHTML = '';
+      scoreView.osmd = new lib.OpenSheetMusicDisplay(view, { autoResize: true, backend: 'svg', drawTitle: true, drawPartNames: true, followCursor: false });
+    }
+    await scoreView.osmd.load(cur.xml);
+    scoreView.osmd.zoom = scoreView.zoom;
+    scoreView.osmd.render();
+    scoreView.cursorAt = -1;
+    if ($('scoreFollow').checked) scoreView.osmd.cursor.show();
+  } catch (err) {
+    console.error(err);
+    scoreView.osmd = null;
+    view.innerHTML = `<p class="score-empty">Couldn't draw this score (${err.message}). ⬇ MusicXML still works: open it in MuseScore or Logic.</p>`;
+  }
+}
+
+// The cursor follows the music (generated scores line up beat for beat).
+function followScore() {
+  const dlg = $('scoreDlg');
+  if (!dlg.open) {
+    scoreView.raf = 0;
+    return;
+  }
+  scoreView.raf = requestAnimationFrame(followScore);
+  const osmd = scoreView.osmd;
+  if (!osmd || !state.song || !$('scoreFollow').checked || !(player.playing || player.waiting)) return;
+  const cursor = osmd.cursor;
+  const target = state.song.beatAt(player.time) / 4 + 1e-4; // whole notes
+  const at = () => cursor.iterator.currentTimeStamp.RealValue;
+  if (at() > target + 0.01) cursor.reset();
+  let moved = false;
+  let guard = 0;
+  while (!cursor.iterator.EndReached && at() + 1e-4 < target && guard++ < 512) {
+    cursor.next();
+    moved = true;
+  }
+  if (moved && at() > target + 1e-3 && guard > 0) cursor.previous?.();
+  if (moved && cursor.cursorElement) {
+    const el = cursor.cursorElement;
+    const box = $('scoreView');
+    const top = el.offsetTop;
+    if (top < box.scrollTop + 20 || top > box.scrollTop + box.clientHeight - 120) box.scrollTo({ top: Math.max(0, top - 60), behavior: 'smooth' });
+  }
+}
+
+function openScore() {
+  const dlg = $('scoreDlg');
+  if (!dlg.open) dlg.show();
+  renderScore();
+  if (!scoreView.raf) scoreView.raf = requestAnimationFrame(followScore);
+}
+
+function initScore() {
+  const dlg = $('scoreDlg');
+  $('btnScore').onclick = openScore;
+  dlg.querySelector('[data-close]').onclick = () => dlg.close();
+  makeDraggable(dlg);
+  $('scoreGrid').onchange = renderScore;
+  $('scoreSource').onchange = renderScore;
+  $('scoreFollow').onchange = () => {
+    if (!scoreView.osmd) return;
+    if ($('scoreFollow').checked) scoreView.osmd.cursor.show();
+    else scoreView.osmd.cursor.hide();
+  };
+  const zoom = (f) => {
+    scoreView.zoom = Math.max(0.4, Math.min(2, scoreView.zoom * f));
+    if (!scoreView.osmd) return;
+    scoreView.osmd.zoom = scoreView.zoom;
+    scoreView.osmd.render();
+  };
+  $('scoreZoomIn').onclick = () => zoom(1.15);
+  $('scoreZoomOut').onclick = () => zoom(1 / 1.15);
+  $('scoreOpen').onclick = () => $('scoreFile').click();
+  $('scoreFile').onchange = async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (file) await openScoreFile(file).catch((err) => toast(`Couldn't open ${file.name}: ${err.message}`));
+  };
+  const baseName = () => (state.song?.title || state.midiName || 'score').replace(/[\\/:*?"<>|]/g, '-');
+  $('scoreXml').onclick = () => {
+    const cur = currentScoreXml();
+    if (!cur) return toast('Open a song first.');
+    download(cur.xml, `${baseName()}.musicxml`, 'application/vnd.recordare.musicxml+xml');
+  };
+  $('scoreMidi').onclick = () => {
+    if (!state.midiBytes) return toast('Open a song first.');
+    download(state.midiBytes, `${baseName()}.mid`, 'audio/midi');
+  };
+  $('scorePrint').onclick = () => {
+    if (!scoreView.osmd) return toast('Open a song first.');
+    if (IN_HOST) return toast('Printing works on the website. Here: ⬇ MusicXML, then open it in MuseScore or Logic to print.');
+    document.body.classList.add('print-score');
+    window.addEventListener('afterprint', () => document.body.classList.remove('print-score'), { once: true });
+    window.print();
+  };
 }
 
 // ---- Vocal Booth -------------------------------------------------------------
@@ -4117,6 +4349,7 @@ initKitRack();
 initStage();
 initLessons();
 initBooth();
+initScore();
 initConverter();
 initSongs();
 applyLayout();

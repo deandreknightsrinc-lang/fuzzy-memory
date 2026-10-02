@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { UNITS, COURSES, ALL_LESSONS, unitsFor, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from '../js/lessons.js';
+import { UNITS, COURSES, ALL_LESSONS, unitsFor, readNotes, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from '../js/lessons.js';
 import { SONGS, songToMidi } from '../js/songs.js';
 import { detectPitch, freqToMidi, freqToCents, centsFromTarget, midiToFreq, NoteTracker, SingJudge, RangeFinder, voiceType } from '../js/pitch.js';
 import { parseMidi, buildSong } from '../js/midi-file.js';
@@ -13,7 +13,14 @@ test('every lesson step is valid and points at real songs', () => {
     ids.add(lesson.id);
     assert.ok(lesson.steps.length > 0);
     for (const step of lesson.steps) {
-      assert.ok(['info', 'notes', 'chords', 'song', 'sing', 'range'].includes(step.type), step.type);
+      assert.ok(['info', 'notes', 'chords', 'song', 'sing', 'range', 'read'].includes(step.type), step.type);
+      if (step.type === 'read') {
+        assert.ok(step.notes || (step.pool?.length && step.count > 0), `${lesson.id}: notes or a pool to read`);
+        const list = readNotes(step);
+        assert.ok(list.length > 0 && list.every((n) => n >= 40 && n <= 84), `${lesson.id}: readable notes`);
+        if (step.clef === 'bass') assert.ok(list.every((n) => n < 61), `${lesson.id}: bass clef notes stay on the bass staff`);
+        else assert.ok(list.every((n) => n >= 60), `${lesson.id}: treble clef notes stay on the treble staff`);
+      }
       if (step.type === 'sing') {
         assert.ok(step.notes.length > 0 && step.notes.every((n) => n >= 40 && n <= 84), `${lesson.id}: singable notes`);
         if (step.names) assert.equal(step.names.length, step.notes.length, `${lesson.id}: a name for every note`);
@@ -42,7 +49,9 @@ test('each course opens its own lessons', () => {
   assert.equal(piano[0].lesson.course, 'piano');
   assert.equal(voice[0].lesson.course, 'voice');
   assert.ok(voice[0].unlocked && !voice[1].unlocked, 'the first voice lesson is open without any piano lessons');
-  assert.ok(piano.length + voice.length === ALL_LESSONS.length);
+  const reading = pathState({}, 'reading');
+  assert.ok(reading[0].unlocked && reading.length >= 10, 'a reading course');
+  assert.equal(piano.length + voice.length + reading.length, ALL_LESSONS.length);
 });
 
 test('the path opens one lesson at a time', () => {
@@ -167,4 +176,13 @@ test('choir parts: four singable parts in the right order, from chord tones', ()
     assert.equal(back.notes.filter((n) => n.ch === 0).length, parts.soprano.length);
     assert.ok(Math.abs(back.bpm - song.bpm) < 0.01);
   }
+});
+
+test('reading drills: random notes from the pool, never twice in a row', () => {
+  let seed = 1;
+  const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const list = readNotes({ pool: [60, 62, 64], count: 30 }, rand);
+  assert.equal(list.length, 30);
+  assert.ok(list.every((n, i) => [60, 62, 64].includes(n) && n !== list[i - 1]));
+  assert.deepEqual(readNotes({ notes: [60, 67] }), [60, 67]);
 });

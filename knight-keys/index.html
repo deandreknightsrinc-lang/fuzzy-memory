@@ -17,7 +17,7 @@
     <div class="group">
       <button id="btnOpen" class="primary" title="Open MIDI, audio, video or lesson files (or drop them anywhere)">Open…</button>
       <input id="fileInput" type="file" multiple hidden
-             accept=".mid,.midi,.kar,.rmi,.klesson,.json,audio/*,video/*" />
+             accept=".mid,.midi,.kar,.rmi,.klesson,.json,.musicxml,.mxl,.xml,audio/*,video/*" />
       <button id="btnSaveLesson" title="Save MIDI + media + loops + settings as one .klesson file">Save lesson</button>
       <span id="songTitle" class="song-title">No file loaded</span>
     </div>
@@ -58,6 +58,7 @@
       <button id="btnLessons" class="lessons-btn" title="Lessons: step-by-step piano and voice courses, like a teacher at your side">🎓 Lessons</button>
       <button id="btnBooth" class="booth-btn" title="Vocal Booth: live pitch graph and tuner for singers, plus four-part choir parts for any song">🎙 Vocal</button>
       <button id="btnStage" class="stage-btn" title="Stage: play songs like a game, earn crowns, unlock songs, beat the family high score">🎸 Stage</button>
+      <button id="btnScore" title="Full score: sheet music for every instrument in the song (print, PDF, MusicXML), and open sheet music (MusicXML) as MIDI">📜 Score</button>
       <button id="btnSongs" title="Free songs to learn on keys or drums">Songs</button>
       <button id="btnConvert" title="Turn a recording into MIDI">Audio → MIDI</button>
       <button id="btnSettings">Settings</button>
@@ -494,6 +495,7 @@ G D/F# Em C x2"></textarea>
           <span id="lpDots" class="lp-dots"></span>
         </div>
         <p id="lpText" class="lp-text"></p>
+        <canvas id="lpStaff" class="lp-staff" width="520" height="190" hidden></canvas>
         <div id="lpTargets" class="lp-targets"></div>
         <div id="lpSing" class="lp-sing" hidden>
           <button id="lpHear" class="mini" title="Play the note to sing">🔊 Hear it</button>
@@ -519,6 +521,33 @@ G D/F# Em C x2"></textarea>
           <button id="lpDoneMap">All lessons</button>
         </div>
       </section>
+    </div>
+  </dialog>
+
+  <dialog id="scoreDlg" class="tool-window score-window" aria-labelledby="scoreTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="scoreTitle">📜 Full Score</h2>
+      <span id="scoreInfo" class="small"></span>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="tool-body">
+      <div class="row score-tools">
+        <label id="scoreSourceWrap" hidden>Show <select id="scoreSource"><option value="original">The original score</option><option value="midi">Made from the MIDI</option></select></label>
+        <label>Rhythm <select id="scoreGrid" title="How notes are lined up on the beat">
+          <option value="auto">Auto (16ths and triplets)</option><option value="0.5">Eighth notes</option><option value="0.25">16th notes</option><option value="0.3333333333333333">Triplets</option>
+        </select></label>
+        <label title="Move the cursor with the music while it plays"><input type="checkbox" id="scoreFollow" checked /> Follow</label>
+        <button id="scoreZoomOut" class="mini" title="Smaller">−</button>
+        <button id="scoreZoomIn" class="mini" title="Bigger">+</button>
+        <button id="scoreOpen" title="Open sheet music saved as MusicXML (.musicxml, .mxl, .xml) and turn it into MIDI">📂 Open score</button>
+        <button id="scoreXml" title="Sheet music file for Logic, MuseScore, Sibelius, Finale, Dorico or ACE Studio">⬇ MusicXML</button>
+        <button id="scoreMidi" title="The song as a MIDI file (one track per instrument)">⬇ MIDI</button>
+        <button id="scorePrint" title="Print, or choose 'Save as PDF' in the print window">🖨 Print / PDF</button>
+        <input id="scoreFile" type="file" hidden accept=".musicxml,.mxl,.xml" />
+      </div>
+      <div id="scoreParts" class="score-parts"></div>
+      <div id="scoreView" class="score-view"><p class="score-empty">Open a song (Songs, Open…, or Audio → MIDI) to see its full score.</p></div>
+      <p class="small score-tip">Sheet music on paper or PDF? Scan it to MusicXML first (free: Audiveris, or the "sheet" drop folder on kl-oracle; apps: PlayScore 2, ScanScore, MuseScore), then 📂 Open score. In Logic: File > Export > Score as MusicXML.</p>
     </div>
   </dialog>
 

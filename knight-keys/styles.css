@@ -657,3 +657,22 @@ dialog.booth-window { width: min(1040px, calc(100vw - 24px)); left: max(12px, ca
 .booth-choir h3 { margin: 12px 0 4px; font-size: 15px; }
 .booth-choir .row { flex-wrap: wrap; align-items: center; }
 .booth-help ul { margin: 6px 0; padding-left: 18px; line-height: 1.5; }
+
+/* Full score and reading lessons */
+#btnScore { font-weight: 600; }
+.lp-staff { width: 100%; max-width: 520px; height: 190px; display: block; margin: 4px auto 8px; background: #181a22; border-radius: 8px; }
+dialog.score-window { width: min(1200px, calc(100vw - 24px)); left: max(12px, calc(50% - 600px)); top: 56px; max-height: calc(100vh - 70px); }
+.score-window .tool-head { display: flex; align-items: center; gap: 10px; }
+.score-window .tool-head h2 { margin: 0; flex: 1; }
+.score-tools { flex-wrap: wrap; align-items: center; }
+.score-parts { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 6px 0; font-size: 13px; }
+.score-view { background: #fff; color: #000; border-radius: 6px; min-height: 240px; max-height: calc(100vh - 290px); overflow: auto; padding: 8px; }
+.score-empty { color: #555; padding: 24px; text-align: center; }
+.score-tip { margin: 6px 0 0; }
+@media print {
+  body.print-score > *:not(#scoreDlg) { display: none !important; }
+  body.print-score #scoreDlg { position: static; display: block; width: auto; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; box-shadow: none; background: #fff; }
+  body.print-score #scoreDlg .tool-head, body.print-score .score-tools, body.print-score .score-parts, body.print-score .score-tip { display: none !important; }
+  body.print-score .score-view { max-height: none; overflow: visible; padding: 0; }
+  body.print-score { background: #fff; }
+}
