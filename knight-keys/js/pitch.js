@@ -228,15 +228,78 @@ export class NoteTracker {
   }
 }
 
+// ---- Chords from the microphone (guitar strumming) ---------------------------
+
+/**
+ * Pitch-class profile ("chroma") of a spectrum: how much of each of the 12 notes
+ * is sounding. `db` is an analyser's getFloatFrequencyData() output.
+ */
+export function chromaFromSpectrum(db, sampleRate, { minHz = 90, maxHz = 2000 } = {}) {
+  const fftSize = db.length * 2;
+  const chroma = new Array(12).fill(0);
+  const lo = Math.max(1, Math.floor((minHz * fftSize) / sampleRate));
+  const hi = Math.min(db.length - 2, Math.ceil((maxHz * fftSize) / sampleRate));
+  for (let i = lo; i <= hi; i++) {
+    // Only spectral peaks count, so the skirts of a loud note don't leak into its neighbours.
+    if (db[i] < db[i - 1] || db[i] < db[i + 1] || db[i] < -85) continue;
+    // Parabolic interpolation finds the peak between bins: much finer than the bin spacing.
+    const den = db[i - 1] - 2 * db[i] + db[i + 1];
+    const delta = den ? (0.5 * (db[i - 1] - db[i + 1])) / den : 0;
+    const f = ((i + delta) * sampleRate) / fftSize;
+    const pc = ((Math.round(12 * Math.log2(f / 440) + 69) % 12) + 12) % 12;
+    chroma[pc] += 10 ** (db[i] / 20);
+  }
+  const total = chroma.reduce((a, b) => a + b, 0);
+  return total > 0 ? chroma.map((c) => c / total) : chroma;
+}
+
+const TRIAD_TEMPLATES = [
+  { quality: '', ints: [0, 4, 7] },
+  { quality: 'm', ints: [0, 3, 7] },
+];
+
+/** The major or minor chord that best explains a chroma, with a confidence (0..1). */
+export function chordFromChroma(chroma) {
+  let best = null;
+  for (let root = 0; root < 12; root++) {
+    for (const t of TRIAD_TEMPLATES) {
+      const pcs = t.ints.map((i) => (root + i) % 12);
+      // Root and fifth weigh a little more than the third, as on a strummed guitar.
+      const inChord = chroma[pcs[0]] * 1.1 + chroma[pcs[1]] + chroma[pcs[2]];
+      const score = inChord - 0.5 * (1 - chroma[pcs[0]] - chroma[pcs[1]] - chroma[pcs[2]]);
+      if (!best || score > best.score) best = { root, quality: t.quality, pcs, score, share: chroma[pcs[0]] + chroma[pcs[1]] + chroma[pcs[2]] };
+    }
+  }
+  return best;
+}
+
+/**
+ * Does a chroma sound like this chord (root + major/minor)? Suspended chords
+ * (no third) pass when their three notes carry most of the sound.
+ */
+export function chromaMatches(chroma, root, quality, susPcs = null) {
+  if (susPcs) {
+    // It must explain the sound at least as well as the best plain chord (G is not Dsus4).
+    const share = susPcs.reduce((a, pc) => a + chroma[pc], 0);
+    return share >= 0.55 && chroma[root] >= 0.12 && share >= chordFromChroma(chroma).share - 0.05;
+  }
+  const c = chordFromChroma(chroma);
+  return !!c && c.share >= 0.5 && c.root === root && c.quality === quality;
+}
+
 /**
  * Microphone listener: start(ctx) asks for the mic, then calls onNote(on, midi).
  * Anyone can also listen to the raw pitch (for meters and the Vocal Booth):
- * addPitchListener(fn) gets fn(exactNote | null, dt) on every frame.
+ * addPitchListener(fn) gets fn(exactNote | null, dt) on every frame, and
+ * addChromaListener(fn) gets fn(chroma | null) for chord recognition.
+ * setRange('bass') listens lower (down to a bass guitar's low E) with a longer window.
  */
 export class PitchListener {
   constructor(onNote) {
     this.tracker = new NoteTracker(onNote);
     this.pitchListeners = new Set();
+    this.chromaListeners = new Set();
+    this.range = { minFreq: 55, maxFreq: 1400, fftSize: 2048 };
     this.timer = null;
     this.stream = null;
   }
@@ -250,20 +313,48 @@ export class PitchListener {
     return () => this.pitchListeners.delete(fn);
   }
 
+  addChromaListener(fn) {
+    this.chromaListeners.add(fn);
+    return () => this.chromaListeners.delete(fn);
+  }
+
+  /** 'bass' (bass guitar: 35-400 Hz), or 'normal' (voice, guitar, keys). */
+  setRange(kind) {
+    this.range = kind === 'bass' ? { minFreq: 35, maxFreq: 450, fftSize: 4096 } : { minFreq: 55, maxFreq: 1400, fftSize: 2048 };
+    if (this.analyser) this.analyser.fftSize = this.range.fftSize;
+  }
+
   async start(ctx) {
     this.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
     const src = ctx.createMediaStreamSource(this.stream);
     this.analyser = ctx.createAnalyser();
-    this.analyser.fftSize = 2048;
+    this.analyser.fftSize = this.range.fftSize;
+    this.analyser.smoothingTimeConstant = 0.5;
     src.connect(this.analyser);
+    // Chords need a longer window: 8192 samples tell neighbouring low notes apart.
+    this.chromaAnalyser = ctx.createAnalyser();
+    this.chromaAnalyser.fftSize = 8192;
+    this.chromaAnalyser.smoothingTimeConstant = 0.3;
+    src.connect(this.chromaAnalyser);
     this.source = src;
-    const buf = new Float32Array(this.analyser.fftSize);
+    let buf = new Float32Array(this.analyser.fftSize);
+    const spec = new Float32Array(this.chromaAnalyser.frequencyBinCount);
     this.timer = setInterval(() => {
+      if (buf.length !== this.analyser.fftSize) {
+        buf = new Float32Array(this.analyser.fftSize);
+      }
       this.analyser.getFloatTimeDomainData(buf);
-      const p = detectPitch(buf, ctx.sampleRate);
+      const p = detectPitch(buf, ctx.sampleRate, { minFreq: this.range.minFreq, maxFreq: this.range.maxFreq });
       this.tracker.push(p ? freqToMidi(p.freq) : null);
       const exact = p ? freqToNote(p.freq) : null;
       for (const fn of this.pitchListeners) fn(exact, 0.03);
+      if (this.chromaListeners.size) {
+        let rms = 0;
+        for (let i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
+        this.chromaAnalyser.getFloatFrequencyData(spec);
+        const chroma = Math.sqrt(rms / buf.length) > 0.01 ? chromaFromSpectrum(spec, ctx.sampleRate) : null;
+        for (const fn of this.chromaListeners) fn(chroma);
+      }
     }, 30);
   }
 

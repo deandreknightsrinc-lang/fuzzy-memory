@@ -12,6 +12,11 @@
 //   hits    - hit these drums in order (an array is drums hit together)
 //   groove  - a drum beat written as a grid: mode 'learn' waits for every hit,
 //             mode 'time' plays along with a click and scores your timing
+//   fret    - guitar/bass: play these notes ([string, fret]) in order, shown on the neck
+//   strum   - guitar: strum these chords (heard by the microphone, or held on keys)
+//   chart   - play along: chords (or a library song's chords) in time with a click;
+//             match 'chord' for guitar, 'root' for bass (the chord's root note)
+// Sing steps with `tune: true` tune an instrument's open strings.
 // Info steps can show notes on the staff too (`staff: [...]`); song steps with
 // `noHints` don't light the keys, so you read the music instead.
 // Stars: 3 for a clean step, fewer for mistakes. Pass a lesson to open the next.
@@ -28,6 +33,8 @@ export const COURSES = [
   { id: 'voice', name: 'Voice', icon: '🎤' },
   { id: 'reading', name: 'Read music', icon: '📖' },
   { id: 'drums', name: 'Drums', icon: '🥁' },
+  { id: 'guitar', name: 'Guitar', icon: '🎸' },
+  { id: 'bass', name: 'Bass', icon: '🎸' },
 ];
 
 // Drums (General MIDI notes).
@@ -616,6 +623,215 @@ export const UNITS = [
       },
       { id: 'd-song-jesus', title: 'Drums for a song: Jesus Loves Me', steps: [{ type: 'song', song: 'jesusloves', part: '9', text: 'Play the drum part of a whole song. It waits for every hit, so learn it at your own speed; then try it on Stage.' }] },
       { id: 'd-song-amazing', title: 'Drums for a song: Amazing Grace', steps: [{ type: 'song', song: 'amazing', part: '9', text: 'The hymn waltz in a real song: 3/4, soft and steady.' }] },
+    ],
+  },
+
+  // ---- Guitar ------------------------------------------------------------------
+  // The microphone hears single notes and strummed chords (acoustic guitar, or an
+  // electric through an amp or interface). Strings: 1 = thinnest (high E), 6 = thickest.
+  {
+    id: 'guitar-start',
+    course: 'guitar',
+    title: 'Getting started',
+    icon: '🎸',
+    lessons: [
+      {
+        id: 'g-tune',
+        title: 'Hold it and tune it',
+        steps: [
+          { type: 'info', text: 'Sit with the guitar\'s body on your right leg, the neck pointing left and a little up. Your left hand presses the strings on the neck (thumb behind it); your right hand strums or picks over the sound hole.' },
+          { type: 'info', fretboard: { instrument: 'guitar', open: [1, 2, 3, 4, 5, 6] }, text: 'The six strings, from the thickest (6, low E) to the thinnest (1, high E): E A D G B E. Remember them with "Eddie Ate Dynamite, Good Bye Eddie".' },
+          { type: 'sing', tune: true, instrument: 'guitar', notes: [40, 45, 50, 55, 59, 64], names: ['6 E', '5 A', '4 D', '3 G', '2 B', '1 E'], hear: true, hold: 1, tolerance: 12, text: 'Tune each string: pluck it and turn its tuning peg slowly until the needle sits in the middle. Turn the microphone on first (🎤).' },
+        ],
+      },
+      {
+        id: 'g-open',
+        title: 'The open strings',
+        steps: [
+          { type: 'info', fretboard: { instrument: 'guitar', open: [1, 2, 3, 4, 5, 6] }, text: 'An "open" string is played without pressing any fret. Pick one string at a time with your right thumb or a pick, and let it ring.' },
+          { type: 'fret', instrument: 'guitar', notes: [[6, 0], [5, 0], [4, 0], [3, 0], [2, 0], [1, 0]], text: 'Pick each open string, thickest to thinnest: E A D G B E.' },
+          { type: 'fret', instrument: 'guitar', notes: [[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0]], text: 'And back: thinnest to thickest.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'guitar-notes',
+    course: 'guitar',
+    title: 'First notes and melodies',
+    icon: '🎶',
+    lessons: [
+      {
+        id: 'g-frets',
+        title: 'Frets 1 and 3',
+        steps: [
+          { type: 'info', fretboard: { instrument: 'guitar', dots: [[1, 1, 1], [1, 3, 3]] }, text: 'Press just behind the metal fret wire with the tip of your finger. Finger 1 (index) plays fret 1, finger 3 (ring) plays fret 3. High E string: open is E, fret 1 is F, fret 3 is G.' },
+          { type: 'fret', instrument: 'guitar', notes: [[1, 0], [1, 1], [1, 3], [1, 1], [1, 0]], fingers: [0, 1, 3, 1, 0], text: 'E F G F E on the high E string.' },
+          { type: 'fret', instrument: 'guitar', notes: [[2, 0], [2, 1], [2, 3], [2, 1], [2, 0]], fingers: [0, 1, 3, 1, 0], text: 'Same on the B string: B C D C B.' },
+        ],
+      },
+      {
+        id: 'g-mary',
+        title: 'Melody: Mary Had a Little Lamb',
+        steps: [{ type: 'fret', instrument: 'guitar', notes: [[1, 0], [2, 3], [2, 1], [2, 3], [1, 0], [1, 0], [1, 0], [2, 3], [2, 3], [2, 3], [1, 0], [1, 3], [1, 3]], fingers: [0, 3, 1, 3, 0, 0, 0, 3, 3, 3, 0, 3, 3], text: 'E D C D E E E, D D D, E G G: high E and B strings.' }],
+      },
+      {
+        id: 'g-joyful',
+        title: 'Melody: Joyful, Joyful',
+        steps: [{ type: 'fret', instrument: 'guitar', notes: [[1, 0], [1, 0], [1, 1], [1, 3], [1, 3], [1, 1], [1, 0], [2, 3], [2, 1], [2, 1], [2, 3], [1, 0], [1, 0], [2, 3], [2, 3]], fingers: [0, 0, 1, 3, 3, 1, 0, 3, 1, 1, 3, 0, 0, 3, 3], text: 'Beethoven\'s "Ode to Joy" melody, the tune of Joyful, Joyful, We Adore Thee.' }],
+      },
+    ],
+  },
+  {
+    id: 'guitar-chords',
+    course: 'guitar',
+    title: 'First chords',
+    icon: '🎼',
+    lessons: [
+      {
+        id: 'g-em',
+        title: 'E minor and A minor',
+        steps: [
+          { type: 'info', chord: 'Em', text: 'Em, the easiest chord: fingers 2 and 3 on the 2nd fret of the A and D strings. Strum all six strings, top to bottom.' },
+          { type: 'strum', chords: ['Em', 'Em'], text: 'Strum Em, let it ring, strum it again.' },
+          { type: 'info', chord: 'Am', text: 'Am: the same shape moved down one string, plus finger 1 on the 1st fret of the B string. Don\'t play the low E string (×).' },
+          { type: 'strum', chords: ['Am', 'Em', 'Am', 'Em'], text: 'Change between Am and Em.' },
+        ],
+      },
+      {
+        id: 'g-gcd',
+        title: 'G, C and D',
+        steps: [
+          { type: 'info', chord: 'G', text: 'G: three fingers spread wide. Low E 3rd fret (finger 2), A 2nd fret (finger 1), high E 3rd fret (finger 3).' },
+          { type: 'strum', chords: ['G', 'G'], text: 'Strum G twice.' },
+          { type: 'info', chord: 'C', text: 'C: fingers 3, 2, 1 step down from the A string: A 3rd fret, D 2nd fret, B 1st fret. Skip the low E string.' },
+          { type: 'strum', chords: ['C', 'G', 'C', 'G'], text: 'C to G and back.' },
+          { type: 'info', chord: 'D', text: 'D: a small triangle on the top three strings (G 2nd, high E 2nd, B 3rd). Strum only the top four strings.' },
+          { type: 'strum', chords: ['G', 'C', 'D', 'G'], text: 'G, C, D, G: the three chords of hundreds of hymns and worship songs.' },
+        ],
+      },
+      {
+        id: 'g-worship4',
+        title: 'The worship four: G D Em C',
+        steps: [
+          { type: 'info', chord: 'D/F#', text: 'Worship players often use D/F#: a D chord with your thumb (or finger 1) on the 2nd fret of the low E string, so the bass walks down G, F#, E. Plain D works too.' },
+          { type: 'strum', chords: ['G', 'D', 'Em', 'C'], text: 'The 1-5-6-4 progression in G: G, D, Em, C.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'guitar-playalong',
+    course: 'guitar',
+    title: 'Strum along in time',
+    icon: '⏱',
+    lessons: [
+      {
+        id: 'g-strum-em-am',
+        title: 'Strumming on the beat',
+        steps: [
+          { type: 'info', text: 'Strum down on every beat: "1 2 3 4". Keep your strumming hand moving like a pendulum even between chords, and change chords on beat 4 so the new one is ready on 1.' },
+          { type: 'chart', match: 'chord', chords: ['Em', 'Am', 'Em', 'Am'], beats: 4, bpm: 60, text: 'Em and Am, one bar each, with the click. The chord to play lights up.' },
+        ],
+      },
+      {
+        id: 'g-strum-gcd',
+        title: 'G, C, D in time',
+        steps: [{ type: 'chart', match: 'chord', chords: ['G', 'C', 'G', 'D', 'G', 'C', 'D', 'G'], beats: 4, bpm: 66, text: 'Eight bars, one chord each. Change on beat 4!' }],
+      },
+      {
+        id: 'g-worship-flow',
+        title: 'Play along: Worship Flow',
+        steps: [{ type: 'chart', match: 'chord', song: 'worshipflow', bpm: 66, text: 'The 1-5-6-4 worship progression from the song library: G, D/F#, Em, C, then the chorus.' }],
+      },
+      {
+        id: 'g-amazing',
+        title: 'Play along: Amazing Grace',
+        steps: [
+          { type: 'info', text: 'Amazing Grace is in 3/4: strum "DOWN down down" (1 2 3) in every bar. Chords: G, C and D.' },
+          { type: 'chart', match: 'chord', song: 'amazing', bpm: 70, text: 'Strum the hymn in G.' },
+        ],
+      },
+    ],
+  },
+
+  // ---- Bass ----------------------------------------------------------------------
+  // Strings: 1 = thinnest (G), 4 = thickest (low E). The microphone listens lower in
+  // these lessons (a bass amp or an interface works best; a bass alone is quiet).
+  {
+    id: 'bass-start',
+    course: 'bass',
+    title: 'Getting started',
+    icon: '🎸',
+    lessons: [
+      {
+        id: 'b-tune',
+        title: 'Hold it and tune it',
+        steps: [
+          { type: 'info', fretboard: { instrument: 'bass', open: [1, 2, 3, 4] }, text: 'Four strings, thickest to thinnest: E A D G (the same as the four lowest guitar strings, an octave lower). Pluck with the first two fingers of your right hand, alternating, resting your thumb on the pickup.' },
+          { type: 'sing', tune: true, instrument: 'bass', notes: [28, 33, 38, 43], names: ['4 E', '3 A', '2 D', '1 G'], hear: true, hold: 1, tolerance: 12, text: 'Tune each string until the needle sits in the middle. Turn the microphone on first (🎤); put it near the amp.' },
+        ],
+      },
+      {
+        id: 'b-open',
+        title: 'Open strings and alternate plucking',
+        steps: [
+          { type: 'fret', instrument: 'bass', notes: [[4, 0], [3, 0], [2, 0], [1, 0]], text: 'E A D G: pluck each open string.' },
+          { type: 'fret', instrument: 'bass', notes: [[4, 0], [4, 0], [4, 0], [4, 0], [3, 0], [3, 0], [3, 0], [3, 0]], text: 'Four on E, four on A, alternating fingers: index, middle, index, middle.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'bass-notes',
+    course: 'bass',
+    title: 'Notes on the neck',
+    icon: '🎶',
+    lessons: [
+      {
+        id: 'b-e-a',
+        title: 'Notes on the E and A strings',
+        steps: [
+          { type: 'info', fretboard: { instrument: 'bass', dots: [[4, 1, 1], [4, 3, 3], [3, 2, 2], [3, 3, 3], [3, 5, 4]] }, text: 'One finger per fret. E string: fret 1 is F, fret 3 is G. A string: fret 2 is B, fret 3 is C, fret 5 is D. Most church songs live right here.' },
+          { type: 'fret', instrument: 'bass', notes: [[4, 0], [4, 1], [4, 3]], fingers: [0, 1, 3], text: 'E, F, G on the E string.' },
+          { type: 'fret', instrument: 'bass', notes: [[3, 0], [3, 2], [3, 3], [3, 5]], fingers: [0, 1, 2, 4], text: 'A, B, C, D on the A string.' },
+        ],
+      },
+      {
+        id: 'b-roots',
+        title: 'Find the roots: G, C, D, Em',
+        steps: [
+          { type: 'info', text: 'The bass player\'s main job: play the root (the name) of each chord, on beat 1. For a G chord play G, for C play C, for Em play E.' },
+          { type: 'fret', instrument: 'bass', notes: [[4, 3], [3, 3], [3, 5], [4, 0]], fingers: [2, 2, 4, 0], text: 'G (E string, 3rd fret), C (A string, 3rd fret), D (A string, 5th fret), E (open E).' },
+          { type: 'fret', instrument: 'bass', notes: [[4, 3], [3, 5], [4, 0], [3, 3]], fingers: [2, 4, 0, 2], text: 'The worship four, roots only: G, D, E, C.' },
+        ],
+      },
+      {
+        id: 'b-fifth',
+        title: 'Root and fifth',
+        steps: [
+          { type: 'info', fretboard: { instrument: 'bass', dots: [[4, 3, 'R'], [3, 5, '5']] }, text: 'The fifth is two frets up on the next string. Root-fifth is the classic country and gospel bass pattern: G then D.' },
+          { type: 'fret', instrument: 'bass', notes: [[4, 3], [3, 5], [4, 3], [3, 5], [3, 3], [2, 5], [3, 3], [2, 5]], fingers: [2, 4, 2, 4, 2, 4, 2, 4], text: 'G-D G-D, then C-G C-G.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'bass-playalong',
+    course: 'bass',
+    title: 'Play along in time',
+    icon: '⏱',
+    lessons: [
+      {
+        id: 'b-chart-gcd',
+        title: 'Roots in time: G, C, D',
+        steps: [
+          { type: 'info', text: 'Play the root on every beat (four per bar) and change on the bar line. Steady and even beats a lot of notes.' },
+          { type: 'chart', match: 'root', instrument: 'bass', chords: ['G', 'C', 'G', 'D', 'G', 'C', 'D', 'G'], beats: 4, bpm: 66, text: 'Roots of G, C, D with the click.' },
+        ],
+      },
+      { id: 'b-worship-flow', title: 'Play along: Worship Flow', steps: [{ type: 'chart', match: 'root', instrument: 'bass', song: 'worshipflow', bpm: 66, text: 'Roots of the 1-5-6-4: G, F# (for D/F#), E, C, then the chorus.' }] },
+      { id: 'b-amazing', title: 'Play along: Amazing Grace', steps: [{ type: 'chart', match: 'root', instrument: 'bass', song: 'amazing', bpm: 70, text: 'One root per bar on beat 1, let it ring: G, C, D in 3/4.' }] },
     ],
   },
 ];

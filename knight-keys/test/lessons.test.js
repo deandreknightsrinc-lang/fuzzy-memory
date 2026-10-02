@@ -5,6 +5,8 @@ import { SONGS, songToMidi } from '../js/songs.js';
 import { detectPitch, freqToMidi, freqToCents, centsFromTarget, midiToFreq, NoteTracker, SingJudge, RangeFinder, voiceType } from '../js/pitch.js';
 import { parseMidi, buildSong } from '../js/midi-file.js';
 import { laneOf, sameDrum } from '../js/drumkit.js';
+import { TUNINGS, CHORD_SHAPES, fretNote, chordShape, shapeNotes, chordTarget, chartTimeline, ChartJudge, rootPosition } from '../js/fretted.js';
+import { chromaFromSpectrum, chordFromChroma, chromaMatches } from '../js/pitch.js';
 import { makeChoirParts, choirMidi, guessChord, diatonicChord, PARTS } from '../js/choir.js';
 
 test('every lesson step is valid and points at real songs', () => {
@@ -14,7 +16,20 @@ test('every lesson step is valid and points at real songs', () => {
     ids.add(lesson.id);
     assert.ok(lesson.steps.length > 0);
     for (const step of lesson.steps) {
-      assert.ok(['info', 'notes', 'chords', 'song', 'sing', 'range', 'read', 'hits', 'groove'].includes(step.type), step.type);
+      assert.ok(['info', 'notes', 'chords', 'song', 'sing', 'range', 'read', 'hits', 'groove', 'fret', 'strum', 'chart'].includes(step.type), step.type);
+      if (step.type === 'fret') {
+        assert.ok(TUNINGS[step.instrument], `${lesson.id}: instrument`);
+        for (const [str, fret] of step.notes) assert.ok(TUNINGS[step.instrument][str] !== undefined && fret >= 0 && fret <= 12, `${lesson.id}: string ${str} fret ${fret}`);
+        if (step.fingers) assert.equal(step.fingers.length, step.notes.length);
+      }
+      if (step.type === 'strum' || (step.type === 'info' && step.chord)) for (const c of step.chords || [step.chord]) assert.ok(chordShape(c), `${lesson.id}: a shape for ${c}`);
+      if (step.type === 'chart') {
+        assert.ok(['chord', 'root'].includes(step.match));
+        const tl = chartTimeline(step, SONGS);
+        assert.ok(tl.windows.length >= 4, `${lesson.id}: chords to play`);
+        if (step.match === 'chord') for (const w of tl.windows) assert.ok(chordShape(w.symbol), `${lesson.id}: a shape for ${w.symbol}`);
+      }
+      if (step.type === 'sing' && step.tune) assert.deepEqual(step.notes, Object.values(TUNINGS[step.instrument]).sort((a, b) => a - b), `${lesson.id}: tunes every open string`);
       if (step.type === 'hits') {
         for (const h of step.hits) for (const n of [].concat(h)) assert.ok(laneOf(n) >= 0, `${lesson.id}: ${n} is a drum on the highway`);
         if (step.sticking) assert.equal(step.sticking.length, step.hits.length);
@@ -35,7 +50,7 @@ test('every lesson step is valid and points at real songs', () => {
         if (step.clef === 'bass') assert.ok(list.every((n) => n < 61), `${lesson.id}: bass clef notes stay on the bass staff`);
         else assert.ok(list.every((n) => n >= 60), `${lesson.id}: treble clef notes stay on the treble staff`);
       }
-      if (step.type === 'sing') {
+      if (step.type === 'sing' && !step.tune) {
         assert.ok(step.notes.length > 0 && step.notes.every((n) => n >= 40 && n <= 84), `${lesson.id}: singable notes`);
         if (step.names) assert.equal(step.names.length, step.notes.length, `${lesson.id}: a name for every note`);
       }
@@ -67,7 +82,10 @@ test('each course opens its own lessons', () => {
   assert.ok(reading[0].unlocked && reading.length >= 10, 'a reading course');
   const drums = pathState({}, 'drums');
   assert.ok(drums[0].unlocked && drums.length >= 12, 'a drum course');
-  assert.equal(piano.length + voice.length + reading.length + drums.length, ALL_LESSONS.length);
+  const guitar = pathState({}, 'guitar');
+  const bass = pathState({}, 'bass');
+  assert.ok(guitar[0].unlocked && guitar.length >= 10 && bass[0].unlocked && bass.length >= 8, 'guitar and bass courses');
+  assert.equal(piano.length + voice.length + reading.length + drums.length + guitar.length + bass.length, ALL_LESSONS.length);
 });
 
 test('the path opens one lesson at a time', () => {
@@ -228,4 +246,71 @@ test('drum timing judge', () => {
   assert.equal(j.missedBy(2.5), 1);
   assert.equal(j.accuracy, Math.round((100 * (2 - 0.5)) / 3));
   assert.equal(j.averageOffsetMs, 60);
+});
+
+test('guitar and bass: notes on the neck and chord shapes', () => {
+  assert.equal(fretNote('guitar', 6, 0), 40);
+  assert.equal(fretNote('guitar', 1, 3), 67, 'high E string, 3rd fret = G4');
+  assert.equal(fretNote('bass', 4, 3), 31, 'bass E string, 3rd fret = G1');
+  // Every shape sounds its chord: all notes are chord tones and the root is in it.
+  for (const [name, shape] of Object.entries(CHORD_SHAPES)) {
+    assert.equal(shape.frets.length, 6);
+    assert.equal(shape.fingers.length, 6);
+    const t = chordTarget(name);
+    const pcs = new Set(shapeNotes(shape).map((n) => n % 12));
+    assert.ok(pcs.has(t.root) && pcs.has(t.pcs[1]), `${name} has its root and third`);
+  }
+  assert.equal(chordShape('Gmaj7').name, 'G');
+  assert.equal(chordShape('Em7').name, 'Em');
+  assert.equal(chordShape('Bb'), null);
+  assert.deepEqual(rootPosition('bass', 7), [4, 3], 'G on the E string');
+  assert.deepEqual(rootPosition('bass', 0), [3, 3], 'C on the A string');
+  assert.equal(chordTarget('D/F#').bass, 6);
+});
+
+// A spectrum (dB per bin) with peaks at these notes and a few overtones.
+function spectrum(notes, sampleRate = 48000, fftSize = 8192) {
+  const db = new Float32Array(fftSize / 2).fill(-100);
+  for (const n of notes) {
+    const f0 = 440 * 2 ** ((n - 69) / 12);
+    [1, 2, 3].forEach((h, k) => {
+      const bin = Math.round((f0 * h * fftSize) / sampleRate);
+      if (bin < db.length - 1) db[bin] = Math.max(db[bin], -20 - k * 8);
+    });
+  }
+  return db;
+}
+
+test('chords from the microphone (chroma)', () => {
+  const sr = 48000;
+  const g = chromaFromSpectrum(spectrum(shapeNotes(CHORD_SHAPES.G)), sr);
+  assert.ok(Math.abs(g.reduce((a, b) => a + b, 0) - 1) < 1e-9);
+  assert.deepEqual([chordFromChroma(g).root, chordFromChroma(g).quality], [7, '']);
+  assert.ok(chromaMatches(g, 7, ''));
+  assert.ok(!chromaMatches(g, 0, ''), 'G is not C');
+  const em = chromaFromSpectrum(spectrum(shapeNotes(CHORD_SHAPES.Em)), sr);
+  assert.ok(chromaMatches(em, 4, 'm'));
+  const am = chromaFromSpectrum(spectrum(shapeNotes(CHORD_SHAPES.Am)), sr);
+  assert.ok(chromaMatches(am, 9, 'm') && !chromaMatches(am, 0, ''), 'Am, not C');
+  const d = chromaFromSpectrum(spectrum(shapeNotes(CHORD_SHAPES.D)), sr);
+  assert.ok(chromaMatches(d, 2, ''));
+  const sus = chromaFromSpectrum(spectrum(shapeNotes(CHORD_SHAPES.Dsus4)), sr);
+  assert.ok(chromaMatches(sus, 2, '', chordTarget('Dsus4').pcs), 'Dsus4');
+  assert.ok(!chromaMatches(g, 2, '', chordTarget('Dsus4').pcs), 'G is not Dsus4');
+});
+
+test('play-along charts and their judge', () => {
+  const tl = chartTimeline({ chords: ['G', 'C'], beats: 4, bpm: 60 });
+  assert.equal(tl.countIn, 4);
+  assert.deepEqual(tl.windows.map((w) => [w.symbol, w.start, w.end]), [['G', 4, 8], ['C', 8, 12]]);
+  const song = buildSong(parseMidi(tl.bytes));
+  assert.equal(song.notes.length, 12, 'a click on every beat, count-in included');
+  const j = new ChartJudge(tl.windows);
+  for (let t = 4; t < 8; t += 0.1) j.frame(t, t < 5.5); // G heard for the first part of its bar
+  for (let t = 8; t < 12; t += 0.1) j.frame(t, false);
+  assert.equal(j.done, 1);
+  assert.equal(j.accuracy, 50);
+  const wf = chartTimeline({ song: 'worshipflow', bpm: 66 }, SONGS);
+  assert.equal(wf.windows[1].symbol, 'D/F#');
+  assert.equal(wf.windows[1].bass, 6);
 });
