@@ -233,3 +233,15 @@ Unzip the files first (double-click each .zip).
    3. Open https://<kl-oracle-ip>:8443 in Safari or Chrome (Knight Keys with
       the AI ready), or in the website/plug-in press Ask > ⚙ and enter that
       address. In a lesson press "💬 Ask" and talk to your teacher.
+
+22. PUPPET STUDIO (PLAY A CHARACTER LIVE, WEBSITE)
+   In Church (or Ask the teacher) press "🎭 Puppet". Pick the character,
+   turn on "📷 Camera" and the character copies your face (head, eyes,
+   eyebrows, smile, mouth); "🎤 Voice" moves the mouth when you talk. Look
+   straight at the camera and press "🎯 Center". Hold keys 1-4 for
+   expressions (happy, surprised, wink, thinking); 5-8 pop a wave, praise
+   hands, music notes or a heart. "📺 Open puppet screen" opens the
+   character on a green screen: in OBS add a Window Capture of it with a
+   Chroma Key filter, then go live. Face tracking runs on the Mac (no video
+   leaves it) and needs Safari or Chrome on the website; the plug-in has
+   the keys only.

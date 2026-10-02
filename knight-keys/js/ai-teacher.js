@@ -168,14 +168,39 @@ export function teacherFaceSvg(t) {
     'professor-note': '<circle cx="60" cy="18" r="13" fill="#cfcfcf"/><path d="M30 42 Q60 14 90 42 Q84 26 60 24 Q36 26 30 42Z" fill="#cfcfcf"/>',
     'producer-nova': '<circle cx="60" cy="34" r="33" fill="#c95b8a"/><path d="M24 60 Q22 30 40 22" stroke="#222" stroke-width="7" fill="none"/><path d="M96 60 Q98 30 80 22" stroke="#222" stroke-width="7" fill="none"/>' }[t.id] || '';
   const glasses = t.id === 'maestro-k' || t.id === 'professor-note' ? '<g fill="none" stroke="#3b2a1a" stroke-width="2.5"><circle cx="47" cy="58" r="9"/><circle cx="73" cy="58" r="9"/><path d="M56 58 H64"/></g>' : '';
-  return `<svg class="t-face" viewBox="0 0 120 130" role="img" aria-label="${t.name}">
+  return `<svg class="t-face auto-blink" viewBox="0 0 120 130" role="img" aria-label="${t.name}">
   <circle cx="60" cy="68" r="58" fill="${t.color}" opacity=".25"/>
-  <rect x="34" y="104" width="52" height="30" rx="14" fill="${t.color}"/>
-  <ellipse cx="60" cy="64" rx="32" ry="38" fill="${skin}"/>
-  ${hair}
-  <g class="t-eyes"><ellipse cx="47" cy="58" rx="4" ry="4.5" fill="#1a1a1a"/><ellipse cx="73" cy="58" rx="4" ry="4.5" fill="#1a1a1a"/></g>
-  ${glasses}
-  <path d="M44 48 Q47 45 51 47 M69 47 Q73 45 76 48" stroke="#1a1a1a" stroke-width="2" fill="none"/>
-  <g class="t-mouth"><ellipse cx="60" cy="84" rx="10" ry="3" fill="#3a1414"/><path d="M50 82 Q60 90 70 82" stroke="#3a1414" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>
+  <g class="t-body"><rect x="34" y="104" width="52" height="30" rx="14" fill="${t.color}"/></g>
+  <g class="t-head">
+    <ellipse cx="60" cy="64" rx="32" ry="38" fill="${skin}"/>
+    ${hair}
+    <g class="t-eyes"><ellipse class="t-eye t-eye-l" cx="47" cy="58" rx="4" ry="4.5" fill="#1a1a1a"/><ellipse class="t-eye t-eye-r" cx="73" cy="58" rx="4" ry="4.5" fill="#1a1a1a"/></g>
+    ${glasses}
+    <path class="t-brows" d="M44 48 Q47 45 51 47 M69 47 Q73 45 76 48" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+    <g class="t-mouth"><ellipse cx="60" cy="84" rx="10" ry="3" fill="#3a1414"/><path class="t-smile" d="M50 82 Q60 90 70 82" stroke="#3a1414" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>
+  </g>
+  <text class="t-fx" x="96" y="30" font-size="22" text-anchor="middle"></text>
 </svg>`;
 }
+
+/**
+ * How the faces move (shared by the app and the puppet screen). Set these CSS
+ * variables on the face's parent: --mouth (0-1), --smile (0-1), --blinkL /
+ * --blinkR (0-1), --brow (-1..1), --turn and --nod (-1..1), --tilt (degrees).
+ */
+export const FACE_CSS = `
+.t-face { overflow: visible; }
+.t-face .t-head { transform-box: view-box; transform-origin: 60px 100px; transition: transform 60ms linear;
+  transform: translate(calc(var(--turn, 0) * 7px), calc(var(--nod, 0) * 5px)) rotate(calc(var(--tilt, 0) * 1deg)); }
+.t-face .t-body { transform-box: view-box; transform-origin: 60px 130px; transform: rotate(calc(var(--tilt, 0) * .3deg)); }
+.t-face .t-eye { transform-box: fill-box; transform-origin: center; transition: transform 50ms; }
+.t-face .t-eye-l { transform: translateX(calc(var(--turn, 0) * 2px)) scaleY(calc(1 - var(--blinkL, 0) * .92)); }
+.t-face .t-eye-r { transform: translateX(calc(var(--turn, 0) * 2px)) scaleY(calc(1 - var(--blinkR, 0) * .92)); }
+.t-face.auto-blink .t-eyes { transform-box: view-box; transform-origin: 60px 58px; animation: t-blink 4.5s infinite; }
+@keyframes t-blink { 0%, 95%, 100% { transform: scaleY(1); } 97% { transform: scaleY(.1); } }
+.t-face .t-brows { transform: translateY(calc(var(--brow, 0) * -4px)); transition: transform 80ms; }
+.t-face .t-mouth { transform-box: view-box; transform-origin: 60px 84px; transform: scale(calc(1 + var(--smile, 0) * .25), calc(1 + var(--mouth, 0) * 2.6)); transition: transform 70ms; }
+.t-face .t-smile { opacity: calc(.45 + var(--smile, 0) * .55); }
+.t-face .t-fx { animation: t-pop 1.2s ease-out forwards; }
+@keyframes t-pop { 0% { opacity: 0; transform: translateY(8px) scale(.6); } 25% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-14px); } }
+`;

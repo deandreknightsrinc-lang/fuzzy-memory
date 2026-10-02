@@ -7,7 +7,8 @@ import { TEACHERS, COURSE_TEACHERS, teacherById, characterBrief, characterFor } 
 import { BUNDLED_PACKS } from './course-packs.js';
 import { SEGMENT_TYPES, newService, validateService, stageFrame, invitePost, hostScript, loadServices, saveServices } from './church.js';
 import { renderStage, STAGE_CSS } from './stage-view.js';
-import { QUICK_ASKS, buildMessages, normalizeServer, listModels, askTeacher, loadAskHistory, saveAskHistory, teacherFaceSvg } from './ai-teacher.js';
+import { QUICK_ASKS, buildMessages, normalizeServer, listModels, askTeacher, loadAskHistory, saveAskHistory, teacherFaceSvg, FACE_CSS } from './ai-teacher.js';
+import { REST_POSE, poseFromBlendshapes, headAngles, poseFromHead, mouthFromLevel, smoothPose, GESTURES, combinePose, applyPose, PUPPET_BACKGROUNDS } from './puppet.js';
 import { STEP_TYPES, STEP_LABELS, newCourse, courseToPack, validateCourse, videoSource, lessonScript, scriptsCsv, loadCourses, saveCourses, loadVideos, saveVideos, saveVideoFile, loadVideoFile } from './courses.js';
 import { ROLES as BAND_ROLES, arrangeBand, bandMidi, chordsFromChart, songInBeats, transposeSymbol } from './band.js';
 import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_CHANNEL } from './synth.js';
@@ -3579,6 +3580,7 @@ function askContext() {
 
 function setMouth(v) {
   $('askFace').style.setProperty('--mouth', String(v));
+  puppet.askMouth = v; // the Puppet Studio can speak the answer too
 }
 
 function renderAskHeader() {
@@ -3773,6 +3775,270 @@ function initAsk() {
       rec.start();
     };
   }
+}
+
+// ---- Puppet Studio (live puppeteering) ----------------------------------------------
+//
+// A person plays a Knight Lyfe character live: the webcam (MediaPipe face tracking,
+// in the browser) moves the head, eyes, brows and mouth, the microphone moves the
+// mouth, and keys 1-8 add expressions and gestures. The puppet screen
+// (puppet.html) shows the character on a green screen for OBS or a projector.
+
+const puppet = {
+  teacher: TEACHERS[0], background: 'green', lower: true, lowerText: '', followAsk: true,
+  face: {}, head: { yaw: 0, pitch: 0, roll: 0 }, center: { yaw: 0, pitch: 0, roll: 0 },
+  pose: { ...REST_POSE }, voice: 0, askMouth: 0, held: null, heldUntil: 0,
+  camStream: null, landmarker: null, lastVideoTime: -1, lastFaceAt: 0,
+  micStream: null, micCtx: null, analyser: null, buf: null,
+  raf: 0, lastSent: '', nextBlink: 0, screenSeen: false,
+};
+const puppetChannel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('knight-puppet') : null;
+document.head.append(Object.assign(document.createElement('style'), { textContent: FACE_CSS }));
+
+function puppetSend(extra = {}) {
+  puppetChannel?.postMessage({ teacher: puppet.teacher.id, background: puppet.background, lower: puppet.lower ? puppet.lowerText || true : false, ...extra });
+}
+
+function renderPuppetFace() {
+  $('ppFace').innerHTML = teacherFaceSvg(puppet.teacher);
+  $('ppFace').querySelector('svg').classList.remove('auto-blink');
+  $('ppFace').style.background = PUPPET_BACKGROUNDS[puppet.background].css;
+  $('ppTeacher').value = puppet.teacher.id;
+  puppetSend();
+}
+
+function puppetStatus() {
+  const bits = [];
+  if (puppet.camStream) bits.push(puppet.landmarker ? (performance.now() - puppet.lastFaceAt < 500 ? '📷 Tracking your face' : '📷 Looking for your face…') : '📷 Loading face tracking…');
+  if (puppet.micStream) bits.push('🎤 Voice moves the mouth');
+  if (!bits.length) bits.push('Turn on 📷 Camera and/or 🎤 Voice, or use the keys.');
+  bits.push(puppet.screenSeen ? '📺 Puppet screen connected' : '📺 Puppet screen not open');
+  setText($('ppStatus'), bits.join(' · '));
+}
+
+async function loadLandmarker() {
+  const base = new URL('../vendor/mediapipe/', import.meta.url).href;
+  const { FaceLandmarker } = await import(`${base}vision_bundle.mjs`);
+  const fileset = { wasmLoaderPath: `${base}wasm/vision_wasm_internal.js`, wasmBinaryPath: `${base}wasm/vision_wasm_internal.wasm` };
+  const opts = (delegate) => ({
+    baseOptions: { modelAssetPath: `${base}face_landmarker.task`, delegate },
+    runningMode: 'VIDEO', numFaces: 1, outputFaceBlendshapes: true, outputFacialTransformationMatrixes: true,
+  });
+  try {
+    return await FaceLandmarker.createFromOptions(fileset, opts('GPU'));
+  } catch {
+    return FaceLandmarker.createFromOptions(fileset, opts('CPU'));
+  }
+}
+
+async function puppetToggleCamera() {
+  if (puppet.camStream) return puppetStopCamera();
+  try {
+    puppet.camStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: 'user' }, audio: false });
+  } catch (err) {
+    return toast(`Couldn't use the camera (${err.name === 'NotAllowedError' ? 'permission was denied' : err.message}).`);
+  }
+  const v = $('ppVideo');
+  v.srcObject = puppet.camStream;
+  v.dataset.on = '';
+  await v.play().catch(() => {});
+  $('ppCamera').classList.add('on');
+  puppetStatus();
+  if (!puppet.landmarker) {
+    try {
+      puppet.landmarker = await loadLandmarker();
+    } catch (err) {
+      console.warn('Face tracking unavailable', err);
+      toast('Face tracking couldn\'t start on this browser. Voice and keys still work.');
+      puppetStopCamera();
+    }
+  }
+  puppetStatus();
+}
+
+function puppetStopCamera() {
+  puppet.camStream?.getTracks().forEach((t) => t.stop());
+  puppet.camStream = null;
+  const v = $('ppVideo');
+  v.srcObject = null;
+  delete v.dataset.on;
+  puppet.face = {};
+  puppet.head = { yaw: 0, pitch: 0, roll: 0 };
+  $('ppCamera').classList.remove('on');
+  puppetStatus();
+}
+
+async function puppetToggleMic() {
+  if (puppet.micStream) return puppetStopMic();
+  try {
+    puppet.micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true }, video: false });
+  } catch (err) {
+    return toast(`Couldn't use the microphone (${err.name === 'NotAllowedError' ? 'permission was denied' : err.message}).`);
+  }
+  puppet.micCtx = new AudioContext();
+  const src = puppet.micCtx.createMediaStreamSource(puppet.micStream);
+  puppet.analyser = puppet.micCtx.createAnalyser();
+  puppet.analyser.fftSize = 1024;
+  puppet.buf = new Float32Array(puppet.analyser.fftSize);
+  src.connect(puppet.analyser);
+  $('ppMic').classList.add('on');
+  puppetStatus();
+}
+
+function puppetStopMic() {
+  puppet.micStream?.getTracks().forEach((t) => t.stop());
+  puppet.micCtx?.close();
+  puppet.micStream = puppet.micCtx = puppet.analyser = null;
+  puppet.voice = 0;
+  $('ppMic').classList.remove('on');
+  puppetStatus();
+}
+
+function puppetTrackFace(now) {
+  const v = $('ppVideo');
+  if (!puppet.landmarker || !puppet.camStream || v.readyState < 2 || v.currentTime === puppet.lastVideoTime) return;
+  puppet.lastVideoTime = v.currentTime;
+  const res = puppet.landmarker.detectForVideo(v, now);
+  const shapes = res.faceBlendshapes?.[0]?.categories;
+  if (!shapes) return;
+  puppet.lastFaceAt = now;
+  puppet.face = poseFromBlendshapes(shapes);
+  const m = res.facialTransformationMatrixes?.[0]?.data;
+  if (m) puppet.head = headAngles(m);
+}
+
+function puppetMicLevel() {
+  if (!puppet.analyser) return 0;
+  puppet.analyser.getFloatTimeDomainData(puppet.buf);
+  let sum = 0;
+  for (const x of puppet.buf) sum += x * x;
+  return mouthFromLevel(Math.sqrt(sum / puppet.buf.length));
+}
+
+function puppetLoop(now) {
+  puppet.raf = 0;
+  if (!$('puppetDlg').open) return;
+  puppetTrackFace(now);
+  puppet.voice = puppet.voice * 0.5 + puppetMicLevel() * 0.5;
+  const tracking = puppet.camStream && now - puppet.lastFaceAt < 500;
+  const c = puppet.center;
+  const face = tracking
+    ? { ...puppet.face, ...poseFromHead({ yaw: puppet.head.yaw - c.yaw, pitch: puppet.head.pitch - c.pitch, roll: puppet.head.roll - c.roll }) }
+    : { ...REST_POSE };
+  // Without the camera the character still blinks now and then.
+  if (!tracking) {
+    if (now > puppet.nextBlink + 140) puppet.nextBlink = now + 2500 + Math.random() * 3000;
+    if (now > puppet.nextBlink) face.blinkL = face.blinkR = 1;
+  }
+  if (puppet.held && puppet.heldUntil && now > puppet.heldUntil) setHeldGesture(null);
+  const voice = Math.max(puppet.voice, puppet.followAsk ? puppet.askMouth : 0);
+  puppet.pose = smoothPose(puppet.pose, combinePose(face, voice, puppet.held), 0.5);
+  applyPose($('ppFace'), puppet.pose);
+  const key = Object.values(puppet.pose).map((x) => x.toFixed(2)).join(',');
+  if (key !== puppet.lastSent) {
+    puppet.lastSent = key;
+    puppetChannel?.postMessage({ pose: puppet.pose });
+  }
+  if (Math.floor(now / 500) !== Math.floor((now - 17) / 500)) puppetStatus();
+  puppet.raf = requestAnimationFrame(puppetLoop);
+}
+
+function puppetFx(fx) {
+  const el = $('ppFace').querySelector('.t-fx');
+  if (el) {
+    el.textContent = fx;
+    el.style.animation = 'none';
+    void el.getBoundingClientRect();
+    el.style.animation = '';
+  }
+  puppetChannel?.postMessage({ fx });
+}
+
+function setHeldGesture(g, ms = 0) {
+  puppet.held = g;
+  puppet.heldUntil = g && ms ? performance.now() + ms : 0;
+  for (const b of $('ppGestures').children) b.classList.toggle('on', b.dataset.id === g?.id);
+}
+
+function triggerGesture(g, { hold = false, ms = 1500 } = {}) {
+  if (g.fx) return puppetFx(g.fx);
+  setHeldGesture(g, hold ? 0 : ms);
+}
+
+function openPuppet(teacherId) {
+  const dlg = $('puppetDlg');
+  if (teacherId) puppet.teacher = teacherById(teacherId);
+  if (!dlg.open) dlg.show();
+  renderPuppetFace();
+  puppetStatus();
+  if (!puppet.raf) puppet.raf = requestAnimationFrame(puppetLoop);
+}
+
+function initPuppet() {
+  const dlg = $('puppetDlg');
+  dlg.querySelector('[data-close]').onclick = () => {
+    puppetStopCamera();
+    puppetStopMic();
+    setHeldGesture(null);
+    dlg.close();
+  };
+  makeDraggable(dlg);
+  for (const t of TEACHERS) $('ppTeacher').append(new Option(`${t.emoji} ${t.name}`, t.id));
+  $('ppTeacher').onchange = () => openPuppet($('ppTeacher').value);
+  for (const [id, b] of Object.entries(PUPPET_BACKGROUNDS)) $('ppBg').append(new Option(b.label, id));
+  $('ppBg').onchange = () => {
+    puppet.background = $('ppBg').value;
+    renderPuppetFace();
+  };
+  $('ppLower').onchange = () => {
+    puppet.lower = $('ppLower').checked;
+    puppetSend();
+  };
+  $('ppLowerText').oninput = () => {
+    puppet.lowerText = $('ppLowerText').value.trim();
+    puppetSend();
+  };
+  $('ppFollowAsk').checked = puppet.followAsk;
+  $('ppFollowAsk').onchange = () => (puppet.followAsk = $('ppFollowAsk').checked);
+  $('ppCamera').onclick = puppetToggleCamera;
+  $('ppMic').onclick = puppetToggleMic;
+  $('ppCenter').onclick = () => {
+    puppet.center = { ...puppet.head };
+    toast('Centered: the character looks straight when you do.');
+  };
+  $('ppScreen').onclick = () => {
+    window.open('puppet.html', 'knight-puppet', 'width=1280,height=720');
+    setTimeout(() => puppetSend({ pose: puppet.pose }), 600);
+  };
+  for (const g of GESTURES) {
+    const b = document.createElement('button');
+    b.className = 'mini';
+    b.dataset.id = g.id;
+    b.innerHTML = `<kbd>${g.key}</kbd>`;
+    b.append(g.label);
+    b.onclick = () => triggerGesture(g);
+    $('ppGestures').append(b);
+  }
+  // Hold a number key for an expression (it lasts while held); gestures pop once.
+  document.addEventListener('keydown', (e) => {
+    if (!dlg.open || e.repeat || e.metaKey || e.ctrlKey || e.altKey || e.target.closest?.('input[type=text], textarea, [contenteditable]')) return;
+    const g = GESTURES.find((x) => x.key === e.key);
+    if (!g) return;
+    e.preventDefault();
+    e.stopPropagation();
+    triggerGesture(g, { hold: true });
+  }, true);
+  document.addEventListener('keyup', (e) => {
+    if (puppet.held && puppet.held.key === e.key && !puppet.heldUntil) setHeldGesture(null);
+  });
+  puppetChannel?.addEventListener('message', (e) => {
+    if (!e.data?.hello) return;
+    puppet.screenSeen = true;
+    puppetSend({ pose: puppet.pose });
+    puppetStatus();
+  });
+  $('askPuppet').onclick = () => openPuppet(ask.teacher?.id);
+  $('chPuppet').onclick = () => openPuppet();
 }
 
 // ---- Virtual Church -----------------------------------------------------------------
@@ -5682,6 +5948,16 @@ function initSongs() {
 }
 
 /** Floating tool windows move by their title bar. */
+// The tool window you open or click comes to the front.
+function windowToFront(dlg) {
+  for (const d of document.querySelectorAll('dialog.tool-window.front')) d.classList.remove('front');
+  dlg.classList.add('front');
+}
+for (const dlg of document.querySelectorAll('dialog.tool-window')) {
+  dlg.addEventListener('pointerdown', () => windowToFront(dlg), true);
+  new MutationObserver(() => dlg.open && windowToFront(dlg)).observe(dlg, { attributes: true, attributeFilter: ['open'] });
+}
+
 function makeDraggable(dlg) {
   const head = dlg.querySelector('.tool-head');
   head.addEventListener('pointerdown', (e) => {
@@ -6062,6 +6338,7 @@ initLyrics();
 initStudio();
 initChurch();
 initAsk();
+initPuppet();
 initConverter();
 initSongs();
 applyLayout();
