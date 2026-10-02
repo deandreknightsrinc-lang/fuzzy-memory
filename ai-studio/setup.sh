@@ -12,6 +12,8 @@
 #   - Studio tools: kk-stems (split a song into vocals/drums/bass/other),
 #     kk-master (master a track to match a reference), kk-lyrics (transcribe),
 #     kk-sheet (sheet music PDF/photo -> MusicXML + MIDI, with Audiveris)
+#   - Ask the teacher: Knight Keys over HTTPS at https://<ip>:8443, with the
+#     Knight Lyfe teacher characters answering through Ollama (/ollama)
 #   - A "studio" network folder for the Mac with drop-in folders that run the
 #     tools automatically (inbox -> outbox)
 #
@@ -279,6 +281,76 @@ EOF
 fi
 
 # ---- Done -------------------------------------------------------------------------
+# ---- Ask the teacher: Knight Keys + the AI over HTTPS (Caddy) ---------------------------
+# Browsers only let a secure (https) page talk to the AI and use the microphone,
+# so Caddy serves Knight Keys and passes /ollama to Ollama over HTTPS, with its
+# own certificate (trust it on the Mac once; the address is printed at the end).
+say "Setting up Ask the teacher (HTTPS for Knight Keys and the AI)"
+KK_SRC=/opt/knight-keys-src
+if command -v git >/dev/null; then
+    if [[ -d $KK_SRC/.git ]]; then
+        git -C "$KK_SRC" pull -q --ff-only >/dev/null 2>&1 && ok "Knight Keys updated" || warn "couldn't update Knight Keys (kept the copy you have)"
+    else
+        git clone -q --depth 1 https://github.com/deandreknightsrinc-lang/fuzzy-memory.git "$KK_SRC" >/dev/null 2>&1 \
+            && ok "Knight Keys downloaded" || warn "couldn't download Knight Keys (Ask the teacher still works from the website)"
+    fi
+fi
+if ! command -v caddy >/dev/null; then
+    apt-get install -y -qq debian-keyring debian-archive-keyring apt-transport-https gnupg >/dev/null 2>&1
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor --yes -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg 2>/dev/null \
+        && curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' > /etc/apt/sources.list.d/caddy-stable.list \
+        && apt-get update -qq >/dev/null 2>&1
+    apt-get install -y -qq caddy >/dev/null 2>&1 || warn "Caddy install failed (Ask the teacher needs it for HTTPS)"
+fi
+if command -v caddy >/dev/null; then
+    KK_IP=$(hostname -I | awk '{print $1}')
+    cat > /etc/caddy/Caddyfile <<EOF
+# Knight Lyfe AI Studio: Knight Keys and the teacher AI over HTTPS (made by setup.sh)
+{
+    local_certs
+}
+
+https://$KK_IP:8443, https://$(hostname):8443, https://localhost:8443 {
+    tls internal
+    # The AI: browsers' preflight checks get a yes; Ollama sees a local request.
+    @preflight {
+        method OPTIONS
+        path /ollama/*
+    }
+    handle @preflight {
+        header Access-Control-Allow-Origin "*"
+        header Access-Control-Allow-Methods "GET, POST, OPTIONS"
+        header Access-Control-Allow-Headers "Content-Type"
+        respond 204
+    }
+    handle_path /ollama/* {
+        header Access-Control-Allow-Origin "*"
+        reverse_proxy 127.0.0.1:11434 {
+            header_up -Origin
+            header_up Host 127.0.0.1:11434
+            flush_interval -1
+        }
+    }
+    handle {
+        root * $KK_SRC/knight-keys
+        file_server
+    }
+}
+
+# The certificate to trust on the Mac (download once).
+http://$KK_IP:8089 {
+    root * /var/lib/caddy/.local/share/caddy/pki/authorities/local
+    file_server browse
+}
+EOF
+    systemctl enable --now caddy >/dev/null 2>&1
+    systemctl reload caddy >/dev/null 2>&1 || systemctl restart caddy
+    for i in $(seq 1 20); do curl -fsk "https://127.0.0.1:8443/ollama/api/tags" -H "Host: localhost:8443" >/dev/null 2>&1 && break; sleep 1; done
+    curl -fsk "https://localhost:8443/ollama/api/tags" >/dev/null 2>&1 && ok "Ask the teacher at https://$KK_IP:8443" || warn "HTTPS isn't answering yet: check 'systemctl status caddy'"
+    # The teachers answer fastest with a small model kept loaded.
+    ollama list 2>/dev/null | grep -q '^llama3.2:3b' || { echo "  downloading the teachers' model llama3.2:3b..."; ollama pull llama3.2:3b >/dev/null || warn "could not download llama3.2:3b"; }
+fi
+
 IP=$(hostname -I | awk '{print $1}')
 say "Knight Lyfe AI Studio is ready"
 cat <<EOF
@@ -299,6 +371,14 @@ cat <<EOF
        inbox/sheet   -> sheet music (PDF, PNG, JPG): a MusicXML score (.mxl)
                         and a MIDI file appear in outbox/sheet; open them in
                         Knight Keys (Score > Open score) to hear and learn them
+
+  ASK THE TEACHER (Knight Lyfe characters answer live)
+     1. On the Mac, once: download http://$IP:8089/root.crt, double-click it,
+        open it in Keychain Access, set "When using this certificate" to
+        Always Trust, and close (type your Mac password).
+     2. Open https://$IP:8443 in Safari or Chrome: Knight Keys with the AI
+        ready (Lessons > Ask). Or on the website, press Ask > ⚙ and enter
+        https://$IP:8443
 
   IN TERMINAL (here)
      ollama run kk-mix          ask the mix engineer

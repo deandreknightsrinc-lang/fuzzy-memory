@@ -7,6 +7,7 @@ import { TEACHERS, COURSE_TEACHERS, teacherById, characterBrief, characterFor } 
 import { BUNDLED_PACKS } from './course-packs.js';
 import { SEGMENT_TYPES, newService, validateService, stageFrame, invitePost, hostScript, loadServices, saveServices } from './church.js';
 import { renderStage, STAGE_CSS } from './stage-view.js';
+import { QUICK_ASKS, buildMessages, normalizeServer, listModels, askTeacher, loadAskHistory, saveAskHistory, teacherFaceSvg } from './ai-teacher.js';
 import { STEP_TYPES, STEP_LABELS, newCourse, courseToPack, validateCourse, videoSource, lessonScript, scriptsCsv, loadCourses, saveCourses, loadVideos, saveVideos, saveVideoFile, loadVideoFile } from './courses.js';
 import { ROLES as BAND_ROLES, arrangeBand, bandMidi, chordsFromChart, songInBeats, transposeSymbol } from './band.js';
 import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_CHANNEL } from './synth.js';
@@ -2320,6 +2321,9 @@ function renderLessonMap() {
   const course = COURSES.find((c) => c.id === lessonCourse);
   const t = teacherForCourse(lessonCourse);
   info.append(teacherAvatar(t, 26), Object.assign(document.createElement('span'), { textContent: `Taught by ${t.name}${course?.by ? ` · by ${course.by}` : ''}` }));
+  const ask = Object.assign(document.createElement('button'), { className: 'mini ask-btn', textContent: `💬 Ask ${t.name}` });
+  ask.onclick = () => openAsk(t.id);
+  info.append(ask);
   const map = $('lpMap');
   map.innerHTML = '';
   const state0 = pathState(lessonProgress(), lessonCourse);
@@ -3521,6 +3525,254 @@ function startLessonFromStudio(lesson) {
   if (!dlg.open) dlg.show();
   lessonCourse = courseOfLesson(lesson);
   startLesson(lesson);
+}
+
+// ---- Ask the teacher -------------------------------------------------------------------
+//
+// The Knight Lyfe characters answer questions live, with what you're doing in
+// the lesson as context. Their brain is Ollama on kl-oracle (free and private);
+// answers stream in, can be spoken aloud, and the face's mouth moves as they talk.
+
+const AI_KEY = 'kk.ai';
+const ask = { cfg: { server: '', model: '', voice: true }, history: loadAskHistory(), busy: null, teacher: null, speaking: false };
+try {
+  Object.assign(ask.cfg, JSON.parse(localStorage.getItem(AI_KEY) || '{}'));
+} catch {
+  /* defaults */
+}
+const saveAskCfg = () => {
+  try {
+    localStorage.setItem(AI_KEY, JSON.stringify(ask.cfg));
+  } catch {
+    /* storage unavailable */
+  }
+};
+const askServer = () => normalizeServer(ask.cfg.server);
+const askLogKey = () => `${stage.current}:${ask.teacher.id}`;
+
+/** Where the student is right now, for the teacher to know. */
+function askContext() {
+  const ctx = { student: stagePlayer()?.name };
+  if (lessonRun.active && lessonRun.lesson) {
+    const courseId = courseOfLesson(lessonRun.lesson);
+    const unit = UNITS.find((u) => u.lessons.some((l) => l.id === (lessonRun.lesson.base || lessonRun.lesson).id));
+    ctx.course = COURSES.find((c) => c.id === courseId)?.name;
+    ctx.unit = unit?.title;
+    ctx.lesson = lessonRun.lesson.title;
+    const st = lessonRun.step;
+    if (st) {
+      const what = st.type === 'quiz' ? `quiz question "${st.question}" (choices: ${st.choices.join(', ')})` : `${STEP_LABELS[st.type] || st.type}: ${st.text || ''}`;
+      ctx.step = `step ${lessonRun.stepIdx + 1} of ${lessonRun.lesson.steps.length}, ${what}`;
+      const bits = [];
+      if (lessonRun.mistakes) bits.push(`${lessonRun.mistakes} wrong note${lessonRun.mistakes > 1 ? 's' : ''} so far on this step`);
+      if (lessonRun.done) bits.push('this step is finished');
+      const stars = lessonRun.stars.filter((x) => x > 0);
+      if (stars.length) bits.push(`earlier steps: ${stars.map((x) => `${x} star${x > 1 ? 's' : ''}`).join(', ')}`);
+      if (learn.enabled) bits.push(`learn mode: ${learn.correct} right, ${learn.wrong} wrong`);
+      ctx.progress = bits.join('; ');
+    }
+    ctx.feedback = $('lpFeedback').textContent.trim();
+  }
+  if (state.song) ctx.song = state.song.title || state.midiName;
+  return ctx;
+}
+
+function setMouth(v) {
+  $('askFace').style.setProperty('--mouth', String(v));
+}
+
+function renderAskHeader() {
+  const t = ask.teacher;
+  $('askFace').innerHTML = teacherFaceSvg(t);
+  setText($('askName'), `${t.name} · ${t.role}`);
+  const c = askContext();
+  setText($('askContext'), c.lesson ? `Knows you're on: ${c.lesson}` : 'Ask about music, your lessons, or practice.');
+  $('askTeacher').value = t.id;
+  $('askVoice').textContent = ask.cfg.voice ? '🔊 Voice on' : '🔇 Voice off';
+}
+
+function addAskMsg(role, text) {
+  const el = Object.assign(document.createElement('div'), { className: `ask-msg ${role}`, textContent: text });
+  $('askLog').append(el);
+  $('askLog').scrollTop = $('askLog').scrollHeight;
+  return el;
+}
+
+function renderAskLog() {
+  $('askLog').innerHTML = '';
+  const log = ask.history[askLogKey()] || [];
+  for (const m of log.slice(-12)) addAskMsg(m.role, m.content);
+  if (!log.length) addAskMsg('assistant', `${ask.teacher.style.hello} Ask me anything about what you're learning!`);
+}
+
+function speak(text) {
+  if (!ask.cfg.voice || typeof speechSynthesis === 'undefined') return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  const voices = speechSynthesis.getVoices().filter((v) => /^en/i.test(v.lang));
+  // Each character gets a steady voice: a different pick from the list per teacher.
+  if (voices.length) u.voice = voices[TEACHERS.findIndex((t) => t.id === ask.teacher.id) % voices.length];
+  u.rate = 1;
+  u.onboundary = () => {
+    setMouth(1);
+    setTimeout(() => setMouth(0.3), 110);
+  };
+  u.onend = () => {
+    ask.speaking = false;
+    setMouth(0);
+  };
+  ask.speaking = true;
+  speechSynthesis.speak(u);
+}
+
+async function sendAsk(question) {
+  question = question.trim();
+  if (!question || ask.busy) return;
+  const server = askServer();
+  addAskMsg('user', question);
+  $('askText').value = '';
+  if (!server) {
+    addAskMsg('error', 'The teachers\' AI server isn\'t set up yet. Press ⚙ and enter kl-oracle\'s address (see the AI Studio setup).');
+    $('askSettings').hidden = false;
+    return;
+  }
+  const key = askLogKey();
+  const log = (ask.history[key] ??= []);
+  const messages = buildMessages(ask.teacher, askContext(), log, question);
+  log.push({ role: 'user', content: question, at: Date.now() });
+  const out = addAskMsg('assistant', '…');
+  const ctrl = new AbortController();
+  ask.busy = ctrl;
+  $('askSend').hidden = true;
+  $('askStop').hidden = false;
+  let flap = 0;
+  try {
+    const answer = await askTeacher(server, ask.cfg.model || 'llama3.2:3b', messages, {
+      signal: ctrl.signal,
+      onText: (t) => {
+        out.textContent = t;
+        $('askLog').scrollTop = $('askLog').scrollHeight;
+        if (!ask.cfg.voice) setMouth((flap = 1 - flap)); // lips move with the words when there's no voice
+      },
+    });
+    out.textContent = answer || '(no answer)';
+    log.push({ role: 'assistant', content: answer, at: Date.now() });
+    saveAskHistory(ask.history);
+    speak(answer);
+  } catch (err) {
+    out.remove();
+    if (err.name === 'AbortError') addAskMsg('error', 'Stopped.');
+    else if (err instanceof TypeError) addAskMsg('error', `Couldn't reach the AI server at ${server}. Is kl-oracle on? If it's the first time on this Mac, open ${server.replace(/\/ollama$/, '')} in a tab once and trust its certificate.`);
+    else addAskMsg('error', `The AI server had a problem: ${err.message}`);
+  } finally {
+    ask.busy = null;
+    $('askSend').hidden = false;
+    $('askStop').hidden = true;
+    if (!ask.speaking) setMouth(0);
+  }
+}
+
+async function testAskServer() {
+  const server = askServer();
+  if (!server) return setText($('askStatus'), 'Enter kl-oracle\'s address first.');
+  setText($('askStatus'), `Connecting to ${server}…`);
+  try {
+    const models = await listModels(server);
+    const sel = $('askModel');
+    sel.innerHTML = '';
+    for (const m of models) sel.append(new Option(m, m));
+    if (!models.length) return setText($('askStatus'), 'Connected, but no models yet: run the AI Studio setup (it downloads them).');
+    ask.cfg.model = models.includes(ask.cfg.model) ? ask.cfg.model : models.find((m) => /llama3\.2/.test(m)) || models[0];
+    sel.value = ask.cfg.model;
+    saveAskCfg();
+    setText($('askStatus'), `✓ Connected: ${models.length} model${models.length > 1 ? 's' : ''}. Using ${ask.cfg.model}.`);
+  } catch (err) {
+    setText($('askStatus'), err instanceof TypeError ? `✗ Couldn't reach it. Is kl-oracle on, and did you trust its certificate (open ${server.replace(/\/ollama$/, '')} once)?` : `✗ ${err.message}`);
+  }
+}
+
+function openAsk(teacherId) {
+  const dlg = $('askDlg');
+  ask.teacher = teacherById(teacherId || lessonRun.teacher?.id || teacherForCourse(lessonCourse).id);
+  if (!dlg.open) dlg.show();
+  renderAskHeader();
+  renderAskLog();
+  $('askText').focus();
+}
+
+function initAsk() {
+  const dlg = $('askDlg');
+  dlg.querySelector('[data-close]').onclick = () => {
+    ask.busy?.abort();
+    if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
+    dlg.close();
+  };
+  makeDraggable(dlg);
+  for (const t of TEACHERS) $('askTeacher').append(new Option(`${t.emoji} ${t.name}`, t.id));
+  $('askTeacher').onchange = () => openAsk($('askTeacher').value);
+  $('lpAsk').onclick = () => openAsk(lessonRun.teacher?.id);
+  for (const q of QUICK_ASKS) {
+    const b = Object.assign(document.createElement('button'), { className: 'mini', textContent: q.label });
+    b.onclick = () => sendAsk(q.text);
+    $('askQuick').append(b);
+  }
+  $('askSend').onclick = () => sendAsk($('askText').value);
+  $('askText').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendAsk($('askText').value);
+  });
+  $('askStop').onclick = () => ask.busy?.abort();
+  $('askVoice').onclick = () => {
+    ask.cfg.voice = !ask.cfg.voice;
+    saveAskCfg();
+    if (!ask.cfg.voice && typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
+    renderAskHeader();
+  };
+  $('askSetup').onclick = () => {
+    $('askSettings').hidden = !$('askSettings').hidden;
+    if (!$('askSettings').hidden && askServer()) testAskServer();
+  };
+  $('askServer').value = ask.cfg.server || '';
+  $('askServer').onchange = () => {
+    ask.cfg.server = $('askServer').value.trim();
+    saveAskCfg();
+    testAskServer();
+  };
+  if (ask.cfg.model) $('askModel').append(new Option(ask.cfg.model, ask.cfg.model));
+  $('askModel').onchange = () => {
+    ask.cfg.model = $('askModel').value;
+    saveAskCfg();
+  };
+  $('askTest').onclick = testAskServer;
+  $('askHistory').onclick = () => {
+    $('askLog').innerHTML = '';
+    const log = ask.history[askLogKey()] || [];
+    if (!log.length) return addAskMsg('assistant', 'No conversations saved yet.');
+    for (const m of log) addAskMsg(m.role, `${m.at ? `${new Date(m.at).toLocaleString()}\n` : ''}${m.content}`);
+  };
+  // Ask out loud (Safari and Chrome can turn speech into text).
+  const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  $('askMic').hidden = !Rec;
+  if (Rec) {
+    let rec = null;
+    $('askMic').onclick = () => {
+      if (rec) return rec.stop();
+      rec = new Rec();
+      rec.lang = 'en-US';
+      rec.interimResults = true;
+      rec.onresult = (e) => {
+        const text = [...e.results].map((r) => r[0].transcript).join('');
+        $('askText').value = text;
+        if (e.results[e.results.length - 1].isFinal) sendAsk(text);
+      };
+      rec.onend = () => {
+        rec = null;
+        $('askMic').classList.remove('on');
+      };
+      rec.onerror = (e) => toast(`Couldn't hear you (${e.error}).`);
+      $('askMic').classList.add('on');
+      rec.start();
+    };
+  }
 }
 
 // ---- Virtual Church -----------------------------------------------------------------
@@ -5809,6 +6061,7 @@ initBand();
 initLyrics();
 initStudio();
 initChurch();
+initAsk();
 initConverter();
 initSongs();
 applyLayout();

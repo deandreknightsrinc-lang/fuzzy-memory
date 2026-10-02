@@ -779,3 +779,29 @@ dialog.church-window { width: min(1100px, calc(100vw - 24px)); left: max(12px, c
 .ch-runlist { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
 .ch-runlist button.on { border-color: var(--accent); background: rgba(79, 140, 255, .2); }
 @media (max-width: 900px) { .ch-cols { grid-template-columns: 1fr; } }
+
+/* Ask the teacher */
+dialog.ask-window { width: min(560px, calc(100vw - 24px)); right: 16px; left: auto; top: 70px; max-height: calc(100vh - 80px); }
+.ask-window .tool-head { display: flex; align-items: center; gap: 8px; }
+.ask-window .tool-head h2 { margin: 0; flex: 1; font-size: 17px; }
+.ask-top { display: flex; gap: 12px; align-items: center; }
+.ask-face { width: 104px; flex: none; }
+.ask-face svg { width: 100%; display: block; }
+.ask-name { font-size: 18px; font-weight: 800; }
+.ask-ai-note { opacity: .7; margin-top: 2px; }
+.t-face .t-eyes { transform-origin: 60px 58px; animation: t-blink 4.5s infinite; }
+@keyframes t-blink { 0%, 95%, 100% { transform: scaleY(1); } 97% { transform: scaleY(.1); } }
+.t-face .t-mouth { transform-origin: 60px 84px; transform: scaleY(calc(1 + var(--mouth, 0) * 2.6)); transition: transform 70ms; }
+.ask-settings { border: 1px solid var(--border); border-radius: 8px; padding: 8px; margin: 8px 0; }
+.ask-settings label.grow { display: flex; gap: 6px; align-items: center; }
+.ask-settings label.grow input { flex: 1; }
+.ask-log { display: grid; gap: 8px; max-height: 42vh; overflow: auto; margin: 10px 0; padding-right: 4px; }
+.ask-msg { padding: 8px 11px; border-radius: 12px; line-height: 1.45; white-space: pre-wrap; max-width: 88%; }
+.ask-msg.user { justify-self: end; background: rgba(79, 140, 255, .22); }
+.ask-msg.assistant { justify-self: start; background: #1d2130; }
+.ask-msg.error { justify-self: stretch; max-width: none; background: rgba(255, 120, 117, .12); color: #ffa39e; }
+.ask-quick { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+.ask-input { align-items: center; }
+.ask-input input { min-width: 0; }
+#askMic.on { background: #ff4d4f; border-color: #ff4d4f; color: #fff; }
+.ask-btn { border-color: #36cfc9; }

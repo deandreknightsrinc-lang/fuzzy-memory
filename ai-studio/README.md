@@ -24,6 +24,7 @@ run `pct resize 112 rootfs +60G` first. Running it again is safe.
 | **kk-stems** | Splits a song into vocals, drums, bass and other (Demucs) |
 | **kk-master** | Masters a mix to match a reference song you like (Matchering) |
 | **kk-lyrics** | Writes out the lyrics of a song (Whisper) |
+| **Ask the teacher** | Knight Keys and the AI over HTTPS at `https://<ip>:8443` (Caddy with its own certificate; `/ollama` passes to Ollama). The Knight Lyfe teacher characters answer students live from the Lessons window. Trust the certificate on the Mac once: `http://<ip>:8089/root.crt` |
 | **kk-sheet** | Reads printed sheet music (PDF, PNG, JPG) with [Audiveris](https://github.com/Audiveris/audiveris): writes a MusicXML score (`.mxl`) and a MIDI file. Open either in Knight Keys (📜 Score > Open score) |
 | **Studio folder** | `smb://<ip>/studio` in Finder (Go > Connect to Server). Drop songs in `inbox/stems`, `inbox/master` or `inbox/lyrics`, or sheet music in `inbox/sheet`, and the results appear in `outbox/`. The password is in `/root/kk-studio-credentials.txt`. |
 
