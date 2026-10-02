@@ -1,0 +1,1518 @@
+{
+ "shelves": [
+  {
+   "id": "ot",
+   "name": "Old Testament",
+   "about": "In every Christian Bible (the Hebrew Bible)."
+  },
+  {
+   "id": "apocrypha",
+   "name": "Apocrypha (1611 King James)",
+   "about": "Printed between the Testaments in the 1611 King James Bible. Most are part of Catholic and Orthodox Bibles; Protestant churches read them for history and instruction, not as Scripture."
+  },
+  {
+   "id": "nt",
+   "name": "New Testament",
+   "about": "In every Christian Bible."
+  },
+  {
+   "id": "ethiopian",
+   "name": "Ethiopian Bible",
+   "about": "Part of the Bible of the Ethiopian and Eritrean Orthodox Tewahedo Churches. Enoch is quoted in Jude 1:14-15."
+  },
+  {
+   "id": "historical",
+   "name": "Historical writings",
+   "about": "Not part of any church's Bible today. Read for history: they show what believers wrote and read in earlier times."
+  }
+ ],
+ "books": [
+  {
+   "id": "Gen",
+   "name": "Genesis",
+   "shelf": "ot",
+   "chapters": 50,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "gen",
+    "ge",
+    "gn"
+   ]
+  },
+  {
+   "id": "Exod",
+   "name": "Exodus",
+   "shelf": "ot",
+   "chapters": 40,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "exo",
+    "ex",
+    "exod"
+   ]
+  },
+  {
+   "id": "Lev",
+   "name": "Leviticus",
+   "shelf": "ot",
+   "chapters": 27,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "lev",
+    "le",
+    "lv"
+   ]
+  },
+  {
+   "id": "Num",
+   "name": "Numbers",
+   "shelf": "ot",
+   "chapters": 36,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "num",
+    "nu",
+    "nm",
+    "nb"
+   ]
+  },
+  {
+   "id": "Deut",
+   "name": "Deuteronomy",
+   "shelf": "ot",
+   "chapters": 34,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "deut",
+    "de",
+    "dt"
+   ]
+  },
+  {
+   "id": "Josh",
+   "name": "Joshua",
+   "shelf": "ot",
+   "chapters": 24,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "josh",
+    "jos",
+    "jsh"
+   ]
+  },
+  {
+   "id": "Judg",
+   "name": "Judges",
+   "shelf": "ot",
+   "chapters": 21,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "judg",
+    "jdg",
+    "jg",
+    "jdgs"
+   ]
+  },
+  {
+   "id": "Ruth",
+   "name": "Ruth",
+   "shelf": "ot",
+   "chapters": 4,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "rth",
+    "ru"
+   ]
+  },
+  {
+   "id": "1Sam",
+   "name": "1 Samuel",
+   "shelf": "ot",
+   "chapters": 31,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "1sam",
+    "1sa",
+    "1s",
+    "isamuel",
+    "1kingdoms"
+   ]
+  },
+  {
+   "id": "2Sam",
+   "name": "2 Samuel",
+   "shelf": "ot",
+   "chapters": 24,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "2sam",
+    "2sa",
+    "2s",
+    "iisamuel",
+    "2kingdoms"
+   ]
+  },
+  {
+   "id": "1Kgs",
+   "name": "1 Kings",
+   "shelf": "ot",
+   "chapters": 22,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "1kgs",
+    "1ki",
+    "1k",
+    "ikings",
+    "3kingdoms"
+   ]
+  },
+  {
+   "id": "2Kgs",
+   "name": "2 Kings",
+   "shelf": "ot",
+   "chapters": 25,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "2kgs",
+    "2ki",
+    "2k",
+    "iikings",
+    "4kingdoms"
+   ]
+  },
+  {
+   "id": "1Chr",
+   "name": "1 Chronicles",
+   "shelf": "ot",
+   "chapters": 29,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "1chr",
+    "1ch",
+    "ichronicles",
+    "1paralipomenon"
+   ]
+  },
+  {
+   "id": "2Chr",
+   "name": "2 Chronicles",
+   "shelf": "ot",
+   "chapters": 36,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "2chr",
+    "2ch",
+    "iichronicles",
+    "2paralipomenon"
+   ]
+  },
+  {
+   "id": "Ezra",
+   "name": "Ezra",
+   "shelf": "ot",
+   "chapters": 10,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "ezr"
+   ]
+  },
+  {
+   "id": "Neh",
+   "name": "Nehemiah",
+   "shelf": "ot",
+   "chapters": 13,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "neh",
+    "ne"
+   ]
+  },
+  {
+   "id": "Esth",
+   "name": "Esther",
+   "shelf": "ot",
+   "chapters": 16,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "esth",
+    "est",
+    "es"
+   ]
+  },
+  {
+   "id": "Job",
+   "name": "Job",
+   "shelf": "ot",
+   "chapters": 42,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "jb"
+   ]
+  },
+  {
+   "id": "Ps",
+   "name": "Psalms",
+   "shelf": "ot",
+   "chapters": 150,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "ps",
+    "psa",
+    "psalm",
+    "pss",
+    "psm"
+   ]
+  },
+  {
+   "id": "Prov",
+   "name": "Proverbs",
+   "shelf": "ot",
+   "chapters": 31,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "prov",
+    "pr",
+    "prv",
+    "pro"
+   ]
+  },
+  {
+   "id": "Eccl",
+   "name": "Ecclesiastes",
+   "shelf": "ot",
+   "chapters": 12,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "eccl",
+    "ecc",
+    "ec",
+    "qoh",
+    "qoheleth"
+   ]
+  },
+  {
+   "id": "Song",
+   "name": "Song of Solomon",
+   "shelf": "ot",
+   "chapters": 8,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "song",
+    "sos",
+    "so",
+    "canticles",
+    "songofsongs",
+    "cant"
+   ]
+  },
+  {
+   "id": "Isa",
+   "name": "Isaiah",
+   "shelf": "ot",
+   "chapters": 66,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "isa",
+    "is"
+   ]
+  },
+  {
+   "id": "Jer",
+   "name": "Jeremiah",
+   "shelf": "ot",
+   "chapters": 52,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "jer",
+    "je",
+    "jr"
+   ]
+  },
+  {
+   "id": "Lam",
+   "name": "Lamentations",
+   "shelf": "ot",
+   "chapters": 5,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "lam",
+    "la"
+   ]
+  },
+  {
+   "id": "Ezek",
+   "name": "Ezekiel",
+   "shelf": "ot",
+   "chapters": 48,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "ezek",
+    "eze",
+    "ezk"
+   ]
+  },
+  {
+   "id": "Dan",
+   "name": "Daniel",
+   "shelf": "ot",
+   "chapters": 14,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "dan",
+    "da",
+    "dn"
+   ]
+  },
+  {
+   "id": "Hos",
+   "name": "Hosea",
+   "shelf": "ot",
+   "chapters": 14,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "hos",
+    "ho"
+   ]
+  },
+  {
+   "id": "Joel",
+   "name": "Joel",
+   "shelf": "ot",
+   "chapters": 3,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "jl"
+   ]
+  },
+  {
+   "id": "Amos",
+   "name": "Amos",
+   "shelf": "ot",
+   "chapters": 9,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "am"
+   ]
+  },
+  {
+   "id": "Obad",
+   "name": "Obadiah",
+   "shelf": "ot",
+   "chapters": 1,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "obad",
+    "ob"
+   ]
+  },
+  {
+   "id": "Jonah",
+   "name": "Jonah",
+   "shelf": "ot",
+   "chapters": 4,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "jon",
+    "jnh"
+   ]
+  },
+  {
+   "id": "Mic",
+   "name": "Micah",
+   "shelf": "ot",
+   "chapters": 7,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "mic",
+    "mc"
+   ]
+  },
+  {
+   "id": "Nah",
+   "name": "Nahum",
+   "shelf": "ot",
+   "chapters": 3,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "nah",
+    "na"
+   ]
+  },
+  {
+   "id": "Hab",
+   "name": "Habakkuk",
+   "shelf": "ot",
+   "chapters": 3,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "hab",
+    "hb"
+   ]
+  },
+  {
+   "id": "Zeph",
+   "name": "Zephaniah",
+   "shelf": "ot",
+   "chapters": 3,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "zeph",
+    "zep",
+    "zp"
+   ]
+  },
+  {
+   "id": "Hag",
+   "name": "Haggai",
+   "shelf": "ot",
+   "chapters": 2,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "hag",
+    "hg"
+   ]
+  },
+  {
+   "id": "Zech",
+   "name": "Zechariah",
+   "shelf": "ot",
+   "chapters": 14,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "zech",
+    "zec",
+    "zc"
+   ]
+  },
+  {
+   "id": "Mal",
+   "name": "Malachi",
+   "shelf": "ot",
+   "chapters": 4,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "mal",
+    "ml"
+   ]
+  },
+  {
+   "id": "1Esd",
+   "name": "1 Esdras",
+   "shelf": "apocrypha",
+   "chapters": 9,
+   "versions": [
+    "kjv"
+   ],
+   "aliases": [
+    "1esd",
+    "1es",
+    "iesdras"
+   ]
+  },
+  {
+   "id": "2Esd",
+   "name": "2 Esdras",
+   "shelf": "apocrypha",
+   "chapters": 16,
+   "versions": [
+    "kjv"
+   ],
+   "aliases": [
+    "2esd",
+    "2es",
+    "iiesdras",
+    "4ezra"
+   ]
+  },
+  {
+   "id": "Tob",
+   "name": "Tobit",
+   "shelf": "apocrypha",
+   "chapters": 14,
+   "versions": [
+    "kjv",
+    "drc"
+   ],
+   "aliases": [
+    "tob",
+    "tb",
+    "tobias"
+   ]
+  },
+  {
+   "id": "Jdt",
+   "name": "Judith",
+   "shelf": "apocrypha",
+   "chapters": 16,
+   "versions": [
+    "kjv",
+    "drc"
+   ],
+   "aliases": [
+    "jdt",
+    "jdth"
+   ]
+  },
+  {
+   "id": "AddEsth",
+   "name": "Additions to Esther",
+   "shelf": "apocrypha",
+   "chapters": 16,
+   "versions": [
+    "kjv"
+   ],
+   "aliases": [
+    "addesth",
+    "adde",
+    "restofesther",
+    "greekesther"
+   ]
+  },
+  {
+   "id": "Wis",
+   "name": "Wisdom of Solomon",
+   "shelf": "apocrypha",
+   "chapters": 19,
+   "versions": [
+    "kjv",
+    "drc"
+   ],
+   "aliases": [
+    "wis",
+    "wisdom"
+   ]
+  },
+  {
+   "id": "Sir",
+   "name": "Sirach (Ecclesiasticus)",
+   "shelf": "apocrypha",
+   "chapters": 51,
+   "versions": [
+    "kjv",
+    "drc"
+   ],
+   "aliases": [
+    "sir",
+    "sirach",
+    "ecclesiasticus",
+    "ecclus"
+   ]
+  },
+  {
+   "id": "Bar",
+   "name": "Baruch",
+   "shelf": "apocrypha",
+   "chapters": 6,
+   "versions": [
+    "kjv",
+    "drc"
+   ],
+   "aliases": [
+    "bar"
+   ]
+  },
+  {
+   "id": "PrAzar",
+   "name": "Song of the Three Children",
+   "shelf": "apocrypha",
+   "chapters": 1,
+   "versions": [
+    "kjv"
+   ],
+   "aliases": [
+    "prazar",
+    "azariah",
+    "songofthree"
+   ]
+  },
+  {
+   "id": "Sus",
+   "name": "Susanna",
+   "shelf": "apocrypha",
+   "chapters": 1,
+   "versions": [
+    "kjv"
+   ],
+   "aliases": [
+    "sus"
+   ]
+  },
+  {
+   "id": "Bel",
+   "name": "Bel and the Dragon",
+   "shelf": "apocrypha",
+   "chapters": 1,
+   "versions": [
+    "kjv"
+   ],
+   "aliases": [
+    "bel"
+   ]
+  },
+  {
+   "id": "PrMan",
+   "name": "Prayer of Manasseh",
+   "shelf": "apocrypha",
+   "chapters": 1,
+   "versions": [
+    "kjv"
+   ],
+   "aliases": [
+    "prman",
+    "manasses",
+    "manasseh"
+   ]
+  },
+  {
+   "id": "1Macc",
+   "name": "1 Maccabees",
+   "shelf": "apocrypha",
+   "chapters": 16,
+   "versions": [
+    "kjv",
+    "drc"
+   ],
+   "aliases": [
+    "1macc",
+    "1mac",
+    "1ma",
+    "imaccabees"
+   ]
+  },
+  {
+   "id": "2Macc",
+   "name": "2 Maccabees",
+   "shelf": "apocrypha",
+   "chapters": 15,
+   "versions": [
+    "kjv",
+    "drc"
+   ],
+   "aliases": [
+    "2macc",
+    "2mac",
+    "2ma",
+    "iimaccabees"
+   ]
+  },
+  {
+   "id": "Matt",
+   "name": "Matthew",
+   "shelf": "nt",
+   "chapters": 28,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "matt",
+    "mt",
+    "mat"
+   ]
+  },
+  {
+   "id": "Mark",
+   "name": "Mark",
+   "shelf": "nt",
+   "chapters": 16,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "mk",
+    "mrk",
+    "mr"
+   ]
+  },
+  {
+   "id": "Luke",
+   "name": "Luke",
+   "shelf": "nt",
+   "chapters": 24,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "lk",
+    "luk"
+   ]
+  },
+  {
+   "id": "John",
+   "name": "John",
+   "shelf": "nt",
+   "chapters": 21,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "jn",
+    "jhn",
+    "joh"
+   ]
+  },
+  {
+   "id": "Acts",
+   "name": "Acts",
+   "shelf": "nt",
+   "chapters": 28,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "act",
+    "ac"
+   ]
+  },
+  {
+   "id": "Rom",
+   "name": "Romans",
+   "shelf": "nt",
+   "chapters": 16,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "rom",
+    "ro",
+    "rm"
+   ]
+  },
+  {
+   "id": "1Cor",
+   "name": "1 Corinthians",
+   "shelf": "nt",
+   "chapters": 16,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "1cor",
+    "1co",
+    "icorinthians"
+   ]
+  },
+  {
+   "id": "2Cor",
+   "name": "2 Corinthians",
+   "shelf": "nt",
+   "chapters": 13,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "2cor",
+    "2co",
+    "iicorinthians"
+   ]
+  },
+  {
+   "id": "Gal",
+   "name": "Galatians",
+   "shelf": "nt",
+   "chapters": 6,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "gal",
+    "ga"
+   ]
+  },
+  {
+   "id": "Eph",
+   "name": "Ephesians",
+   "shelf": "nt",
+   "chapters": 6,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "eph",
+    "ephes"
+   ]
+  },
+  {
+   "id": "Phil",
+   "name": "Philippians",
+   "shelf": "nt",
+   "chapters": 4,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "phil",
+    "php",
+    "pp"
+   ]
+  },
+  {
+   "id": "Col",
+   "name": "Colossians",
+   "shelf": "nt",
+   "chapters": 4,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "col"
+   ]
+  },
+  {
+   "id": "1Thess",
+   "name": "1 Thessalonians",
+   "shelf": "nt",
+   "chapters": 5,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "1thess",
+    "1th",
+    "ithessalonians"
+   ]
+  },
+  {
+   "id": "2Thess",
+   "name": "2 Thessalonians",
+   "shelf": "nt",
+   "chapters": 3,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "2thess",
+    "2th",
+    "iithessalonians"
+   ]
+  },
+  {
+   "id": "1Tim",
+   "name": "1 Timothy",
+   "shelf": "nt",
+   "chapters": 6,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "1tim",
+    "1ti",
+    "itimothy"
+   ]
+  },
+  {
+   "id": "2Tim",
+   "name": "2 Timothy",
+   "shelf": "nt",
+   "chapters": 4,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "2tim",
+    "2ti",
+    "iitimothy"
+   ]
+  },
+  {
+   "id": "Titus",
+   "name": "Titus",
+   "shelf": "nt",
+   "chapters": 3,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "tit",
+    "ti"
+   ]
+  },
+  {
+   "id": "Phlm",
+   "name": "Philemon",
+   "shelf": "nt",
+   "chapters": 1,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "phlm",
+    "phm",
+    "philem"
+   ]
+  },
+  {
+   "id": "Heb",
+   "name": "Hebrews",
+   "shelf": "nt",
+   "chapters": 13,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "heb"
+   ]
+  },
+  {
+   "id": "Jas",
+   "name": "James",
+   "shelf": "nt",
+   "chapters": 5,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "jas",
+    "jm"
+   ]
+  },
+  {
+   "id": "1Pet",
+   "name": "1 Peter",
+   "shelf": "nt",
+   "chapters": 5,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "1pet",
+    "1pe",
+    "1pt",
+    "ipeter"
+   ]
+  },
+  {
+   "id": "2Pet",
+   "name": "2 Peter",
+   "shelf": "nt",
+   "chapters": 3,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "2pet",
+    "2pe",
+    "2pt",
+    "iipeter"
+   ]
+  },
+  {
+   "id": "1John",
+   "name": "1 John",
+   "shelf": "nt",
+   "chapters": 5,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "1john",
+    "1jn",
+    "1jo",
+    "ijohn"
+   ]
+  },
+  {
+   "id": "2John",
+   "name": "2 John",
+   "shelf": "nt",
+   "chapters": 1,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "2john",
+    "2jn",
+    "iijohn"
+   ]
+  },
+  {
+   "id": "3John",
+   "name": "3 John",
+   "shelf": "nt",
+   "chapters": 1,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "3john",
+    "3jn",
+    "iiijohn"
+   ]
+  },
+  {
+   "id": "Jude",
+   "name": "Jude",
+   "shelf": "nt",
+   "chapters": 1,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "jud",
+    "jd"
+   ]
+  },
+  {
+   "id": "Rev",
+   "name": "Revelation",
+   "shelf": "nt",
+   "chapters": 22,
+   "versions": [
+    "kjv",
+    "bsb",
+    "asv",
+    "ylt",
+    "drc",
+    "geneva"
+   ],
+   "aliases": [
+    "rev",
+    "re",
+    "revelations",
+    "apocalypse"
+   ]
+  },
+  {
+   "id": "1En",
+   "name": "Enoch (1 Enoch)",
+   "shelf": "ethiopian",
+   "chapters": 108,
+   "versions": [
+    "charles"
+   ],
+   "aliases": [
+    "1en",
+    "enoch",
+    "1enoch"
+   ]
+  },
+  {
+   "id": "Jub",
+   "name": "Jubilees",
+   "shelf": "ethiopian",
+   "chapters": 50,
+   "versions": [
+    "charles-jub"
+   ],
+   "aliases": [
+    "jub",
+    "jubilees"
+   ]
+  },
+  {
+   "id": "Jasher",
+   "name": "Book of Jasher",
+   "shelf": "historical",
+   "chapters": 91,
+   "versions": [
+    "jasher-1840"
+   ],
+   "aliases": [
+    "jasher",
+    "jashar"
+   ]
+  }
+ ]
+}

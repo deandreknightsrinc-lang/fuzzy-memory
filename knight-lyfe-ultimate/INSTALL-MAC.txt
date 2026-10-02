@@ -245,3 +245,23 @@ Unzip the files first (double-click each .zip).
    Chroma Key filter, then go live. Face tracking runs on the Mac (no video
    leaves it) and needs Safari or Chrome on the website; the plug-in has
    the keys only.
+
+23. CHURCH PLATFORM (BAC MINISTRIES AND OTHER CHURCHES, WEBSITE)
+   The website's front page leads to BAC Ministries' church home: online
+   church, free music lessons with the AI teachers, band and choir
+   rehearsal, kids and giving. To fill in BAC's details, open "Free church
+   platform", press "Edit BAC Ministries", fill in the form, download
+   church.json and replace church/churches/bac-ministries.json. Another
+   church uses the same form ("New church") to get its own page, powered
+   by BAC Ministries.
+
+24. THE BIBLE (READ, LISTEN, WATCH)
+   On the church page press "Bible". Pick a version (King James with the
+   Apocrypha, Berean Standard Bible in modern English, and more), a book and
+   chapter, or type a reference like John 3:16. "Listen" reads it with a
+   voice cast; "Watch" shows it full screen. Enoch, Jubilees and Jasher
+   are on their own shelves, labeled.
+   To make the real audio Bible and videos, on kl-oracle run the AI Studio
+   setup again, then for example:  kl-bible make kjv John 3 --vertical
+   In the church setup, put https://<kl-oracle-ip>:8443/bible-media under
+   "Audio and video Bible server", and the Bible page plays them.

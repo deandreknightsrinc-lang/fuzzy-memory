@@ -28,11 +28,14 @@ jobs:
       - name: Run Knight Keys tests
         run: npm test
         working-directory: knight-keys
+      - name: Run Bible studio tests
+        run: python3 -m unittest discover ai-studio/bible
       - name: Collect site files
         run: |
           mkdir _site
           cp index.html _site/
           cp -r dashboard _site/
+          cp -r church _site/
           mkdir _site/knight-keys
           cp -r knight-keys/index.html knight-keys/stage.html knight-keys/puppet.html knight-keys/styles.css knight-keys/js knight-keys/samples knight-keys/vendor _site/knight-keys/
       - uses: actions/configure-pages@v5

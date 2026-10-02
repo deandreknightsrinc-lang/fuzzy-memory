@@ -827,3 +827,4 @@ dialog.puppet-window { width: min(640px, calc(100vw - 24px)); left: 16px; top: 7
 .pp-status { margin-top: 8px; min-height: 1.3em; }
 .pp-note { opacity: .65; }
 @media (max-width: 600px) { .pp-top { grid-template-columns: 1fr; } .pp-gestures { grid-template-columns: repeat(2, 1fr); } }
+.church-badge { margin-left: 4px; padding: 3px 9px; border-radius: 999px; font-size: 13px; font-weight: 700; color: #fff; text-decoration: none; background: var(--church, #7c3aed); white-space: nowrap; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }

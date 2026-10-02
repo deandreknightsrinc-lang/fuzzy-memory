@@ -14,6 +14,9 @@
 #     kk-sheet (sheet music PDF/photo -> MusicXML + MIDI, with Audiveris)
 #   - Ask the teacher: Knight Keys over HTTPS at https://<ip>:8443, with the
 #     Knight Lyfe teacher characters answering through Ollama (/ollama)
+#   - kl-bible: the dramatized audio Bible (AI voice cast) and cinematic Bible
+#     for the church app, served at https://<ip>:8443/bible-media
+#     (KK_IMAGES=1 also installs FLUX scene painting; best with a GPU)
 #   - A "studio" network folder for the Mac with drop-in folders that run the
 #     tools automatically (inbox -> outbox)
 #
@@ -331,6 +334,21 @@ https://$KK_IP:8443, https://$(hostname):8443, https://localhost:8443 {
             flush_interval -1
         }
     }
+    # The church platform (BAC Ministries and the Bible) and Knight Keys by name.
+    handle /church/* {
+        root * $KK_SRC
+        file_server
+    }
+    handle /knight-keys/* {
+        root * $KK_SRC
+        file_server
+    }
+    # The produced audio Bible and cinematic Bible (kl-bible), for the church app anywhere.
+    handle_path /bible-media/* {
+        header Access-Control-Allow-Origin "*"
+        root * $STUDIO/bible
+        file_server
+    }
     handle {
         root * $KK_SRC/knight-keys
         file_server
@@ -350,6 +368,27 @@ EOF
     # The teachers answer fastest with a small model kept loaded.
     ollama list 2>/dev/null | grep -q '^llama3.2:3b' || { echo "  downloading the teachers' model llama3.2:3b..."; ollama pull llama3.2:3b >/dev/null || warn "could not download llama3.2:3b"; }
 fi
+
+# ---- The Bible studio: dramatized audio Bible + cinematic Bible (kl-bible) --------------
+say "Setting up the Bible studio (kl-bible)"
+apt-get install -y -qq nodejs espeak-ng >/dev/null 2>&1 || warn "could not install nodejs/espeak-ng (kl-bible needs them)"
+"$TOOLS/bin/pip" install -q "kokoro>=0.9" soundfile >/dev/null 2>&1 && ok "Kokoro voices (the Bible's AI voice cast)" \
+    || warn "Kokoro voices failed to install (kl-bible can still draft with --engine flite)"
+if [[ "${KK_IMAGES:-0}" == 1 ]]; then
+    "$TOOLS/bin/pip" install -q diffusers transformers accelerate sentencepiece protobuf >/dev/null 2>&1 \
+        && ok "scene painting (FLUX.1-schnell downloads on first use, about 24 GB)" || warn "image tools failed to install"
+fi
+mkdir -p "$STUDIO/bible"
+cat > /usr/local/bin/kl-bible <<BIBLE
+#!/bin/bash
+# kl-bible make kjv John 3   - the dramatized audio Bible and cinematic Bible (see kl-bible --help)
+export KL_BIBLE_ROOT=$KK_SRC/church/bible KL_BIBLE_OUT=$STUDIO/bible
+exec $TOOLS/bin/python $KK_SRC/ai-studio/bible/kl_bible.py "\$@"
+BIBLE
+chmod 755 /usr/local/bin/kl-bible
+ollama list 2>/dev/null | grep -q '^qwen2.5:7b' || ollama pull qwen2.5:7b >/dev/null 2>&1 || warn "could not download qwen2.5:7b (kl-bible's casting director)"
+chown -R studio:studio "$STUDIO/bible" 2>/dev/null || true
+ok "kl-bible (try: kl-bible make kjv John 3)"
 
 IP=$(hostname -I | awk '{print $1}')
 say "Knight Lyfe AI Studio is ready"
@@ -379,6 +418,13 @@ cat <<EOF
      2. Open https://$IP:8443 in Safari or Chrome: Knight Keys with the AI
         ready (Lessons > Ask). Or on the website, press Ask > ⚙ and enter
         https://$IP:8443
+
+  THE BIBLE (audio Bible and cinematic Bible for the church app)
+     kl-bible make kjv John 3 --vertical    one chapter: voices, music, video
+     kl-bible book bsb Ruth                 a whole book
+     kl-bible shots kjv Gen 1               shot list for Runway/Kling/Veo
+     Results: the studio folder > bible, and https://$IP:8443/bible-media
+     The church's Bible page plays them: https://$IP:8443/church/bible.html
 
   IN TERMINAL (here)
      ollama run kk-mix          ask the mix engineer

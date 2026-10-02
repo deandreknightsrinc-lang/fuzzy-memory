@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bible</title>
+  <meta name="description" content="Read, listen to and watch the Bible: a dramatized audio Bible, a cinematic version, many versions and the extra books." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="bible.css" />
+</head>
+<body>
+  <header class="kc-top">
+    <a class="kc-brand" id="brand" href="./"><span class="kc-mark">✝</span><span id="brandName">Church</span></a>
+    <nav><a id="homeLink" href="./">Home</a></nav>
+  </header>
+
+  <main class="bb">
+    <div class="bb-bar">
+      <button class="bb-btn" id="pickBook" title="Books">📚 <span id="where">…</span></button>
+      <button class="bb-btn" id="prev" title="Previous chapter">‹</button>
+      <button class="bb-btn" id="next" title="Next chapter">›</button>
+      <select id="version" title="Version"></select>
+      <select id="compare" title="Compare with another version"><option value="">Compare…</option></select>
+      <form id="goForm" class="bb-go"><input id="goTo" placeholder="Go to… John 3:16" aria-label="Go to a reference" /></form>
+    </div>
+    <div id="shelfNote" class="bb-note" hidden></div>
+
+    <div class="bb-player">
+      <button class="bb-btn primary" id="listen">▶ Listen</button>
+      <select id="cast" title="Who reads">
+        <option value="cast">Full voice cast</option>
+        <option value="narrator">One voice</option>
+      </select>
+      <select id="speed" title="Speed">
+        <option value="0.85">Slower</option>
+        <option value="1" selected>Normal</option>
+        <option value="1.2">Faster</option>
+      </select>
+      <label class="bb-check"><input id="keepGoing" type="checkbox" checked /> Keep going</label>
+      <button class="bb-btn" id="watch">🎬 Watch</button>
+      <button class="bb-btn" id="production" title="For the media team: script, voices, scenes and shot lists">🎞 Production</button>
+      <span id="audioNote" class="bb-small"></span>
+      <audio id="audio" preload="none"></audio>
+    </div>
+
+    <article id="reader" class="bb-reader" aria-live="polite"></article>
+    <p class="bb-small bb-credit" id="credit"></p>
+  </main>
+
+  <dialog id="booksDlg" class="bb-dlg">
+    <div class="bb-dlg-head"><b>Books of the Bible</b><button class="bb-btn" data-close>✕</button></div>
+    <div id="shelves"></div>
+    <div id="chapters" class="bb-chapters" hidden></div>
+  </dialog>
+
+  <dialog id="prodDlg" class="bb-dlg bb-prod">
+    <div class="bb-dlg-head"><b>🎞 Production: <span id="prodWhere"></span></b><button class="bb-btn" data-close>✕</button></div>
+    <p class="bb-small">The dramatized script for this chapter: who reads each line. The Bible's words can't be changed here, only who says them. Download it for the AI Studio on kl-oracle, which records it with the AI voice cast and makes the cinematic video.</p>
+    <div id="prodCheck" class="bb-small"></div>
+    <div class="bb-prod-cols">
+      <div><h3>Script</h3><div id="prodLines" class="bb-lines"></div></div>
+      <div><h3>Scenes</h3><div id="prodScenes" class="bb-scenes"></div></div>
+    </div>
+    <div class="kc-actions">
+      <button class="bb-btn primary" id="dlScript">💾 Script for kl-oracle</button>
+      <button class="bb-btn" id="dlShots">🎬 Shot list (Runway, Kling, Veo…)</button>
+      <button class="bb-btn" id="dlShotsCsv">Shot list (spreadsheet)</button>
+      <button class="bb-btn" id="resetScript">↺ Start over</button>
+    </div>
+    <p class="bb-small">On kl-oracle: <code id="prodCmd"></code></p>
+  </dialog>
+
+  <div id="theater" class="bb-theater" hidden>
+    <div class="bb-scene" id="scene"></div>
+    <video id="movie" playsinline controls hidden></video>
+    <div class="bb-caption" id="caption">
+      <div class="bb-ref" id="capRef"></div>
+      <div class="bb-who" id="capWho"></div>
+      <div class="bb-words" id="capText"></div>
+    </div>
+    <div class="bb-theater-bar">
+      <button class="bb-btn" id="thPrev">‹</button>
+      <button class="bb-btn primary" id="thPlay">▶</button>
+      <button class="bb-btn" id="thNext">›</button>
+      <button class="bb-btn" id="thClose">✕ Close</button>
+    </div>
+  </div>
+
+  <script type="module" src="js/bible-app.js"></script>
+</body>
+</html>

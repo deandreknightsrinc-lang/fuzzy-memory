@@ -1,0 +1,52 @@
+{
+  "format": "knight-church",
+  "version": 1,
+  "id": "bac-ministries",
+  "name": "BAC Ministries",
+  "tagline": "Worship. Learn. Grow. Together.",
+  "about": "",
+  "color": "#7c3aed",
+  "accent": "#c9a227",
+  "logo": "",
+  "heroImage": "",
+  "leader": {
+    "name": "",
+    "title": "Pastor",
+    "photo": ""
+  },
+  "address": "",
+  "times": [],
+  "links": {
+    "live": "",
+    "giving": "",
+    "website": "",
+    "youtube": "",
+    "facebook": "",
+    "instagram": "",
+    "tiktok": "",
+    "email": "",
+    "phone": "",
+    "prayer": "",
+    "bibleMedia": ""
+  },
+  "programs": {
+    "online": true,
+    "bible": true,
+    "academy": true,
+    "band": true,
+    "courses": true,
+    "kids": true
+  },
+  "academy": [
+    "piano",
+    "voice",
+    "reading",
+    "drums",
+    "guitar",
+    "bass",
+    "worship-team"
+  ],
+  "sermons": [],
+  "events": [],
+  "poweredBy": true
+}

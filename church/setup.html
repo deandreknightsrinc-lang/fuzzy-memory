@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Church platform setup</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="su-wrap">
+    <form id="form" class="su-form" autocomplete="off">
+      <h1>✨ Your church's free platform</h1>
+      <p class="kc-small">Fill this in and watch your church's page build itself on the right: online church, free music lessons with the Knight Lyfe AI teachers, band and choir rehearsal, courses and giving, under your church's name. Free, from BAC Ministries.</p>
+      <div class="kc-actions">
+        <button type="button" class="su-mini" id="startBlank">New church</button>
+        <button type="button" class="su-mini" id="startBac">Edit BAC Ministries</button>
+        <button type="button" class="su-mini" id="openFile">Open church.json…</button>
+        <input id="fileInput" type="file" accept=".json,application/json" hidden />
+      </div>
+
+      <h2>Your church</h2>
+      <label>Church name <input data-k="name" maxlength="80" placeholder="e.g. Grace Chapel" /></label>
+      <label>Web name <input data-k="id" maxlength="48" placeholder="grace-chapel" /><span class="kc-small" id="idHint"></span></label>
+      <label>Tagline or welcome <input data-k="tagline" maxlength="140" placeholder="Welcome home. We're glad you're here." /></label>
+      <label>About your church <textarea data-k="about" maxlength="2000" placeholder="Your mission and story"></textarea></label>
+      <div class="su-row">
+        <label>Main color <input type="color" data-k="color" /></label>
+        <label>Button color <input type="color" data-k="accent" /></label>
+      </div>
+      <label>Logo (link to the image) <input data-k="logo" placeholder="https://…/logo.png" /></label>
+      <label>Big picture at the top (link) <input data-k="heroImage" placeholder="https://…/sanctuary.jpg" /></label>
+      <div class="su-row">
+        <label>Pastor / leader <input data-k="leader.name" maxlength="80" /></label>
+        <label>Title <input data-k="leader.title" maxlength="60" placeholder="Pastor" /></label>
+      </div>
+      <label>Pastor's photo (link) <input data-k="leader.photo" placeholder="https://…" /></label>
+
+      <h2>When and where</h2>
+      <div id="times" class="su-list"></div>
+      <button type="button" class="su-mini" id="addTime">+ Service time</button>
+      <label>Address <input data-k="address" maxlength="200" placeholder="123 Main St, City, State" /></label>
+
+      <h2>Links</h2>
+      <label>Live service (YouTube or Facebook Live link) <input data-k="links.live" /></label>
+      <label>Giving (Cash App, PayPal, Tithe.ly, …) <input data-k="links.giving" /></label>
+      <div class="su-row">
+        <label>YouTube <input data-k="links.youtube" /></label>
+        <label>Facebook <input data-k="links.facebook" /></label>
+        <label>Instagram <input data-k="links.instagram" /></label>
+        <label>TikTok <input data-k="links.tiktok" /></label>
+        <label>Email <input data-k="links.email" /></label>
+        <label>Phone <input data-k="links.phone" /></label>
+      </div>
+      <label>Prayer request form (link) <input data-k="links.prayer" /></label>
+      <label>Your current website <input data-k="links.website" /></label>
+      <label>Audio and video Bible server (optional) <input data-k="links.bibleMedia" placeholder="https://kl-oracle:8443/bible-media" /><span class="kc-small">Where your produced audio Bible and cinematic videos live (made by the AI Studio on kl-oracle). Without it, the Bible reads aloud with this device's voices.</span></label>
+
+      <h2>What you offer</h2>
+      <div id="programs"></div>
+      <div class="kc-small">Music academy courses:</div>
+      <div id="academy"></div>
+
+      <h2>Messages (sermons)</h2>
+      <div id="sermons" class="su-list"></div>
+      <button type="button" class="su-mini" id="addSermon">+ Message</button>
+
+      <h2>Coming up (events)</h2>
+      <div id="events" class="su-list"></div>
+      <button type="button" class="su-mini" id="addEvent">+ Event</button>
+
+      <h2>Help other churches</h2>
+      <label class="su-check"><input type="checkbox" data-k="poweredBy" /> Show "Powered by BAC Ministries" at the bottom, so other small churches can find this free platform</label>
+
+      <h2>Launch</h2>
+      <div id="errors" class="su-errors"></div>
+      <div id="todoBox"><div class="kc-small">To finish your page (optional):</div><ul id="todo" class="su-todo"></ul></div>
+      <div class="kc-actions">
+        <button type="button" class="su-mini su-primary" id="download">💾 Download church.json</button>
+        <button type="button" class="su-mini" id="tryIt">👀 Open my page on this device</button>
+      </div>
+      <div class="su-launch" style="margin-top:12px">
+        <div class="su-path">
+          <h3>1. Join the BAC Ministries church network (easiest)</h3>
+          BAC Ministries hosts your church's platform for free. Send your <b>church.json</b> to BAC Ministries<span id="joinHow"></span>; your page will be at <code id="netUrl"></code> and your church is listed in the network.
+        </div>
+        <div class="su-path">
+          <h3>2. Run it yourself (free, on GitHub)</h3>
+          <ol>
+            <li>Make a free GitHub account and fork the Knight Lyfe platform repository.</li>
+            <li>Put your file in <code>church/churches/</code> as <code id="fileName"></code>, and in <code>church/churches/index.json</code> set <code>"home"</code> to <code id="homeId"></code>.</li>
+            <li>In the fork's Settings → Pages, choose GitHub Actions. Your church's site: <code>https://&lt;your-account&gt;.github.io/&lt;repo&gt;/church/</code></li>
+          </ol>
+        </div>
+        <div class="su-path">
+          <h3>Your church in Knight Keys</h3>
+          The lessons, Band Room and Virtual Church open with your church's name and colors from your page (new services start with your name, colors, logo and giving link).
+        </div>
+      </div>
+      <p class="kc-small">Your answers are kept on this device as you type.</p>
+    </form>
+    <div class="su-preview">
+      <div class="su-bar"><span class="grow">Live preview</span><button type="button" class="su-mini" id="viewDesktop">🖥</button><button type="button" class="su-mini" id="viewPhone">📱</button></div>
+      <iframe id="preview" class="su-frame" src="index.html?preview" title="Preview of your church's page"></iframe>
+    </div>
+  </div>
+  <script type="module" src="js/setup.js"></script>
+</body>
+</html>
