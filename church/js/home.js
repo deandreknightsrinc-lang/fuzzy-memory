@@ -1,10 +1,8 @@
-// The church home page (church/index.html). Which church:
-//   ?c=<id>     a church on the network (churches/<id>.json)
-//   ?c=local    the church saved on this device by the setup
-//   (nothing)   the home church named in churches/index.json (BAC Ministries)
+// The church home page (church/index.html). Which church: see church-load.js.
 //   ?preview    the setup's live preview (the setup sends the church file)
 
-import { normalizeChurch, networkList, validateChurch, slugify, FLAGSHIP_ID } from './profile.js';
+import { normalizeChurch, networkList } from './profile.js';
+import { loadChurch } from './church-load.js';
 import { renderHome, themeCss } from './render.js';
 import { FACE_CSS } from '../../knight-keys/js/ai-teacher.js';
 
@@ -12,12 +10,6 @@ const params = new URLSearchParams(location.search);
 const root = document.getElementById('page');
 const theme = document.head.appendChild(document.createElement('style'));
 document.head.append(Object.assign(document.createElement('style'), { textContent: FACE_CSS }));
-
-async function getJson(url) {
-  const r = await fetch(url, { cache: 'no-cache' });
-  if (!r.ok) throw new Error(`${r.status}`);
-  return r.json();
-}
 
 function show(church, network) {
   const c = normalizeChurch(church);
@@ -32,38 +24,22 @@ function showError(text) {
 }
 
 async function main() {
-  let index = { home: FLAGSHIP_ID, churches: [] };
-  try {
-    index = await getJson('churches/index.json');
-  } catch {
-    // no directory: just the church itself
-  }
-  const network = networkList(index);
   if (params.has('preview')) {
+    let network = [];
+    try {
+      network = networkList(await (await fetch('churches/index.json')).json());
+    } catch {
+      network = [];
+    }
     window.addEventListener('message', (e) => {
       if (e.origin === location.origin && e.data?.church) show(e.data.church, network);
     });
     window.parent?.postMessage({ previewReady: true }, location.origin);
     return;
   }
-  const id = params.get('c') || index.home || FLAGSHIP_ID;
-  if (id === 'local') {
-    let saved = null;
-    try {
-      saved = JSON.parse(localStorage.getItem('kc.local') || 'null');
-    } catch {
-      saved = null;
-    }
-    if (!saved || validateChurch(saved).length) return showError('No church is saved on this device yet. Make one in the setup.');
-    return show(saved, network);
-  }
-  try {
-    const church = await getJson(`churches/${slugify(id)}.json`);
-    if (validateChurch(church).length) throw new Error('invalid');
-    show(church, network);
-  } catch {
-    showError(`We couldn't find the church "${id}" on this network.`);
-  }
+  const { church, network, error } = await loadChurch(params);
+  if (church) show(church, network);
+  else showError(error);
 }
 
 main();

@@ -2,7 +2,7 @@
 // it can be tested; every value from the file is escaped, since church files come
 // from many churches.
 
-import { PROGRAMS, ACADEMY_COURSES, FLAGSHIP_ID, normalizeChurch, safeUrl, embedFor, appLink } from './profile.js';
+import { PROGRAMS, ACADEMY_COURSES, FLAGSHIP_ID, normalizeChurch, safeUrl, embedFor, appLink, bibleLink } from './profile.js';
 import { teacherById } from '../../knight-keys/js/teachers.js';
 import { teacherFaceSvg } from '../../knight-keys/js/ai-teacher.js';
 
@@ -45,7 +45,7 @@ export function renderHome(raw, { network = [], app = '../knight-keys/', home = 
   // Top bar
   out.push(`<header class="kc-top">
   <a class="kc-brand" href="#top">${c.logo && safeUrl(c.logo) ? `<img src="${esc(safeUrl(c.logo))}" alt="" />` : '<span class="kc-mark">✝</span>'}<span>${name}</span></a>
-  <nav>${[p.online && '<a href="#watch">Watch</a>', (p.academy || p.band || p.courses) && '<a href="#learn">Learn</a>', (c.times.length || c.address) && '<a href="#visit">Visit</a>', L.giving && '<a href="#give">Give</a>'].filter(Boolean).join('')}</nav>
+  <nav>${[p.online && '<a href="#watch">Watch</a>', p.bible && `<a href="${esc(bibleLink(c))}">Bible</a>`, (p.academy || p.band || p.courses) && '<a href="#learn">Learn</a>', (c.times.length || c.address) && '<a href="#visit">Visit</a>', L.giving && '<a href="#give">Give</a>'].filter(Boolean).join('')}</nav>
 </header>`);
 
   // Hero
@@ -85,6 +85,17 @@ export function renderHome(raw, { network = [], app = '../knight-keys/', home = 
     <a class="kc-btn" href="${esc(appLink(c, 'church', app))}">⛪ Run a virtual service</a>
   </div>
   ${c.sermons.length > 1 ? `<div class="kc-sermons">${c.sermons.filter((s) => s !== latest).slice(0, 6).map((s) => `<div class="kc-sermon">${link(s.video, `▶ ${esc(s.title || 'Message')}`) || `<b>${esc(s.title)}</b>`}<small>${[s.speaker, s.date].filter(Boolean).map(esc).join(' · ')}</small></div>`).join('')}</div>` : ''}
+</section>`);
+  }
+
+  // The Bible
+  if (p.bible) {
+    const start = [['Gen.1', 'In the beginning', 'Genesis 1'], ['Ps.23', 'The Lord is my shepherd', 'Psalm 23'], ['John.3', 'For God so loved the world', 'John 3'], ['Rev.21', 'All things new', 'Revelation 21']];
+    out.push(`<section class="kc-section" id="bible">
+  <h2>${PROGRAMS.bible.icon} The Bible: read, listen, watch</h2>
+  <p>${esc(PROGRAMS.bible.text)}</p>
+  <div class="kc-bible">${start.map(([at, line, ref]) => `<a class="kc-verse" href="${esc(bibleLink(c, at))}"><b>${esc(line)}</b><small>${esc(ref)}</small></a>`).join('')}</div>
+  <div class="kc-actions"><a class="kc-btn primary" href="${esc(bibleLink(c))}">📖 Open the Bible</a><a class="kc-btn" href="${esc(bibleLink(c, 'listen'))}">🎧 Audio Bible</a><a class="kc-btn" href="${esc(bibleLink(c, 'watch'))}">🎬 Watch</a></div>
 </section>`);
   }
 

@@ -28,6 +28,8 @@ jobs:
       - name: Run Knight Keys tests
         run: npm test
         working-directory: knight-keys
+      - name: Run Bible studio tests
+        run: python3 -m unittest discover ai-studio/bible
       - name: Collect site files
         run: |
           mkdir _site

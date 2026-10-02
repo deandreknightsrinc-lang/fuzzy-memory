@@ -9,12 +9,43 @@
   "accent": "#c9a227",
   "logo": "",
   "heroImage": "",
-  "leader": { "name": "", "title": "Pastor", "photo": "" },
+  "leader": {
+    "name": "",
+    "title": "Pastor",
+    "photo": ""
+  },
   "address": "",
   "times": [],
-  "links": { "live": "", "giving": "", "website": "", "youtube": "", "facebook": "", "instagram": "", "tiktok": "", "email": "", "phone": "", "prayer": "" },
-  "programs": { "online": true, "academy": true, "band": true, "courses": true, "kids": true },
-  "academy": ["piano", "voice", "reading", "drums", "guitar", "bass", "worship-team"],
+  "links": {
+    "live": "",
+    "giving": "",
+    "website": "",
+    "youtube": "",
+    "facebook": "",
+    "instagram": "",
+    "tiktok": "",
+    "email": "",
+    "phone": "",
+    "prayer": "",
+    "bibleMedia": ""
+  },
+  "programs": {
+    "online": true,
+    "bible": true,
+    "academy": true,
+    "band": true,
+    "courses": true,
+    "kids": true
+  },
+  "academy": [
+    "piano",
+    "voice",
+    "reading",
+    "drums",
+    "guitar",
+    "bass",
+    "worship-team"
+  ],
   "sermons": [],
   "events": [],
   "poweredBy": true

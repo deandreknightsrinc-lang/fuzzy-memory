@@ -13,6 +13,7 @@ export const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Fr
 /** What a church can offer on its platform (shown as sections of its home page). */
 export const PROGRAMS = {
   online: { label: 'Online church', icon: '⛪', text: 'Worship with us live or watch past services.' },
+  bible: { label: 'Bible', icon: '📖', text: 'Read, listen to and watch the Bible: a dramatized audio Bible with a full voice cast, a cinematic version, many versions, and the books of the 1611 King James Apocrypha, the Ethiopian Bible and more.' },
   academy: { label: 'Music academy', icon: '🎹', text: 'Free piano, voice, drums, guitar and bass lessons with the Knight Lyfe AI teachers.' },
   band: { label: 'Band & choir rehearsal', icon: '🎶', text: 'Rehearse the songs for Sunday with AI musicians and an AI choir filling any empty spot.' },
   courses: { label: 'Courses', icon: '🎓', text: 'Worship team training and more courses for the whole church.' },
@@ -58,8 +59,8 @@ export function blankChurch(name = '') {
     leader: { name: '', title: 'Pastor', photo: '' },
     address: '',
     times: [{ day: 'Sunday', time: '11:00 AM', label: 'Worship service' }],
-    links: { live: '', giving: '', website: '', youtube: '', facebook: '', instagram: '', tiktok: '', email: '', phone: '', prayer: '' },
-    programs: { online: true, academy: true, band: true, courses: true, kids: false },
+    links: { live: '', giving: '', website: '', youtube: '', facebook: '', instagram: '', tiktok: '', email: '', phone: '', prayer: '', bibleMedia: '' },
+    programs: { online: true, bible: true, academy: true, band: true, courses: true, kids: false },
     academy: ACADEMY_COURSES.map((c) => c.id),
     sermons: [],
     events: [],
@@ -166,6 +167,11 @@ export function embedFor(url) {
   if (vm) return { kind: 'vimeo', src: `https://player.vimeo.com/video/${vm[1]}` };
   if (/\.(mp4|webm|m4v|mov)(\?|$)/i.test(s)) return { kind: 'file', src: s };
   return null;
+}
+
+/** The church's Bible page, optionally at a chapter: bible.html?c=bac-ministries#John.3 */
+export function bibleLink(c, at = '') {
+  return `bible.html${c?.id ? `?c=${encodeURIComponent(c.id)}` : ''}${at ? `#${at}` : ''}`;
 }
 
 /** Knight Keys, opened for this church (its name and colors) at a given place. */

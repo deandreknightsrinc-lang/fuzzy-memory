@@ -44,6 +44,10 @@ img { max-width: 100%; }
 .kc-sermon { display: grid; padding: 10px 12px; border-radius: 12px; background: var(--kc-card); border: 1px solid var(--kc-line); }
 .kc-sermon small { color: var(--kc-muted); }
 
+.kc-bible { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 16px; }
+.kc-verse { display: grid; gap: 2px; padding: 16px; border-radius: 16px; color: #fff; text-decoration: none; background: linear-gradient(135deg, var(--kc-color), color-mix(in srgb, var(--kc-color) 45%, #000)); font-family: Georgia, "Times New Roman", serif; }
+.kc-verse b { font-size: 19px; font-weight: 600; }
+.kc-verse small { opacity: .8; font-family: system-ui, sans-serif; }
 .kc-courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 16px; }
 .kc-course { display: grid; justify-items: center; text-align: center; padding: 14px 10px; border-radius: 16px; background: var(--kc-card); border: 1px solid var(--kc-line); color: var(--kc-text); text-decoration: none; transition: transform .15s, border-color .15s; }
 .kc-course:hover { transform: translateY(-2px); border-color: var(--kc-color); }
