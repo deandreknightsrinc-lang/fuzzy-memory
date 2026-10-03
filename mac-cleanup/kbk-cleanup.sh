@@ -9,6 +9,8 @@
 #                                         samples into your Sound Library, the rest to KBK-Offload
 #   bash kbk-cleanup.sh --documents     # go through Documents, biggest first, ask for each
 #   bash kbk-cleanup.sh --desktop       # same for the Desktop
+#   bash kbk-cleanup.sh --home          # your whole home folder: every file and folder of yours
+#                                         goes to the drive; what macOS and your apps need stays
 #   bash kbk-cleanup.sh --caches        # clear app caches (they rebuild themselves)
 #   bash kbk-cleanup.sh --snapshots     # remove local Time Machine snapshots (System Data)
 #   bash kbk-cleanup.sh --iphone-backups  # move iPhone/iPad backups to the drive
@@ -16,7 +18,7 @@
 # Options:
 #   --drive "/Volumes/NAME"   the external drive (default: KNIGHT LYFE INC - Data)
 #   --dry-run                 show what would happen, change nothing
-#   --yes                     move Downloads without asking about each item
+#   --yes                     move Downloads (or with --home, everything) without asking about each item
 #
 # Moving is copy, check, then delete: an item is only removed from the Mac
 # after its copy on the drive has the same number of files and the same
@@ -27,7 +29,7 @@ set -u
 DRIVE="/Volumes/KNIGHT LYFE INC - Data"
 DRY=0
 YES=0
-DO_LIBRARY=0 DO_DOWNLOADS=0 DO_DOCUMENTS=0 DO_DESKTOP=0 DO_CACHES=0 DO_SNAPSHOTS=0 DO_IPHONE=0
+DO_LIBRARY=0 DO_DOWNLOADS=0 DO_DOCUMENTS=0 DO_DESKTOP=0 DO_CACHES=0 DO_SNAPSHOTS=0 DO_IPHONE=0 DO_HOME=0
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -38,11 +40,12 @@ while [[ $# -gt 0 ]]; do
         --caches) DO_CACHES=1 ;;
         --snapshots) DO_SNAPSHOTS=1 ;;
         --iphone-backups) DO_IPHONE=1 ;;
+        --home) DO_HOME=1 ;;
         --all) DO_LIBRARY=1 DO_DOWNLOADS=1 DO_DOCUMENTS=1 DO_DESKTOP=1 DO_CACHES=1 DO_SNAPSHOTS=1 DO_IPHONE=1 ;;
         --drive) shift; DRIVE="${1:-}" ;;
         --dry-run) DRY=1 ;;
         --yes) YES=1 ;;
-        -h|--help) sed -n '2,25p' "$0"; exit 0 ;;
+        -h|--help) sed -n '2,27p' "$0"; exit 0 ;;
         *) echo "Unknown option: $1 (try --help)" >&2; exit 1 ;;
     esac
     shift
@@ -326,14 +329,17 @@ move_folder_contents() { # $1 = folder, $2 = name on the drive, $3 = ask each (1
         [[ -n "$lib" ]] && info "Stems go to your Sound Library's Stems folder, samples and packs to its Inbox." \
                         || info "Tip: run --sound-library first and stems/samples go straight into your own library."
     fi
+    local reason
     while IFS=$'\t' read -r kb p; do
+        reason="$(child_skip_reason "$p")"
+        if [[ -n "$reason" ]]; then info "stays:  $(basename "$p") - $reason"; continue; fi
         if [[ "$each" == 1 ]]; then
             ask "Move \"$(basename "$p")\" ($(human "$kb")) to the drive?" || continue
         fi
         if [[ "$name" == "Downloads" ]]; then
             move_item "$p" "$(destination_for "$p" "$lib")"
         else
-            move_item "$p" "$dest_dir"
+            move_item "$p" "$dest_dir" && [[ "$p" == *.photoslibrary && $DRY == 0 ]] && PHOTOS_MOVED="$dest_dir"
         fi
     done < "${TMPDIR:-/tmp}/kbk-items.$$"
     if [[ -n "$lib" && $DRY == 0 && -d "$lib/Inbox (drop new sounds here)" ]] && [[ -n "$(ls -A "$lib/Inbox (drop new sounds here)" 2>/dev/null | grep -v '^Unsorted$')" ]]; then
@@ -341,6 +347,110 @@ move_folder_contents() { # $1 = folder, $2 = name on the drive, $3 = ask each (1
         info "  bash \"$(cd "$HERE/../sound-library" 2>/dev/null && pwd)/organize-samples.sh\""
     fi
     rm -f "${TMPDIR:-/tmp}/kbk-items.$$"
+}
+
+# ---- the whole home folder ------------------------------------------------------------
+
+# These folders stay (macOS and Finder expect them); what's inside them moves.
+CONTENT_FOLDERS=" Desktop Documents Downloads Movies Music Pictures "
+PHOTOS_MOVED=""
+
+# The drive's format: apfs, hfs, exfat, msdos, ntfs ... (empty if unknown)
+drive_fs() {
+    mount 2>/dev/null | awk -v d="$DRIVE" '{ i = index($0, " on " d " (");
+        if (i) { s = substr($0, i + length(d) + 6); sub(/[,)].*/, "", s); print s; exit } }'
+}
+
+drive_takes_mac_packages() { # Photos libraries need a Mac-formatted drive
+    [[ $IS_MAC == 1 ]] || return 0
+    case "$(drive_fs)" in apfs|hfs|"") return 0 ;; esac
+    return 1
+}
+
+home_skip_reason() { # an item directly in ~ -> why it stays on the Mac (nothing = it can go)
+    local p="$1" name
+    name="$(basename "$p")"
+    [[ -L "$p" ]] && { echo "a link to somewhere else"; return; }
+    case "$name" in
+        Library) echo "app settings, passwords (keychain), Logic's presets: macOS needs it on the Mac" ;;
+        Applications) echo "apps stay on the Mac" ;;
+        Public) echo "used by macOS file sharing" ;;
+        fuzzy-memory|kbk-system) echo "your KBK tools run from here" ;;
+        Dropbox*|"Google Drive"*|OneDrive*|"Creative Cloud Files"*|"iCloud Drive"*|Box|"Box Sync"|"pCloud Drive")
+            echo "a cloud sync folder: moving files out of it deletes them from the cloud. Change its folder in that app's settings" ;;
+    esac
+}
+
+child_skip_reason() { # an item inside Music, Pictures, Documents ... -> why it stays (nothing = it can go)
+    local p="$1" name parent
+    name="$(basename "$p")"
+    parent="$(basename "$(dirname "$p")")"
+    [[ -L "$p" ]] && { echo "a link (it already points somewhere else)"; return; }
+    case "$parent/$name" in
+        "Music/Audio Music Apps") echo "Logic's own presets, patches and channel strips: Logic looks for them here" ;;
+        Music/Music|Music/iTunes) echo "the Music app's library: move its songs with the Music app (steps at the end)" ;;
+        "Music/KBK Voices") echo "AI Vox voices: the KBK helper reads them here" ;;
+        Movies/TV) echo "the TV app's library: move it with the TV app (steps at the end)" ;;
+        *.photoslibrary)
+            if ! drive_takes_mac_packages; then echo "Photos needs a drive formatted APFS or Mac OS Extended (this one is $(drive_fs))"
+            elif [[ $IS_MAC == 1 ]] && pgrep -x Photos >/dev/null 2>&1; then echo "Photos is open: quit it and run this again"; fi ;;
+        *.logicx)
+            if [[ $IS_MAC == 1 ]] && pgrep -f "Logic Pro" >/dev/null 2>&1; then echo "Logic is open: quit it and run this again"; fi ;;
+    esac
+}
+
+move_home() {
+    bold "Your home folder ($(short "$HOME")) to the drive"
+    info "Your files and folders go to the drive. What macOS and your apps need to run stays."
+    echo
+    local p name reason each=1
+    for p in "$HOME"/*; do
+        [[ -e "$p" || -L "$p" ]] || continue
+        name="$(basename "$p")"
+        reason="$(home_skip_reason "$p")"
+        if [[ -n "$reason" ]]; then
+            info "stays:  $name - $reason"
+        elif [[ "$CONTENT_FOLDERS" == *" $name "* ]]; then
+            info "moves:  everything in $name ($(human "$(kb_of "$p")")); the empty folder stays"
+        else
+            info "moves:  $name ($(human "$(kb_of "$p")"))  ->  KBK-Offload/Home"
+        fi
+    done
+    info "Hidden settings (the names starting with a dot) always stay."
+    if [[ $DRY == 0 && $YES == 0 ]]; then
+        ask "Go ahead? It asks about each item; add --yes to move them all without asking" || return 0
+    fi
+    [[ $DRY == 1 || $YES == 1 ]] && each=0
+    for name in $CONTENT_FOLDERS; do
+        move_folder_contents "$HOME/$name" "$name" "$each"
+    done
+    local header=0
+    for p in "$HOME"/*; do
+        [[ -e "$p" || -L "$p" ]] || continue
+        name="$(basename "$p")"
+        [[ "$CONTENT_FOLDERS" == *" $name "* || -n "$(home_skip_reason "$p")" ]] && continue
+        [[ $header == 1 ]] || { bold "Your other files and folders to the drive (KBK-Offload/Home)"; header=1; }
+        [[ $each == 1 ]] && { ask "Move \"$name\" ($(human "$(kb_of "$p")")) to the drive?" || continue; }
+        move_item "$p" "$DEST/Home"
+    done
+    home_notes
+}
+
+home_notes() {
+    bold "After the move"
+    info "Everything is on the drive in $DEST (Home, Documents, Desktop, Music ...)."
+    info "Drag that folder into Finder's sidebar to get to it in one click."
+    info "Apps' \"recent files\" lists still point to the old places: open things from the drive."
+    if [[ -n "$PHOTOS_MOVED" ]]; then
+        info "Photos: hold Option while you open Photos, click Other Library and choose the library in"
+        info "  $(short "$PHOTOS_MOVED"). If you use iCloud Photos: Photos > Settings > General > Use as System Photo Library."
+    fi
+    if [[ -d "$HOME/Music/Music" || -d "$HOME/Music/iTunes" ]]; then
+        info "Music app songs: Music > Settings > Files > Change... (pick a folder on the drive), then"
+        info "  File > Library > Organize Library > Consolidate files. Then delete the old Media folder in ~/Music/Music."
+    fi
+    [[ -d "$HOME/Movies/TV" ]] && info "TV app: TV > Settings > Files > Change..., then File > Library > Organize Library > Consolidate files."
+    info "Keep the drive plugged in when you open these files. New downloads: set the browsers to save to the drive (see the README)."
 }
 
 clear_caches() {
@@ -412,13 +522,17 @@ move_iphone_backups() {
 
 # ---- go -----------------------------------------------------------------------------
 
-ACTIONS=$((DO_LIBRARY + DO_DOWNLOADS + DO_DOCUMENTS + DO_DESKTOP + DO_CACHES + DO_SNAPSHOTS + DO_IPHONE))
+ACTIONS=$((DO_LIBRARY + DO_DOWNLOADS + DO_DOCUMENTS + DO_DESKTOP + DO_CACHES + DO_SNAPSHOTS + DO_IPHONE + DO_HOME))
 [[ $DRY == 1 ]] && bold "Dry run: nothing will change"
 report
-[[ $ACTIONS -eq 0 ]] && { echo; info "That was a report only. Add --downloads, --documents, --caches ... or --all (see --help)."; exit 0; }
+[[ $ACTIONS -eq 0 ]] && { echo; info "That was a report only. Add --downloads, --documents, --home, --caches ... or --all (see --help)."; exit 0; }
 
-if [[ $((DO_LIBRARY + DO_DOWNLOADS + DO_DOCUMENTS + DO_DESKTOP + DO_IPHONE)) -gt 0 ]]; then need_drive; fi
+if [[ $((DO_LIBRARY + DO_DOWNLOADS + DO_DOCUMENTS + DO_DESKTOP + DO_IPHONE + DO_HOME)) -gt 0 ]]; then need_drive; fi
 [[ $DO_LIBRARY == 1 ]] && build_sound_library
+if [[ $DO_HOME == 1 ]]; then # covers Downloads, Documents and Desktop too
+    move_home
+    DO_DOWNLOADS=0 DO_DOCUMENTS=0 DO_DESKTOP=0
+fi
 if [[ $DO_DOWNLOADS == 1 ]]; then
     if [[ $YES == 1 || $DRY == 1 ]] || ask "Move EVERYTHING in Downloads to $DEST/Downloads?"; then
         move_folder_contents "$HOME/Downloads" "Downloads" 0
