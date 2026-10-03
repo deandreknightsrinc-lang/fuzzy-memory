@@ -297,7 +297,7 @@ class Handler(BaseHTTPRequestHandler):
         if two and two not in ("vocals", "drums", "bass", "other"):
             raise HelperError(400, "two= must be vocals, drums, bass or other")
         if not tools()["demucs"]:
-            raise HelperError(500, "Demucs isn't installed. Run setup-helper.sh (it takes a while: it installs PyTorch).")
+            raise HelperError(500, "Demucs isn't installed. Run: bash setup-helper.sh --stems (it downloads PyTorch, about 2 GB).")
         d = self.job_dir()
         src = d / "song.wav"
         src.write_bytes(self.body())

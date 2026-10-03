@@ -239,9 +239,9 @@
     <label>Helper address <input id="helperUrl" type="url" placeholder="http://localhost:8765" /></label>
     <div class="actions"><button id="helperTest" class="primary">Connect</button><button data-close>Close</button></div>
     <h3>Start it on your Mac</h3>
-    <pre>cd fuzzy-memory/kbk-studio/server
-bash setup-helper.sh      # once: ffmpeg, yt-dlp, demucs
-python3 kbk_server.py     # then open http://localhost:8765</pre>
+    <pre>cd ~/fuzzy-memory/kbk-studio/server
+bash setup-helper.sh      # once: yt-dlp + ffmpeg (add --stems for Demucs)
+bash start-helper.sh      # then open http://localhost:8765</pre>
   </dialog>
 
   <div id="toasts" class="toasts" aria-live="polite"></div>
