@@ -1,0 +1,123 @@
+name: Build KBK Studio plug-in
+
+# Builds the KBK Studio 2 Logic Pro plug-in (AU), VST3 and standalone app for
+# Mac (Intel + Apple Silicon), validates the AU with Apple's auval, runs the
+# engine tests and uploads a download with an installer (see
+# kbk-studio-plugin/README.md). A Linux build runs the engine tests too.
+
+on:
+  push:
+    paths:
+      - 'kbk-studio-plugin/**'
+      - '.github/workflows/kbk-studio-plugin.yml'
+  pull_request:
+    paths:
+      - 'kbk-studio-plugin/**'
+      - '.github/workflows/kbk-studio-plugin.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kbk-plugin-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mac:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache JUCE download
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: kbk-juce-8.0.15-${{ runner.os }}
+
+      - name: Configure
+        run: cmake -S kbk-studio-plugin -B build -G Xcode -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build AU, VST3, standalone app and engine tests
+        run: cmake --build build --config Release --parallel 4
+
+      - name: Engine tests
+        run: build/KBKStudioTests_artefacts/Release/KBKStudioTests
+
+      - name: Check it is universal and runs on macOS 11+
+        run: |
+          BIN="build/KBKStudio_artefacts/Release/AU/KBK Studio 2.component/Contents/MacOS/KBK Studio 2"
+          archs=$(lipo -archs "$BIN"); echo "Architectures: $archs"
+          minos=$(otool -l "$BIN" | awk '/LC_BUILD_VERSION/{f=1} f&&/minos/{print $2; exit}'); echo "Minimum macOS: $minos"
+          [[ "$archs" == *arm64* && "$archs" == *x86_64* ]] || { echo "::error::not a universal binary"; exit 1; }
+          [[ "$minos" == "11.0" ]] || { echo "::error::minimum macOS is $minos, expected 11.0"; exit 1; }
+
+      - name: Sign (ad hoc) so Apple Silicon Macs can load it
+        run: |
+          cd "build/KBKStudio_artefacts/Release"
+          codesign --force --deep --sign - "AU/KBK Studio 2.component"
+          codesign --force --deep --sign - "VST3/KBK Studio 2.vst3"
+          codesign --force --deep --sign - "Standalone/KBK Studio 2.app"
+
+      - name: Validate the Audio Unit (auval)
+        run: |
+          mkdir -p ~/Library/Audio/Plug-Ins/Components
+          cp -R "build/KBKStudio_artefacts/Release/AU/KBK Studio 2.component" ~/Library/Audio/Plug-Ins/Components/
+          killall -9 AudioComponentRegistrar 2>/dev/null || true
+          sleep 3
+          auval -a | grep -i "Klyf" || true
+          auval -strict -v aumu Kbk2 Klyf
+
+      - name: Package
+        run: |
+          mkdir -p dist
+          cd "build/KBKStudio_artefacts/Release"
+          ditto -c -k --keepParent "AU/KBK Studio 2.component" "$GITHUB_WORKSPACE/dist/KBK Studio 2 (AU for Logic).zip"
+          ditto -c -k --keepParent "VST3/KBK Studio 2.vst3" "$GITHUB_WORKSPACE/dist/KBK Studio 2 (VST3).zip"
+          ditto -c -k --keepParent "Standalone/KBK Studio 2.app" "$GITHUB_WORKSPACE/dist/KBK Studio 2 (App).zip"
+          cp "$GITHUB_WORKSPACE/kbk-studio-plugin/install.sh" "$GITHUB_WORKSPACE/kbk-studio-plugin/README.md" "$GITHUB_WORKSPACE/dist/"
+
+      - name: Test the installer the way a user runs it
+        run: |
+          rm -rf ~/Library/Audio/Plug-Ins/Components/"KBK Studio 2.component"
+          bash dist/install.sh
+          test -d "/Library/Audio/Plug-Ins/Components/KBK Studio 2.component"
+          test -d "/Library/Audio/Plug-Ins/VST3/KBK Studio 2.vst3"
+          test -d "/Applications/KBK Studio 2.app"
+          codesign --verify --deep "/Library/Audio/Plug-Ins/Components/KBK Studio 2.component"
+          auval -v aumu Kbk2 Klyf | grep "AU VALIDATION SUCCEEDED"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KBK-Studio-macOS
+          path: dist/
+          retention-days: 30
+
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ninja-build libasound2-dev libfreetype-dev libfontconfig1-dev \
+            libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev \
+            libxrender-dev libgtk-3-dev libcurl4-openssl-dev
+
+      - name: Cache JUCE download
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: kbk-juce-8.0.15-${{ runner.os }}
+
+      - name: Configure
+        run: cmake -S kbk-studio-plugin -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build VST3, standalone app and engine tests
+        run: cmake --build build --parallel 4
+
+      - name: Engine tests
+        run: build/KBKStudioTests_artefacts/Release/KBKStudioTests
