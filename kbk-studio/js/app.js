@@ -2,7 +2,7 @@
 import { Engine } from './engine.js';
 import {
   peaks, slice, clipDuration, encodeWav, encodeAiff, encodeMp3, mp3Rate, decodeWav, normalize, trimSilence,
-  toMono, toStereo, detectOnsets, equalStarts, chop, safeFileName, formatTime, fadeEdges,
+  toMono, toStereo, detectOnsets, equalStarts, autoChop, chopRanges, safeFileName, formatTime, fadeEdges,
 } from './audio-utils.js';
 import { normalizeAudioUrl, isMixedContent, filenameFromUrl, sniffAudio } from './url-tools.js';
 import {
@@ -230,8 +230,19 @@ function selectPad(i) {
 const saveTimers = {};
 function persistPad(i) {
   clearTimeout(saveTimers[i]);
-  saveTimers[i] = setTimeout(() => store.savePad(i, engine.pads[i]).catch(() => {}), 300);
+  saveTimers[i] = setTimeout(() => persistNow(i), 300);
 }
+
+function persistNow(i) {
+  clearTimeout(saveTimers[i]);
+  delete saveTimers[i];
+  return store.savePad(i, engine.pads[i]).catch(() => {});
+}
+
+// don't lose a just-made change when the tab is closed or hidden
+function flushSaves() { for (const k of Object.keys(saveTimers)) persistNow(Number(k)); }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushSaves(); });
+window.addEventListener('pagehide', flushSaves);
 
 function setPad(i, patch) {
   engine.setPad(i, patch);
@@ -246,6 +257,59 @@ function loadOntoPad(i, clip, name) {
   persistPad(i);
   refreshPads();
   if (i === state.selected) renderEditor();
+}
+
+// ---- chop across the pads ----
+// how: 'auto' (smart), 'hits', or a slice count. Returns null for a one-shot.
+function spreadToPads(clip, how = 'auto') {
+  const dur = clipDuration(clip);
+  let kind = 'loop', bpm = 0, ranges;
+  if (how === 'auto') ({ kind, bpm, ranges } = autoChop(clip));
+  else {
+    const st = how === 'hits' ? detectOnsets(clip, { max: 16 }) : equalStarts(clip, Number(how));
+    ranges = st.map((a, i) => [a, i + 1 < st.length ? st[i + 1] : dur]);
+  }
+  if (kind === 'oneshot') return null;
+  engine.ensure();
+  engine.stopAll();
+  state.undoKit = engine.pads.map((p) => ({ ...p }));
+  const parts = chopRanges(clip, ranges, clip.name);
+  const cut = $('chopCut').checked;
+  for (let i = 0; i < 16; i++) {
+    if (i < parts.length) {
+      engine.loadPad(i, parts[i], parts[i].name);
+      engine.setPad(i, { mode: 'oneshot', choke: cut ? 4 : 0, tune: 0, gain: 0.8 });
+    } else engine.clearPad(i);
+    persistNow(i);
+  }
+  $('undoChop').hidden = false;
+  selectPad(0);
+  return { kind, bpm, ranges, count: parts.length };
+}
+
+function chopMessage(r, name) {
+  const how = r.kind === 'song' ? ` (${Math.round(r.bpm)} BPM, one bar each, picked from across the whole song)` : r.kind === 'loop' ? ' at the hits' : '';
+  return `Chopped "${name}" into ${r.count} pads${how}. Play them from your keyboard or pads.`;
+}
+
+function undoChop() {
+  if (!state.undoKit) return;
+  engine.stopAll();
+  state.undoKit.forEach((p, i) => { engine.pads[i] = p; engine.rebuild(i); persistNow(i); });
+  state.undoKit = null;
+  $('undoChop').hidden = true;
+  refreshPads(); renderEditor();
+  toast('Pads put back the way they were');
+}
+
+// Loads a clip the way the Auto-chop switch says: spread or one pad.
+function placeClip(clip, i, name) {
+  if ($('autoChop').checked) {
+    const r = spreadToPads(clip);
+    if (r) { const msg = chopMessage(r, name || clip.name); editorStatus(msg, 'ok'); toast(msg, 'ok'); return; }
+  }
+  loadOntoPad(i, clip, name);
+  editorStatus(`Pad ${i + 1}: ${name || clip.name} (${formatTime(clipDuration(clip))})`, 'ok');
 }
 
 function renderEditor() {
@@ -287,8 +351,7 @@ async function loadFileToPad(file, i) {
   editorStatus(`Loading ${file.name}…`);
   try {
     const clip = await decodeBytes(await file.arrayBuffer(), file.name);
-    loadOntoPad(i, clip, safeFileName(file.name));
-    editorStatus(`Pad ${i + 1}: ${file.name} (${formatTime(clipDuration(clip))})`, 'ok');
+    placeClip(clip, i, safeFileName(file.name));
   } catch (err) {
     editorStatus(err.message, 'err');
   }
@@ -298,8 +361,7 @@ async function loadUrlToPad(url, i) {
   editorStatus('Reading link…');
   try {
     const { clip } = await readUrl(url, (msg) => editorStatus(msg));
-    loadOntoPad(i, clip, clip.name);
-    editorStatus(`Pad ${i + 1}: ${clip.name} (${formatTime(clipDuration(clip))})`, 'ok');
+    placeClip(clip, i, clip.name);
   } catch (err) {
     editorStatus(err.message, 'err');
   }
@@ -321,8 +383,16 @@ function wireEditor() {
   $('edFile').onchange = (e) => { const f = e.target.files[0]; if (f) loadFileToPad(f, sel()); e.target.value = ''; };
   $('edFromLib').onchange = (e) => {
     const entry = state.library.find((x) => x.id === e.target.value);
-    if (entry) { loadOntoPad(sel(), entry.clip, entry.name); editorStatus(`Pad ${sel() + 1}: ${entry.name}`, 'ok'); }
+    if (entry) placeClip(entry.clip, sel(), entry.name);
   };
+  $('edChop').onclick = () => {
+    const p = engine.pads[sel()];
+    if (!p.clip) { editorStatus('Load a song or loop on this pad first.', 'err'); return; }
+    const r = spreadToPads(p.clip, clipDuration(p.clip) <= 1.5 ? 'hits' : 'auto');
+    if (r) { const msg = chopMessage(r, p.name || p.clip.name); editorStatus(msg, 'ok'); toast(msg, 'ok'); }
+  };
+  $('undoChop').onclick = undoChop;
+  for (const id of ['autoChop', 'chopCut']) $(id).onchange = (e) => store.setSetting(id, e.target.checked);
   $('edClear').onclick = () => { engine.clearPad(sel()); store.savePad(sel(), engine.pads[sel()]).catch(() => {}); refreshPads(); renderEditor(); editorStatus(''); };
   $('edLearn').onclick = () => { state.learnPad = state.learnPad === sel() ? -1 : sel(); refreshPads(); renderEditor(); if (state.learnPad >= 0) toast(`Press the key or pad that should play pad ${sel() + 1}`); };
   $('edDownload').onclick = () => {
@@ -612,6 +682,7 @@ async function doRead() {
     const { clip, url } = await readUrl(input, (m) => readerLog(m));
     readerLog(`Ready: ${clip.name}, ${formatTime(clipDuration(clip))}, ${clip.channels.length === 1 ? 'mono' : 'stereo'}, ${clip.sampleRate} Hz.`, 'ok');
     setReader(clip, url);
+    if ($('rdAuto').checked) chopReader('auto');
   } catch (err) {
     readerLog(err.message, 'err');
   } finally {
@@ -641,6 +712,25 @@ function readerSelection() {
   const whole = a === 0 && b >= clipDuration(state.reader.clip) - 1e-6;
   c.name = whole ? state.reader.clip.name : `${state.reader.clip.name} ${formatTime(a)}`;
   return c;
+}
+
+function chopReader(how) {
+  const sel = readerSelection();
+  const r = spreadToPads(sel, how);
+  if (!r) {
+    const i = Number($('rdPad').value);
+    loadOntoPad(i, sel);
+    toast(`That's a one-shot, so it went on pad ${i + 1}`, 'ok');
+    return;
+  }
+  const [a] = readerRange();
+  const d = clipDuration(state.reader.clip);
+  state.reader.slices = r.ranges.map(([s]) => (a + s) / d);
+  renderReaderWave();
+  padOptions($('rdPad'));
+  const msg = chopMessage(r, state.reader.clip.name);
+  readerLog(msg, 'ok');
+  toast(msg, 'ok');
 }
 
 function renderReaderWave(playhead = null) {
@@ -680,18 +770,8 @@ function wireReader() {
     toast(`Put on pad ${i + 1}`, 'ok');
     padOptions($('rdPad'));
   };
-  $('rdChop').onclick = () => {
-    const sel = readerSelection();
-    const how = $('rdChopN').value;
-    const starts = how === 'hits' ? detectOnsets(sel, { max: 16 }) : equalStarts(sel, Number(how));
-    const parts = chop(sel, starts, state.reader.clip.name);
-    parts.forEach((p, k) => loadOntoPad(k, p, p.name));
-    const [a] = readerRange();
-    const d = clipDuration(state.reader.clip);
-    state.reader.slices = starts.map((t) => (a + t) / d);
-    renderReaderWave();
-    toast(`Chopped into ${parts.length} pads. Play them from your keyboard.`, 'ok');
-  };
+  $('rdChop').onclick = () => chopReader($('rdChopN').value);
+  $('rdAuto').onchange = (e) => store.setSetting('rdAuto', e.target.checked);
   $('rdToLib').onclick = () => addToLibrary(readerSelection(), null, 'url');
   $('rdToStems').onclick = () => { setStemSource(readerSelection()); showTab('stems'); };
   $('rdDownload').onclick = async () => {
@@ -916,7 +996,7 @@ function renderLibrary() {
   for (const e of state.library) {
     const row = document.createElement('div');
     row.className = 'row';
-    row.innerHTML = `<div class="name"></div><canvas></canvas><div class="actions"><button data-a="play">▶</button><button data-a="stop">■</button><select data-a="pad"></select><button data-a="topad">To pad</button><button data-a="open">Open in reader</button><select data-a="fmt" class="fmt-select"></select><button data-a="dl" class="primary">Download</button><button data-a="del" class="ghost danger" title="Delete">✕</button></div>`;
+    row.innerHTML = `<div class="name"></div><canvas></canvas><div class="actions"><button data-a="play">▶</button><button data-a="stop">■</button><select data-a="pad"></select><button data-a="topad">To pad</button><button data-a="chop">Chop to pads</button><button data-a="open">Open in reader</button><select data-a="fmt" class="fmt-select"></select><button data-a="dl" class="primary">Download</button><button data-a="del" class="ghost danger" title="Delete">✕</button></div>`;
     row.querySelector('.name').textContent = e.name;
     row.querySelector('.name').append(Object.assign(document.createElement('small'), { textContent: `${formatTime(clipDuration(e.clip))} · ${e.source || ''}` }));
     list.append(row);
@@ -930,6 +1010,10 @@ function renderLibrary() {
     row.querySelector('[data-a="play"]').onclick = () => { engine.playClip(e.clip); animatePreview((pos) => drawWave(canvas, e.clip, { playhead: pos == null ? null : pos / clipDuration(e.clip) })); };
     row.querySelector('[data-a="stop"]').onclick = () => engine.stopPreview();
     row.querySelector('[data-a="topad"]').onclick = () => { const i = Number(padSel.value); loadOntoPad(i, e.clip, e.name); toast(`On pad ${i + 1}`, 'ok'); padOptions(padSel); };
+    row.querySelector('[data-a="chop"]').onclick = () => {
+      const r = spreadToPads(e.clip, clipDuration(e.clip) <= 1.5 ? 'hits' : 'auto');
+      if (r) { toast(chopMessage(r, e.name), 'ok'); showTab('pads'); } else toast('That one is a one-shot. Use "To pad".');
+    };
     row.querySelector('[data-a="open"]').onclick = () => { setReader(e.clip, 'library'); showTab('reader'); };
     row.querySelector('[data-a="dl"]').onclick = async (ev) => {
       ev.target.disabled = true;
@@ -1020,6 +1104,7 @@ async function restore() {
     state.padNotes = await store.getSetting('padNotes', defaultPadNotes(DEFAULT_BASE_NOTE));
     state.velocity = await store.getSetting('velocity', true);
     state.midiInput = await store.getSetting('midiInput', 'all');
+    for (const id of ['autoChop', 'chopCut', 'rdAuto']) $(id).checked = await store.getSetting(id, true);
     const master = await store.getSetting('master', 0.9);
     $('master').value = master; engine.setMaster(master);
     const url = await store.getSetting('helperUrl', null);

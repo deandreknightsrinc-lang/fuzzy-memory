@@ -52,6 +52,11 @@
             </div>
           </div>
           <div id="padGrid" class="pad-grid"></div>
+          <div class="pad-foot chop-row">
+            <label class="check" title="Songs, loops and breaks you load are cut up and spread across all 16 pads. Short one-shots still go on one pad."><input id="autoChop" type="checkbox" checked /> <b>Auto-chop</b> songs &amp; loops across the pads</label>
+            <label class="check" title="A new chop stops the one playing, like an MPC"><input id="chopCut" type="checkbox" checked /> Chops cut each other off</label>
+            <button id="undoChop" class="ghost" hidden>↶ Undo chop</button>
+          </div>
           <div class="pad-foot">
             <label>Pad 1 note <select id="baseNote"></select></label>
             <button id="learnBase" class="ghost" title="Press this, then the key on your keyboard that should play pad 1">Learn from key</button>
@@ -81,6 +86,7 @@
           <div class="load-row">
             <label class="btn"><input id="edFile" type="file" accept="audio/*,video/*,.wav,.aif,.aiff,.mp3,.flac,.ogg,.m4a" hidden />Open file…</label>
             <select id="edFromLib"><option value="">From library…</option></select>
+            <button id="edChop" title="Cut this pad's sample up and spread it across all 16 pads">Chop across pads</button>
             <button id="edClear" class="ghost danger">Clear pad</button>
           </div>
           <p id="edStatus" class="status-line"></p>
@@ -112,6 +118,7 @@
           <input id="rdUrl" type="url" placeholder="https://… (audio file, Dropbox, Google Drive, GitHub, YouTube, SoundCloud…)" />
           <button id="rdGo" class="primary">Read link</button>
         </div>
+        <label class="check"><input id="rdAuto" type="checkbox" checked /> Chop it across the 16 pads as soon as it loads</label>
         <ol id="rdLog" class="log"></ol>
       </div>
       <div id="rdResult" class="panel" hidden>
@@ -131,7 +138,7 @@
           <select id="rdPad"></select>
           <button id="rdToPad">Put selection on pad</button>
           <span class="sep"></span>
-          <select id="rdChopN"><option value="hits">Chop by hits</option><option value="4">Chop into 4</option><option value="8">Chop into 8</option><option value="16" selected>Chop into 16</option></select>
+          <select id="rdChopN"><option value="auto" selected>Smart chop</option><option value="hits">Chop by hits</option><option value="4">Chop into 4</option><option value="8">Chop into 8</option><option value="16">Chop into 16</option></select>
           <button id="rdChop">Chop to pads</button>
         </div>
         <div class="actions">
