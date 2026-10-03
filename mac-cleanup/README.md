@@ -15,6 +15,7 @@ bash mac-cleanup/kbk-cleanup.sh --all               # everything below, asking b
 | `--sound-library` | Builds the **Knight Lyfe Sound Library** on the drive with `sound-library/setup-library.sh`: organized folders, the Knight Lyfe sound packs, and links so it shows up in Logic's Library and Browser. It then shows the steps to put **Logic's own sound library** on the drive. |
 | `--downloads` | Moves everything in Downloads to the drive. **Stems folders** go to your library's `Stems`, and **samples and sample packs** go to the library's `Inbox (drop new sounds here)` (sort them with `sound-library/organize-samples.sh`). Everything else goes to `KBK-Offload/Downloads`. Files still downloading are left alone. |
 | `--documents`, `--desktop` | Goes through each item, biggest first, and asks before moving it to `KBK-Offload/Documents` (or `Desktop`). |
+| `--home` | Your **whole home folder**. Every file and folder of yours goes to the drive: what's inside Desktop, Documents, Downloads (sorted as above), Movies, Music and Pictures goes to `KBK-Offload/<folder>`; any other folders and loose files go to `KBK-Offload/Home`. It shows the plan first, then asks about each item (add `--yes` to move them all). See "What stays on the Mac" below. |
 | `--caches` | Clears app caches (apps rebuild what they need), Xcode build files, old simulators, and pip/npm/Homebrew download caches. Quit your apps first. |
 | `--snapshots` | Removes Time Machine's *local* snapshots on the Mac. These are often the biggest hidden part of System Data. Your backups on the Time Machine drive aren't touched. |
 | `--iphone-backups` | Moves iPhone/iPad backups to the drive and leaves a link, so Finder keeps backing up there. |
@@ -22,6 +23,19 @@ bash mac-cleanup/kbk-cleanup.sh --all               # everything below, asking b
 | `--drive "/Volumes/NAME"` | Uses another drive. |
 
 **How moving stays safe:** each item is copied, then the copy is checked: same number of files and same total bytes. Only then is it removed from the Mac. A name that already exists on the drive gets "(2)" instead of overwriting. If the drive runs low (it keeps 1 GB spare), the item is skipped. Every move is logged in `KBK-Offload/logs` on the drive.
+
+## What stays on the Mac with `--home`
+
+Moving the home folder itself to the drive (or all of it) would break the Mac: it couldn't log you in with the drive unplugged. So these stay, and the script says why for each one:
+
+- **Library**: app settings, your passwords (keychain), Logic's preferences. Its big parts (caches, iPhone backups) are handled by `--caches` and `--iphone-backups`.
+- **Applications**, **Public**, the hidden settings (names starting with a dot), and the folders Desktop, Documents, Downloads, Movies, Music and Pictures themselves (they're emptied, not removed).
+- **fuzzy-memory** and **kbk-system**: your KBK tools run from there.
+- **Cloud folders** (Dropbox, Google Drive, OneDrive, Creative Cloud, iCloud Drive): moving files out of them deletes them from the cloud. Change the folder in that app's settings instead.
+- In Music: **Audio Music Apps** (Logic's presets, patches and channel strips), **KBK Voices** (AI Vox), the **Music app's library**, and the link to your sound library. In Movies: the **TV app's library**. The script prints how to move the Music and TV media with those apps.
+- A **Photos library** moves only if the drive is formatted APFS or Mac OS Extended and Photos is closed. Afterwards, hold Option while opening Photos and choose the library on the drive. **Logic projects** move only while Logic is closed.
+
+If Desktop & Documents sync with iCloud and "Optimize Mac Storage" is on, files that live only in iCloud are downloaded while they're copied, so this can take a while.
 
 ## Logic Pro's sound library on the drive
 
