@@ -95,3 +95,41 @@ test('safe file names', () => {
   assert.equal(safeFileName('My Beat: v2/final.mp3', 'wav'), 'My Beat_ v2_final.wav');
   assert.equal(safeFileName('', 'wav'), 'audio.wav');
 });
+
+test('autoChop: one-shots stay whole, loops cut at hits, songs spread across the track', async () => {
+  const { autoChop, chopRanges, estimateTempo } = await import('../js/audio-utils.js');
+  const rate = 22050;
+  const hitAt = (ch, t, len = 2500) => { const s = Math.round(t * rate); for (let i = 0; i < len && s + i < ch.length; i++) ch[s + i] += Math.exp(-i / 300) * Math.sin(i * 0.3) * 0.8; };
+
+  assert.equal(autoChop(makeClip([sine(rate, 200, rate)], rate)).kind, 'oneshot');
+
+  const loop = new Float32Array(rate * 4);
+  const hits = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5];
+  hits.forEach((h) => hitAt(loop, h));
+  const lc = autoChop(makeClip([loop], rate));
+  assert.equal(lc.kind, 'loop');
+  assert.equal(lc.ranges.length, 8, JSON.stringify(lc.ranges));
+  for (const h of hits) assert.ok(lc.ranges.some(([a]) => Math.abs(a - h) < 0.03), `hit ${h}`);
+
+  // 64 s "song" at 100 BPM: a hit on every beat, louder on beat 1
+  const song = new Float32Array(rate * 64);
+  for (let b = 0; b * 0.6 < 63.5; b++) hitAt(song, b * 0.6, b % 4 === 0 ? 4000 : 2500);
+  for (let i = 0; i < song.length; i++) song[i] += 0.05 * Math.sin((2 * Math.PI * 220 * i) / rate);
+  const clip = makeClip([song], rate, 'song');
+  const bpm = estimateTempo(clip);
+  assert.ok(Math.abs(bpm - 100) <= 2, `bpm ${bpm}`);
+  const sc = autoChop(clip);
+  assert.equal(sc.kind, 'song');
+  assert.equal(sc.ranges.length, 16);
+  // spread through the whole song, in order
+  assert.ok(sc.ranges[0][0] < 4 && sc.ranges[15][0] > 56, JSON.stringify(sc.ranges.map((r) => r[0].toFixed(1))));
+  for (let i = 1; i < 16; i++) assert.ok(sc.ranges[i][0] > sc.ranges[i - 1][0]);
+  // each chop starts on a hit and lasts about a bar (2.4 s)
+  for (const [a, b] of sc.ranges) {
+    assert.ok(Math.abs(a / 0.6 - Math.round(a / 0.6)) < 0.05, `start ${a} on a beat`);
+    assert.ok(b - a > 1.7 && b - a < 2.7, `length ${b - a}`);
+  }
+  const parts = chopRanges(clip, sc.ranges);
+  assert.equal(parts.length, 16);
+  assert.equal(parts[15].name, 'song 16');
+});

@@ -163,6 +163,9 @@ main { max-width: 1280px; margin: 0 auto; padding: 18px; }
 
 .pad-foot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .pad-foot #stopAll { margin-left: auto; }
+.chop-row { background: rgba(232, 185, 49, 0.06); border: 1px solid rgba(232, 185, 49, 0.25); border-radius: 8px; padding: 8px 12px; }
+.chop-row b { color: var(--gold); }
+.chop-row #undoChop { margin-left: auto; }
 
 /* ---- editor ---- */
 .wave-wrap { position: relative; background: #0a0b0f; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }

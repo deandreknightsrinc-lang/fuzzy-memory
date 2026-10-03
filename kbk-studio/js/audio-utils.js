@@ -176,6 +176,141 @@ export function equalStarts(clip, count) {
   return Array.from({ length: count }, (_, i) => (d * i) / count);
 }
 
+// ---- auto chop ---------------------------------------------------------------
+
+const HOP = 512;
+
+// Onset strength per 512-sample frame (rise in loudness) plus loudness.
+function onsetCurve(clip) {
+  const mono = toMono(clip).channels[0];
+  const frames = Math.floor(mono.length / HOP);
+  const env = new Float32Array(frames);
+  for (let f = 0; f < frames; f++) {
+    let s = 0;
+    for (let i = f * HOP; i < (f + 1) * HOP; i++) s += mono[i] * mono[i];
+    env[f] = Math.sqrt(s / HOP);
+  }
+  const flux = new Float32Array(frames);
+  for (let f = 1; f < frames; f++) flux[f] = Math.max(0, env[f] - env[f - 1]);
+  return { env, flux, frames, fps: clip.sampleRate / HOP };
+}
+
+// Local peaks in the onset curve that stand out from their neighbours.
+function onsetPeaks({ flux, frames }, sensitivity = 1.5) {
+  const peaks = [];
+  const win = 8;
+  let max = 0;
+  for (let f = 0; f < frames; f++) if (flux[f] > max) max = flux[f];
+  const floor = max * 0.04;
+  for (let f = 1; f < frames - 1; f++) {
+    if (flux[f] <= flux[f - 1] || flux[f] < flux[f + 1] || flux[f] < floor) continue;
+    let mean = 0, cnt = 0;
+    for (let k = Math.max(0, f - win); k <= Math.min(frames - 1, f + win); k++) { mean += flux[k]; cnt++; }
+    if (flux[f] > (mean / cnt) * sensitivity) peaks.push({ f, s: flux[f] });
+  }
+  return peaks;
+}
+
+// Tempo from the onset curve's autocorrelation, folded into 70-160 BPM.
+export function estimateTempo(clip, { min = 70, max = 160 } = {}) {
+  const oc = onsetCurve(clip);
+  const { flux, fps } = oc;
+  const n = Math.min(oc.frames, Math.round(fps * 90)); // the first 90 s is plenty
+  if (n < fps * 2) return 0;
+  let mean = 0;
+  for (let i = 0; i < n; i++) mean += flux[i];
+  mean /= n;
+  const x = new Float32Array(n);
+  for (let i = 0; i < n; i++) x[i] = flux[i] - mean;
+  const lagOf = (bpm) => (60 / bpm) * fps;
+  const ac = (lag) => {
+    const l0 = Math.floor(lag), t = lag - l0;
+    let s = 0;
+    for (let i = 0; i + l0 + 1 < n; i++) s += x[i] * (x[i + l0] * (1 - t) + x[i + l0 + 1] * t);
+    return s;
+  };
+  let best = 0, bestBpm = 0;
+  for (let bpm = min; bpm <= max; bpm += 0.5) {
+    const lag = lagOf(bpm);
+    // a real beat also lines up at 2x the period
+    const score = ac(lag) + 0.5 * ac(lag * 2);
+    if (score > best) { best = score; bestBpm = bpm; }
+  }
+  return best > 0 ? bestBpm : 0;
+}
+
+// Where the sound starts and stops (ignores silence at the ends).
+function audibleRange(clip, thresholdDb = -45) {
+  const th = Math.pow(10, thresholdDb / 20);
+  const n = clipLength(clip);
+  const loud = (i) => clip.channels.some((c) => Math.abs(c[i]) > th);
+  let a = 0;
+  while (a < n && !loud(a)) a++;
+  let b = n - 1;
+  while (b > a && !loud(b)) b--;
+  return [a / clip.sampleRate, (b + 1) / clip.sampleRate];
+}
+
+// Picks where to cut so the audio spreads across `count` pads.
+//   one-shot (<= oneShotSec): no chop, it belongs on one pad
+//   loop / break (<= loopSec): cut at the hits, slices end where the next begins
+//   song: find the tempo, take one bar from the strongest hit in each 1/count
+//         of the song, so the chops cover the whole track
+// Returns { kind, bpm, ranges: [[start, end], ...] } in seconds.
+export function autoChop(clip, { count = 16, oneShotSec = 1.5, loopSec = 20 } = {}) {
+  const dur = clipDuration(clip);
+  if (dur <= oneShotSec) return { kind: 'oneshot', bpm: 0, ranges: [[0, dur]] };
+  const [lo, hi] = audibleRange(clip);
+  const oc = onsetCurve(clip);
+  const peaks = onsetPeaks(oc);
+  const t = (f) => f / oc.fps;
+
+  if (hi - lo <= loopSec) {
+    const minGap = Math.max(0.08, (hi - lo) / (count * 3));
+    const picked = [lo];
+    for (const p of [...peaks].sort((a, b) => b.s - a.s)) {
+      if (picked.length >= count) break;
+      const at = t(p.f);
+      if (at > lo && at < hi - 0.05 && picked.every((q) => Math.abs(q - at) >= minGap)) picked.push(at);
+    }
+    let starts = picked.sort((a, b) => a - b);
+    if (starts.length < Math.min(4, count)) starts = Array.from({ length: count }, (_, i) => lo + ((hi - lo) * i) / count);
+    return { kind: 'loop', bpm: 0, ranges: starts.map((s, i) => [s, i + 1 < starts.length ? starts[i + 1] : hi]) };
+  }
+
+  const bpm = estimateTempo(clip) || 90;
+  const bar = Math.min(4, Math.max(1.2, 240 / bpm));
+  const ranges = [];
+  const span = (hi - lo) / count;
+  for (let k = 0; k < count; k++) {
+    const r0 = lo + k * span, r1 = r0 + span;
+    let best = null;
+    for (const p of peaks) {
+      const at = t(p.f);
+      if (at < r0 || at >= r1 || at + bar > hi) continue;
+      // loud hits in loud places make the best chops
+      const score = p.s * (0.5 + oc.env[p.f]);
+      if (!best || score > best.score) best = { at, score };
+    }
+    const start = best ? best.at : Math.min(r0, Math.max(lo, hi - bar));
+    // end just before the hit nearest to one bar later, so the next hit isn't clipped in
+    let end = start + bar;
+    let near = null;
+    for (const p of peaks) {
+      const at = t(p.f);
+      if (at > start + bar * 0.75 && at < start + bar * 1.1 && (!near || Math.abs(at - (start + bar)) < Math.abs(near - (start + bar)))) near = at;
+    }
+    if (near) end = near - 0.005;
+    ranges.push([start, Math.min(hi, end)]);
+  }
+  return { kind: 'song', bpm, ranges };
+}
+
+// Cut out each [start, end] range, with click-free edges.
+export function chopRanges(clip, ranges, baseName = clip.name) {
+  return ranges.map(([a, b], i) => fadeEdges(slice(clip, a, b, `${baseName} ${i + 1}`)));
+}
+
 // ---- encoders --------------------------------------------------------------
 
 function interleave(clip) {
