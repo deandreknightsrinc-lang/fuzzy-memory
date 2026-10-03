@@ -358,6 +358,25 @@ int main()
         CHECK (std::abs (z - 40) <= 2, "200 Hz -> 40 crossings in 0.1 s, got " + juce::String (z));
     });
 
+    run ("master: the default master bus doesn't change the sound", []
+    {
+        kbk::PadSampler s;
+        s.prepare (44100.0, 512);
+        s.setMaster (kbk::MasterSettings {}); // the plug-in's defaults
+        auto p = padWith (sine (44100, 220.0f, 44100.0, 0.5f));
+        p.gain = 1.0f;
+        s.setPad (0, p);
+        auto out = renderBlocks (s, notes ({ juce::MidiMessage::noteOn (1, 36, (juce::uint8) 127) }), 40);
+        const float pk = out.getMagnitude (0, 8192, 8192);
+        CHECK (std::abs (juce::Decibels::gainToDecibels (pk / 0.5f)) < 0.1f, "level change " + juce::String (juce::Decibels::gainToDecibels (pk / 0.5f), 2) + " dB");
+        // the limiter's look-ahead delays the sound by exactly its latency
+        int first = 0;
+        while (first < out.getNumSamples() && std::abs (out.getSample (0, first)) < 1e-6f)
+            ++first;
+        CHECK (s.latencySamples() == 66, "1.5 ms at 44.1 kHz = 66 samples, got " + juce::String (s.latencySamples()));
+        CHECK (std::abs (first - (s.latencySamples() + 1)) <= 2, "delay " + juce::String (first));
+    });
+
     run ("master: the limiter holds the ceiling", []
     {
         kbk::PadSampler s;

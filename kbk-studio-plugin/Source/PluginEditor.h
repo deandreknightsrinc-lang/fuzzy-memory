@@ -122,6 +122,11 @@ private:
     std::unique_ptr<ComboAttachment> keyModeAttachment;
     std::unique_ptr<ButtonAttachment> velocityAttachment;
 
+    // record row (under the pads)
+    juce::TextButton recButton { "REC" }, takePadButton { "-> Pad" }, takeLibButton { "-> Library" }, revealButton { "Reveal" };
+    juce::ComboBox recSourceBox;
+    static constexpr int padsPanelExtra = 150; // room under the pads for the chop, keyboard and record rows
+
     // pad editor
     juce::Label padTitle;
     juce::TextButton playButton { "Play" };

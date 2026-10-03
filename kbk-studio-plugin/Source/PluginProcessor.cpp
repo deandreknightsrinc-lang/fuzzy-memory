@@ -73,7 +73,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout KbkStudioProcessor::createLa
     juce::AudioProcessorValueTreeState::ParameterLayout l;
     l.add (knob ("master", "Master", -24.0f, 6.0f, 0.0f, "dB"));
     l.add (toggle ("glueOn", "Glue On", true));
-    l.add (knob ("glueThresh", "Glue Threshold", -40.0f, 0.0f, -12.0f, "dB"));
+    l.add (knob ("glueThresh", "Glue Threshold", -40.0f, 0.0f, 0.0f, "dB"));
     l.add (knob ("glueRatio", "Glue Ratio", 1.0f, 10.0f, 2.0f, ":1", 3.0f));
     l.add (knob ("glueAttack", "Glue Attack", 0.1f, 100.0f, 10.0f, "ms", 10.0f));
     l.add (knob ("glueRelease", "Glue Release", 10.0f, 1000.0f, 120.0f, "ms", 150.0f));
@@ -110,6 +110,8 @@ KbkStudioProcessor::KbkStudioProcessor()
 
 KbkStudioProcessor::~KbkStudioProcessor()
 {
+    stopRecording();
+    writerThread.stopThread (2000);
     *alive = false;
     loader.cancelled = true;
     pool.removeAllJobs (true, 5000);
@@ -168,7 +170,9 @@ void KbkStudioProcessor::pushMasterSettings()
 
 void KbkStudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    hostRate = sampleRate;
     sampler.prepare (sampleRate, samplesPerBlock);
+    setLatencySamples (sampler.latencySamples()); // the limiter's look-ahead
     pushMasterSettings();
 }
 
@@ -178,6 +182,28 @@ void KbkStudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     if (masterDirty.exchange (false))
         pushMasterSettings();
     sampler.render (buffer, midi);
+
+    // record this block (the writer thread puts it on disk)
+    const juce::SpinLock::ScopedTryLockType sl (writerLock);
+    if (sl.isLocked() && activeWriter != nullptr)
+    {
+        const int n = buffer.getNumSamples();
+        const float* chans[2];
+        if (recSource.load() == 1 && n <= sampler.dry.getNumSamples())
+        {
+            chans[0] = sampler.dry.getReadPointer (0);
+            chans[1] = sampler.dry.getReadPointer (1);
+        }
+        else
+        {
+            chans[0] = buffer.getReadPointer (0);
+            chans[1] = buffer.getReadPointer (buffer.getNumChannels() > 1 ? 1 : 0);
+        }
+        if (activeWriter->write (chans, n))
+            recSamples += n;
+        else
+            droppedSamples += n; // the disk fell behind (only possible far faster than real time)
+    }
 }
 
 // ---- loading ------------------------------------------------------------------
@@ -417,6 +443,114 @@ void KbkStudioProcessor::clearAmp()
     ampJson.clear();
     ampName.clear();
     setStatus ("Neural Tone: amp removed.");
+}
+
+// ---- Record ------------------------------------------------------------------------
+
+juce::File KbkStudioProcessor::recordingsFolder()
+{
+    return juce::File::getSpecialLocation (juce::File::userMusicDirectory).getChildFile ("KBK Studio").getChildFile ("Recordings");
+}
+
+juce::File KbkStudioProcessor::libraryInbox()
+{
+    // made by sound-library/setup-library.sh (a shortcut to the library on the external drive)
+    return juce::File::getSpecialLocation (juce::File::userMusicDirectory)
+        .getChildFile ("Knight Lyfe Sound Library")
+        .getChildFile ("Inbox (drop new sounds here)");
+}
+
+void KbkStudioProcessor::startRecording()
+{
+    stopRecording();
+    auto dir = recordingsFolder();
+    dir.createDirectory();
+    currentTake = dir.getNonexistentChildFile ("KBK Take " + juce::Time::getCurrentTime().formatted ("%Y-%m-%d %H-%M-%S"), ".wav");
+    const double rate = hostRate.load();
+    juce::WavAudioFormat wav;
+    auto w = makeWriter (wav, currentTake.createOutputStream(), rate, 2, 24);
+    if (w == nullptr)
+    {
+        setStatus ("Record: couldn't create " + currentTake.getFullPathName(), true);
+        return;
+    }
+    writerThread.startThread();
+    // ~6 s of slack at 44.1 kHz between the audio thread and the disk
+    threadedWriter = std::make_unique<juce::AudioFormatWriter::ThreadedWriter> (w.release(), writerThread, 1 << 18);
+    recSamples = 0;
+    droppedSamples = 0;
+    sampler.tapDry = recSource.load() == 1;
+    {
+        const juce::SpinLock::ScopedLockType sl (writerLock);
+        activeWriter = threadedWriter.get();
+    }
+    recording = true;
+    setStatus (juce::String ("Recording ") + (recSource.load() == 1 ? "the pads (dry)" : "the output (master)")
+               + "... play your pads, or press Play in Logic. Click REC again to stop.");
+}
+
+void KbkStudioProcessor::stopRecording()
+{
+    if (! recording)
+        return;
+    {
+        const juce::SpinLock::ScopedLockType sl (writerLock);
+        activeWriter = nullptr;
+    }
+    threadedWriter.reset(); // flushes and closes the file
+    sampler.tapDry = false;
+    recording = false;
+    if (recSamples.load() == 0)
+    {
+        currentTake.deleteFile();
+        setStatus ("Record: nothing came in. Logic only runs the plug-in while the track is selected, armed or playing.", true);
+        return;
+    }
+    lastTake = currentTake;
+    setStatus ("Saved take: " + lastTake.getFileName() + " (" + juce::String (recordedSeconds(), 1) + " s). -> Pad, -> Library or Reveal."
+                   + (droppedSamples.load() > 0 ? " Some audio was dropped: the disk couldn't keep up." : ""),
+               droppedSamples.load() > 0);
+}
+
+void KbkStudioProcessor::takeToPad (int pad)
+{
+    if (! lastTake.existsAsFile())
+    {
+        setStatus ("Record a take first.", true);
+        return;
+    }
+    loadFile (lastTake, pad); // auto-chop applies, like any other load
+}
+
+void KbkStudioProcessor::takeToLibrary()
+{
+    if (! lastTake.existsAsFile())
+    {
+        setStatus ("Record a take first.", true);
+        return;
+    }
+    const auto inbox = libraryInbox();
+    if (! inbox.isDirectory())
+    {
+        setStatus ("No Knight Lyfe Sound Library found in your Music folder. Run sound-library/setup-library.sh once (it puts the library on your external drive).", true);
+        return;
+    }
+    const auto dest = inbox.getNonexistentChildFile (lastTake.getFileNameWithoutExtension(), ".wav");
+    if (lastTake.copyFileTo (dest))
+        setStatus ("Copied to the Sound Library inbox: " + dest.getFileName() + ". Run organize-samples.sh to sort it.");
+    else
+        setStatus ("Couldn't copy to " + inbox.getFullPathName() + " (is the external drive plugged in?)", true);
+}
+
+void KbkStudioProcessor::revealTake()
+{
+    if (lastTake.existsAsFile())
+        lastTake.revealToUser();
+    else
+    {
+        recordingsFolder().createDirectory();
+        recordingsFolder().revealToUser();
+    }
 }
 
 // ---- Analyze + Suno ----------------------------------------------------------------
