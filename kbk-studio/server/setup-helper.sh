@@ -4,17 +4,27 @@
 #   yt-dlp          reads YouTube, SoundCloud, TikTok... links (official build)
 #   ffmpeg/ffprobe  converts formats (static build, MP3/OGG/Opus/FLAC/AAC)
 #   Demucs          AI stems, only with --stems (downloads ~2 GB of PyTorch)
+#   rvc-python      AI Vox voice conversion, only with --vox (~3 GB; voice models
+#                   go in ~/Music/KBK Voices)
 # Works on Intel and Apple Silicon Macs, and on Linux (apt). Safe to run again;
 # run it again to update yt-dlp when YouTube links stop working.
 #
 #   bash setup-helper.sh            # yt-dlp + ffmpeg (about 90 MB)
 #   bash setup-helper.sh --stems    # also Demucs for Pro stems
+#   bash setup-helper.sh --vox      # also AI Vox (voice conversion)
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 home="${KBK_HOME:-$HOME/.kbk-helper}"
 bin="$home/bin"
 stems=0
-[[ "${1:-}" == "--stems" ]] && stems=1
+vox=0
+for arg in "$@"; do
+  case "$arg" in
+    --stems) stems=1 ;;
+    --vox) vox=1 ;;
+    *) echo "Unknown option: $arg (use --stems and/or --vox)" >&2; exit 1 ;;
+  esac
+done
 
 say() { printf '\033[1;33m==>\033[0m %s\n' "$*"; }
 ok() { printf '  \033[32m✓\033[0m %s\n' "$*"; }
@@ -94,6 +104,29 @@ if [[ $stems == 1 ]]; then
 else
   run_py="$py"
   echo "  (Pro stems skipped. Add --stems to install Demucs, or use kk-stems on the studio server.)"
+fi
+
+if [[ $vox == 1 ]]; then
+  # rvc-python needs fairseq 0.12.2 (Python 3.9/3.10, and a pip older than 24.1
+  # to accept its dependencies' metadata) and NumPy 1.23; PyTorch 2.2.2 is the
+  # last release with Intel Mac builds and works on Apple Silicon too.
+  vpy=""
+  for c in python3.10 python3.9 /usr/bin/python3; do
+    if command -v "$c" >/dev/null 2>&1 && "$c" -c 'import sys; sys.exit(0 if sys.version_info[:2] in ((3, 9), (3, 10)) else 1)' 2>/dev/null; then
+      vpy="$(command -v "$c")"; break
+    fi
+  done
+  [[ -n "$vpy" ]] || die "AI Vox needs Python 3.9 or 3.10 (macOS has 3.9 after: xcode-select --install)."
+  say "AI Vox (rvc-python) in $home/vox with $("$vpy" --version) - downloads ~3 GB and builds fairseq, so it takes a while"
+  "$vpy" -m venv "$home/vox"
+  "$home/vox/bin/pip" install -q "pip<24.1" "setuptools<70" wheel
+  "$home/vox/bin/pip" install -q "numpy==1.23.5" "torch==2.2.2" "torchaudio==2.2.2"
+  "$home/vox/bin/pip" install -q "Cython<3" 
+  "$home/vox/bin/pip" install -q rvc-python
+  "$home/vox/bin/python" -c "import rvc_python" || die "rvc-python didn't install. Scroll up for the error."
+  ok "AI Vox ready (the first conversion also downloads ~400 MB of base models)"
+  mkdir -p "$HOME/Music/KBK Voices"
+  ok "Put RVC voice models in: $HOME/Music/KBK Voices  (Name.pth + Name.index, or one folder per voice)"
 fi
 
 cat > "$here/start-helper.sh" <<RUN

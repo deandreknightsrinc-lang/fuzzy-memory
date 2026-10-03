@@ -6,6 +6,8 @@
                                video/music pages through yt-dlp -> WAV
   POST /convert?format=flac    body = audio/video file, answer = converted file (ffmpeg)
   POST /stems?model=htdemucs   body = WAV, answer = JSON of stem URLs (Demucs)
+  GET  /voices                 AI Vox voice models in ~/Music/KBK Voices
+  POST /vox?voice=Name&pitch=0 body = WAV, answer = the same audio in that voice (RVC)
   GET  /files/<job>/<stem>.wav a finished stem
   GET  /                       KBK Studio itself, so http://localhost:8765 works
                                with MIDI (localhost counts as a secure page)
@@ -52,6 +54,10 @@ FORMATS = {
     "ogg": (["-c:a", "libvorbis"], "ogg", "audio/ogg"),
     "opus": (["-c:a", "libopus"], "opus", "audio/ogg"),
 }
+
+VOICES_DIR = Path(os.environ.get("KBK_VOICES", Path.home() / "Music" / "KBK Voices"))
+KBK_HOME = Path(os.environ.get("KBK_HOME", Path.home() / ".kbk-helper"))
+VOX_METHODS = {"rmvpe", "harvest", "crepe", "pm"}
 
 DEMUCS_MODELS = {"htdemucs", "htdemucs_ft", "htdemucs_6s", "mdx_extra", "mdx_extra_q"}
 
@@ -112,6 +118,77 @@ def demucs_args(src, out_dir, model="htdemucs", two=None):
     return args
 
 
+def list_voices(folder):
+    """RVC voice models in `folder`: name -> (model .pth, matching .index or None).
+
+    Either loose files (Name.pth + Name.index) or one folder per voice
+    (Name/anything.pth + Name/anything.index), the way RVC models are shared.
+    """
+    folder = Path(folder)
+    found = {}
+    if not folder.is_dir():
+        return found
+
+    def pick_index(candidates, stem=None):
+        cands = [c for c in candidates if not c.name.startswith("._")]
+        if stem:
+            same = [c for c in cands if c.stem == stem]
+            if same:
+                return same[0]
+        # RVC writes "added_IVF..._v2.index" (the one to use) and "trained_..."
+        added = [c for c in cands if c.name.startswith("added")]
+        return (added or cands or [None])[0]
+
+    for pth in sorted(folder.glob("*.pth")):
+        if not pth.name.startswith("._"):
+            found[pth.stem] = (pth, pick_index(list(folder.glob("*.index")), pth.stem))
+    for sub in sorted(p for p in folder.iterdir() if p.is_dir() and not p.name.startswith(".")):
+        pths = [p for p in sorted(sub.rglob("*.pth")) if not p.name.startswith("._")]
+        if pths:
+            found[sub.name] = (pths[0], pick_index(sorted(sub.rglob("*.index"))))
+    return found
+
+
+def vox_python():
+    """The Python that has rvc-python (setup-helper.sh --vox makes it)."""
+    env = os.environ.get("KBK_VOX_PYTHON")
+    if env:
+        return env
+    py = KBK_HOME / "vox" / "bin" / "python"
+    return str(py) if py.exists() else None
+
+
+_vox_cache = {"at": 0.0, "ok": False}
+
+
+def vox_ready():
+    if time.time() - _vox_cache["at"] < 60:
+        return _vox_cache["ok"]
+    py = vox_python()
+    ok = False
+    if py:
+        try:
+            ok = subprocess.run([py, "-c", "import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('rvc_python') else 1)"],
+                                capture_output=True, timeout=30).returncode == 0
+        except Exception:
+            ok = False
+    _vox_cache.update(at=time.time(), ok=ok)
+    return ok
+
+
+def vox_args(python, src, dst, model, index=None, pitch=0, method="rmvpe", version="v2"):
+    if method not in VOX_METHODS:
+        raise ValueError(f"Unknown pitch method {method!r}")
+    pitch = int(pitch)
+    if not -36 <= pitch <= 36:
+        raise ValueError("pitch must be between -36 and 36 semitones")
+    args = [python, "-m", "rvc_python", "cli", "-i", str(src), "-o", str(dst), "-mp", str(model),
+            "-pi", str(pitch), "-me", method, "-v", version, "-de", "cpu:0"]
+    if index:
+        args += ["-ip", str(index)]
+    return args
+
+
 def tools():
     demucs = bool(shutil.which("demucs"))
     if not demucs:
@@ -120,7 +197,7 @@ def tools():
             demucs = importlib.util.find_spec("demucs") is not None
         except Exception:
             demucs = False
-    return {"ffmpeg": bool(shutil.which("ffmpeg")), "ytdlp": bool(shutil.which("yt-dlp")), "demucs": demucs}
+    return {"ffmpeg": bool(shutil.which("ffmpeg")), "ytdlp": bool(shutil.which("yt-dlp")), "demucs": demucs, "vox": vox_ready()}
 
 
 # ---- server ----------------------------------------------------------------
@@ -229,6 +306,10 @@ class Handler(BaseHTTPRequestHandler):
                 return self.convert(q)
             if method == "POST" and u.path == "/stems":
                 return self.stems(q)
+            if method == "GET" and u.path == "/voices":
+                return self.voices()
+            if method == "POST" and u.path == "/vox":
+                return self.vox(q)
             if method == "GET" and u.path.startswith("/files/"):
                 return self.job_file(u.path)
             if method == "GET":
@@ -310,6 +391,30 @@ class Handler(BaseHTTPRequestHandler):
         if not stems:
             raise HelperError(500, "Demucs finished but wrote no stems.")
         self.send_json({"stems": stems, "model": model})
+
+    def voices(self):
+        VOICES_DIR.mkdir(parents=True, exist_ok=True)
+        self.send_json({"folder": str(VOICES_DIR), "voices": sorted(list_voices(VOICES_DIR)), "ready": vox_ready()})
+
+    def vox(self, q):
+        name = q.get("voice", "")
+        voices = list_voices(VOICES_DIR)
+        if name not in voices:
+            raise HelperError(404, f"No voice called {name!r} in {VOICES_DIR}. Press Rescan.")
+        if not vox_ready():
+            raise HelperError(500, "Voice conversion isn't installed. Run: bash setup-helper.sh --vox")
+        model, index = voices[name]
+        d = self.job_dir()
+        src, dst = d / "in.wav", d / "out.wav"
+        src.write_bytes(self.body())
+        try:
+            args = vox_args(vox_python(), src, dst, model, index, q.get("pitch", 0), q.get("method", "rmvpe"), q.get("version", "v2"))
+        except ValueError as e:
+            raise HelperError(400, str(e))
+        run(args, timeout=1800)
+        if not dst.exists() or dst.stat().st_size < 100:
+            raise HelperError(500, "The voice model ran but wrote no audio.")
+        self.send_file(dst, "audio/wav", name=f"{name} vox")
 
     def job_file(self, path):
         m = re.fullmatch(r"/files/([0-9a-f]{12})/([\w\-]+\.wav)", path)

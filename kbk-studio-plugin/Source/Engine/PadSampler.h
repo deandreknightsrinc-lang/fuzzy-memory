@@ -6,6 +6,8 @@
 #include <atomic>
 #include <memory>
 
+#include "NeuralTone.h"
+
 // The sound of KBK Studio: 16 sample pads played by MIDI, through a master
 // bus with glue compressor, tape saturation and a limiter. No GUI code here,
 // so the tests can drive it offline.
@@ -35,6 +37,7 @@ struct Pad
 
 struct MasterSettings
 {
+    NeuralSettings neural;
     float masterDb = 0.0f;
     bool glueOn = true;
     float glueThreshDb = -12.0f, glueRatio = 2.0f, glueAttackMs = 10.0f, glueReleaseMs = 120.0f, glueMakeupDb = 0.0f, glueMix = 1.0f;
@@ -82,6 +85,9 @@ public:
     std::atomic<float> outputPeak { 0.0f };
 
     void setMaster (const MasterSettings& m);
+
+    // Neural Tone (amp model) on the master bus, before the glue compressor
+    NeuralTone neural;
 
 private:
     struct Voice

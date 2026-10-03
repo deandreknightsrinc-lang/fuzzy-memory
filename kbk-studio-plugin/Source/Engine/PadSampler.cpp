@@ -24,6 +24,7 @@ void PadSampler::prepare (double sr, int maxBlock)
     sampleRate = sr;
     juce::dsp::ProcessSpec spec { sr, (juce::uint32) juce::jmax (1, maxBlock), 2 };
     limiter.prepare (spec);
+    neural.prepare (sr, juce::jmax (1, maxBlock));
     limiter.reset();
     masterGain.reset (sr, 0.02);
     masterGain.setCurrentAndTargetValue (juce::Decibels::decibelsToGain (master.masterDb));
@@ -361,6 +362,8 @@ void PadSampler::applyMaster (juce::AudioBuffer<float>& out)
     float* L = out.getWritePointer (0);
     float* R = out.getWritePointer (chans > 1 ? 1 : 0);
     const float sr = (float) sampleRate;
+
+    neural.process (L, R, n, master.neural);
 
     if (master.glueOn)
     {

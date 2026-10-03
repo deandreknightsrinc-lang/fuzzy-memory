@@ -134,9 +134,18 @@ private:
     Knob level, tune, pan;
     juce::Label noteLabel, modeLabel, chokeLabel;
 
+    // AI Vox (pad editor)
+    juce::Label voxHeading, voxPitchLabel;
+    juce::ComboBox voiceBox;
+    juce::TextButton voxRescan { "Rescan" }, voxFolder { "Folder" }, voxButton { "AI Vox" };
+    juce::Slider voxPitch { juce::Slider::LinearHorizontal, juce::Slider::TextBoxRight };
+
     // master
-    juce::ToggleButton glueOn { "GLUE COMP" }, tapeOn { "TAPE" }, limOn { "LIMITER" };
-    std::unique_ptr<ButtonAttachment> glueOnA, tapeOnA, limOnA;
+    juce::ToggleButton ntOn { "NEURAL TONE" }, glueOn { "GLUE COMP" }, tapeOn { "TAPE" }, limOn { "LIMITER" };
+    std::unique_ptr<ButtonAttachment> ntOnA, glueOnA, tapeOnA, limOnA;
+    juce::TextButton ampButton { "Load Amp..." };
+    juce::Label ampLabel;
+    Knob ntIn, ntDrive, ntMix, ntOut;
     Knob glueThresh, glueRatio, glueAttack, glueRelease, glueMakeup, glueMix, tapeDrive, tapeWarmth, limCeiling, limRelease, master;
 
     juce::Label status, helperLabel;

@@ -33,7 +33,7 @@ bash setup-helper.sh          # once: yt-dlp + ffmpeg (~90 MB, no Homebrew neede
 bash start-helper.sh          # then open http://localhost:8765
 ```
 
-Add `--stems` (`bash setup-helper.sh --stems`) to also install Demucs for Pro stems. That downloads about 2 GB of PyTorch, so skip it if the Mac is short on space and use `kk-stems` on the studio server instead. Run `setup-helper.sh` again to update; `start-helper.sh` keeps yt-dlp current on every start, because YouTube changes often.
+Add `--stems` (`bash setup-helper.sh --stems`) to also install Demucs for Pro stems, and `--vox` for AI Vox voice conversion in the KBK Studio 2 plug-in (RVC voice models go in `~/Music/KBK Voices`). That downloads about 2 GB of PyTorch, so skip it if the Mac is short on space and use `kk-stems` on the studio server instead. Run `setup-helper.sh` again to update; `start-helper.sh` keeps yt-dlp current on every start, because YouTube changes often.
 
 The website finds a helper running on the same computer (`http://localhost:8765`) by itself; the **Helper** chip turns green. To run it on the Proxmox server for the whole network, `bash start-helper.sh --host 0.0.0.0` and open `http://<server-ip>:8765` there. That address is http, so the website can't use it and MIDI won't work on it; use it for stems and conversions, or put it behind the HTTPS Caddy from AI Studio.
 
