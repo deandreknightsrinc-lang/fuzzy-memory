@@ -3,6 +3,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_audio_formats/juce_audio_formats.h>
 
+#include "Engine/Analysis.h"
 #include "Engine/AudioLoader.h"
 #include "Engine/AutoChop.h"
 #include "Engine/PadSampler.h"
@@ -57,6 +58,12 @@ public:
     void loadAmp (const juce::File& file);
     void clearAmp();
     juce::String ampName;
+
+    // Analyze + Suno
+    void analyzePad (int pad);
+    void sunoPrompt (int pad);
+    juce::String analysisText, sunoText;
+    bool analyzing = false;
 
     // AI Vox: voice models live on the KBK helper
     void refreshVoices();

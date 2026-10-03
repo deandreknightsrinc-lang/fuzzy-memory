@@ -8,6 +8,8 @@
   POST /stems?model=htdemucs   body = WAV, answer = JSON of stem URLs (Demucs)
   GET  /voices                 AI Vox voice models in ~/Music/KBK Voices
   POST /vox?voice=Name&pitch=0 body = WAV, answer = the same audio in that voice (RVC)
+  POST /suno                   {"facts", "draft"} -> a Suno style prompt polished by a
+                               local AI (Ollama), or the draft when there's none
   GET  /files/<job>/<stem>.wav a finished stem
   GET  /                       KBK Studio itself, so http://localhost:8765 works
                                with MIDI (localhost counts as a secure page)
@@ -58,6 +60,10 @@ FORMATS = {
 VOICES_DIR = Path(os.environ.get("KBK_VOICES", Path.home() / "Music" / "KBK Voices"))
 KBK_HOME = Path(os.environ.get("KBK_HOME", Path.home() / ".kbk-helper"))
 VOX_METHODS = {"rmvpe", "harvest", "crepe", "pm"}
+
+# Ollama on this Mac, or on the studio server (e.g. http://192.168.1.172:11434)
+OLLAMA_URL = os.environ.get("KBK_OLLAMA_URL", "http://127.0.0.1:11434").rstrip("/")
+OLLAMA_MODEL = os.environ.get("KBK_OLLAMA_MODEL", "llama3.1:8b")
 
 DEMUCS_MODELS = {"htdemucs", "htdemucs_ft", "htdemucs_6s", "mdx_extra", "mdx_extra_q"}
 
@@ -189,6 +195,37 @@ def vox_args(python, src, dst, model, index=None, pitch=0, method="rmvpe", versi
     return args
 
 
+SUNO_INSTRUCTIONS = (
+    "Write one style prompt for the Suno music generator, for the 'Style of Music' box. "
+    "Use only these facts about the track: {facts}. Starting draft: {draft}. "
+    "Rules: describe genre feel, groove, mood, instruments, vocals and production in plain words; "
+    "never name or compare to any artist, band, producer, song, album or label; no 'in the style of', no 'like'; "
+    "keep the BPM and key; at most 200 characters; reply with the prompt only, no quotes."
+)
+
+# any of these in the AI's answer means it compared to someone: use the draft instead
+_SUNO_BANNED = re.compile(r"\b(in the style of|style of|sounds like|like [A-Z]|inspired by|reminiscent of|a la|à la|feat\.?|ft\.)", re.I)
+
+
+def clean_suno(text, draft):
+    """The AI's answer as a usable prompt, or the draft if it broke the rules."""
+    line = (text or "").strip().splitlines()[0] if (text or "").strip() else ""
+    line = line.strip().strip('"\'`').strip()
+    line = re.sub(r"^(style( of music)?|prompt)\s*:\s*", "", line, flags=re.I)
+    if not line or _SUNO_BANNED.search(line):
+        return draft, "template"
+    if len(line) > 200:
+        line = line[:200].rsplit(",", 1)[0].strip()
+    return line, "ollama"
+
+
+def ask_ollama(prompt, timeout=90):
+    body = json.dumps({"model": OLLAMA_MODEL, "prompt": prompt, "stream": False, "options": {"temperature": 0.6}}).encode()
+    req = urllib.request.Request(OLLAMA_URL + "/api/generate", data=body, headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return json.loads(r.read().decode()).get("response", "")
+
+
 def tools():
     demucs = bool(shutil.which("demucs"))
     if not demucs:
@@ -306,6 +343,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.convert(q)
             if method == "POST" and u.path == "/stems":
                 return self.stems(q)
+            if method == "POST" and u.path == "/suno":
+                return self.suno()
             if method == "GET" and u.path == "/voices":
                 return self.voices()
             if method == "POST" and u.path == "/vox":
@@ -391,6 +430,20 @@ class Handler(BaseHTTPRequestHandler):
         if not stems:
             raise HelperError(500, "Demucs finished but wrote no stems.")
         self.send_json({"stems": stems, "model": model})
+
+    def suno(self):
+        try:
+            req = json.loads(self.body().decode("utf-8"))
+        except (ValueError, UnicodeDecodeError):
+            raise HelperError(400, "Send JSON: {\"facts\": ..., \"draft\": ...}")
+        facts = str(req.get("facts", ""))[:600]
+        draft = str(req.get("draft", ""))[:300]
+        try:
+            answer = ask_ollama(SUNO_INSTRUCTIONS.format(facts=facts, draft=draft))
+        except Exception as e:  # no Ollama: the draft is still a good prompt
+            return self.send_json({"prompt": draft, "source": "template", "note": f"local AI not reachable at {OLLAMA_URL} ({type(e).__name__})"})
+        prompt, source = clean_suno(answer, draft)
+        self.send_json({"prompt": prompt, "source": source})
 
     def voices(self):
         VOICES_DIR.mkdir(parents=True, exist_ok=True)

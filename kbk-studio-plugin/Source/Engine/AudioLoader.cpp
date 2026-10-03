@@ -370,6 +370,22 @@ LoadedAudio AudioLoader::convertVoice (const juce::AudioBuffer<float>& audio, do
     return decode (out, name, false);
 }
 
+juce::String AudioLoader::polishPrompt (const juce::String& facts, const juce::String& draft, juce::String& source)
+{
+    auto* obj = new juce::DynamicObject();
+    obj->setProperty ("facts", facts);
+    obj->setProperty ("draft", draft);
+    const auto body = juce::JSON::toString (juce::var (obj), true);
+    auto url = juce::URL::createWithoutParsing (helperBase + "/suno").withPOSTData (body);
+    juce::MemoryBlock out;
+    juce::String err;
+    if (! download (url, out, err, 120 * 1000))
+        return {};
+    auto j = juce::JSON::parse (out.toString());
+    source = j["source"].toString();
+    return j["prompt"].toString().trim();
+}
+
 LoadedAudio AudioLoader::loadUrl (const juce::String& input, std::function<void (const juce::String&)> progress)
 {
     LoadedAudio res;

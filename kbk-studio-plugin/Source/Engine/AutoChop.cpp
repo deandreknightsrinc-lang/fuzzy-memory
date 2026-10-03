@@ -137,6 +137,26 @@ double estimateTempo (const juce::AudioBuffer<float>& audio, double sampleRate)
     return tempoFrom (onsetCurve (audio, sampleRate));
 }
 
+std::vector<double> hitTimes (const juce::AudioBuffer<float>& audio, double sampleRate, float minStrength)
+{
+    const auto oc = onsetCurve (audio, sampleRate);
+    const auto peaks = onsetPeaks (oc, 1.8f);
+    float mx = 0.0f;
+    for (auto& p : peaks)
+        mx = juce::jmax (mx, p.strength);
+    std::vector<double> t;
+    for (auto& p : peaks)
+    {
+        // a hit jumps in level within ~23 ms; tones beating against each
+        // other swell much more slowly and don't count
+        const float before = oc.env[(size_t) juce::jmax (0, p.frame - 2)];
+        const bool sharp = oc.env[(size_t) p.frame] >= before * 1.4f + 1e-6f;
+        if (sharp && p.strength >= mx * minStrength && (t.empty() || p.frame / oc.fps - t.back() >= 0.08))
+            t.push_back (p.frame / oc.fps);
+    }
+    return t;
+}
+
 std::vector<Range> chopEqual (double durationSec, int count)
 {
     std::vector<Range> r;

@@ -56,7 +56,8 @@ set(ENGINE_SOURCES
     Source/Engine/AutoChop.cpp
     Source/Engine/PadSampler.cpp
     Source/Engine/AudioLoader.cpp
-    Source/Engine/NeuralTone.cpp)
+    Source/Engine/NeuralTone.cpp
+    Source/Engine/Analysis.cpp)
 
 # Network reads use the system on Mac (NSURLSession); Linux builds need curl.
 if(APPLE)
