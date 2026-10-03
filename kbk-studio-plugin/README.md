@@ -15,6 +15,8 @@ A 16-pad sampler for Logic Pro (Audio Unit), with VST3 and a standalone app, tha
   - Velocity, sustain pedal and pitch bend work, and you can click the pads too.
 - **Links:** paste or drag a link onto a pad. Direct files and Dropbox / Google Drive / OneDrive / GitHub share links load straight in. YouTube, SoundCloud, TikTok and other pages go through the [KBK helper](../kbk-studio/server/) (`bash ~/fuzzy-memory/kbk-studio/server/start-helper.sh`), and the plug-in tells you if it isn't running. Only pull audio you own or have the rights to use.
 - **Files:** WAV, AIFF, FLAC, MP3, OGG, and anything macOS opens (M4A, AAC, ALAC, CAF, and the audio of MP4/MOV video).
+- **Neural Tone:** play the pads through a real amp, pedal or mic'd rig captured with [Neural Amp Modeler](https://www.neuralampmodeler.com). Click **Load Amp...** and pick a `.nam` (or `.json`) capture, for example one from [TONE3000](https://www.tone3000.com). It sits on the master bus before the Glue Comp, with **In**, **Drive**, **Mix** and **Out**, and is leveled the way the NAM plug-in levels it. Captures run at the rate they were made at (usually 48 kHz) even when Logic runs at 44.1 kHz, and the amp is saved in your project. A standard WaveNet capture uses roughly a quarter of one CPU core, more on older Intel Macs. The "A1/A2 lite" or "feather" captures are lighter.
+- **AI Vox:** turn a vocal on a pad into another voice, with RVC voice models on the [KBK helper](../kbk-studio/server/). Put the models in `~/Music/KBK Voices`, either as `Name.pth` + `Name.index` or one folder per voice. Then choose the voice, set **Pitch** (semitones: about +12 for a male voice into a female model, -12 the other way) and click **AI Vox**. The converted vocal lands on the next empty pad, so the original stays, and **Undo** removes it. One-time setup on the Mac: `bash ~/fuzzy-memory/kbk-studio/server/setup-helper.sh --vox` (about 3 GB; the first conversion also downloads about 400 MB of base models). It runs on the CPU, so expect a few seconds per second of audio. Only use voices you have permission to use.
 - **Master bus:** Glue Comp (threshold, ratio, attack, release, makeup, mix), Tape (drive, warmth), Limiter (ceiling, release) and Master. All of them can be automated in Logic.
 - **Saved in your project:** the pads, chops and settings are stored inside the Logic project (the audio as FLAC), so the project reopens with its chops even if the original file is gone.
 
@@ -31,7 +33,7 @@ The build is universal (Intel and Apple Silicon), runs on macOS 11 or later, and
 
 ## Build it yourself
 
-You need CMake 3.22+ and Xcode (Mac) or GCC/Clang with the ALSA, X11 and curl dev packages (Linux). JUCE 8.0.15 is downloaded automatically.
+You need CMake 3.22+ and Xcode (Mac) or GCC/Clang with the ALSA, X11 and curl dev packages (Linux). JUCE 8.0.15 and NeuralAmpModelerCore 0.6.0 (MIT, with Eigen under MPL-2.0 and nlohmann/json under MIT) are downloaded automatically. Use `-DJUCE_DIR=` / `-DNAM_DIR=` to point at local checkouts.
 
 ```bash
 cmake -S kbk-studio-plugin -B build -G Xcode        # or -G Ninja
@@ -43,6 +45,7 @@ build/KBKStudioTests_artefacts/Release/KBKStudioTests   # engine tests
 
 - `Source/Engine/AutoChop.*`: onset detection, tempo, smart chop, hits, equal slices
 - `Source/Engine/PadSampler.*`: the 16 pads, voices, MIDI routing, choke, master bus
+- `Source/Engine/NeuralTone.*`: Neural Tone (NAM model loading, sample-rate conversion, In/Drive/Mix/Out)
 - `Source/Engine/AudioLoader.*`: link rules (share links, video pages, DRM), downloads, the helper, decoding
 - `Source/PluginProcessor.*`: parameters, background loading, auto-chop and undo, saving into the project
 - `Source/PluginEditor.*`: the interface

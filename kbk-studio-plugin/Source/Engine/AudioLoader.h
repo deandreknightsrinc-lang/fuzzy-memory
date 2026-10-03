@@ -50,6 +50,12 @@ public:
 
     bool helperOnline();
 
+    // AI Vox: the voice models the helper has ({"folder": ..., "voices": [...], "ready": bool}).
+    juce::var listVoices (juce::String& error);
+    // Sings/says the audio again in another voice (RVC on the helper). `pitch` in semitones.
+    LoadedAudio convertVoice (const juce::AudioBuffer<float>& audio, double sampleRate, const juce::String& voice, int pitch,
+                              const juce::String& name);
+
     // set to stop a download that's in progress (the plug-in is closing)
     std::atomic<bool> cancelled { false };
 

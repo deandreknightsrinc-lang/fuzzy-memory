@@ -34,7 +34,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/_deps
-          key: kbk-juce-8.0.15-${{ runner.os }}
+          key: kbk-juce-8.0.15-nam-0.6.0-${{ runner.os }}
 
       - name: Configure
         run: cmake -S kbk-studio-plugin -B build -G Xcode -DCMAKE_BUILD_TYPE=Release
@@ -52,6 +52,17 @@ jobs:
           minos=$(otool -l "$BIN" | awk '/LC_BUILD_VERSION/{f=1} f&&/minos/{print $2; exit}'); echo "Minimum macOS: $minos"
           [[ "$archs" == *arm64* && "$archs" == *x86_64* ]] || { echo "::error::not a universal binary"; exit 1; }
           [[ "$minos" == "11.0" ]] || { echo "::error::minimum macOS is $minos, expected 11.0"; exit 1; }
+
+      - name: Check Neural Tone's amp models are inside the plug-in
+        run: |
+          BIN="build/KBKStudio_artefacts/Release/AU/KBK Studio 2.component/Contents/MacOS/KBK Studio 2"
+          for arch in arm64 x86_64; do
+            for kind in wavenet lstm; do
+              n=$(nm -arch $arch -C "$BIN" | grep -c "nam::$kind" || true)
+              echo "$arch nam::$kind symbols: $n"
+              [[ "$n" -gt 0 ]] || { echo "::error::nam::$kind missing from the $arch AU - amps would fail to load"; exit 1; }
+            done
+          done
 
       - name: Sign (ad hoc) so Apple Silicon Macs can load it
         run: |
@@ -111,7 +122,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/_deps
-          key: kbk-juce-8.0.15-${{ runner.os }}
+          key: kbk-juce-8.0.15-nam-0.6.0-${{ runner.os }}
 
       - name: Configure
         run: cmake -S kbk-studio-plugin -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
@@ -121,3 +132,12 @@ jobs:
 
       - name: Engine tests
         run: build/KBKStudioTests_artefacts/Release/KBKStudioTests
+
+      - name: Check Neural Tone's amp models are inside the plug-in
+        run: |
+          SO="build/KBKStudio_artefacts/Release/VST3/KBK Studio 2.vst3/Contents/x86_64-linux/KBK Studio 2.so"
+          for kind in wavenet lstm; do
+            n=$(nm -C "$SO" | grep -c "nam::$kind" || true)
+            echo "nam::$kind symbols: $n"
+            [[ "$n" -gt 0 ]] || { echo "::error::nam::$kind missing from the VST3 - amps would fail to load"; exit 1; }
+          done

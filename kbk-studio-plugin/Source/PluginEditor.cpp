@@ -448,12 +448,76 @@ KbkStudioEditor::KbkStudioEditor (KbkStudioProcessor& p) : AudioProcessorEditor 
     };
     addAndMakeVisible (learnButton);
 
+    // AI Vox
+    voxHeading.setText ("AI VOX  -  voice conversion", juce::dontSendNotification);
+    voxHeading.setFont (juce::FontOptions (12.0f, juce::Font::bold));
+    voxHeading.setColour (juce::Label::textColourId, colours::gold);
+    addAndMakeVisible (voxHeading);
+    voiceBox.setTextWhenNothingSelected ("Target voice...");
+    voiceBox.setTextWhenNoChoicesAvailable ("No voices yet - press Rescan");
+    voiceBox.onChange = [this]
+    {
+        if (! refreshing && voiceBox.getSelectedItemIndex() >= 0)
+            proc.voxVoice = proc.voices[voiceBox.getSelectedItemIndex()];
+    };
+    addAndMakeVisible (voiceBox);
+    voxRescan.onClick = [this] { proc.refreshVoices(); };
+    addAndMakeVisible (voxRescan);
+    voxFolder.onClick = [this]
+    {
+        if (proc.voicesFolder.isEmpty())
+        {
+            proc.refreshVoices();
+            return;
+        }
+        juce::File dir (proc.voicesFolder);
+        dir.createDirectory();
+        dir.startAsProcess(); // opens it in Finder
+    };
+    addAndMakeVisible (voxFolder);
+    voxPitchLabel.setText ("Pitch", juce::dontSendNotification);
+    voxPitchLabel.setColour (juce::Label::textColourId, colours::muted);
+    voxPitchLabel.setFont (juce::FontOptions (12.0f));
+    addAndMakeVisible (voxPitchLabel);
+    voxPitch.setRange (-24.0, 24.0, 1.0);
+    voxPitch.setTextValueSuffix (" st");
+    voxPitch.setTextBoxStyle (juce::Slider::TextBoxRight, false, 52, 22);
+    voxPitch.setColour (juce::Slider::trackColourId, colours::purple);
+    voxPitch.setColour (juce::Slider::thumbColourId, colours::gold);
+    voxPitch.setColour (juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+    voxPitch.onValueChange = [this] { proc.voxPitch = (int) voxPitch.getValue(); };
+    addAndMakeVisible (voxPitch);
+    voxButton.getProperties().set ("primary", true);
+    voxButton.onClick = [this] { proc.aiVox (proc.sampler.selectedPad); refreshEditor(); };
+    addAndMakeVisible (voxButton);
+
+    // Neural Tone
+    ampButton.onClick = [this]
+    {
+        chooser = std::make_unique<juce::FileChooser> ("Load a Neural Amp Modeler capture", juce::File(), "*.nam;*.json");
+        chooser->launchAsync (juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles,
+                              [this] (const juce::FileChooser& fc)
+                              {
+                                  if (fc.getResult().existsAsFile())
+                                      proc.loadAmp (fc.getResult());
+                              });
+    };
+    addAndMakeVisible (ampButton);
+    ampLabel.setFont (juce::FontOptions (11.0f));
+    ampLabel.setColour (juce::Label::textColourId, colours::muted);
+    addAndMakeVisible (ampLabel);
+    setupKnob (ntIn, "In", "ntIn");
+    setupKnob (ntDrive, "Drive", "ntDrive");
+    setupKnob (ntMix, "Mix", "ntMix");
+    setupKnob (ntOut, "Out", "ntOut");
+
     // master strip
-    for (auto* t : { &glueOn, &tapeOn, &limOn })
+    for (auto* t : { &ntOn, &glueOn, &tapeOn, &limOn })
     {
         t->getProperties().set ("heading", true);
         addAndMakeVisible (t);
     }
+    ntOnA = std::make_unique<ButtonAttachment> (proc.params, "ntOn", ntOn);
     glueOnA = std::make_unique<ButtonAttachment> (proc.params, "glueOn", glueOn);
     tapeOnA = std::make_unique<ButtonAttachment> (proc.params, "tapeOn", tapeOn);
     limOnA = std::make_unique<ButtonAttachment> (proc.params, "limOn", limOn);
@@ -477,7 +541,8 @@ KbkStudioEditor::KbkStudioEditor (KbkStudioProcessor& p) : AudioProcessorEditor 
 
     proc.addChangeListener (this);
     proc.checkHelper();
-    setSize (1180, 846);
+    proc.refreshVoices();
+    setSize (1240, 846);
     refreshEditor();
     startTimerHz (30);
 }
@@ -546,6 +611,16 @@ void KbkStudioEditor::refreshEditor()
                          juce::dontSendNotification);
     helperLabel.setColour (juce::Label::textColourId, hs == 1 ? colours::green : colours::muted);
     urlButton.setEnabled (! proc.busy);
+
+    voiceBox.clear (juce::dontSendNotification);
+    voiceBox.addItemList (proc.voices, 1);
+    if (const int vi = proc.voices.indexOf (proc.voxVoice); vi >= 0)
+        voiceBox.setSelectedItemIndex (vi, juce::dontSendNotification);
+    voxPitch.setValue (proc.voxPitch, juce::dontSendNotification);
+    voxButton.setEnabled (p.loaded() && ! proc.voxBusy);
+    voxButton.setButtonText (proc.voxBusy ? "Converting..." : "AI Vox");
+    ampLabel.setText (proc.ampName.isNotEmpty() ? proc.ampName : juce::String ("no amp loaded (.nam / .json)"), juce::dontSendNotification);
+    ampLabel.setColour (juce::Label::textColourId, proc.ampName.isNotEmpty() ? colours::text : colours::muted);
     refreshing = false;
 }
 
@@ -716,7 +791,7 @@ void KbkStudioEditor::paint (juce::Graphics& g)
 
     // master section dividers
     g.setColour (colours::line);
-    for (auto* t : std::initializer_list<juce::Component*> { &tapeOn, &limOn, &master.label })
+    for (auto* t : std::initializer_list<juce::Component*> { &glueOn, &tapeOn, &limOn, &master.label })
         g.fillRect (t->getX() - 12, padsPanel.getBottom() + 24, 1, getHeight() - padsPanel.getBottom() - 76);
 }
 
@@ -780,6 +855,16 @@ void KbkStudioEditor::resized()
     noteLabel.setBounds (ex, y, 200, 28);
     learnButton.setBounds (ex + 204, y, 110, 28);
     exportButton.setBounds (ex + ew - 120, y, 120, 28);
+    y += 40;
+    voxHeading.setBounds (ex, y, 260, 20);
+    y += 22;
+    voiceBox.setBounds (ex, y, ew - 168, 28);
+    voxRescan.setBounds (ex + ew - 160, y, 76, 28);
+    voxFolder.setBounds (ex + ew - 78, y, 78, 28);
+    y += 36;
+    voxPitchLabel.setBounds (ex, y, 40, 28);
+    voxPitch.setBounds (ex + 42, y, ew - 42 - 128, 28);
+    voxButton.setBounds (ex + ew - 116, y, 116, 28);
 
     // master strip
     const int my = padArea.getBottom() + 112 + 12 + 14;
@@ -790,17 +875,22 @@ void KbkStudioEditor::resized()
         int kx = x;
         for (auto* k : knobs)
         {
-            k->label.setBounds (kx, my + 24, 72, 14);
-            k->slider.setBounds (kx, my + 38, 72, 74);
-            kx += 76;
+            k->label.setBounds (kx, my + 24, 64, 14);
+            k->slider.setBounds (kx, my + 38, 64, 74);
+            kx += 66;
         }
-        x = kx + 24;
+        x = juce::jmax (kx, t.getRight() - 40) + 22;
     };
+    section (ntOn, { &ntIn, &ntDrive, &ntMix, &ntOut });
+    ntOn.setSize (112, 22);
+    ampButton.setBounds (ntOn.getX() + 116, my - 3, 88, 22);
+    ampLabel.setBounds (ntOn.getX() + 208, my - 3, 104, 22);
+    x = juce::jmax (x, ampLabel.getRight() + 22);
     section (glueOn, { &glueThresh, &glueRatio, &glueAttack, &glueRelease, &glueMakeup, &glueMix });
     section (tapeOn, { &tapeDrive, &tapeWarmth });
     section (limOn, { &limCeiling, &limRelease });
-    master.label.setBounds (x, my + 24, 72, 14);
-    master.slider.setBounds (x, my + 38, 72, 74);
+    master.label.setBounds (x, my + 24, 64, 14);
+    master.slider.setBounds (x, my + 38, 64, 74);
 
     status.setBounds (16, getHeight() - 34, getWidth() - 32, 26);
 }

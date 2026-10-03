@@ -4,7 +4,8 @@
 namespace
 {
 const juce::StringArray masterIds { "master", "glueOn", "glueThresh", "glueRatio", "glueAttack", "glueRelease", "glueMakeup",
-                                    "glueMix", "tapeOn", "tapeDrive", "tapeWarmth", "limOn", "limCeiling", "limRelease" };
+                                    "glueMix", "tapeOn", "tapeDrive", "tapeWarmth", "limOn", "limCeiling", "limRelease",
+                                    "ntOn", "ntIn", "ntDrive", "ntMix", "ntOut" };
 
 std::unique_ptr<juce::AudioParameterFloat> knob (const juce::String& id, const juce::String& name, float lo, float hi,
                                                  float def, const juce::String& unit = {}, float skewCentre = 0.0f)
@@ -84,6 +85,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout KbkStudioProcessor::createLa
     l.add (toggle ("limOn", "Limiter On", true));
     l.add (knob ("limCeiling", "Limiter Ceiling", -12.0f, 0.0f, -0.3f, "dB"));
     l.add (knob ("limRelease", "Limiter Release", 10.0f, 1000.0f, 100.0f, "ms", 150.0f));
+    l.add (toggle ("ntOn", "Neural Tone On", false));
+    l.add (knob ("ntIn", "Neural Tone In", -24.0f, 24.0f, 0.0f, "dB"));
+    l.add (knob ("ntDrive", "Neural Tone Drive", 0.0f, 1.0f, 0.5f));
+    l.add (knob ("ntMix", "Neural Tone Mix", 0.0f, 1.0f, 1.0f));
+    l.add (knob ("ntOut", "Neural Tone Out", -24.0f, 12.0f, 0.0f, "dB"));
     l.add (std::make_unique<juce::AudioParameterChoice> (juce::ParameterID { "keyMode", 1 }, "Keyboard",
                                                          juce::StringArray { "Pads", "Keys", "Split" }, 0));
     l.add (std::make_unique<juce::AudioParameterInt> (juce::ParameterID { "baseNote", 1 }, "Pad 1 Note", 0, 112, 36));
@@ -150,6 +156,11 @@ void KbkStudioProcessor::pushMasterSettings()
     m.limiterOn = v ("limOn") > 0.5f;
     m.limiterCeilingDb = v ("limCeiling");
     m.limiterReleaseMs = v ("limRelease");
+    m.neural.on = v ("ntOn") > 0.5f;
+    m.neural.inDb = v ("ntIn");
+    m.neural.drive = v ("ntDrive");
+    m.neural.mix = v ("ntMix");
+    m.neural.outDb = v ("ntOut");
     sampler.setMaster (m);
     sampler.keyMode = (int) v ("keyMode");
     sampler.velocitySensitive = v ("velocity") > 0.5f;
@@ -256,9 +267,7 @@ bool KbkStudioProcessor::chopToPads (const juce::AudioBuffer<float>& audio, doub
         how_ = " (equal slices)";
     }
 
-    undoKit.clear();
-    for (int i = 0; i < kbk::numPads; ++i)
-        undoKit.push_back (sampler.getPad (i));
+    snapshotForUndo();
     sampler.stopAll();
     for (int i = 0; i < kbk::numPads; ++i)
     {
@@ -347,6 +356,157 @@ bool KbkStudioProcessor::exportPad (int pad, const juce::File& file)
     return w->writeFromAudioSampleBuffer (part, 0, part.getNumSamples());
 }
 
+void KbkStudioProcessor::snapshotForUndo()
+{
+    undoKit.clear();
+    for (int i = 0; i < kbk::numPads; ++i)
+        undoKit.push_back (sampler.getPad (i));
+}
+
+// ---- Neural Tone -------------------------------------------------------------------
+
+void KbkStudioProcessor::loadAmp (const juce::File& file)
+{
+    const auto text = file.loadFileAsString().toStdString();
+    if (text.empty())
+    {
+        setStatus ("Couldn't read " + file.getFileName(), true);
+        return;
+    }
+    setStatus ("Loading amp " + file.getFileNameWithoutExtension() + "...");
+    applyAmp (text, file.getFileNameWithoutExtension(), true);
+}
+
+void KbkStudioProcessor::applyAmp (const std::string& json, const juce::String& name, bool announce)
+{
+    const double rate = getSampleRate() > 0.0 ? getSampleRate() : 48000.0;
+    const int block = getBlockSize() > 0 ? getBlockSize() : 512;
+    pool.addJob ([this, json, name, announce, rate, block]
+                 {
+                     std::shared_ptr<nam::DSP> model;
+                     const auto err = kbk::NeuralTone::loadModel (json, rate, block, model);
+                     onMessageThread ([this, err, model, json, name, announce]
+                                      {
+                                          if (! err.empty())
+                                          {
+                                              setStatus (juce::String (err), true);
+                                              return;
+                                          }
+                                          sampler.neural.setModel (model);
+                                          ampJson = json;
+                                          ampName = name;
+                                          if (announce)
+                                          {
+                                              if (auto* on = params.getParameter ("ntOn"))
+                                                  on->setValueNotifyingHost (1.0f);
+                                              setStatus ("Neural Tone: " + name + " loaded. It runs at "
+                                                         + juce::String (juce::roundToInt (sampler.neural.modelRate() / 100.0) / 10.0) + " kHz, like it was captured.");
+                                          }
+                                          else
+                                              sendChangeMessage();
+                                      });
+                 });
+}
+
+void KbkStudioProcessor::clearAmp()
+{
+    sampler.neural.setModel (nullptr);
+    ampJson.clear();
+    ampName.clear();
+    setStatus ("Neural Tone: amp removed.");
+}
+
+// ---- AI Vox ----------------------------------------------------------------------------
+
+void KbkStudioProcessor::refreshVoices()
+{
+    pool.addJob ([this]
+                 {
+                     juce::String err;
+                     auto j = loader.listVoices (err);
+                     onMessageThread ([this, j, err]
+                                      {
+                                          if (err.isNotEmpty() || ! j.isObject())
+                                          {
+                                              voxReady = false;
+                                              setStatus ("AI Vox: " + (err.isNotEmpty() ? err : juce::String ("the helper sent nothing back")), true);
+                                              return;
+                                          }
+                                          voices.clear();
+                                          if (auto* arr = j["voices"].getArray())
+                                              for (auto& v : *arr)
+                                                  voices.add (v.toString());
+                                          voicesFolder = j["folder"].toString();
+                                          voxReady = (bool) j["ready"];
+                                          if (! voices.contains (voxVoice))
+                                              voxVoice = voices.isEmpty() ? juce::String() : voices[0];
+                                          setStatus (voices.isEmpty() ? "AI Vox: no voice models yet. Put RVC voice models (.pth, with their .index) in " + voicesFolder
+                                                                      : "AI Vox: " + juce::String (voices.size()) + " voice" + (voices.size() == 1 ? "" : "s") + " found."
+                                                                            + (voxReady ? "" : " Voice conversion isn't installed on the helper yet: run  bash setup-helper.sh --vox"),
+                                                     voices.isEmpty() || ! voxReady);
+                                      });
+                 });
+}
+
+void KbkStudioProcessor::aiVox (int pad)
+{
+    const auto p = sampler.getPad (pad);
+    if (! p.loaded())
+    {
+        setStatus ("AI Vox: load a vocal on this pad first.", true);
+        return;
+    }
+    if (voxVoice.isEmpty())
+    {
+        setStatus ("AI Vox: pick a voice first (Rescan finds the voices on the helper).", true);
+        return;
+    }
+    // the trimmed part of the pad, as it plays
+    const int n = p.audio->getNumSamples();
+    const int a = (int) (juce::jmin (p.start, p.end) * n), b = juce::jmax (a + 1, (int) (juce::jmax (p.start, p.end) * n));
+    auto part = std::make_shared<juce::AudioBuffer<float>> (p.audio->getNumChannels(), b - a);
+    for (int c = 0; c < part->getNumChannels(); ++c)
+        part->copyFrom (c, 0, *p.audio, c, a, b - a);
+    if (p.reverse)
+        part->reverse (0, part->getNumSamples());
+
+    voxBusy = busy = true;
+    setStatus ("AI Vox: turning \"" + p.name + "\" into " + voxVoice + " (on the helper; a few seconds per second of audio on a CPU)...");
+    const auto voice = voxVoice;
+    const int pitch = voxPitch;
+    const double rate = p.sourceRate;
+    const auto name = voice + " - " + p.name;
+    pool.addJob ([this, part, rate, voice, pitch, name, pad]
+                 {
+                     auto result = std::make_shared<kbk::LoadedAudio> (loader.convertVoice (*part, rate, voice, pitch, name));
+                     onMessageThread ([this, result, pad, name]
+                                      {
+                                          voxBusy = busy = false;
+                                          if (! result->ok())
+                                          {
+                                              setStatus (result->error, true);
+                                              return;
+                                          }
+                                          // next empty pad after this one, so the original stays; else replace it
+                                          int target = pad;
+                                          for (int k = 1; k < kbk::numPads; ++k)
+                                              if (! sampler.getPad ((pad + k) % kbk::numPads).loaded())
+                                              {
+                                                  target = (pad + k) % kbk::numPads;
+                                                  break;
+                                              }
+                                          snapshotForUndo();
+                                          kbk::Pad np;
+                                          np.audio = std::make_shared<const juce::AudioBuffer<float>> (std::move (result->audio));
+                                          np.sourceRate = result->sampleRate;
+                                          np.name = name;
+                                          sampler.setPad (target, np);
+                                          sampler.selectedPad = target;
+                                          setStatus ("AI Vox: \"" + name + "\" is on pad " + juce::String (target + 1) + ". Undo puts the pads back.");
+                                      });
+                 });
+}
+
 void KbkStudioProcessor::checkHelper()
 {
     pool.addJob ([this]
@@ -365,6 +525,13 @@ void KbkStudioProcessor::getStateInformation (juce::MemoryBlock& destData)
     root.setProperty ("autoChop", autoChop, nullptr);
     root.setProperty ("chopCut", chopCut, nullptr);
     root.setProperty ("selected", sampler.selectedPad.load(), nullptr);
+    root.setProperty ("voxVoice", voxVoice, nullptr);
+    root.setProperty ("voxPitch", voxPitch, nullptr);
+    if (! ampJson.empty())
+    {
+        root.setProperty ("ampName", ampName, nullptr);
+        root.setProperty ("amp", juce::String (ampJson), nullptr);
+    }
     root.appendChild (params.copyState(), nullptr);
     juce::ValueTree padsTree ("Pads");
     const auto notes = sampler.getPadNotes();
@@ -401,6 +568,10 @@ void KbkStudioProcessor::setStateInformation (const void* data, int sizeInBytes)
     if (! root.hasType ("KBKStudio"))
         return;
     autoChop = root.getProperty ("autoChop", true);
+    voxVoice = root.getProperty ("voxVoice", "").toString();
+    voxPitch = root.getProperty ("voxPitch", 0);
+    if (const auto amp = root.getProperty ("amp", "").toString(); amp.isNotEmpty())
+        applyAmp (amp.toStdString(), root.getProperty ("ampName", "Amp").toString(), false);
     chopCut = root.getProperty ("chopCut", true);
     if (auto ps = root.getChildWithName (params.state.getType()); ps.isValid())
         params.replaceState (ps);

@@ -1,5 +1,7 @@
 import json
+import os
 import shutil
+import tempfile
 import struct
 import sys
 import threading
@@ -48,6 +50,38 @@ class PureTests(unittest.TestCase):
         self.assertEqual(a[-1], "song.wav")
         with self.assertRaises(ValueError):
             k.demucs_args("s", "o", "rm -rf")
+
+
+class VoiceTests(unittest.TestCase):
+    def test_list_voices_loose_and_folders(self):
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d)
+            (d / "Lauren.pth").write_bytes(b"x")
+            (d / "Lauren.index").write_bytes(b"x")
+            (d / "._Lauren.pth").write_bytes(b"x")  # macOS junk file
+            choir = d / "Choir Alto"
+            (choir / "weights").mkdir(parents=True)
+            (choir / "weights" / "alto_e300.pth").write_bytes(b"x")
+            (choir / "trained_IVF256_v2.index").write_bytes(b"x")
+            (choir / "added_IVF256_v2.index").write_bytes(b"x")
+            (d / "Empty").mkdir()
+            v = k.list_voices(d)
+            self.assertEqual(sorted(v), ["Choir Alto", "Lauren"])
+            self.assertEqual(v["Lauren"][1].name, "Lauren.index")
+            self.assertEqual(v["Choir Alto"][0].name, "alto_e300.pth")
+            self.assertEqual(v["Choir Alto"][1].name, "added_IVF256_v2.index")
+            self.assertEqual(k.list_voices(d / "missing"), {})
+
+    def test_vox_args(self):
+        a = k.vox_args("py", "in.wav", "out.wav", "m.pth", "m.index", pitch=-5)
+        self.assertEqual(a[:4], ["py", "-m", "rvc_python", "cli"])
+        self.assertEqual(a[a.index("-pi") + 1], "-5")
+        self.assertEqual(a[a.index("-ip") + 1], "m.index")
+        self.assertNotIn("-ip", k.vox_args("py", "i", "o", "m.pth"))
+        with self.assertRaises(ValueError):
+            k.vox_args("py", "i", "o", "m", pitch=99)
+        with self.assertRaises(ValueError):
+            k.vox_args("py", "i", "o", "m", method="rm -rf")
 
 
 class ServerTests(unittest.TestCase):
@@ -105,6 +139,48 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(s, 200)
         self.assertEqual(w[:4], b"RIFF")
         self.assertEqual(struct.unpack("<I", w[24:28])[0], 22050)
+
+    def test_voices_and_vox_round_trip(self):
+        # a stand-in for rvc-python: copies the audio and notes the pitch it was given
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d)
+            pkg = d / "fake" / "rvc_python"
+            pkg.mkdir(parents=True)
+            (pkg / "__init__.py").write_text("")
+            (pkg / "__main__.py").write_text(
+                "import sys, shutil\n"
+                "a = sys.argv\n"
+                "shutil.copy(a[a.index('-i') + 1], a[a.index('-o') + 1])\n"
+                "open(a[a.index('-o') + 1] + '.pitch', 'w').write(a[a.index('-pi') + 1])\n")
+            voices = d / "voices"
+            voices.mkdir()
+            (voices / "Test Voice.pth").write_bytes(b"x")
+            old = (k.VOICES_DIR, os.environ.get("KBK_VOX_PYTHON"), os.environ.get("PYTHONPATH"), dict(k._vox_cache))
+            k.VOICES_DIR = voices
+            os.environ["KBK_VOX_PYTHON"] = sys.executable
+            os.environ["PYTHONPATH"] = str(d / "fake")
+            k._vox_cache.update(at=0.0, ok=False)
+            try:
+                s, _, b = self.get("/voices")
+                j = json.loads(b)
+                self.assertEqual(s, 200)
+                self.assertEqual(j["voices"], ["Test Voice"])
+                self.assertTrue(j["ready"])
+                wav = tiny_wav()
+                s, h, out = self.get("/vox?voice=Test%20Voice&pitch=3", data=wav, method="POST")
+                self.assertEqual(s, 200, out[:300])
+                self.assertEqual(out, wav)
+                self.assertEqual(self.get("/vox?voice=Nobody", data=wav, method="POST")[0], 404)
+                self.assertEqual(self.get("/vox?voice=Test%20Voice&pitch=90", data=wav, method="POST")[0], 400)
+            finally:
+                k.VOICES_DIR = old[0]
+                for key, val in (("KBK_VOX_PYTHON", old[1]), ("PYTHONPATH", old[2])):
+                    if val is None:
+                        os.environ.pop(key, None)
+                    else:
+                        os.environ[key] = val
+                k._vox_cache.clear()
+                k._vox_cache.update(old[3])
 
     def test_convert_unknown_format(self):
         self.assertEqual(self.get("/convert?format=exe", data=tiny_wav(), method="POST")[0], 400)

@@ -53,6 +53,19 @@ public:
     bool exportPad (int pad, const juce::File& file);
     void checkHelper();
 
+    // Neural Tone: load a NAM amp model (.nam / .json)
+    void loadAmp (const juce::File& file);
+    void clearAmp();
+    juce::String ampName;
+
+    // AI Vox: voice models live on the KBK helper
+    void refreshVoices();
+    void aiVox (int pad);
+    juce::StringArray voices;
+    juce::String voicesFolder, voxVoice;
+    int voxPitch = 0;
+    bool voxReady = false, voxBusy = false;
+
     bool autoChop = true, chopCut = true;
     juce::String statusText { "Drop a song, loop or sample on the pads, or paste a link." };
     bool statusError = false, busy = false;
@@ -75,6 +88,9 @@ private:
     void onMessageThread (std::function<void()> fn);
     juce::ThreadPool pool { 1 };
     std::vector<kbk::Pad> undoKit;
+    void snapshotForUndo();
+    void applyAmp (const std::string& json, const juce::String& name, bool announce);
+    std::string ampJson; // kept so the project reopens with the same amp
     std::atomic<bool> masterDirty { true };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KbkStudioProcessor)

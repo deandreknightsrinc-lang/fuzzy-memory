@@ -324,6 +324,52 @@ bool AudioLoader::helperOnline()
     return download (juce::URL (helperBase + "/health"), mb, err, 1500) && mb.toString().contains ("\"ok\"");
 }
 
+juce::var AudioLoader::listVoices (juce::String& error)
+{
+    juce::MemoryBlock mb;
+    if (! download (juce::URL (helperBase + "/voices"), mb, error, 4000))
+    {
+        if (error == "couldn't connect")
+            error = "The KBK helper isn't running. In Terminal: bash ~/fuzzy-memory/kbk-studio/server/start-helper.sh";
+        return {};
+    }
+    return juce::JSON::parse (mb.toString());
+}
+
+LoadedAudio AudioLoader::convertVoice (const juce::AudioBuffer<float>& audio, double sampleRate, const juce::String& voice, int pitch,
+                                       const juce::String& name)
+{
+    LoadedAudio res;
+    juce::MemoryBlock wav;
+    {
+        juce::WavAudioFormat fmt;
+        std::unique_ptr<juce::OutputStream> os = std::make_unique<juce::MemoryOutputStream> (wav, false);
+        auto w = fmt.createWriterFor (os, juce::AudioFormatWriterOptions {}.withSampleRate (sampleRate)
+                                              .withNumChannels (audio.getNumChannels())
+                                              .withBitsPerSample (24));
+        if (w == nullptr)
+        {
+            res.error = "Couldn't prepare the audio.";
+            return res;
+        }
+        w->writeFromAudioSampleBuffer (audio, 0, audio.getNumSamples());
+    }
+    // query kept in the address: JUCE would otherwise move it into the POST body
+    auto url = juce::URL::createWithoutParsing (helperBase + "/vox?voice=" + juce::URL::addEscapeChars (voice, true)
+                                                + "&pitch=" + juce::String (pitch))
+                   .withPOSTData (wav);
+    juce::MemoryBlock out;
+    juce::String err;
+    if (! download (url, out, err, 30 * 60 * 1000))
+    {
+        res.error = err == "couldn't connect"
+                        ? juce::String ("The KBK helper isn't running. In Terminal: bash ~/fuzzy-memory/kbk-studio/server/start-helper.sh")
+                        : "AI Vox didn't work: " + err;
+        return res;
+    }
+    return decode (out, name, false);
+}
+
 LoadedAudio AudioLoader::loadUrl (const juce::String& input, std::function<void (const juce::String&)> progress)
 {
     LoadedAudio res;

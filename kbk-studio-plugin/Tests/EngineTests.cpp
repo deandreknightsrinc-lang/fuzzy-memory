@@ -5,6 +5,7 @@
 
 #include "Engine/AudioLoader.h"
 #include "Engine/AutoChop.h"
+#include "Engine/NeuralTone.h"
 #include "Engine/PadSampler.h"
 
 #include <cmath>
@@ -374,6 +375,129 @@ int main()
         const float pk = out.getMagnitude (0, 4096, out.getNumSamples() - 4096);
         CHECK (pk <= juce::Decibels::decibelsToGain (-1.0f) * 1.02f, "peak " + juce::String (pk));
         CHECK (pk > 0.5f, "still loud");
+    });
+
+    // ---- Neural Tone ---------------------------------------------------------------------
+    run ("rate converter: 44.1 kHz -> 48 kHz -> 44.1 kHz keeps the pitch", []
+    {
+        kbk::RateConverter up, down;
+        up.prepare (44100.0, 48000.0, 512);
+        down.prepare (48000.0, 44100.0, 600);
+        std::vector<float> zeros (64, 0.0f);
+        down.push (zeros.data(), (int) zeros.size());
+        auto in = sine (44100, 441.0f, 44100.0);
+        juce::AudioBuffer<float> out (1, 44100);
+        out.clear();
+        std::vector<float> mid (1200), o (512);
+        for (int pos = 0; pos + 512 <= 44100; pos += 512)
+        {
+            up.push (in.getReadPointer (0) + pos, 512);
+            const int m = up.available();
+            up.pull (mid.data(), m);
+            down.push (mid.data(), m);
+            const int r = juce::jmin (512, down.available());
+            down.pull (o.data(), r);
+            CHECK (r == 512, "output keeps up: " + juce::String (r));
+            out.copyFrom (0, pos, o.data(), r);
+        }
+        const int z = zeroCrossings (out, 4410, 4410 + 22050);
+        CHECK (std::abs (z - 441) <= 3, "441 Hz -> 441 crossings in 0.5 s, got " + juce::String (z));
+    });
+
+    for (auto* modelName : { "wavenet_a1_standard.nam", "lstm.nam", "A2.nam" })
+    {
+        run ((juce::String ("neural tone: plays through ") + modelName).toRawUTF8(), [modelName]
+        {
+            const auto json = juce::File (NAM_EXAMPLE_MODELS).getChildFile (modelName).loadFileAsString().toStdString();
+            CHECK (! json.empty(), "example model found");
+            std::shared_ptr<nam::DSP> model;
+            const auto err = kbk::NeuralTone::loadModel (json, 44100.0, 512, model);
+            CHECK (err.empty() && model != nullptr, juce::String (err));
+            if (model == nullptr)
+                return;
+            kbk::NeuralTone tone;
+            tone.prepare (44100.0, 512);
+            tone.setModel (model);
+            CHECK (tone.hasModel(), "model in");
+            auto in = sine (512 * 40, 220.0f, 44100.0, 0.3f, 2);
+            auto dry = in;
+            kbk::NeuralSettings s;
+            s.on = true;
+            for (int pos = 0; pos < in.getNumSamples(); pos += 512)
+                tone.process (in.getWritePointer (0) + pos, in.getWritePointer (1) + pos, 512, s);
+            bool finite = true;
+            for (int i = 0; i < in.getNumSamples(); ++i)
+                finite = finite && std::isfinite (in.getSample (0, i));
+            CHECK (finite, "no NaN/inf");
+            const float rms = in.getRMSLevel (0, 8192, in.getNumSamples() - 8192);
+            CHECK (rms > 0.005f, "sound comes out: rms " + juce::String (rms));
+            float diff = 0.0f;
+            for (int i = 8192; i < in.getNumSamples(); ++i)
+                diff = juce::jmax (diff, std::abs (in.getSample (0, i) - dry.getSample (0, i)));
+            CHECK (diff > 0.01f, "the amp changes the sound");
+            // mix 0 = untouched
+            auto again = dry;
+            s.mix = 0.0f;
+            kbk::NeuralTone dryTone;
+            dryTone.prepare (44100.0, 512);
+            std::shared_ptr<nam::DSP> m2;
+            kbk::NeuralTone::loadModel (json, 44100.0, 512, m2);
+            dryTone.setModel (m2);
+            // the mix is smoothed over 30 ms, so start it at 0 by processing silence first
+            juce::AudioBuffer<float> warm (2, 512 * 8);
+            warm.clear();
+            for (int pos = 0; pos < warm.getNumSamples(); pos += 512)
+                dryTone.process (warm.getWritePointer (0) + pos, warm.getWritePointer (1) + pos, 512, s);
+            for (int pos = 0; pos < again.getNumSamples(); pos += 512)
+                dryTone.process (again.getWritePointer (0) + pos, again.getWritePointer (1) + pos, 512, s);
+            float d2 = 0.0f;
+            for (int i = 0; i < again.getNumSamples(); ++i)
+                d2 = juce::jmax (d2, std::abs (again.getSample (0, i) - dry.getSample (0, i)));
+            CHECK (d2 < 1e-5f, "mix 0 leaves the sound alone: " + juce::String (d2));
+        });
+    }
+
+    run ("neural tone: a bad file is refused with a message, off = untouched", []
+    {
+        std::shared_ptr<nam::DSP> model;
+        const auto err = kbk::NeuralTone::loadModel ("{\"not\": \"a model\"}", 44100.0, 512, model);
+        CHECK (! err.empty() && model == nullptr, "refused");
+        const auto err2 = kbk::NeuralTone::loadModel ("this is not json", 44100.0, 512, model);
+        CHECK (! err2.empty(), "not json");
+        kbk::NeuralTone tone;
+        tone.prepare (44100.0, 512);
+        auto in = sine (512, 220.0f, 44100.0, 0.3f, 2);
+        auto ref = in;
+        kbk::NeuralSettings s; // off
+        tone.process (in.getWritePointer (0), in.getWritePointer (1), 512, s);
+        CHECK (in.getSample (0, 100) == ref.getSample (0, 100), "off");
+    });
+
+    run ("neural tone: a WaveNet amp runs faster than real time", []
+    {
+        const auto json = juce::File (NAM_EXAMPLE_MODELS).getChildFile ("wavenet_a1_standard.nam").loadFileAsString().toStdString();
+        std::shared_ptr<nam::DSP> model;
+        const auto err = kbk::NeuralTone::loadModel (json, 44100.0, 512, model);
+        CHECK (err.empty() && model != nullptr, "model loads: " + juce::String (err));
+        if (model == nullptr)
+            return;
+        kbk::NeuralTone tone;
+        tone.prepare (44100.0, 512);
+        tone.setModel (model);
+        kbk::NeuralSettings s;
+        s.on = true;
+        juce::AudioBuffer<float> b (2, 512);
+        const auto t0 = juce::Time::getMillisecondCounterHiRes();
+        const int blocks = 44100 * 5 / 512; // 5 seconds of audio
+        for (int k = 0; k < blocks; ++k)
+        {
+            for (int i = 0; i < 512; ++i)
+                b.setSample (0, i, 0.2f * std::sin ((float) (k * 512 + i) * 0.03f)), b.setSample (1, i, b.getSample (0, i));
+            tone.process (b.getWritePointer (0), b.getWritePointer (1), 512, s);
+        }
+        const double ms = juce::Time::getMillisecondCounterHiRes() - t0;
+        std::printf ("    5 s of audio through the standard WaveNet amp took %.0f ms (%.1f%% of real time)\n", ms, ms / 50.0);
+        CHECK (ms < 5000.0, "faster than real time");
     });
 
     std::printf ("\n%d checks, %d failed\n", checks, failures);
