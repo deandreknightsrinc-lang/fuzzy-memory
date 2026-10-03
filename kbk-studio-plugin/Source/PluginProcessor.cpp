@@ -245,12 +245,14 @@ bool KbkStudioProcessor::chopToPads (const juce::AudioBuffer<float>& audio, doub
     const double dur = audio.getNumSamples() / rate;
     std::vector<kbk::Range> ranges;
     juce::String how_;
+    double sourceBpm = 0.0;
     if (how == ChopHow::Smart)
     {
         auto r = kbk::autoChop (audio, rate);
         if (r.kind == kbk::ChopResult::Kind::OneShot)
             return false;
         ranges = r.ranges;
+        sourceBpm = r.bpm;
         how_ = r.kind == kbk::ChopResult::Kind::Song
                    ? " (" + juce::String (juce::roundToInt (r.bpm)) + " BPM, one bar each, picked from across the whole song)"
                    : " at the hits";
@@ -284,6 +286,7 @@ bool KbkStudioProcessor::chopToPads (const juce::AudioBuffer<float>& audio, doub
             p.gain = 0.8f;
             p.mode = kbk::PlayMode::OneShot;
             p.choke = chopCut ? 4 : 0;
+            p.bpm = sourceBpm;
         }
         else
             p = kbk::Pad();
@@ -416,6 +419,83 @@ void KbkStudioProcessor::clearAmp()
     setStatus ("Neural Tone: amp removed.");
 }
 
+// ---- Analyze + Suno ----------------------------------------------------------------
+
+namespace
+{
+// the trimmed part of a pad, as it plays
+std::shared_ptr<juce::AudioBuffer<float>> playedPart (const kbk::Pad& p)
+{
+    const int n = p.audio->getNumSamples();
+    const int a = (int) (juce::jmin (p.start, p.end) * n), b = juce::jmax (a + 1, (int) (juce::jmax (p.start, p.end) * n));
+    auto part = std::make_shared<juce::AudioBuffer<float>> (p.audio->getNumChannels(), b - a);
+    for (int c = 0; c < part->getNumChannels(); ++c)
+        part->copyFrom (c, 0, *p.audio, c, a, b - a);
+    if (p.reverse)
+        part->reverse (0, part->getNumSamples());
+    return part;
+}
+} // namespace
+
+void KbkStudioProcessor::analyzePad (int pad)
+{
+    const auto p = sampler.getPad (pad);
+    if (! p.loaded())
+    {
+        setStatus ("Analyze: load something on this pad first.", true);
+        return;
+    }
+    analyzing = true;
+    setStatus ("Analyzing \"" + p.name + "\"...");
+    auto part = playedPart (p);
+    const double rate = p.sourceRate, bpm = p.bpm;
+    const auto name = p.name;
+    pool.addJob ([this, part, rate, bpm, name]
+                 {
+                     const auto a = kbk::analyze (*part, rate, bpm);
+                     const auto text = kbk::summary (a);
+                     onMessageThread ([this, text, name]
+                                      {
+                                          analyzing = false;
+                                          analysisText = text;
+                                          setStatus ("Analyze \"" + name + "\": " + text);
+                                      });
+                 });
+}
+
+void KbkStudioProcessor::sunoPrompt (int pad)
+{
+    const auto p = sampler.getPad (pad);
+    if (! p.loaded())
+    {
+        setStatus ("Suno Prompt: load a take or sample on this pad first.", true);
+        return;
+    }
+    analyzing = true;
+    setStatus ("Writing a Suno prompt from \"" + p.name + "\"...");
+    auto part = playedPart (p);
+    const double rate = p.sourceRate, bpm = p.bpm;
+    pool.addJob ([this, part, rate, bpm]
+                 {
+                     const auto a = kbk::analyze (*part, rate, bpm);
+                     const auto summaryText = kbk::summary (a);
+                     const auto draft = kbk::sunoPrompt (a);
+                     juce::String source;
+                     auto polished = loader.polishPrompt (summaryText, draft, source);
+                     const bool ai = polished.isNotEmpty() && source == "ollama";
+                     const auto prompt = ai ? polished : draft;
+                     onMessageThread ([this, summaryText, prompt, ai]
+                                      {
+                                          analyzing = false;
+                                          analysisText = summaryText;
+                                          sunoText = prompt;
+                                          juce::SystemClipboard::copyTextToClipboard (prompt);
+                                          setStatus (juce::String ("Suno prompt copied") + (ai ? " (written by your local AI)" : "")
+                                                     + ". Click Open Suno and paste it into Style of Music.");
+                                      });
+                 });
+}
+
 // ---- AI Vox ----------------------------------------------------------------------------
 
 void KbkStudioProcessor::refreshVoices()
@@ -461,14 +541,7 @@ void KbkStudioProcessor::aiVox (int pad)
         setStatus ("AI Vox: pick a voice first (Rescan finds the voices on the helper).", true);
         return;
     }
-    // the trimmed part of the pad, as it plays
-    const int n = p.audio->getNumSamples();
-    const int a = (int) (juce::jmin (p.start, p.end) * n), b = juce::jmax (a + 1, (int) (juce::jmax (p.start, p.end) * n));
-    auto part = std::make_shared<juce::AudioBuffer<float>> (p.audio->getNumChannels(), b - a);
-    for (int c = 0; c < part->getNumChannels(); ++c)
-        part->copyFrom (c, 0, *p.audio, c, a, b - a);
-    if (p.reverse)
-        part->reverse (0, part->getNumSamples());
+    auto part = playedPart (p);
 
     voxBusy = busy = true;
     setStatus ("AI Vox: turning \"" + p.name + "\" into " + voxVoice + " (on the helper; a few seconds per second of audio on a CPU)...");
@@ -550,6 +623,7 @@ void KbkStudioProcessor::getStateInformation (juce::MemoryBlock& destData)
         t.setProperty ("mode", (int) p.mode, nullptr);
         t.setProperty ("reverse", p.reverse, nullptr);
         t.setProperty ("choke", p.choke, nullptr);
+        t.setProperty ("bpm", p.bpm, nullptr);
         if (p.loaded())
         {
             t.setProperty ("rate", p.sourceRate, nullptr);
@@ -594,6 +668,7 @@ void KbkStudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             p.mode = (kbk::PlayMode) (int) t.getProperty ("mode", 0);
             p.reverse = t.getProperty ("reverse", false);
             p.choke = t.getProperty ("choke", 0);
+            p.bpm = t.getProperty ("bpm", 0.0);
             notes[(size_t) i] = t.getProperty ("note", 36 + i);
             if (auto* mb = t.getProperty ("flac").getBinaryData())
             {

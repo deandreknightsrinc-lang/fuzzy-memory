@@ -37,6 +37,9 @@ double estimateTempo (const juce::AudioBuffer<float>& audio, double sampleRate);
 // Slices that start at the strongest hits (always one at 0), at most `count`.
 std::vector<Range> chopAtHits (const juce::AudioBuffer<float>& audio, double sampleRate, int count = 16);
 
+// Times (seconds) of the clear hits: onsets at least `minStrength` (0..1) of the strongest.
+std::vector<double> hitTimes (const juce::AudioBuffer<float>& audio, double sampleRate, float minStrength = 0.3f);
+
 // `count` equal slices.
 std::vector<Range> chopEqual (double durationSec, int count);
 

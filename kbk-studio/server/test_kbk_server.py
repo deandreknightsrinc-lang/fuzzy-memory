@@ -84,6 +84,17 @@ class VoiceTests(unittest.TestCase):
             k.vox_args("py", "i", "o", "m", method="rm -rf")
 
 
+class SunoTests(unittest.TestCase):
+    def test_clean_suno(self):
+        d = "mid-tempo groove, 92 BPM, A minor"
+        self.assertEqual(k.clean_suno('"Soulful gospel groove, 92 BPM, A minor, warm keys"', d), ("Soulful gospel groove, 92 BPM, A minor, warm keys", "ollama"))
+        self.assertEqual(k.clean_suno("Style of Music: neo-soul, 92 BPM\nextra line", d), ("neo-soul, 92 BPM", "ollama"))
+        for bad in ("R&B in the style of Someone, 92 BPM", "sounds like a famous band", "trap like Drake, 92 BPM", "", "inspired by the 90s greats"):
+            self.assertEqual(k.clean_suno(bad, d), (d, "template"), bad)
+        long = ", ".join(["warm keys"] * 40)
+        self.assertLessEqual(len(k.clean_suno(long, d)[0]), 200)
+
+
 class ServerTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -181,6 +192,44 @@ class ServerTests(unittest.TestCase):
                         os.environ[key] = val
                 k._vox_cache.clear()
                 k._vox_cache.update(old[3])
+
+    def test_suno_with_and_without_ollama(self):
+        draft = "upbeat groove, 120 BPM, C major"
+        body = json.dumps({"facts": "120 BPM - C major", "draft": draft}).encode()
+        old = k.OLLAMA_URL
+        try:
+            k.OLLAMA_URL = "http://127.0.0.1:9"  # nothing there
+            s, _, b = self.get("/suno", data=body, method="POST")
+            j = json.loads(b)
+            self.assertEqual((s, j["prompt"], j["source"]), (200, draft, "template"))
+
+            # a stand-in Ollama
+            from http.server import BaseHTTPRequestHandler
+
+            class FakeOllama(BaseHTTPRequestHandler):
+                def log_message(self, *a):
+                    pass
+
+                def do_POST(self):
+                    req = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+                    assert "never name" in req["prompt"] and "120 BPM" in req["prompt"]
+                    out = json.dumps({"response": "Joyful gospel-pop, 120 BPM, C major, choir and organ"}).encode()
+                    self.send_response(200)
+                    self.send_header("Content-Length", str(len(out)))
+                    self.end_headers()
+                    self.wfile.write(out)
+
+            fake = ThreadingHTTPServer(("127.0.0.1", 0), FakeOllama)
+            threading.Thread(target=fake.serve_forever, daemon=True).start()
+            k.OLLAMA_URL = f"http://127.0.0.1:{fake.server_address[1]}"
+            s, _, b = self.get("/suno", data=body, method="POST")
+            j = json.loads(b)
+            fake.shutdown()
+            fake.server_close()
+            self.assertEqual((j["prompt"], j["source"]), ("Joyful gospel-pop, 120 BPM, C major, choir and organ", "ollama"))
+            self.assertEqual(self.get("/suno", data=b"not json", method="POST")[0], 400)
+        finally:
+            k.OLLAMA_URL = old
 
     def test_convert_unknown_format(self):
         self.assertEqual(self.get("/convert?format=exe", data=tiny_wav(), method="POST")[0], 400)

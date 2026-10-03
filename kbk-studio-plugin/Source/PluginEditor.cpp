@@ -491,6 +491,27 @@ KbkStudioEditor::KbkStudioEditor (KbkStudioProcessor& p) : AudioProcessorEditor 
     voxButton.onClick = [this] { proc.aiVox (proc.sampler.selectedPad); refreshEditor(); };
     addAndMakeVisible (voxButton);
 
+    // Analyze + Suno
+    analyzeHeading.setText ("ANALYZE  -  SUNO", juce::dontSendNotification);
+    analyzeHeading.setFont (juce::FontOptions (12.0f, juce::Font::bold));
+    analyzeHeading.setColour (juce::Label::textColourId, colours::gold);
+    addAndMakeVisible (analyzeHeading);
+    analyzeButton.onClick = [this] { proc.analyzePad (proc.sampler.selectedPad); refreshEditor(); };
+    addAndMakeVisible (analyzeButton);
+    sunoButton.getProperties().set ("primary", true);
+    sunoButton.onClick = [this] { proc.sunoPrompt (proc.sampler.selectedPad); refreshEditor(); };
+    addAndMakeVisible (sunoButton);
+    openSunoButton.onClick = [] { juce::URL ("https://suno.com/create").launchInDefaultBrowser(); };
+    addAndMakeVisible (openSunoButton);
+    analysisLabel.setFont (juce::FontOptions (11.5f));
+    analysisLabel.setColour (juce::Label::textColourId, colours::muted);
+    analysisLabel.setMinimumHorizontalScale (0.8f);
+    addAndMakeVisible (analysisLabel);
+    promptBox.setReadOnly (true);
+    promptBox.setCaretVisible (false);
+    promptBox.setTextToShowWhenEmpty ("Suno Prompt writes a style prompt from the sound (no artist names) and copies it.", colours::muted);
+    addAndMakeVisible (promptBox);
+
     // Neural Tone
     ampButton.onClick = [this]
     {
@@ -619,6 +640,13 @@ void KbkStudioEditor::refreshEditor()
     voxPitch.setValue (proc.voxPitch, juce::dontSendNotification);
     voxButton.setEnabled (p.loaded() && ! proc.voxBusy);
     voxButton.setButtonText (proc.voxBusy ? "Converting..." : "AI Vox");
+    analysisLabel.setText (proc.analysisText.isNotEmpty() ? proc.analysisText : juce::String ("BPM, key, loudness (LUFS), peak and brightness of this pad"),
+                           juce::dontSendNotification);
+    analysisLabel.setColour (juce::Label::textColourId, proc.analysisText.isNotEmpty() ? colours::text : colours::muted);
+    if (promptBox.getText() != proc.sunoText)
+        promptBox.setText (proc.sunoText, false);
+    for (auto* b : { &analyzeButton, &sunoButton })
+        b->setEnabled (p.loaded() && ! proc.analyzing);
     ampLabel.setText (proc.ampName.isNotEmpty() ? proc.ampName : juce::String ("no amp loaded (.nam / .json)"), juce::dontSendNotification);
     ampLabel.setColour (juce::Label::textColourId, proc.ampName.isNotEmpty() ? colours::text : colours::muted);
     refreshing = false;
@@ -828,8 +856,8 @@ void KbkStudioEditor::resized()
     padTitle.setBounds (ex, y, ew - 90, 26);
     playButton.setBounds (ex + ew - 80, y, 80, 28);
     y += 38;
-    wave.setBounds (ex, y, ew, 170);
-    y += 180;
+    wave.setBounds (ex, y, ew, 120);
+    y += 128;
     urlBox.setBounds (ex, y, ew - 110, 30);
     urlButton.setBounds (ex + ew - 102, y, 102, 30);
     y += 40;
@@ -837,7 +865,7 @@ void KbkStudioEditor::resized()
     chopBox.setBounds (ex + 108, y, 136, 28);
     chopButton.setBounds (ex + 250, y, 130, 28);
     clearButton.setBounds (ex + ew - 94, y, 94, 28);
-    y += 42;
+    y += 36;
     const int kw = 84;
     level.label.setBounds (ex, y, kw, 14);
     level.slider.setBounds (ex, y + 14, kw, 80);
@@ -851,11 +879,11 @@ void KbkStudioEditor::resized()
     chokeLabel.setBounds (ox, y + 40, 46, 26);
     chokeBox.setBounds (ox + 48, y + 40, ex + ew - ox - 48, 26);
     reverseToggle.setBounds (ox, y + 74, 100, 24);
-    y += 104;
+    y += 100;
     noteLabel.setBounds (ex, y, 200, 28);
     learnButton.setBounds (ex + 204, y, 110, 28);
     exportButton.setBounds (ex + ew - 120, y, 120, 28);
-    y += 40;
+    y += 34;
     voxHeading.setBounds (ex, y, 260, 20);
     y += 22;
     voiceBox.setBounds (ex, y, ew - 168, 28);
@@ -865,6 +893,15 @@ void KbkStudioEditor::resized()
     voxPitchLabel.setBounds (ex, y, 40, 28);
     voxPitch.setBounds (ex + 42, y, ew - 42 - 128, 28);
     voxButton.setBounds (ex + ew - 116, y, 116, 28);
+    y += 36;
+    analyzeHeading.setBounds (ex, y, 260, 18);
+    y += 20;
+    analyzeButton.setBounds (ex, y, 86, 28);
+    sunoButton.setBounds (ex + 92, y, 110, 28);
+    openSunoButton.setBounds (ex + 208, y, 94, 28);
+    analysisLabel.setBounds (ex + 310, y - 6, ew - 310, 40);
+    y += 34;
+    promptBox.setBounds (ex, y, ew, 26);
 
     // master strip
     const int my = padArea.getBottom() + 112 + 12 + 14;

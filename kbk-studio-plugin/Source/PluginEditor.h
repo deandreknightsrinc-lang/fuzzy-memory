@@ -140,6 +140,11 @@ private:
     juce::TextButton voxRescan { "Rescan" }, voxFolder { "Folder" }, voxButton { "AI Vox" };
     juce::Slider voxPitch { juce::Slider::LinearHorizontal, juce::Slider::TextBoxRight };
 
+    // Analyze + Suno (pad editor)
+    juce::Label analyzeHeading, analysisLabel;
+    juce::TextButton analyzeButton { "Analyze" }, sunoButton { "Suno Prompt" }, openSunoButton { "Open Suno" };
+    juce::TextEditor promptBox;
+
     // master
     juce::ToggleButton ntOn { "NEURAL TONE" }, glueOn { "GLUE COMP" }, tapeOn { "TAPE" }, limOn { "LIMITER" };
     std::unique_ptr<ButtonAttachment> ntOnA, glueOnA, tapeOnA, limOnA;

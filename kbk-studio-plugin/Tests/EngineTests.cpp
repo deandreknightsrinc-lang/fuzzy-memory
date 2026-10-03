@@ -3,6 +3,7 @@
 
 #include <juce_audio_formats/juce_audio_formats.h>
 
+#include "Engine/Analysis.h"
 #include "Engine/AudioLoader.h"
 #include "Engine/AutoChop.h"
 #include "Engine/NeuralTone.h"
@@ -498,6 +499,103 @@ int main()
         const double ms = juce::Time::getMillisecondCounterHiRes() - t0;
         std::printf ("    5 s of audio through the standard WaveNet amp took %.0f ms (%.1f%% of real time)\n", ms, ms / 50.0);
         CHECK (ms < 5000.0, "faster than real time");
+    });
+
+    // ---- Analyze ------------------------------------------------------------------------
+    run ("analyze: LUFS matches the BS.1770 reference (1 kHz sine)", []
+    {
+        // EBU Tech 3341: a stereo 1 kHz sine at -20 dBFS reads -20 LUFS
+        auto s20 = sine (44100 * 6, 1000.0f, 44100.0, 0.1f, 2);
+        const double l = kbk::integratedLufs (s20, 44100.0);
+        CHECK (std::abs (l + 20.0) < 0.2, "got " + juce::String (l, 2));
+        auto s48 = sine (48000 * 6, 1000.0f, 48000.0, juce::Decibels::decibelsToGain (-23.0f), 2);
+        const double l48 = kbk::integratedLufs (s48, 48000.0);
+        CHECK (std::abs (l48 + 23.0) < 0.2, "48k: got " + juce::String (l48, 2));
+        // the gate ignores silence: 3 s of tone + 3 s of silence reads like the tone
+        auto gated = sine (44100 * 6, 1000.0f, 44100.0, 0.1f, 2);
+        gated.clear (44100 * 3, 44100 * 3);
+        CHECK (std::abs (kbk::integratedLufs (gated, 44100.0) + 20.0) < 0.3, "gating");
+    });
+
+    auto chordSong = [] (std::initializer_list<std::initializer_list<int>> chords, double sr)
+    {
+        // each chord 1 s, notes as MIDI numbers, sawtooth-ish so there are harmonics
+        juce::AudioBuffer<float> b (1, (int) (sr * (double) chords.size() * 2));
+        b.clear();
+        int k = 0;
+        for (int rep = 0; rep < 2; ++rep)
+            for (auto& chord : chords)
+            {
+                for (int note : chord)
+                {
+                    const double f = 440.0 * std::pow (2.0, (note - 69) / 12.0);
+                    for (int i = 0; i < (int) sr; ++i)
+                        for (int h = 1; h <= 4; ++h)
+                            b.addSample (0, k * (int) sr + i, (float) (0.08 / h * std::sin (2.0 * juce::MathConstants<double>::pi * f * h * i / sr)));
+                }
+                ++k;
+            }
+        return b;
+    };
+
+    run ("analyze: key of a I-IV-V-I in C major", [&]
+    {
+        auto b = chordSong ({ { 48, 60, 64, 67 }, { 53, 60, 65, 69 }, { 55, 59, 62, 67 }, { 48, 60, 64, 67 } }, 22050.0);
+        bool minor = true;
+        float conf = 0;
+        const int root = kbk::estimateKey (b, 22050.0, minor, conf);
+        CHECK (root == 0 && ! minor, "got " + kbk::keyName (root, minor) + " " + juce::String (conf));
+    });
+
+    run ("analyze: key of i-iv-V-i in A minor", [&]
+    {
+        auto b = chordSong ({ { 45, 57, 60, 64 }, { 50, 57, 62, 65 }, { 52, 56, 59, 64 }, { 45, 57, 60, 64 } }, 22050.0);
+        bool minor = false;
+        float conf = 0;
+        const int root = kbk::estimateKey (b, 22050.0, minor, conf);
+        CHECK (root == 9 && minor, "got " + kbk::keyName (root, minor) + " " + juce::String (conf));
+    });
+
+    run ("analyze: noise has no key, a sub bass is dark and noise is bright", []
+    {
+        juce::AudioBuffer<float> noise (1, 44100 * 2);
+        juce::Random r (3);
+        for (int i = 0; i < noise.getNumSamples(); ++i)
+            noise.setSample (0, i, r.nextFloat() * 0.4f - 0.2f);
+        bool minor;
+        float conf;
+        CHECK (kbk::estimateKey (noise, 44100.0, minor, conf) == -1, "noise: " + juce::String (conf));
+        CHECK (kbk::brightnessWord (kbk::analyze (noise, 44100.0).centroidHz) == "bright", "noise is bright");
+        CHECK (kbk::brightnessWord (kbk::analyze (sine (44100 * 2, 60.0f, 44100.0), 44100.0).centroidHz) == "dark", "sub is dark");
+    });
+
+    run ("analyze: tempo from the song, from the chop, from the loop length", []
+    {
+        juce::AudioBuffer<float> song (1, (int) rate * 30);
+        song.clear();
+        for (int b = 0; b * 0.6 < 29.5; ++b)
+            hitAt (song, b * 0.6, b % 4 == 0 ? 4000 : 2500);
+        auto a = kbk::analyze (song, rate);
+        CHECK (std::abs (a.bpm - 100.0) <= 2.0 && a.bpmSource == "measured", "measured " + juce::String (a.bpm) + " " + a.bpmSource);
+        auto chop = kbk::cut (song, rate, { 0.0, 2.4 });
+        auto c = kbk::analyze (chop, rate, 100.0);
+        CHECK (c.bpm == 100.0 && c.bpmSource == "from the chop", "chop " + c.bpmSource);
+        auto loop = kbk::cut (song, rate, { 0.0, 2.0 });
+        auto d = kbk::analyze (loop, rate);
+        CHECK (std::abs (d.bpm - 120.0) < 0.1 && d.bpmSource == "from the length", "loop " + juce::String (d.bpm) + " " + d.bpmSource);
+        CHECK (a.hitsPerSecond > 1.0f && a.hitsPerSecond < 2.5f, "hits/s " + juce::String (a.hitsPerSecond));
+    });
+
+    run ("suno prompt: describes the sound, short, no names", [&]
+    {
+        auto b = chordSong ({ { 45, 57, 60, 64 }, { 50, 57, 62, 65 }, { 52, 56, 59, 64 }, { 45, 57, 60, 64 } }, 22050.0);
+        auto a = kbk::analyze (b, 22050.0, 92.0);
+        const auto p = kbk::sunoPrompt (a);
+        std::printf ("    %s\n    %s\n    hits/s %.2f\n", kbk::summary (a).toRawUTF8(), p.toRawUTF8(), a.hitsPerSecond);
+        CHECK (p.contains ("92 BPM") && p.contains ("A minor") && p.contains ("moody"), p);
+        CHECK (p.length() <= 200, "short");
+        CHECK (! p.containsIgnoreCase ("style of") && ! p.containsIgnoreCase (" like "), "no comparisons");
+        CHECK (! p.contains ("drums"), "sustained chords aren't drums");
     });
 
     std::printf ("\n%d checks, %d failed\n", checks, failures);

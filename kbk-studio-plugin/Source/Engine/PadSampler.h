@@ -31,6 +31,7 @@ struct Pad
     PlayMode mode = PlayMode::OneShot;
     bool reverse = false;
     int choke = 0;       // 0 = off, 1-4 = group
+    double bpm = 0.0;    // tempo of the song it was chopped from (0 = unknown)
     bool loaded() const { return audio != nullptr && audio->getNumSamples() > 0; }
     double seconds() const { return loaded() ? audio->getNumSamples() / sourceRate : 0.0; }
 };

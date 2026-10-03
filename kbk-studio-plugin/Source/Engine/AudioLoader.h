@@ -56,6 +56,10 @@ public:
     LoadedAudio convertVoice (const juce::AudioBuffer<float>& audio, double sampleRate, const juce::String& voice, int pitch,
                               const juce::String& name);
 
+    // Suno: asks the helper to polish a style prompt with a local AI (Ollama).
+    // Returns the prompt, or empty when the helper/AI isn't there; `source` says which.
+    juce::String polishPrompt (const juce::String& facts, const juce::String& draft, juce::String& source);
+
     // set to stop a download that's in progress (the plug-in is closing)
     std::atomic<bool> cancelled { false };
 
