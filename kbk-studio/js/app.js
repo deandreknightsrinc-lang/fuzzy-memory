@@ -961,7 +961,7 @@ function setHelperStatus(err) {
     const t = helper.info.tools || {};
     const missing = Object.entries(t).filter(([, v]) => !v).map(([k]) => k);
     led.className = `led ${missing.length ? 'warn' : 'on'}`;
-    $('helperMsg').textContent = `Connected to ${helper.base}.${missing.length ? ` Missing: ${missing.join(', ')} (run setup-helper.sh).` : ' ffmpeg, yt-dlp and Demucs are ready.'}`;
+    $('helperMsg').textContent = `Connected to ${helper.base}.${missing.length ? ` Missing: ${missing.join(', ')} (run setup-helper.sh; add --stems for Demucs).` : ' ffmpeg, yt-dlp and Demucs are ready.'}`;
     $('helperMsg').className = 'status-line ok';
   } else {
     led.className = 'led';
