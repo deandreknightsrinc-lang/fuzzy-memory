@@ -87,6 +87,8 @@ void LookAndFeel::drawButtonBackground (juce::Graphics& g, juce::Button& b, cons
     const bool primary = b.getProperties()["primary"];
     juce::Colour top = primary ? juce::Colour (0xfff1c94a) : juce::Colour (0xff262a36);
     juce::Colour bottom = primary ? juce::Colour (0xffd9a520) : juce::Colour (0xff1d2029);
+    if (b.getProperties()["rec"])
+        top = bottom = b.findColour (juce::TextButton::buttonColourId);
     if (over)
     {
         top = top.brighter (0.08f);
@@ -350,6 +352,28 @@ KbkStudioEditor::KbkStudioEditor (KbkStudioProcessor& p) : AudioProcessorEditor 
     addAndMakeVisible (stopButton);
     stopButton.onClick = [this] { proc.sampler.stopAll(); };
 
+    // record row
+    recButton.getProperties().set ("rec", true);
+    recButton.setColour (juce::TextButton::buttonColourId, juce::Colour (0xff3a1418));
+    recButton.onClick = [this]
+    {
+        if (proc.isRecording())
+            proc.stopRecording();
+        else
+            proc.startRecording();
+        refreshEditor();
+    };
+    addAndMakeVisible (recButton);
+    recSourceBox.addItemList ({ "Rec: Output (master)", "Rec: Pads (dry)" }, 1);
+    recSourceBox.setSelectedId (proc.recSource.load() + 1, juce::dontSendNotification);
+    recSourceBox.onChange = [this] { proc.recSource = recSourceBox.getSelectedId() - 1; };
+    addAndMakeVisible (recSourceBox);
+    takePadButton.onClick = [this] { proc.takeToPad (proc.sampler.selectedPad); };
+    takeLibButton.onClick = [this] { proc.takeToLibrary(); };
+    revealButton.onClick = [this] { proc.revealTake(); };
+    for (auto* b : { &takePadButton, &takeLibButton, &revealButton })
+        addAndMakeVisible (b);
+
     // pad editor
     padTitle.setFont (juce::FontOptions (15.0f, juce::Font::bold));
     addAndMakeVisible (padTitle);
@@ -563,7 +587,7 @@ KbkStudioEditor::KbkStudioEditor (KbkStudioProcessor& p) : AudioProcessorEditor 
     proc.addChangeListener (this);
     proc.checkHelper();
     proc.refreshVoices();
-    setSize (1240, 846);
+    setSize (1240, 884);
     refreshEditor();
     startTimerHz (30);
 }
@@ -640,6 +664,11 @@ void KbkStudioEditor::refreshEditor()
     voxPitch.setValue (proc.voxPitch, juce::dontSendNotification);
     voxButton.setEnabled (p.loaded() && ! proc.voxBusy);
     voxButton.setButtonText (proc.voxBusy ? "Converting..." : "AI Vox");
+    recSourceBox.setEnabled (! proc.isRecording());
+    takePadButton.setEnabled (proc.lastTake.existsAsFile() && ! proc.isRecording());
+    takeLibButton.setEnabled (takePadButton.isEnabled());
+    if (! proc.isRecording())
+        recButton.setButtonText ("REC");
     analysisLabel.setText (proc.analysisText.isNotEmpty() ? proc.analysisText : juce::String ("BPM, key, loudness (LUFS), peak and brightness of this pad"),
                            juce::dontSendNotification);
     analysisLabel.setColour (juce::Label::textColourId, proc.analysisText.isNotEmpty() ? colours::text : colours::muted);
@@ -691,6 +720,14 @@ void KbkStudioEditor::timerCallback()
         learnTarget = -1;
         refreshEditor();
     }
+    if (proc.isRecording())
+    {
+        const double t = proc.recordedSeconds();
+        recButton.setButtonText (juce::String::formatted ("STOP %d:%04.1f", (int) t / 60, std::fmod (t, 60.0)));
+        recButton.setColour (juce::TextButton::buttonColourId, ((int) (t * 2.0) % 2 == 0) ? juce::Colour (0xffd92b3a) : juce::Colour (0xff8a1520));
+    }
+    else
+        recButton.setColour (juce::TextButton::buttonColourId, juce::Colour (0xff3a1418));
     const int ln = proc.sampler.lastNote;
     midiLabel.setText (ln >= 0 ? "Last key: " + noteToName (ln) + " - vel " + juce::String (proc.sampler.lastVelocity.load()) : juce::String ("Play a key on your keyboard"),
                        juce::dontSendNotification);
@@ -802,7 +839,7 @@ void KbkStudioEditor::paint (juce::Graphics& g)
             g.drawText (title, r.getX() + 24, r.getY() + 12, 300, 20, juce::Justification::left);
         }
     };
-    const auto padsPanel = padArea.expanded (14).withTop (66).withBottom (padArea.getBottom() + 112);
+    const auto padsPanel = padArea.expanded (14).withTop (66).withBottom (padArea.getBottom() + padsPanelExtra);
     panelAt (padsPanel, "PADS");
     g.setColour (juce::Colour (0xff0a0b0f));
     g.fillRoundedRectangle (padArea.expanded (8).toFloat(), 10.0f);
@@ -849,6 +886,12 @@ void KbkStudioEditor::resized()
     learnBaseButton.setBounds (padArea.getX() + 168, y, 104, 26);
     velocityToggle.setBounds (padArea.getX() + 280, y, 84, 26);
     stopButton.setBounds (padArea.getRight() - 72, y, 72, 26);
+    y += 40;
+    recButton.setBounds (padArea.getX(), y, 92, 26);
+    recSourceBox.setBounds (padArea.getX() + 98, y, 138, 26);
+    takePadButton.setBounds (padArea.getX() + 242, y, 58, 26);
+    takeLibButton.setBounds (padArea.getX() + 304, y, 74, 26);
+    revealButton.setBounds (padArea.getRight() - 50, y, 50, 26);
 
     // pad editor
     const int ex = padArea.getRight() + 28 + 14, ew = getWidth() - ex - 28;
@@ -904,7 +947,7 @@ void KbkStudioEditor::resized()
     promptBox.setBounds (ex, y, ew, 26);
 
     // master strip
-    const int my = padArea.getBottom() + 112 + 12 + 14;
+    const int my = padArea.getBottom() + padsPanelExtra + 12 + 14;
     int x = 34;
     auto section = [&] (juce::ToggleButton& t, std::initializer_list<Knob*> knobs)
     {

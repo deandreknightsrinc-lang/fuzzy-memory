@@ -41,7 +41,7 @@ struct MasterSettings
     NeuralSettings neural;
     float masterDb = 0.0f;
     bool glueOn = true;
-    float glueThreshDb = -12.0f, glueRatio = 2.0f, glueAttackMs = 10.0f, glueReleaseMs = 120.0f, glueMakeupDb = 0.0f, glueMix = 1.0f;
+    float glueThreshDb = 0.0f, glueRatio = 2.0f, glueAttackMs = 10.0f, glueReleaseMs = 120.0f, glueMakeupDb = 0.0f, glueMix = 1.0f;
     bool tapeOn = false;
     float tapeDrive = 0.3f, tapeWarmth = 0.4f;
     bool limiterOn = true;
@@ -86,9 +86,15 @@ public:
     std::atomic<float> outputPeak { 0.0f };
 
     void setMaster (const MasterSettings& m);
+    // samples of delay the limiter adds (report it to the host)
+    int latencySamples() const { return limLength; }
 
     // Neural Tone (amp model) on the master bus, before the glue compressor
     NeuralTone neural;
+
+    // Record "Pads (dry)": a copy of the pads before the master effects
+    std::atomic<bool> tapDry { false };
+    juce::AudioBuffer<float> dry;
 
 private:
     struct Voice
@@ -132,7 +138,11 @@ private:
     MasterSettings master, masterLive;
     float compEnv = 0.0f;
     float warmthL = 0.0f, warmthR = 0.0f;
-    juce::dsp::Limiter<float> limiter;
+    // brick-wall limiter: looks 1.5 ms ahead so nothing passes the ceiling,
+    // and leaves everything below the ceiling untouched
+    std::vector<float> limDelayL, limDelayR, limTarget;
+    int limPos = 0, limLength = 1;
+    float limGain = 1.0f;
     juce::LinearSmoothedValue<float> masterGain;
 };
 

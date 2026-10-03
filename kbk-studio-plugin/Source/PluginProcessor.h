@@ -65,6 +65,19 @@ public:
     juce::String analysisText, sunoText;
     bool analyzing = false;
 
+    // Record: the plug-in's output (or the dry pads) to a WAV take
+    void startRecording();
+    void stopRecording();
+    bool isRecording() const { return recording; }
+    double recordedSeconds() const { return recSamples.load() / juce::jmax (1.0, hostRate.load()); }
+    void takeToPad (int pad);
+    void takeToLibrary();
+    void revealTake();
+    static juce::File recordingsFolder();
+    static juce::File libraryInbox();
+    std::atomic<int> recSource { 0 }; // 0 = output (master), 1 = pads (dry)
+    juce::File lastTake;
+
     // AI Vox: voice models live on the KBK helper
     void refreshVoices();
     void aiVox (int pad);
@@ -99,6 +112,16 @@ private:
     void applyAmp (const std::string& json, const juce::String& name, bool announce);
     std::string ampJson; // kept so the project reopens with the same amp
     std::atomic<bool> masterDirty { true };
+
+    // recorder: the audio thread hands blocks to a writer thread (no disk work in the callback)
+    juce::TimeSliceThread writerThread { "KBK Studio recorder" };
+    std::unique_ptr<juce::AudioFormatWriter::ThreadedWriter> threadedWriter;
+    juce::SpinLock writerLock;
+    juce::AudioFormatWriter::ThreadedWriter* activeWriter = nullptr;
+    std::atomic<juce::int64> recSamples { 0 }, droppedSamples { 0 };
+    std::atomic<double> hostRate { 44100.0 }; // from prepareToPlay
+    bool recording = false;
+    juce::File currentTake;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KbkStudioProcessor)
 };

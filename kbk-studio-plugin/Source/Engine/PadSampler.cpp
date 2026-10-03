@@ -22,10 +22,15 @@ PadSampler::PadSampler()
 void PadSampler::prepare (double sr, int maxBlock)
 {
     sampleRate = sr;
-    juce::dsp::ProcessSpec spec { sr, (juce::uint32) juce::jmax (1, maxBlock), 2 };
-    limiter.prepare (spec);
+    limLength = juce::jmax (1, (int) std::round (0.0015 * sr));
+    limDelayL.assign ((size_t) limLength, 0.0f);
+    limDelayR.assign ((size_t) limLength, 0.0f);
+    limTarget.assign ((size_t) limLength, 1.0f);
+    limPos = 0;
+    limGain = 1.0f;
     neural.prepare (sr, juce::jmax (1, maxBlock));
-    limiter.reset();
+    dry.setSize (2, juce::jmax (1, maxBlock));
+    dry.clear();
     masterGain.reset (sr, 0.02);
     masterGain.setCurrentAndTargetValue (juce::Decibels::decibelsToGain (master.masterDb));
     compEnv = 0.0f;
@@ -345,6 +350,9 @@ void PadSampler::render (juce::AudioBuffer<float>& out, const juce::MidiBuffer& 
     }
     if (out.getNumChannels() > 1 && R == L)
         out.copyFrom (1, 0, out, 0, 0, n);
+    if (tapDry && n <= dry.getNumSamples())
+        for (int c = 0; c < 2; ++c)
+            dry.copyFrom (c, 0, out, juce::jmin (c, out.getNumChannels() - 1), 0, n);
     applyMaster (out);
 }
 
@@ -414,13 +422,35 @@ void PadSampler::applyMaster (juce::AudioBuffer<float>& out)
         if (R != L)
             R[i] *= g;
     }
-    if (master.limiterOn)
     {
-        limiter.setThreshold (master.limiterCeilingDb);
-        limiter.setRelease (juce::jmax (1.0f, master.limiterReleaseMs));
-        juce::dsp::AudioBlock<float> block (out);
-        auto sub = block.getSubsetChannelBlock (0, (size_t) chans);
-        limiter.process (juce::dsp::ProcessContextReplacing<float> (sub));
+        // the delay runs even with the limiter off, so the latency never changes
+        const bool on = master.limiterOn;
+        const float ceiling = juce::Decibels::decibelsToGain (master.limiterCeilingDb);
+        const float attack = 1.0f - std::exp (-1.0f / (0.25f * (float) limLength));
+        const float release = 1.0f - std::exp (-1.0f / (0.001f * juce::jmax (1.0f, master.limiterReleaseMs) * sr));
+        for (int i = 0; i < n; ++i)
+        {
+            const float l = L[i], r = R != L ? R[i] : l;
+            const float pk = juce::jmax (std::abs (l), std::abs (r));
+            limTarget[(size_t) limPos] = pk > ceiling ? ceiling / pk : 1.0f;
+            float need = 1.0f; // the lowest gain any sample in the look-ahead window needs
+            for (float t : limTarget)
+                need = juce::jmin (need, t);
+            limGain += (need - limGain) * (need < limGain ? attack : release);
+            const float dl = limDelayL[(size_t) limPos], dr = limDelayR[(size_t) limPos];
+            limDelayL[(size_t) limPos] = l;
+            limDelayR[(size_t) limPos] = r;
+            limPos = (limPos + 1) % limLength;
+            float ol = dl, orr = dr;
+            if (on)
+            {
+                ol = juce::jlimit (-ceiling, ceiling, dl * limGain); // final safety: never above the ceiling
+                orr = juce::jlimit (-ceiling, ceiling, dr * limGain);
+            }
+            L[i] = ol;
+            if (R != L)
+                R[i] = orr;
+        }
     }
     float pk = 0.0f;
     for (int c = 0; c < chans; ++c)
