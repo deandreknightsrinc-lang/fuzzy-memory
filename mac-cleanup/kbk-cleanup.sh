@@ -163,6 +163,7 @@ move_item() {
     if [[ "$before" != "$after" ]]; then
         warn "The copy of $name doesn't match (files/bytes $before vs $after) - kept it on the Mac"
         log "MISMATCH $src -> $dest ($before vs $after)"
+        rm -rf "$dest" # the half copy; dest was a new name, so nothing else is touched
         return 1
     fi
     rm -rf "$src"
