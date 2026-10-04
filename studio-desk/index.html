@@ -140,6 +140,111 @@ ol.steps ul { padding-left: 18px; }
 @media (max-width: 720px) { #convert { grid-template-columns: 1fr; } }
 footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 10px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+.printonly { display: none; }
+b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--accent); }
+
+/* Blueprint: white lines on blueprint blue; cut-outs in amber, hardware in orange. */
+.bp { --bp-bg: #123b66; --bp-paper: #164675; --bp-line: #e9f2ff; --bp-dim: #8fd0ff; --bp-cut: #ffcf70; --bp-hw: #ff9d5c; --bp-soft: rgba(233, 242, 255, .7);
+  background: var(--bp-bg); color: var(--bp-line); border-radius: 6px; padding: 14px 14px 18px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .bp { --bp-bg: #0c2747; --bp-paper: #0f2f54; } }
+.bp > h2, .bp .bp-h { color: var(--bp-line); }
+.bp > p.lead { color: var(--bp-soft); }
+.bp-h { font-family: var(--font-display); font-weight: 800; letter-spacing: .03em; text-transform: uppercase; font-size: 22px; margin: 22px 0 8px; border-bottom: 1px solid var(--bp-soft); padding-bottom: 4px; }
+.bp-h small { font-family: var(--font-body); font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 13px; color: var(--bp-soft); margin-left: 8px; }
+.bp-group { font-family: var(--font-cond); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; font-size: 14px; color: var(--bp-cut); margin: 14px 0 6px; }
+.bp-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--bp-soft); }
+.bp-legend span { display: inline-flex; gap: 6px; align-items: center; }
+.bp-legend svg { width: 28px; height: 16px; }
+.bp-grid { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; }
+.bp-card { margin: 0; background: var(--bp-paper); border: 1px solid rgba(233, 242, 255, .25); border-radius: 4px; padding: 6px 8px 8px; max-width: 100%; }
+.bp-card figcaption { display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap; font-size: 13px; }
+.bp-card figcaption .pid, .bp-hwcard .q, .bp-card .q { color: var(--bp-cut); }
+.bp-card figcaption .q { color: var(--bp-soft); font-family: var(--font-mono); font-size: 12px; }
+.bp-card svg { display: block; max-width: 100%; height: auto; margin-top: 4px; }
+.bp-card ul { margin: 4px 0 0; padding-left: 16px; font-size: 12px; color: var(--bp-soft); max-width: 46ch; }
+.bp .bp-part { fill: none; stroke: var(--bp-line); stroke-width: .25; }
+.bp .bp-cut { fill: var(--bp-cut); fill-opacity: .55; stroke: var(--bp-cut); stroke-width: .18; }
+.bp .bp-hid { fill: none; stroke: var(--bp-dim); stroke-width: .18; stroke-dasharray: .8 .5; }
+.bp .bp-hole { fill: var(--bp-paper); stroke: var(--bp-cut); stroke-width: .18; }
+.bp .bp-hinge { fill: var(--bp-dim); fill-opacity: .45; stroke: var(--bp-dim); stroke-width: .15; }
+.bp .bp-hw, .bp .bp-hwf { fill: var(--bp-hw); stroke: var(--bp-hw); stroke-width: .15; }
+.bp .bp-hw-l { fill: none; stroke: var(--bp-hw); stroke-width: 1.4; }
+.bp .bp-flute { fill: none; stroke: var(--bp-dim); stroke-width: .25; }
+.bp .bp-note { fill: var(--bp-soft); font-family: var(--font-cond); letter-spacing: .04em; }
+.bp .bp-dims .s-dim { stroke: var(--bp-dim); stroke-width: .18; }
+.bp .bp-dims .t-dim { fill: var(--bp-dim); }
+.bp-hwgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 10px; }
+.bp-hwcard { display: grid; grid-template-columns: 96px 1fr; gap: 10px; background: var(--bp-paper); border: 1px solid rgba(233, 242, 255, .25); border-radius: 4px; padding: 8px; font-size: 13px; }
+.bp-hwcard svg { width: 96px; height: 60px; }
+.bp-hwcard svg .bp-part { stroke-width: 1.2; }
+.bp-hwcard svg .bp-hid { stroke-width: .8; stroke-dasharray: none; }
+.bp-hwcard svg .bp-hole, .bp-hwcard svg .bp-hinge { stroke-width: .8; }
+.bp-hwcard p { margin: 3px 0 0; color: var(--bp-soft); }
+.bp-hwcard p.where { color: var(--bp-line); }
+.bp-exgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 10px; }
+.bp-ex { margin: 0; background: var(--bp-paper); border: 1px solid rgba(233, 242, 255, .25); border-radius: 4px; padding: 8px; }
+.bp-ex svg { width: 100%; height: auto; max-height: 460px; display: block; }
+.bp-ex figcaption { font-size: 13px; color: var(--bp-soft); margin-top: 6px; }
+.bp-ex .bp-part { stroke-width: .3; }
+.bp-ex .bp-f0 { fill: rgba(233, 242, 255, .16); } .bp-ex .bp-f1 { fill: rgba(233, 242, 255, .08); } .bp-ex .bp-f2 { fill: rgba(233, 242, 255, .03); }
+.bp-ex .bp-hwf { fill: var(--bp-hw); stroke: var(--bp-paper); stroke-width: .2; }
+.bp-ex .bp-ghost { fill: none; stroke: var(--bp-soft); stroke-width: .25; stroke-dasharray: 1 .7; }
+.bp-ex .bp-move { fill: none; stroke: var(--bp-cut); stroke-width: .35; stroke-dasharray: 1.2 .8; }
+.bp-tag circle { fill: var(--bp-cut); }
+.bp-tag text { fill: #1a1206; font-family: var(--font-mono); font-weight: 600; }
+.bp .printbar .copy { background: var(--bp-line); color: var(--bp-bg); }
+.printbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.printbar .copy { margin-top: 0; }
+.copy.alt { background: transparent; color: var(--ink); border: 2px solid var(--ink); }
+
+/* Printing: a workshop sheet in black ink on white paper. "Print cut list" keeps just the
+   cut list, leather pieces and shopping list; "Print build packet" (or the browser's own Print)
+   adds the drawings, conversion and build steps. */
+@media print {
+  :root, :root[data-theme] {
+    --bg: #fff !important; --panel: #fff !important; --ink: #000 !important; --muted: #444 !important; --line: #bbb !important;
+    --accent: #000 !important; --knee: rgba(0, 0, 0, .06) !important; color-scheme: light !important;
+  }
+  @page { margin: 12mm; }
+  body { font-size: 10pt; background: #fff; }
+  .wrap { max-width: none; padding: 0; }
+  header.top .stamp, header.top .units, .grid, .printbar, .reset, footer .noprint { display: none !important; }
+  .brand h1 { font-size: 26pt; }
+  .brand p { font-size: 9pt; }
+  .printonly { display: block; }
+  section.block { margin-top: 14px; break-inside: auto; }
+  section.block > h2 { font-size: 18pt; break-after: avoid; }
+  section.block > p.lead { font-size: 9pt; }
+  .tablewrap { overflow: visible; border: 0; }
+  table { min-width: 0; font-size: 9pt; }
+  th { position: static; background: #eee; color: #000; }
+  th, td { padding: 3px 6px; }
+  tr { break-inside: avoid; }
+  tr.group td { background: #eee; color: #000; }
+  thead { display: table-header-group; }
+  td.tick { width: 18px; text-align: center; font-size: 12pt; }
+  th.printonly, td.printonly { display: table-cell; }
+  .totals { grid-template-columns: repeat(6, 1fr); gap: 4px; }
+  .total { padding: 4px 6px; }
+  .total .n { font-size: 12pt; }
+  .mode, ol.steps > li, .warnbox { break-inside: avoid; }
+  ol.steps > li { padding: 6px; grid-template-columns: 30px 1fr; }
+  ol.steps > li::before { font-size: 18pt; }
+  #convert { grid-template-columns: 1fr 1fr; }
+  #printSpec { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px 14px; margin: 8px 0 0; font-size: 9pt; border: 1px solid #000; padding: 6px 8px; }
+  #printSpec div b { display: block; font-family: var(--font-cond); text-transform: uppercase; letter-spacing: .05em; font-size: 7.5pt; color: #444; font-weight: 600; }
+  #printDrawings { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  #printDrawings figure { margin: 0; border: 1px solid #bbb; padding: 4px; break-inside: avoid; }
+  #printDrawings svg { width: 100%; height: auto; max-height: 90mm; display: block; }
+  #printDrawings figcaption { font-size: 8pt; color: #444; margin-top: 2px; }
+  body[data-print="cut"] .packet, body[data-print="cut"] #blueprint { display: none !important; }
+  body[data-print="bp"] section.block:not(#blueprint), body[data-print="bp"] #printDrawings { display: none !important; }
+  .bp, :root .bp { --bp-bg: #fff; --bp-paper: #fff; --bp-line: #0b2d55; --bp-dim: #1d6fb8; --bp-cut: #b86e00; --bp-hw: #c2410c; --bp-soft: #33415a; background: #fff !important; padding: 0 !important; }
+  .bp .printbar { display: none !important; }
+  .bp-card, .bp-hwcard, .bp-ex { break-inside: avoid; }
+  .bp-card svg { max-width: 100%; height: auto; }
+  .bp-h { break-after: avoid; }
+}
 </style>
 
 <div class="wrap">
@@ -158,6 +263,9 @@ footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px
       </div>
     </div>
   </header>
+
+  <div class="printonly" id="printSpec"></div>
+  <div class="printonly packet" id="printDrawings"></div>
 
   <div class="grid">
     <form class="card controls" id="form" autocomplete="off">
@@ -310,40 +418,66 @@ footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px
     </div>
   </div>
 
+  <section class="block bp" id="blueprint">
+    <h2>Blueprint</h2>
+    <p class="lead">Every board and panel drawn to the same scale, with its openings, slots, holes and hardware positions, then every piece of hardware and where it goes, then how the parts come together. Part IDs (A1, B2...) match the cut list. Drawn for your settings; it redraws as you change them.</p>
+    <div class="bp-legend">
+      <span><svg viewBox="0 0 14 8"><rect class="bp-part" x="1" y="1" width="12" height="6"/></svg>Cut line (outside edge)</span>
+      <span><svg viewBox="0 0 14 8"><rect class="bp-cut" x="1" y="1" width="12" height="6"/></svg>Cut out (opening, slot)</span>
+      <span><svg viewBox="0 0 14 8"><rect class="bp-hid" x="1" y="1" width="12" height="6"/></svg>Position mark (pad, plate, groove, hidden part)</span>
+      <span><svg viewBox="0 0 14 8"><circle class="bp-hole" cx="7" cy="4" r="2.5"/></svg>Hole (T-nut, knob, screw)</span>
+      <span><svg viewBox="0 0 14 8"><rect class="bp-hinge" x="1" y="1" width="12" height="6"/></svg>Hinge edge</span>
+      <span><svg viewBox="0 0 14 8"><rect class="bp-hw" x="1" y="1" width="12" height="6"/></svg>Hardware on the outside</span>
+      <span><svg viewBox="0 0 14 8"><path class="bp-flute" d="M2 4h9m-2 -2l2 2l-2 2"/></svg>Flute direction (layer 1)</span>
+    </div>
+    <h3 class="bp-h">1 · Boards and panels <small>all at one scale on screen (1 in = 6 px); long strips are drawn broken</small></h3>
+    <div id="bpParts"></div>
+    <h3 class="bp-h">2 · Hardware and mechanisms</h3>
+    <div class="bp-hwgrid" id="bpHardware"></div>
+    <h3 class="bp-h">3 · How it goes together</h3>
+    <div class="bp-exgrid" id="bpExploded"></div>
+    <div class="printbar"><button type="button" class="copy" id="printBp">Print blueprint</button></div>
+  </section>
+
   <section class="block">
     <h2>Cut list</h2>
     <p class="lead" id="cutLead"></p>
     <div class="totals" id="totals"></div>
-    <div class="tablewrap"><table id="cut"><thead><tr><th>Part</th><th>Qty</th><th>Size (finished)</th><th>Layers</th><th>Cut / notes</th></tr></thead><tbody></tbody></table></div>
-    <button type="button" class="copy" id="copyCut">Copy cut list</button><span class="copied" id="copied" hidden>Copied as a spreadsheet table.</span>
+    <div class="tablewrap"><table id="cut"><thead><tr><th class="printonly">✓</th><th>Part</th><th>Qty</th><th>Size (finished)</th><th>Layers</th><th class="printonly">Pieces</th><th>Cut / notes</th></tr></thead><tbody></tbody></table></div>
+    <div class="printbar">
+      <button type="button" class="copy" id="printCut">Print cut list</button>
+      <button type="button" class="copy alt" id="printAll">Print build packet</button>
+      <button type="button" class="copy alt" id="copyCut">Copy cut list</button><span class="copied" id="copied" hidden>Copied as a spreadsheet table.</span>
+    </div>
+    <p class="hint printbar">The cut list prints with a tick box for every part and the total pieces to cut (quantity × layers). The build packet adds the drawings, the desk ↔ road case steps and the build steps. Choose "Save as PDF" in the print window to keep a copy.</p>
   </section>
 
   <section class="block" id="leatherBlock">
     <h2>Faux leather pieces</h2>
     <p class="lead" id="leatherLead"></p>
     <div class="totals" id="leatherTotals"></div>
-    <div class="tablewrap"><table id="leatherCut"><thead><tr><th>Piece</th><th>Qty</th><th>Cut size (with wrap)</th><th>Covers</th></tr></thead><tbody></tbody></table></div>
+    <div class="tablewrap"><table id="leatherCut"><thead><tr><th class="printonly">✓</th><th>Piece</th><th>Qty</th><th>Cut size (with wrap)</th><th>Covers</th></tr></thead><tbody></tbody></table></div>
   </section>
 
   <section class="block">
     <h2>Shopping list</h2>
     <p class="lead">Everything besides the cardboard. Quantities come from your design; buy a little extra leather for mistakes.</p>
-    <div class="tablewrap"><table id="shop"><thead><tr><th>Item</th><th>How many</th><th>What it's for</th></tr></thead><tbody></tbody></table></div>
+    <div class="tablewrap"><table id="shop"><thead><tr><th class="printonly">✓</th><th>Item</th><th>How many</th><th>What it's for</th></tr></thead><tbody></tbody></table></div>
   </section>
 
-  <section class="block">
+  <section class="block packet">
     <h2>Desk ↔ road case</h2>
     <p class="lead">Two ways to live: set up as an L-shaped studio desk, or closed up as two rolling road cases and a top pack. Nothing is left over in either mode: every part has a job in both.</p>
     <div class="cols2" id="convert"></div>
   </section>
 
-  <section class="block">
+  <section class="block packet">
     <h2>Build it</h2>
     <p class="lead">The order matters: laminate and flatten every panel first, build the two cases, then the tops, then finish. Strength comes from three things: layers glued with their corrugation crossing, ribs inside the tops, and glued corner blocks.</p>
     <ol class="steps" id="steps"></ol>
   </section>
 
-  <section class="block">
+  <section class="block packet">
     <h2>Before you power it on</h2>
     <div class="cols2">
       <div class="warnbox">
@@ -510,7 +644,7 @@ footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px
     const m = MAT[p.mat];
     const L = (k) => (m.card ? +p[k] : 1);
     const out = [];
-    const add = (group, name, qty, w, h, layers, note) => out.push({ group, name, qty, w: Math.max(w, h), h: Math.min(w, h), layers, note });
+    const add = (group, name, qty, w, h, layers, note) => out.push({ group, name, qty, w: Math.max(w, h), h: Math.min(w, h), ow: w, oh: h, layers, note });
     const ribsFor = (group, label, len, wid) => {
       if (!m.card) return;
       const longN = Math.max(2, Math.ceil(wid / p.ribS) + 1);
@@ -545,7 +679,7 @@ footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px
       add(E, 'Tower lid panel', 1, g.WA, g.caseH, L('lw') + (m.card ? 1 : 0), 'Same size as the case front, so the closed case is flush all round. In desk mode it stands on end under the keys wing as the leg panel (rim toward the wall makes it a stiff channel).');
       add(E, 'Tower lid rim, long', 2, g.caseH, g.lidD, L('lw'), 'Glued on edge around the panel, flush with its outside edges. When closed the rim lands on the front edges of the case walls.');
       add(E, 'Tower lid rim, short', 2, g.WA - 2 * g.tw, g.lidD, L('lw'), 'Between the long rim pieces. Corner blocks inside every rim corner.');
-      if (g.casterH) add(E, 'Leg riser block', 1, g.WA, g.casterH, m.card ? Math.ceil(3 / m.t) : 1, `A solid stack 3 in wide with a ${short(g.lidD + g.tw + 0.125)} wide groove down the middle. The lid stands in the groove as the leg, so the keys wing sits level with the cases on their casters (adds ${short(g.casterH)}).`);
+      if (g.casterH) add(E, 'Leg riser block', 1, g.WA, g.casterH, m.card ? Math.ceil(3 / m.t) : 1, `A solid stack 3 in wide with a ${short(g.lidD + g.tw + 0.125)} wide groove down the middle. The lid stands in the groove as the leg, so the keys wing sits level with the cases on their casters (adds ${short(g.casterH)}). Glue a 1/2 in plywood strip on the bottom of the stack for the two leveling-glide T-nuts.`);
       add(E, 'Keys lid panel', 1, g.WB, g.caseH, L('lw'), 'Covers the rack and storage door on the road. In desk mode it lies rim-down under the main run as a tilted footrest.');
       add(E, 'Keys lid rim, long', 2, g.caseH, g.lidD, L('lw'), 'As for the Tower lid.');
       add(E, 'Keys lid rim, short', 2, g.WB - 2 * g.tw, g.lidD, L('lw'), 'As for the Tower lid.');
@@ -587,6 +721,13 @@ footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px
       add(D, 'Riser top', 1, g.hutchW, g.hutchD, L('lw'), g.proj ? 'The projector sits here, aimed at the wall.' : 'The portable monitor stands here, at eye height.');
       add(D, 'Riser legs', 2, g.hutchD, g.hutchH - g.tw, L('lw'), 'One at each end.');
       add(D, 'Riser back strip', 1, g.hutchW - 2 * g.tw, g.hutchH - g.tw, L('lw'), 'Stops it racking side to side; cut a cable notch.');
+    }
+    // Part IDs for the blueprint: a letter per group, a number per part (A1, A2, ... B1 ...).
+    const letters = [];
+    for (const x of out) {
+      if (!letters.includes(x.group)) letters.push(x.group);
+      const L0 = String.fromCharCode(65 + letters.indexOf(x.group));
+      x.id = L0 + (out.filter((y) => y.group === x.group).indexOf(x) + 1);
     }
     return out;
   }
@@ -685,6 +826,7 @@ footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px
       add('3 in swivel casters with brakes', 8, '4 per case. Plate-mount, rated at least 75 lb each.');
       add('1/4-20 × 3/4 in bolts + T-nuts', 32, 'Caster mounting: set the T-nuts into the top of each caster board before it is glued to the case, so the casters can be bolted from below and replaced.');
     }
+    if (p.lids && p.casters) add('Leveling glides, 3/8-16, with T-nuts', 2, 'Under the riser block: screw in or out to bring the keys wing exactly level with the main top.');
     if (joints > 0) add('1/4-20 star knobs with 1-1/2 in studs + T-nuts', 4 * joints, `Tool-free joints between top pieces (${joints} joint${joints > 1 ? 's' : ''}, 4 knobs each).`);
     add('Heavy hook-and-loop (Velcro Industrial), 2 in', '3 ft', 'Corner plates: joins the return top to the main top.');
     add('Rubber or felt pads', 16, 'Under the tops where they sit on the cases and the leg, and between top pieces in the top pack.');
@@ -800,7 +942,7 @@ footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px
     s += dimV(pad - 7, pad, p.L2 + pad, `return ${short(p.L2)}`, fs);
     s += dimH(pad, p.D2 + pad, p.L2 + pad + 6, short(p.D2), fs, fs * 1.6);
     s += '</svg>';
-    return { svg: s, cap: `Top view. Shaded areas are leg room. The Tower Case sits under the corner, ${short(g.bearing)} deeper than the main top so the keys wing can rest on it; the leg panel holds up the far end of the wing.` };
+    return { svg: s, cap: `Top view. Shaded areas are leg room. The Tower Case sits under the corner, ${short(g.bearing)} deeper than the main top so the keys wing can rest on it; ${p.lids ? 'the Tower lid, standing on end as the leg,' : 'the leg panel'} holds up the far end of the wing.` };
   }
 
   function drawTower(g) {
@@ -1052,6 +1194,261 @@ footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px
     return { svg: s, cap: `Packed for the road: ${p.lids ? 'both cases closed by their lids (the Tower lid was the leg, the Keys lid was the footrest), ' : ''}${p.casters ? 'rolling on locking casters, ' : ''}${p.handles ? 'recessed handles on the sides, ' : ''}and the tops stacked into a strapped top pack ${short(pl)} × ${short(pd)} × ${short(z)}. Nothing is left over.` };
   }
 
+  // ---- blueprint ----------------------------------------------------------------------
+  // Every part drawn to one scale (as it stands in the build: sides seen from outside, floors and tops from above),
+  // with its openings, slots and hardware positions. Coordinates are inches from the part's top-left corner.
+  const BP_PX = 6;                                       // screen pixels per inch on the parts sheet
+  const BP_MAX = 96;                                     // longer parts are drawn broken
+  function features(x, g) {
+    const f = [], W = x.ow, H = x.oh, n = x.name, grp = x.group;
+    const cut = (x0, y0, w, h, note) => f.push({ t: 'cut', x: x0, y: y0, w, h, note });
+    const hid = (x0, y0, w, h, note) => f.push({ t: 'hid', x: x0, y: y0, w, h, note });
+    const hole = (cx, cy, r, note) => f.push({ t: 'hole', x: cx, y: cy, r, note });
+    const hinge = (x0, y0, w, h, note) => f.push({ t: 'hinge', x: x0, y: y0, w, h, note });
+    const hw = (x0, y0, w, h, note) => f.push({ t: 'hw', x: x0, y: y0, w, h, note });
+    const txt = (x0, y0, s) => f.push({ t: 'txt', x: x0, y: y0, s });
+    const tower = grp.startsWith('Tower'), keys = grp.startsWith('Keys');
+    const handle = () => { if (p.handles) cut((W - 5) / 2, 3, 5, 2, 'Handle opening 5 × 2 in: cut through the wall and the backer pad behind it'); };
+    const backers = () => { if (p.lids) for (const fy of [0.22, 0.78]) hid(W - 4, H * fy - 1.5, 4, 3, 'Plywood backer pad inside, at the front edge, behind each latch'); };
+    if ((tower || keys) && n === 'Sides') {
+      if (tower) { const vw = p.pcD * 0.6, vh = p.pcH * 0.5; cut((W - vw) / 2, H - (g.plinth + g.tw + p.pcH / 2) - vh / 2, vw, vh, 'Vent window: right side only (opposite the computer\'s side panel)'); }
+      handle(); backers();
+      if (p.handles) hid((W - 10) / 2, 1.5, 10, 5, 'Handle backer pad inside');
+      txt(W - 1, H - 1, 'FRONT →');
+    }
+    if (tower && n === 'Back') { cut(0.5, H - (g.plinth + g.tw + p.pcH / 2) - p.pcH * 0.3, g.bayW - 1, p.pcH * 0.6, 'Exhaust opening behind the computer'); cut(W - 4.5, 2, 3, 6, 'Cable pass-through 3 × 6 in'); txt(1, 1.6, 'SEEN FROM BEHIND'); }
+    if (keys && n === 'Back') cut((W - 3) / 2, 2, 3, 6, 'Cable pass-through behind the rack');
+    if (tower && n === 'Floor') cut(W - g.bayW / 2 - 2, (H - 8) / 2, 4, 8, 'Intake slot 4 × 8 in under the computer');
+    if (n === 'Computer door') {
+      for (let yy = 2; yy + 0.5 <= H - 2; yy += 1.25) for (let xx = 1.25; xx + 4 <= W - 1.25; xx += 4.75) cut(xx, yy, 4, 0.5, 'Intake grille: 1/2 × 4 in slots');
+      hinge(W - 0.6, 0, 0.6, H, 'Hinge edge (canvas hinge, or piano hinge in plywood)'); hole(1, H / 2, 0.4, 'Magnet catch');
+    }
+    if (n === 'Cubby door' || n === 'Storage door') { hinge(0, 0, 0.6, H, 'Hinge edge (canvas hinge, or piano hinge in plywood)'); hole(W - 1, H / 2, 0.4, 'Magnet catch'); if (n === 'Storage door') cut(W / 2 - 2, 1.5, 4, 1, 'Finger pull slot'); }
+    if (n.endsWith('lid panel')) {
+      hid(g.tw, g.tw, W - 2 * g.tw, H - 2 * g.tw, 'Rim glued on edge inside this line (other face)');
+      hid(2 * g.tw + 0.125, 2 * g.tw + 0.125, W - 4 * g.tw - 0.25, H - 4 * g.tw - 0.25, 'Lip strips inside the rim, standing 3/4 in proud');
+      for (const fy of [0.22, 0.78]) { hw(-0.6, H * fy - 1.5, 0.6, 3, 'Butterfly latch on the rim (4 per lid)'); hw(W, H * fy - 1.5, 0.6, 3, 'Butterfly latch on the rim (4 per lid)'); }
+    }
+    if (n.includes('lid rim, long')) for (const fx of [0.22, 0.78]) hid(W * fx - 2, 0, 4, H, 'Latch backer pad glued inside the rim');
+    if (n === 'Leg riser block') {
+      hid(-0.01, 0, W + 0.02, 1, 'Groove along the top, ' + short(g.lidD + g.tw + 0.125) + ' wide × 1 in deep: the Tower lid stands in it');
+      for (const xx of [2, W - 2]) hid(xx - 0.2, H - 1.5, 0.4, 1.5, 'Leveling glide T-nut (3/8-16) from below: fine-tunes the leg height');
+    }
+    if (n.startsWith('Caster boards')) {
+      for (const [cx, cy] of [[1, 1], [W - 3.6, 1], [1, H - 3.5], [W - 3.6, H - 3.5]]) {
+        hid(cx, cy, 2.6, 2.5, 'Caster plate (4 per board)');
+        for (const [dx, dy] of [[0.4, 0.35], [2.2, 0.35], [0.4, 2.15], [2.2, 2.15]]) hole(cx + dx, cy + dy, 0.17, 'T-nut 1/4-20, set from the top before gluing');
+      }
+    }
+    if (n.startsWith('Hardware backer') || n.startsWith('Handle backer')) for (const [cx, cy] of [[0.7, 0.7], [W - 0.7, 0.7], [0.7, H - 0.7], [W - 0.7, H - 0.7]]) hole(cx, cy, 0.15, 'Pilot holes for the latch or handle screws');
+    if (n.startsWith('Handle backer')) cut((W - 5) / 2, (H - 2) / 2, 5, 2, 'Handle opening');
+    if (n.includes('ribs, lengthwise') || n.includes('ribs, crosswise')) {
+      const top = n.includes('lengthwise');
+      for (let xx = p.ribS; xx < W - 0.5; xx += p.ribS) cut(xx - g.ribT / 2, top ? 0 : H / 2, g.ribT, H / 2, top ? 'Half-depth slots from the top edge (egg-crate)' : 'Half-depth slots from the bottom edge');
+    }
+    if (n.startsWith('Main top skins') || n.startsWith('Return top skins') || n.startsWith('Main top (3/4') || n.startsWith('Return top (3/4')) {
+      const sections = n.startsWith('Main') ? g.sec1 : g.sec2;
+      if (sections > 1) { hid(W - 1.5, 0, 1.5, H, 'Joint block inside, at a joining end'); for (const fy of [1 / 3, 2 / 3]) hole(W - 0.75, H * fy, 0.25, 'Star-knob hole + T-nut (bottom skin, joining end only)'); }
+      for (const fx of [0.15, 0.85]) hid(W * fx - 2, H - 1.5, 4, 1, 'Locating cleat under the bottom skin, where a case edge meets it');
+    }
+    if (n.startsWith('Joint blocks')) for (const fx of [1 / 3, 2 / 3]) hid(W * fx - 0.2, 0, 0.4, H, 'T-nut bore for a star knob');
+    if (n.startsWith('Joint plates')) {
+      f.push({ t: 'line', x: 0, y: H / 2, x2: W, y2: H / 2, note: 'Joint line between the two top pieces' });
+      for (const fx of [1 / 3, 2 / 3]) for (const fy of [0.25, 0.75]) hole(W * fx, H * fy, 0.3, '1/4-20 star knob through the plate into a T-nut');
+    }
+    if (n === 'Corner joining plates') { hid(1, 1, 3.5, H - 2, 'Hook-and-loop pad: glue the plate under the return top so this end reaches under the main top'); }
+    if (n === 'Riser back strip') cut(W / 2 - 1.5, 0, 3, 1.25, 'Cable notch');
+    if (n === 'Rack shelf') hid(0.5, 0.5, Math.min(17.25, W - 1), H - 1, 'Rack gear footprint (17-1/4 in bodies)');
+    return f;
+  }
+
+  function partFigure(x, g) {
+    const card = MAT[p.mat].card;
+    const trunc = x.ow > BP_MAX;
+    const W = trunc ? BP_MAX : x.ow, H = x.oh;
+    const fs = 1.8, mL = 5, mT = 2.5, mB = 6;
+    const vbW = Math.max(W + mL + 4, 34), vbH = H + mT + mB;
+    const ox = Math.max(mL, (vbW - W) / 2), oy = mT;
+    let s = `<svg viewBox="0 0 ${vbW.toFixed(2)} ${vbH.toFixed(2)}" style="width:${(vbW * BP_PX).toFixed(0)}px" role="img" aria-label="${esc(x.name)}, ${esc(short(x.ow))} by ${esc(short(x.oh))}">`;
+    if (x.name === 'Corner blocks') s += `<path class="bp-part" d="M${ox} ${oy + H}V${oy}L${ox + W} ${oy + H}Z"/>`;
+    else if (trunc) {
+      s += `<rect class="bp-part" x="${ox}" y="${oy}" width="${W / 2 - 1.5}" height="${H}"/><rect class="bp-part" x="${ox + W / 2 + 1.5}" y="${oy}" width="${W / 2 - 1.5}" height="${H}"/>`;
+      s += `<path class="bp-hid" d="M${ox + W / 2 - 1.5} ${oy - 1}v${H + 2}M${ox + W / 2 + 1.5} ${oy - 1}v${H + 2}"/>`;
+    } else s += `<rect class="bp-part" x="${ox}" y="${oy}" width="${W}" height="${H}"/>`;
+    const notes = [];
+    const note = (k) => { if (k && !notes.includes(k)) notes.push(k); };
+    for (const q of features(x, g)) {
+      note(q.note);
+      if (q.t === 'cut') s += `<rect class="bp-cut" x="${ox + q.x}" y="${oy + q.y}" width="${q.w}" height="${q.h}"/>`;
+      else if (q.t === 'hid') s += `<rect class="bp-hid" x="${ox + q.x}" y="${oy + q.y}" width="${q.w}" height="${q.h}"/>`;
+      else if (q.t === 'hole') s += `<circle class="bp-hole" cx="${ox + q.x}" cy="${oy + q.y}" r="${q.r}"/>`;
+      else if (q.t === 'hinge') s += `<rect class="bp-hinge" x="${ox + q.x}" y="${oy + q.y}" width="${q.w}" height="${q.h}"/>`;
+      else if (q.t === 'hw') s += `<rect class="bp-hw" x="${ox + q.x}" y="${oy + q.y}" width="${q.w}" height="${q.h}"/>`;
+      else if (q.t === 'line') s += `<path class="bp-hid" d="M${ox + q.x} ${oy + q.y}H${ox + q.x2}"/>`;
+      else if (q.t === 'txt') s += `<text class="bp-note" x="${ox + q.x}" y="${oy + q.y}" font-size="${fs * 0.7}" text-anchor="${q.x > W / 2 ? 'end' : 'start'}">${esc(q.s)}</text>`;
+    }
+    if (card && H >= 3 && W >= 8 && !x.name.includes('plywood')) {
+      const ax = ox + 1.2, ay = oy + Math.min(2, H / 2);
+      s += `<path class="bp-flute" d="M${ax} ${ay}h4m-1 -0.7l1 0.7l-1 0.7"/>`;
+      note('Arrow: flutes run this way on layer 1; turn every other layer 90°');
+    }
+    s += `<g class="bp-dims">${dimH(ox, ox + W, oy + H + 3.6, short(x.ow), fs)}${dimV(ox - 2, oy, oy + H, short(x.oh), fs)}</g>`;
+    s += '</svg>';
+    return `<figure class="bp-card"><figcaption><span class="pid">${esc(x.id)}</span><b>${esc(x.name)}</b><span class="q">× ${x.qty}${MAT[p.mat].card && x.layers > 1 ? ` · ${x.layers} layers` : ''}</span></figcaption>${s}${notes.length ? `<ul>${notes.map((k) => `<li>${esc(k)}</li>`).join('')}</ul>` : ''}</figure>`;
+  }
+
+  // Hardware: what it is, how many, and which parts it goes on (by part ID).
+  function hardware(g, list) {
+    const m = MAT[p.mat];
+    const id = (name, grp) => list.filter((x) => x.name.startsWith(name) && (!grp || x.group.startsWith(grp))).map((x) => x.id).join(', ');
+    const joints = g.sec1 - 1 + (g.sec2 - 1);
+    const out = [];
+    const add = (icon, name, spec, qty, where) => out.push({ icon, name, spec, qty, where });
+    if (p.casters) {
+      add('caster', '3 in swivel caster with brake', 'Plate mount, about 2-1/2 × 3-5/8 in plate, 75 lb or more each. The brake pedal locks wheel and swivel.', 8, `4 under each caster board (${id('Caster boards')})`);
+      add('bolt', '1/4-20 × 3/4 in hex bolt + washer', 'Bolts each caster plate up into the T-nuts.', 32, `Caster plates → ${id('Caster boards')}`);
+      add('tnut', '1/4-20 T-nut', 'Hammered into the top of the caster board before it is glued on, so casters can be swapped.', 32, id('Caster boards'));
+    }
+    if (joints > 0) {
+      add('knob', '1/4-20 star knob, 1-1/2 in stud', 'Hand-tight, no tools: joins the travel pieces of the tops.', 4 * joints, `Up through ${id('Joint plates')} into ${id('Joint blocks')}`);
+      add('tnut', '1/4-20 T-nut (for the knobs)', 'Set into the joint blocks from inside, before the top skin goes on.', 4 * joints, id('Joint blocks'));
+    }
+    if (p.lids) {
+      add('latch', 'Butterfly latch, medium', 'Two parts: the latch on the case, the keeper on the lid rim. Twist to lock.', 8, `Case sides (${id('Sides', 'Tower')}, ${id('Sides', 'Keys')}) and lid rims (${id('Tower lid rim, long')}, ${id('Keys lid rim, long')}), over the backer pads`);
+      if (g.casterH) {
+        add('glide', 'Leveling glide, 3/8-16 thread, with T-nut', 'Screw it in or out to raise the leg until the keys wing sits level. This is the build\'s only height adjustment.', 2, `Underside of the riser block ${id('Leg riser block')}`);
+      }
+      add('pad', 'Felt or rubber gasket strip', 'Round the lid lips: stops rattles.', `${Math.ceil(2 * (2 * g.caseH + g.WA + g.WB) / 12)} ft`, `${id('Lid lip strips, long')}, ${id('Lid lip strips, short')}`);
+    }
+    if (p.handles) add('handle', 'Recessed spring handle', 'Flush dish with a spring-return bar; the dish sits in the 5 × 2 in opening.', 4, `2 per case on the sides (${id('Sides', 'Tower')}, ${id('Sides', 'Keys')}), into the backer pads`);
+    if (p.lids || p.handles) add('screw', '#8 × 1 in pan-head screw', 'Through the leather and the cardboard wall into the plywood backer pads.', (p.lids ? 64 : 0) + (p.handles ? 16 : 0), `Latches${p.handles ? ' and handles' : ''}`);
+    add('corner', 'Ball corner, 1-1/2 in', m.card ? 'Bond with construction adhesive or 2-part epoxy (no screws in cardboard).' : 'Rivets or #6 screws into the plywood.', 16, '8 per case: 4 back corners, 4 front (on the lids when they are on)');
+    const caseEdges = 4 * (g.WA + g.DA + g.caseH) + 4 * (g.WB + g.DB + g.caseH) + (p.lids ? 2 * (2 * (g.WA + g.caseH) + 2 * (g.WB + g.caseH)) : 0);
+    add('angle', 'Aluminum angle, 1 × 1 × 1/16 in', m.card ? 'Bonded with construction adhesive; a #6 screw at each end where a backer or plywood is behind it.' : 'A #6 × 1/2 in screw every 6 in.', `${Math.ceil(caseEdges / 12)} ft`, `Every case${p.lids ? ' and lid' : ''} edge, over the leather`);
+    add('hinge', m.card ? 'Canvas hinge strip, 2 in wide' : 'Piano hinge, 1-1/16 in', m.card ? 'Glued between two layers of the door and onto the case: the classic cardboard hinge.' : 'Cut to the door height, #4 screws.', 3, `Hinge edges of ${id('Computer door')}, ${id('Cubby door')}, ${id('Storage door')}`);
+    add('magnet', 'Magnet catch (disc magnet + steel washer)', 'Magnet glued into the door edge, washer on the case.', 3, `${id('Computer door')}, ${id('Cubby door')}, ${id('Storage door')}`);
+    add('velcro', 'Heavy hook-and-loop, 2 in', 'Holds the return top to the main top at the corner.', '3 ft', id('Corner joining plates'));
+    add('pad', 'Rubber or felt pads', 'Between tops and cases; between pieces in the top pack.', 16, `Under ${[id('Main top skins'), id('Return top skins'), id('Main top ('), id('Return top (')].filter(Boolean).join(', ')}`);
+    add('strap', 'Cam strap, 1 in × 8 ft', 'Holds the top pack together on the road.', 2, 'Top pack');
+    return out;
+  }
+
+  function hwIcon(k) {
+    const S = (body) => `<svg viewBox="0 0 64 40" role="img" aria-hidden="true">${body}</svg>`;
+    switch (k) {
+      case 'caster': return S('<rect class="bp-part" x="16" y="3" width="32" height="4"/><circle class="bp-hole" cx="20" cy="5" r="1"/><circle class="bp-hole" cx="44" cy="5" r="1"/><path class="bp-part" d="M27 7v5h10V7"/><path class="bp-part" d="M26 12h12l-2 6H28z"/><circle class="bp-part" cx="32" cy="26" r="11"/><circle class="bp-part" cx="32" cy="26" r="3"/><path class="bp-hw-l" d="M38 16l10 4"/><text class="bp-note" x="50" y="22" font-size="5">brake</text>');
+      case 'bolt': return S('<path class="bp-part" d="M10 14l4-4h8l4 4v12l-4 4h-8l-4-4z"/><rect class="bp-part" x="26" y="16" width="28" height="8"/><path class="bp-hid" d="M30 16v8M34 16v8M38 16v8M42 16v8M46 16v8M50 16v8"/>');
+      case 'tnut': return S('<rect class="bp-part" x="14" y="8" width="36" height="4"/><path class="bp-part" d="M16 12l-2 6M48 12l2 6"/><rect class="bp-part" x="26" y="12" width="12" height="20"/><path class="bp-hid" d="M29 12v20M35 12v20"/>');
+      case 'knob': return S('<path class="bp-part" d="M32 2l5 6 8-1-2 8 6 5-7 4 1 8-8-2-3 7-3-7-8 2 1-8-7-4 6-5-2-8 8 1z" transform="translate(-14 2) scale(.9)"/><rect class="bp-part" x="26" y="18" width="34" height="5"/><path class="bp-hid" d="M30 18v5M34 18v5M38 18v5M42 18v5M46 18v5M50 18v5M54 18v5"/>');
+      case 'latch': return S('<rect class="bp-part" x="6" y="10" width="26" height="20" rx="2"/><rect class="bp-part" x="34" y="14" width="22" height="12" rx="2"/><path class="bp-hw-l" d="M19 20l-7-6v12zM19 20l7-6v12z"/><path class="bp-part" d="M32 20h6"/><circle class="bp-hole" cx="9" cy="13" r="1"/><circle class="bp-hole" cx="29" cy="27" r="1"/><circle class="bp-hole" cx="53" cy="17" r="1"/><circle class="bp-hole" cx="53" cy="23" r="1"/>');
+      case 'glide': return S('<path class="bp-part" d="M14 34h36l-4-6H18z"/><rect class="bp-part" x="29" y="6" width="6" height="22"/><path class="bp-hid" d="M29 10h6M29 14h6M29 18h6M29 22h6"/><rect class="bp-part" x="22" y="4" width="20" height="3"/><text class="bp-note" x="46" y="16" font-size="5">↕ adjust</text>');
+      case 'handle': return S('<rect class="bp-part" x="8" y="8" width="48" height="24" rx="4"/><rect class="bp-part" x="14" y="13" width="36" height="14" rx="3"/><path class="bp-hw-l" d="M18 20h28"/><circle class="bp-hole" cx="11" cy="11" r="1"/><circle class="bp-hole" cx="53" cy="11" r="1"/><circle class="bp-hole" cx="11" cy="29" r="1"/><circle class="bp-hole" cx="53" cy="29" r="1"/>');
+      case 'screw': return S('<path class="bp-part" d="M8 12a8 8 0 0 1 0 16z" transform="translate(4 0)"/><path class="bp-part" d="M12 16h36l6 4-6 4H12z"/><path class="bp-hid" d="M18 16l2 8M24 16l2 8M30 16l2 8M36 16l2 8M42 16l2 8"/>');
+      case 'corner': return S('<path class="bp-part" d="M14 34V12h8a14 14 0 0 1 14 14v8z"/><path class="bp-part" d="M14 12l6-8h10l-8 8M36 34l8-6v-10l-8 8"/><circle class="bp-hole" cx="18" cy="28" r="1.2"/><circle class="bp-hole" cx="30" cy="30" r="1.2"/>');
+      case 'angle': return S('<path class="bp-part" d="M10 30V8h3v19h41v3z"/><circle class="bp-hole" cx="22" cy="28.5" r="1"/><circle class="bp-hole" cx="40" cy="28.5" r="1"/><circle class="bp-hole" cx="11.5" cy="16" r="1"/>');
+      case 'hinge': return S('<rect class="bp-part" x="8" y="6" width="22" height="28"/><rect class="bp-part" x="34" y="6" width="22" height="28"/><rect class="bp-hinge" x="28" y="6" width="8" height="28"/>');
+      case 'magnet': return S('<circle class="bp-hw-l" cx="22" cy="20" r="9"/><text class="bp-note" x="22" y="22" font-size="6" text-anchor="middle">N</text><circle class="bp-part" cx="46" cy="20" r="8"/><circle class="bp-part" cx="46" cy="20" r="3"/>');
+      case 'velcro': return S('<rect class="bp-part" x="6" y="10" width="52" height="9"/><rect class="bp-hinge" x="6" y="22" width="52" height="9"/>');
+      case 'strap': return S('<path class="bp-part" d="M4 22h40"/><path class="bp-part" d="M4 18h40"/><rect class="bp-part" x="44" y="12" width="14" height="16" rx="2"/><path class="bp-hw-l" d="M48 16v8"/>');
+      default: return S('<ellipse class="bp-part" cx="22" cy="22" rx="12" ry="5"/><rect class="bp-hinge" x="38" y="12" width="20" height="16"/>');
+    }
+  }
+
+  // Exploded views: the parts pulled apart along the way they go together, with their IDs.
+  function exploded(g, list) {
+    const c = Math.cos(Math.PI / 6), sn = 0.5;
+    const idOf = (name, grp) => (list.find((x) => x.name.startsWith(name) && (!grp || x.group.startsWith(grp))) || {}).id || '';
+    const view = (build, label) => {
+      const pts = [], body = [], tags = [];
+      const P = (x, y, z) => { const X = (x - y) * c, Y = (x + y) * sn - z; pts.push([X, Y]); return `${X.toFixed(2)},${Y.toFixed(2)}`; };
+      const box = (x, y, z, w, d, h, cls = 'bp-part', tag) => {
+        const faces = [[P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], [P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)], [P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)]];
+        body.push(faces.map((f, i) => `<polygon points="${f.join(' ')}" class="${cls} bp-f${i}"/>`).join(''));
+        if (tag) { const [X, Y] = [((x + w / 2) - (y + d)) * c, ((x + w / 2) + (y + d)) * sn - (z + h / 2)]; tags.push([X, Y, tag]); }
+      };
+      const arrow = (x1, y1, z1, x2, y2, z2) => body.push(`<polyline points="${P(x1, y1, z1)} ${P(x2, y2, z2)}" class="bp-move"/>`);
+      build(box, arrow);
+      let t = '';
+      for (const [X, Y, tag] of tags) { pts.push([X - 4, Y - 4], [X + 4, Y + 4]); t += `<g class="bp-tag"><circle cx="${X.toFixed(2)}" cy="${Y.toFixed(2)}" r="2.3"/><text x="${X.toFixed(2)}" y="${(Y + 0.8).toFixed(2)}" font-size="2.2" text-anchor="middle">${esc(tag)}</text></g>`; }
+      const xs = pts.map((q) => q[0]), ys = pts.map((q) => q[1]);
+      const minX = Math.min(...xs) - 4, minY = Math.min(...ys) - 4, w = Math.max(...xs) - minX + 4, h = Math.max(...ys) - minY + 4;
+      return `<figure class="bp-ex"><svg viewBox="${minX.toFixed(1)} ${minY.toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)}" role="img" aria-label="${esc(label)}">${body.join('')}${t}</svg><figcaption>${label}</figcaption></figure>`;
+    };
+    let e = 10;
+    const tw = g.tw, z0 = g.casterH ? g.casterH + e : 0;
+    const out = [];
+    out.push(view((box, arrow) => {
+      const WA = g.WA, DA = g.DA, H = g.caseH;
+      box(tw, -e, z0, WA - 2 * tw, tw, H, 'bp-part', idOf('Back', 'Tower'));
+      box(-e, 0, z0, tw, DA, H, 'bp-part', '');
+      if (g.casterH) {
+        for (const [cx, cy] of [[2, 2], [WA - 4, 2], [2, DA - 4], [WA - 4, DA - 4]]) box(cx, cy, 0, 2, 2, g.casterH - 0.5, 'bp-hwf');
+        box(0, 0, g.casterH - 0.5 + 2, WA, DA, 0.5, 'bp-part', idOf('Caster boards'));
+        arrow(WA / 2, DA / 2, g.casterH + 2.5, WA / 2, DA / 2, z0);
+      }
+      box(tw, tw, z0 + g.plinth + 2, g.inWA, g.inDA, tw, 'bp-part', idOf('Floor', 'Tower'));
+      box(WA - tw - g.bayW - tw, tw, z0 + g.plinth + tw + 2 + e * 0.3, tw, g.inDA, g.shelfY, 'bp-part', idOf('Divider'));
+      box(WA + e, 0, z0, tw, DA, H, 'bp-part', idOf('Sides', 'Tower'));
+      box(0, 0, z0 + H + e, WA, DA, tw, 'bp-part', idOf('Top', 'Tower'));
+      box(WA - tw - g.bayW, DA + e, z0 + g.plinth + tw, g.bayW + tw, tw, g.shelfY, 'bp-part', idOf('Computer door'));
+      if (g.compW > 1) box(tw, DA + e, z0 + g.plinth + tw, g.compW, tw, g.shelfY, 'bp-part', idOf('Cubby door'));
+      if (p.lids) {
+        box(0, DA + 2.4 * e, z0, WA, tw, H, 'bp-part', idOf('Tower lid panel'));
+        box(0, DA + 2.4 * e - g.lidD, z0, WA, g.lidD, tw, 'bp-part', idOf('Tower lid rim, short'));
+        box(WA - tw, DA + 2.4 * e - g.lidD, z0, tw, g.lidD, H, 'bp-part', idOf('Tower lid rim, long'));
+        arrow(WA / 2, DA + 2.4 * e - g.lidD, z0 + H / 2, WA / 2, DA, z0 + H / 2);
+      }
+    }, `<b>Tower Case, exploded.</b> Back, sides and top go together first with corner blocks in every inside corner${g.plinth ? '' : '; the floor sits flush on the caster board'}. Then the divider, doors and the ${p.lids ? 'lid (rim and lip toward the case)' : 'hardware'}. The Keys Case is built the same way, with the rack shelf in place of the divider.`));
+    e = 7;
+    const L = Math.min(g.sec1Len, 48), D = p.D1, rh = MAT[p.mat].card ? p.ribH : 0;
+    out.push(view((box, arrow) => {
+      if (MAT[p.mat].card) {
+        box(0, 0, 0, L, D, g.skin, 'bp-part', idOf('Main top skins'));
+        const zr = g.skin + e;
+        for (let yy = 0; yy <= D - g.ribT + 0.01; yy += Math.max(p.ribS, (D - g.ribT) / Math.max(1, Math.round((D - g.ribT) / p.ribS)))) box(0, yy, zr, L, g.ribT, rh, 'bp-part');
+        for (let xx = p.ribS; xx < L - 1; xx += p.ribS) box(xx, g.ribT, zr, g.ribT, D - 2 * g.ribT, rh, 'bp-part');
+        if (g.sec1 > 1) box(L - 1.5, g.ribT, zr, 1.5, D - 2 * g.ribT, rh, 'bp-hwf', idOf('Joint blocks'));
+        box(0, 0, zr + rh + e, L, D, g.skin, 'bp-part', idOf('Main top skins'));
+        const tag = idOf('Main top ribs, lengthwise');
+        box(L * 0.3, -0.01, zr, 0.01, 0.01, 0.01, 'bp-part', tag);
+      } else box(0, 0, 0, L, D, 0.75, 'bp-part', idOf('Main top'));
+      if (g.sec1 > 1) {
+        box(L - 3, 1, -e, 6, D - 2, 0.5, 'bp-part', idOf('Joint plates'));
+        for (const fy of [1 / 3, 2 / 3]) { box(L - 1.2, D * fy - 0.4, -e - 3, 0.8, 0.8, 2.5, 'bp-hwf'); arrow(L - 0.8, D * fy, -e + 0.5, L - 0.8, D * fy, 0); }
+        box(L + e * 0.6, 0, 0, Math.min(10, L / 3), D, g.T, 'bp-ghost');
+      }
+    }, `<b>Desktop piece, exploded.</b> ${MAT[p.mat].card ? `Bottom skin, the egg-crate rib grid (slots interlock), then the top skin. ` : ''}${g.sec1 > 1 ? 'A joint block fills the grid at each joining end; the joint plate goes under the joint and star knobs thread up into T-nuts in the block. The ghost on the right is the next piece.' : 'One piece per run at this travel length.'}`));
+    if (p.lids) out.push(view((box, arrow) => {
+      const W = g.WA, H = g.caseH;
+      if (g.casterH) {
+        for (const xx of [2, W - 2]) box(xx - 0.8, 1.2, 0, 1.6, 1.6, 1.2, 'bp-hwf');
+        const gz = 1.2 + e * 0.5;
+        box(0, 0, gz, W, 3, g.casterH - 1, 'bp-part', idOf('Leg riser block'));
+        box(0, 0, gz + g.casterH - 1, W, (3 - (g.lidD + g.tw + 0.125)) / 2, 1, 'bp-part');
+        box(0, 3 - (3 - (g.lidD + g.tw + 0.125)) / 2, gz + g.casterH - 1, W, (3 - (g.lidD + g.tw + 0.125)) / 2, 1, 'bp-part');
+        arrow(W / 2, 1.5, gz + g.casterH + e, W / 2, 1.5, gz + g.casterH);
+      }
+      const zl = g.casterH ? 1.2 + e * 0.5 + g.casterH + e : 0;
+      box(0, 3 - g.tw, zl, W, g.tw, H, 'bp-part', idOf('Tower lid panel'));
+      box(0, 0, zl, W, 3 - g.tw, g.tw, 'bp-part', idOf('Tower lid rim, short'));
+      box(W - g.tw, 0, zl, g.tw, 3 - g.tw, H, 'bp-part', idOf('Tower lid rim, long'));
+    }, `<b>Leg (desk mode), exploded.</b> The Tower lid stands on end, rim toward the wall${g.casterH ? `, in the groove of the riser block. Two leveling glides under the block screw in or out to bring the keys wing exactly level with the main top` : ''}.`));
+    return out.join('');
+  }
+
+  function renderBlueprint(g, list) {
+    $('bpParts').innerHTML = (() => {
+      let s = '', grp = '';
+      for (const x of list) {
+        if (x.group !== grp) { if (grp) s += '</div>'; grp = x.group; s += `<h3 class="bp-group">${esc(x.id.replace(/\d+$/, ''))} · ${esc(grp)}</h3><div class="bp-grid">`; }
+        s += partFigure(x, g);
+      }
+      return s + '</div>';
+    })();
+    $('bpHardware').innerHTML = hardware(g, list).map((h) => `<div class="bp-hwcard">${hwIcon(h.icon)}<div><b>${esc(h.name)}</b> <span class="q">× ${esc(h.qty)}</span><p>${esc(h.spec)}</p><p class="where">Goes on: ${esc(h.where)}</p></div></div>`).join('');
+    $('bpExploded').innerHTML = exploded(g, list);
+  }
+
   // ---- build steps ---------------------------------------------------------------------
   function roadSteps(g, card) {
     const out = [];
@@ -1127,9 +1524,9 @@ footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px
     ].map(([n, l]) => `<div class="total"><div class="n">${esc(n)}</div><div class="l">${esc(l)}</div></div>`).join('');
     let rows = '', grp = '';
     for (const x of list) {
-      if (x.group !== grp) { grp = x.group; rows += `<tr class="group"><td colspan="5">${esc(grp)}</td></tr>`; }
+      if (x.group !== grp) { grp = x.group; rows += `<tr class="group"><td class="printonly"></td><td colspan="6">${esc(x.id.replace(/\d+$/, ''))} · ${esc(grp)}</td></tr>`; }
       const big = tot.big.includes(x) ? ' Longer than a sheet: splice and stagger the joints.' : '';
-      rows += `<tr><td>${esc(x.name)}</td><td class="num">${x.qty}</td><td class="num">${esc(fmt(x.w))} × ${esc(fmt(x.h))}</td><td class="num">${x.layers}</td><td class="note">${esc(x.note + big)}</td></tr>`;
+      rows += `<tr><td class="printonly tick">☐</td><td><b class="pid">${esc(x.id)}</b> ${esc(x.name)}</td><td class="num">${x.qty}</td><td class="num">${esc(fmt(x.w))} × ${esc(fmt(x.h))}</td><td class="num">${x.layers}</td><td class="num printonly">${x.qty * x.layers}</td><td class="note">${esc(x.note + big)}</td></tr>`;
     }
     document.querySelector('#cut tbody').innerHTML = rows;
     // faux leather, shopping, conversion
@@ -1145,15 +1542,26 @@ footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px
       $('leatherLead').textContent = `Cut these from ${LEATHER[p.leatherColor].name} faux leather. Sizes include ${short(WRAP)} on every side to fold around edges and glue down out of sight. Long sides run across the ${short(p.rollW)} roll.`;
       $('leatherTotals').innerHTML = [[`${lea.yards} yd`, `of ${short(p.rollW)} roll, 10% extra`], [Math.round(lea.area), 'sq ft of leather'], [lea.pieces.reduce((a, x) => a + x.qty, 0), 'pieces to cut'], [lea.cans, 'cans of spray adhesive']]
         .map(([n, l]) => `<div class="total"><div class="n">${esc(n)}</div><div class="l">${esc(l)}</div></div>`).join('');
-      document.querySelector('#leatherCut tbody').innerHTML = lea.pieces.map((x) => `<tr><td>${esc(x.name)}</td><td class="num">${x.qty}</td><td class="num">${esc(fmt(Math.max(x.w, x.h)))} × ${esc(fmt(Math.min(x.w, x.h)))}${lea.tooWide.includes(x) ? ' (seamed)' : ''}</td><td class="note">${esc(x.covers)}</td></tr>`).join('');
+      document.querySelector('#leatherCut tbody').innerHTML = lea.pieces.map((x) => `<tr><td class="printonly tick">☐</td><td>${esc(x.name)}</td><td class="num">${x.qty}</td><td class="num">${esc(fmt(Math.max(x.w, x.h)))} × ${esc(fmt(Math.min(x.w, x.h)))}${lea.tooWide.includes(x) ? ' (seamed)' : ''}</td><td class="note">${esc(x.covers)}</td></tr>`).join('');
     }
-    document.querySelector('#shop tbody').innerHTML = shopping(g, lea, tot).map(([a, b, c]) => `<tr><td>${esc(a)}</td><td class="num">${esc(b)}</td><td class="note">${esc(c)}</td></tr>`).join('');
+    document.querySelector('#shop tbody').innerHTML = shopping(g, lea, tot).map(([a, b, c]) => `<tr><td class="printonly tick">☐</td><td>${esc(a)}</td><td class="num">${esc(b)}</td><td class="note">${esc(c)}</td></tr>`).join('');
+    // print header: the design at a glance
+    const spec = [
+      ['Desk height', short(p.H)], ['Main run', `${short(p.L1)} × ${short(p.D1)}`], ['Return wing', `${short(p.L2)} × ${short(p.D2)}`], ['Leg room', short(g.kneeMain)],
+      ['Tower Case', `${short(g.WA)} × ${short(g.DA)} × ${short(g.caseH)}`], ['Keys Case', `${short(g.WB)} × ${short(g.DB)} × ${short(g.caseH)}`],
+      ['Material', m.name], [m.card ? 'Walls / tops' : 'Tops', m.card ? `${short(g.tw)} / ${short(g.T)}` : '3/4 in plywood'],
+      ['Finish', isLea ? `${LEATHER[p.leatherColor].name} faux leather${lea ? `, ${lea.yards} yd` : ''}` : p.finish === 'shellac' ? 'shellac + wax + paint' : 'sealer + paint'],
+      ['Road case', [p.lids && 'lids', p.casters && 'casters', p.handles && 'handles'].filter(Boolean).join(', ') || 'none'],
+      ['Top pieces', `${g.sec1 + g.sec2}, longest ${short(Math.max(g.sec1Len, g.sec2Len))}`], ['Printed', new Date().toLocaleDateString()],
+    ];
+    $('printSpec').innerHTML = spec.map(([k, v]) => `<div><b>${esc(k)}</b>${esc(v)}</div>`).join('');
     const cv = conversion(g);
     const list2 = (rows) => rows.map(([h, d]) => `<li><b>${esc(h)}</b> ${esc(d)}</li>`).join('');
     $('convert').innerHTML = `<div class="mode"><h3>Desk → road case</h3><p class="when">About 15 minutes, one person (two for the top pack).</p><ol>${list2(cv.toRoad)}</ol></div>`
       + `<div class="mode"><h3>Road case → desk</h3><p class="when">About 10 minutes. Same parts, nothing left over.</p><ol>${list2(cv.toDesk)}</ol></div>`
       + `<div class="tablewrap jobs" style="grid-column: 1 / -1"><table><thead><tr><th>Part</th><th>Desk mode</th><th>Road mode</th></tr></thead><tbody>${cv.jobs.map(([a, b, c]) => `<tr><td>${esc(a)}</td><td>${esc(b)}</td><td>${esc(c)}</td></tr>`).join('')}</tbody></table></div>`;
     $('steps').innerHTML = steps(g, tot).map(([h, b]) => `<li><div><h3>${esc(h)}</h3>${b}</div></li>`).join('');
+    renderBlueprint(g, list);
     window.__cut = list;
   }
 
@@ -1197,8 +1605,28 @@ footer { margin-top: 30px; color: var(--muted); font-size: 13px; border-top: 1px
     document.querySelectorAll('.tabs button').forEach((x) => x.setAttribute('aria-selected', x === b));
     render();
   }));
+  // Drawings for the build packet, drawn fresh at print time in the chosen finish colors.
+  function printDrawings() {
+    const g = compute();
+    const views = [[drawIso, 'Overview'], [drawPlan, 'Floor plan'], [drawTower, 'Tower Case front'], [drawKeys, 'Keys Case front'], ...(p.lids || p.casters ? [[drawRoad, 'Road mode']] : []), [drawSection, 'Desktop build-up']];
+    const box = $('printDrawings');
+    box.innerHTML = views.map(([fn, name]) => { const d = fn(g); return `<figure data-v="${esc(name)}">${d.svg}<figcaption><b>${esc(name)}.</b> ${esc(d.cap)}</figcaption></figure>`; }).join('');
+    if (p.finish === 'leather') box.querySelectorAll('figure:not([data-v="Desktop build-up"])').forEach((f) => {
+      for (const [i, k] of ['', '-2', '-3'].entries()) { f.style.setProperty(`--case${k}`, LEATHER[p.leatherColor].c[i]); f.style.setProperty(`--top${k}`, LEATHER[p.leatherColor].t[i]); }
+    });
+  }
+  const doPrint = (mode) => {
+    document.body.dataset.print = mode;
+    if (mode === 'all') printDrawings();
+    window.print();
+  };
+  window.addEventListener('beforeprint', () => { if (!['cut', 'bp'].includes(document.body.dataset.print)) printDrawings(); });
+  window.addEventListener('afterprint', () => { delete document.body.dataset.print; });
+  $('printCut').onclick = () => doPrint('cut');
+  $('printAll').onclick = () => doPrint('all');
+  $('printBp').onclick = () => doPrint('bp');
   $('copyCut').onclick = () => {
-    const text = ['Part\tQty\tLength\tWidth\tLayers\tNotes', ...window.__cut.map((x) => `${x.group}: ${x.name}\t${x.qty}\t${fmt(x.w)}\t${fmt(x.h)}\t${x.layers}\t${x.note}`)].join('\n');
+    const text = ['Part\tQty\tLength\tWidth\tLayers\tNotes', ...window.__cut.map((x) => `${x.id} ${x.group}: ${x.name}\t${x.qty}\t${fmt(x.w)}\t${fmt(x.h)}\t${x.layers}\t${x.note}`)].join('\n');
     const done = () => { $('copied').hidden = false; setTimeout(() => ($('copied').hidden = true), 2500); };
     try {
       navigator.clipboard.writeText(text).then(done, () => fallback(text, done));
