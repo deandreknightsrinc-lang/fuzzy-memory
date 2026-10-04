@@ -56,5 +56,12 @@ low-profile also works, with less room for big models and images. Check after
 setup with `nvidia-smi` on the host, and `pct exec 112 -- ollama ps` (PROCESSOR
 says GPU while a model is loaded).
 
+## Grow it into a cluster
+
+[cluster.md](cluster.md) is the step-by-step guide to a 4-node Proxmox
+cluster: the OptiPlex 9010 plus three OptiPlex Micros, a Raspberry Pi
+tie-breaker vote, ZFS replication, automatic restart of guests when a node
+dies, backups, and a UPS that shuts everything down cleanly.
+
 Choose other models with `KK_MODELS="llama3.2:3b qwen2.5:14b" bash setup.sh`
 (the last one is used for the agents).
