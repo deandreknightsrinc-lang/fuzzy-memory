@@ -100,7 +100,10 @@ if [[ ! -x $TOOLS/bin/python ]]; then
 fi
 "$TOOLS/bin/pip" install -q --upgrade pip wheel >/dev/null
 # torchaudio 2.9+ moved file saving to torchcodec, which Demucs does not use yet.
-"$TOOLS/bin/pip" install -q "torch==2.8.*" "torchaudio==2.8.*" --index-url https://download.pytorch.org/whl/cpu >/dev/null \
+# With an NVIDIA card shared in (gpu-setup.sh on the Proxmox host), use the CUDA build.
+TORCH_INDEX=https://download.pytorch.org/whl/cpu
+if nvidia-smi -L >/dev/null 2>&1; then TORCH_INDEX=https://download.pytorch.org/whl/cu128; ok "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader | head -1)"; fi
+"$TOOLS/bin/pip" install -q "torch==2.8.*" "torchaudio==2.8.*" --index-url "$TORCH_INDEX" >/dev/null \
     || die "PyTorch install failed"
 "$TOOLS/bin/pip" install -q demucs matchering openai-whisper soundfile >/dev/null \
     || die "studio tools install failed"
