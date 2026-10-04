@@ -130,6 +130,20 @@ ol.steps ul { padding-left: 18px; }
 .warnbox h3 { margin: 0 0 6px; font-family: var(--font-cond); color: var(--bad); letter-spacing: .04em; text-transform: uppercase; }
 .warnbox ul { margin: 0; padding-left: 18px; }
 .mode { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; }
+.sched-top { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 12px; }
+.sched-top .reset { margin-top: 0; }
+.sched-bar { flex: 1 1 220px; height: 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); overflow: hidden; }
+.sched-bar span { display: block; height: 100%; width: 0; background: var(--ok); transition: width .3s; }
+.sched-pct { font-family: var(--font-mono); font-size: 14px; }
+.sched { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+.day { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 10px 12px; break-inside: avoid; }
+.day.done { border-color: var(--ok); }
+.day h3 { margin: 0 0 2px; font-family: var(--font-cond); font-size: 18px; letter-spacing: .02em; display: flex; justify-content: space-between; gap: 8px; }
+.day h3 small { font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-weight: 400; }
+.day .goal { margin: 0 0 6px; font-size: 13px; color: var(--muted); }
+.task { display: grid; grid-template-columns: 22px 1fr; gap: 4px; align-items: start; padding: 4px 0; border-top: 1px dashed var(--line); font-size: 14px; color: var(--ink); cursor: pointer; }
+.task input { margin: 3px 0 0; width: 16px; height: 16px; accent-color: var(--ok); }
+.task input:checked + span { color: var(--muted); text-decoration: line-through; }
 .mode h3 { margin: 0 0 6px; font-family: var(--font-cond); font-size: 18px; letter-spacing: .03em; text-transform: uppercase; color: var(--accent); }
 .mode ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
 .mode .when { font-size: 13px; color: var(--muted); margin: 0 0 8px; }
@@ -481,6 +495,17 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     <h2>Desk ↔ road case</h2>
     <p class="lead">Two ways to live: set up as an L-shaped studio desk, or closed up as two rolling road cases and a top pack. Nothing is left over in either mode: every part has a job in both.</p>
     <div class="cols2" id="convert"></div>
+  </section>
+
+  <section class="block packet" id="scheduleBlock">
+    <h2>Build schedule</h2>
+    <p class="lead">A day-by-day plan for this design. Tick tasks as you finish them; your progress stays on this device. Panels need a night under weight to dry flat, so each day ends with something pressing.</p>
+    <div class="sched-top">
+      <div class="sched-bar" role="progressbar" aria-label="Build progress" aria-valuemin="0" aria-valuemax="100"><span id="schedBar"></span></div>
+      <span class="sched-pct" id="schedPct"></span>
+      <button type="button" class="reset" id="schedReset">Clear all ticks</button>
+    </div>
+    <div class="sched" id="schedule"></div>
   </section>
 
   <section class="block packet">
@@ -1659,6 +1684,126 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
       ['Hardware over the leather', `<ul><li>Aluminum angle on every case${p.lids ? ' and lid' : ''} edge: cut to length with 45° ends, drill, and fix over the leather into the ${ply ? 'plywood' : 'backers or glued wood strips'}. It protects the leather's edges.</li><li>Ball corners on every corner${p.lids ? ', butterfly latches across each lid seam (into the backers)' : ''}${p.handles ? ', recessed handles in their openings' : ''}.</li><li>Optional: brass nailhead trim along the front edges of the tops, and stenciled names (TOWER, KEYS CASE) in white paint pen.</li><li>Wipe the leather with a damp cloth; avoid solvent cleaners, which strip the finish.</li></ul>`],
     ];
   }
+  // Day-by-day build schedule. Task ids are fixed strings so ticks survive changes to the settings.
+  const SCHED_KEY = 'casedesk.sched.v1';
+  let ticks = (() => { try { return JSON.parse(localStorage.getItem(SCHED_KEY) || '{}') || {}; } catch { return {}; } })();
+  const saveTicks = () => { try { localStorage.setItem(SCHED_KEY, JSON.stringify(ticks)); } catch { /* private window */ } };
+  function schedule(g, list, tot, lea) {
+    const m = MAT[p.mat], card = m.card;
+    const ids = (prefix) => {
+      const xs = list.filter((x) => x.group.startsWith(prefix));
+      if (!xs.length) return '';
+      return xs.length > 1 ? `${xs[0].id}–${xs[xs.length - 1].id}` : xs[0].id;
+    };
+    const pieces = (prefix) => list.filter((x) => x.group.startsWith(prefix)).reduce((a, x) => a + x.qty * x.layers, 0);
+    const A = ids('Tower'), B = ids('Keys Case'), C = ids('Front lids'), E = ids('Desktops'), K = ids('Keyboard tray'), S = ids('Screen case');
+    const order = [];
+    if (p.casters) order.push('3 in locking casters (8)');
+    if (p.lids) order.push('butterfly latches (8)');
+    if (p.handles) order.push('recessed handles (4)');
+    if (g.kbt) order.push(`${g.kbtSlide} in keyboard-tray slides`);
+    if (p.tray) order.push(`${g.slideL} in shelf slides`);
+    if (g.sc) order.push('piano hinge and 2 lid stays');
+    if (g.table) order.push('folding table legs');
+    if (g.sec1 + g.sec2 > 2 || g.kbtPieces > 1) order.push('star knobs and T-nuts');
+    if (g.beam) order.push('aluminum tube and U-brackets');
+    const glue = !card ? 'wood glue and screws' : p.glue === 'paste' ? `about ${tot.pasteBatches} cups of flour for wheat paste (plus a pot and whisk)` : `${tot.glueOz > 64 ? `${(tot.glueOz / 128).toFixed(1)} gal` : `${tot.glueOz} oz`} of wood glue and a small foam roller`;
+    const lam = (what) => card ? `Laminate ${what}: glue each layer, flutes crossing, press out from the center. Stack under a board with weight on it overnight, flat.` : `Cut ${what} from plywood and label each piece.`;
+    const days = [];
+    const day = (title, goal, tasks) => days.push({ title, goal, tasks: tasks.filter(Boolean) });
+    day('Get ready', 'Measure, lock the design, gather everything.', [
+      ['prep-measure', 'Measure the wall space, the computer case and your sitting elbow height; enter them above until every check says Fits.'],
+      g.kbt && ['prep-keys', "When the keyboard arrives, measure its height without the music rest and enter it (sets the tray height)."],
+      ['prep-print', 'Print (or save as PDF) the cut list and the blueprint.'],
+      ['prep-board', card ? `Collect ${tot.sheets} sheets of ${m.name} (${p.shW}×${p.shL} in) or the same area in big, clean, flat boxes. ECT 44 or higher.` : `Buy ${tot.sheets} sheets of ${m.name} (${p.shW}×${p.shL} in).`],
+      ['prep-glue', `Glue: ${glue}.`],
+      ['prep-tools', 'Tools: utility knife and a pack of snap-off blades, 48 in metal straightedge, square, tape measure, pencil and marker.'],
+      ['prep-surface', 'A flat work surface (old door or plywood on sawhorses) and weights for pressing (books, paint cans, water jugs).'],
+      order.length && ['prep-order', `Order hardware now (it takes days to ship): ${order.join(', ')}. Counts are in the shopping list.`],
+    ]);
+    day('Day 1 · Tower Case panels', 'The biggest panels first: they dry overnight.', [
+      card && ['d1-flutes', 'Mark an arrow along the flutes on every sheet.'],
+      ['d1-cut', `Cut the Tower Case parts ${A} (${pieces('Tower')} pieces counting layers). Alternate the flute direction layer to layer.`],
+      ['d1-lam', lam('the Tower Case sides, back, top, floor, divider and doors')],
+      card && p.glue === 'paste' && ['d1-paste', 'Cook the wheat paste (1 part flour to 5 parts water, heat until it just boils, let it cool). Keep extra in the fridge.'],
+    ]);
+    day('Day 2 · Keys Case panels', p.lids ? 'Keys Case and the lids.' : 'Keys Case panels.', [
+      ['d2-cut', `Cut the Keys Case parts ${B} (${pieces('Keys Case')} pieces counting layers).`],
+      ['d2-lam', lam('the Keys Case panels')],
+      p.lids && ['d2-lids', `Cut and ${card ? 'laminate' : 'label'} the lid parts ${C}: lid panels, rims and lip strips${g.casterH ? ', and stack the leg riser block' : ''}.`],
+      p.casters && ['d2-casterboards', 'Cut the two 1/2 in plywood caster boards and hammer in the T-nuts for the caster plates.'],
+    ]);
+    day('Day 3 · Desktop parts', 'Skins and ribs for the torsion-box tops.', [
+      ['d3-cut', `Cut the desktop parts ${E}: ${card ? 'top and bottom skins, lengthwise and crosswise ribs, edge banding, cleats and plates' : 'tops, cleats and plates'}.`],
+      card && ['d3-slots', `Cut the half-depth slots in the ribs every ${short(p.ribS)} (lengthwise ribs from the top edge, crosswise from the bottom).`],
+      card && ['d3-lam', lam('the skins and ribs')],
+      g.kbt && ['d3-tray', `Cut the keyboard tray ${K} from 3/4 in plywood (${short(g.kbtW)} × ${short(g.kbtD)}${g.kbtPieces > 1 ? ', in two halves' : ''}) and its rails.`],
+      g.sc && ['d3-screen', `Cut ${card ? 'and laminate ' : ''}the screen case parts ${S}.`],
+    ]);
+    day('Day 4 · Build the cases', 'Two boxes, square and solid.', [
+      ['d4-glue', 'Glue the back between the sides, then the top. Check square by measuring both diagonals.'],
+      ['d4-corners', 'Glue a corner block into every inside corner of both cases.'],
+      ['d4-floor', g.plinth ? 'Glue in the plinth runners, then the floors.' : 'Glue in the floors, flush with the bottom edges.'],
+      ['d4-vents', 'Cut the computer door grille, the rear exhaust and the cable pass-throughs.'],
+      card && (p.lids || p.handles) && ['d4-backers', 'Glue the 1/2 in plywood backer pads inside the walls where latches and handles go; cut the handle openings.'],
+      p.casters && ['d4-casters', 'Glue and screw a caster board under each case. Weight them overnight.'],
+    ]);
+    day('Day 5 · Doors, lids and moving parts', 'Everything that opens, slides or folds.', [
+      ['d5-doors', 'Hang the doors 1 in back from the front edge; fit the magnet catches. Fit the shelves.'],
+      p.lids && ['d5-lids', 'Glue the lid rims and lip strips; test-fit each lid on its case.'],
+      g.kbt && ['d5-tray', 'Glue the keyboard-tray rails to the knee-facing case sides, level, and fit the slides and tray.'],
+      p.tray && ['d5-shelf', 'Fit the Keys Case pull-out shelf on its slides.'],
+      g.sc && ['d5-screen', 'Glue up the screen case, hinge the lid, fit the lid stays and the monitor plate.'],
+      g.table && ['d5-table', 'Glue the leg pads into the Keys lid and screw on the folding legs.'],
+    ]);
+    day('Day 6 · Torsion-box tops', 'The desktops: light and very stiff.', card ? [
+      ['d6-grid', 'Slot the ribs together into a grid on each bottom skin and glue them down. Keep it square.'],
+      (g.sec1 + g.sec2 > 2) && ['d6-joints', 'Glue the joint blocks into the grid at each joining end and set the T-nuts.'],
+      ['d6-skins', 'Glue on the top skins. Weight them evenly, flat, overnight.'],
+    ] : [
+      ['d6-tops', 'Sand the plywood tops and round the edges slightly.'],
+      (g.sec1 + g.sec2 > 2) && ['d6-joints', 'Fit the joint plates and T-nuts.'],
+    ]);
+    day('Day 7 · Edges and joins', 'Edges, joints and a dry run.', [
+      card && ['d7-band', 'Wrap the top edges with the edge banding.'],
+      (g.sec1 + g.sec2 > 2) && ['d7-plates', 'Fit the joint plates and star knobs; check the pieces bolt up flat.'],
+      ['d7-cleats', 'Glue on the locating cleats and the corner joining plates.'],
+      g.beam && ['d7-beam', 'Glue the beam bracket pads to the cases and screw on the U-brackets.'],
+      card && p.paperSkin && ['d7-skin', 'Paste 2–3 layers of kraft paper over the tops and case fronts for a hard surface.'],
+      ['d7-dry', 'Dry run: stand the cases, lay the tops, check heights and leg room before finishing.'],
+    ]);
+    day('Day 8 · Finish', p.finish === 'leather' ? `Faux leather (${lea.yards} yd of ${LEATHER[p.leatherColor].name}).` : 'Seal and paint.', p.finish === 'leather' ? [
+      card && ['d8-seal', 'Seal all outside surfaces with thinned PVA; sand bumps smooth.'],
+      ['d8-cut', `Unroll the leather overnight to relax, then cut the ${lea.pieces.reduce((a, x) => a + x.qty, 0)} pieces from the leather table, grain all one way.`],
+      ['d8-cases', 'Wrap the case bands, then the doors and lids (spray both sides, wait for tack, roll from the center).'],
+      ['d8-tops', 'Wrap each desktop piece and the tray; contact cement on the front edges. Let it all cure 24 hours.'],
+    ] : [
+      ['d8-seal', p.finish === 'shellac' ? 'Two coats of the shellac-wax mix (made outdoors on an electric hot plate); 12 hours between coats.' : 'Two coats of sealer.'],
+      ['d8-paint', 'Paint matte or satin black.'],
+    ]);
+    day('Day 9 · Hardware and setup', 'Make it a road case, then a desk.', [
+      ['d9-angle', 'Fit the aluminum angle on the case edges, then the ball corners.'],
+      (p.lids || p.handles) && ['d9-latches', `Screw on the ${[p.lids && 'latches', p.handles && 'handles'].filter(Boolean).join(' and ')} through the backer pads.`],
+      p.casters && ['d9-casters', 'Bolt on the casters.'],
+      ['d9-setup', 'Set up the L, load-test each top with books, then move the gear in.'],
+      (p.lids || p.casters) && ['d9-road', 'Practice the desk ↔ road case change once and time it.'],
+      ['d9-temps', "Watch the computer's temperatures for the first week."],
+    ]);
+    return days;
+  }
+  function renderSchedule(g, list, tot, lea) {
+    const days = schedule(g, list, tot, lea);
+    let all = 0, done = 0;
+    $('schedule').innerHTML = days.map((d) => {
+      const n = d.tasks.filter(([id]) => ticks[id]).length;
+      all += d.tasks.length; done += n;
+      return `<div class="day${n && n === d.tasks.length ? ' done' : ''}"><h3>${esc(d.title)}<small>${n}/${d.tasks.length}</small></h3><p class="goal">${esc(d.goal)}</p>${d.tasks.map(([id, text]) => `<label class="task"><input type="checkbox" data-task="${id}"${ticks[id] ? ' checked' : ''} /><span>${esc(text)}</span></label>`).join('')}</div>`;
+    }).join('');
+    const pct = all ? Math.round((done / all) * 100) : 0;
+    $('schedBar').style.width = `${pct}%`;
+    $('schedBar').parentElement.setAttribute('aria-valuenow', pct);
+    $('schedPct').textContent = `${done} of ${all} tasks · ${pct}%`;
+  }
   function steps(g, tot) {
     const m = MAT[p.mat];
     if (!m.card) return [
@@ -1753,6 +1898,7 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
       + `<div class="tablewrap jobs" style="grid-column: 1 / -1"><table><thead><tr><th>Part</th><th>Desk mode</th><th>Road mode</th></tr></thead><tbody>${cv.jobs.map(([a, b, c]) => `<tr><td>${esc(a)}</td><td>${esc(b)}</td><td>${esc(c)}</td></tr>`).join('')}</tbody></table></div>`;
     $('steps').innerHTML = steps(g, tot).map(([h, b]) => `<li><div><h3>${esc(h)}</h3>${b}</div></li>`).join('');
     renderBlueprint(g, list);
+    renderSchedule(g, list, tot, lea);
     window.__cut = list;
   }
 
@@ -1825,6 +1971,17 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     try {
       navigator.clipboard.writeText(text).then(done, () => fallback(text, done));
     } catch { fallback(text, done); }
+  };
+  $('schedule').addEventListener('change', (e) => {
+    const id = e.target.dataset && e.target.dataset.task;
+    if (!id) return;
+    if (e.target.checked) ticks[id] = true; else delete ticks[id];
+    saveTicks();
+    render();
+  });
+  $('schedReset').onclick = () => {
+    if (!confirm('Clear every tick in the build schedule?')) return;
+    ticks = {}; saveTicks(); render();
   };
   function fallback(text, done) {
     const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
