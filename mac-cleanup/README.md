@@ -31,6 +31,8 @@ Moving the home folder itself to the drive (or all of it) would break the Mac: i
 - **Library**: app settings, your passwords (keychain), Logic's preferences. Its big parts (caches, iPhone backups) are handled by `--caches` and `--iphone-backups`.
 - **Applications**, **Public**, the hidden settings (names starting with a dot), and the folders Desktop, Documents, Downloads, Movies, Music and Pictures themselves (they're emptied, not removed).
 - **fuzzy-memory** and **kbk-system**: your KBK tools run from there.
+- **Splice** (Splice keeps its sounds there: change it in Splice's settings) and **Claude** (used by the Claude app).
+- Folders that are already **links** to somewhere else, such as a Downloads or Music folder that already points to the drive. Anything that's already on the drive is never moved again.
 - **Cloud folders** (Dropbox, Google Drive, OneDrive, Creative Cloud, iCloud Drive): moving files out of them deletes them from the cloud. Change the folder in that app's settings instead.
 - In Music: **Audio Music Apps** (Logic's presets, patches and channel strips), **KBK Voices** (AI Vox), the **Music app's library**, and the link to your sound library. In Movies: the **TV app's library**. The script prints how to move the Music and TV media with those apps.
 - A **Photos library** moves only if the drive is formatted APFS or Mac OS Extended and Photos is closed. Afterwards, hold Option while opening Photos and choose the library on the drive. **Logic projects** move only while Logic is closed.

@@ -119,10 +119,20 @@ need_drive() {
 
 log() { [[ -n "$LOG" ]] && echo "$*" >> "$LOG"; }
 
+# true if $1 really lives on the drive (for example through a linked folder)
+on_drive() {
+    local real drive_real
+    real="$(cd "$(dirname "$1")" 2>/dev/null && pwd -P)" || return 1
+    drive_real="$(cd "$DRIVE" 2>/dev/null && pwd -P)" || return 1
+    case "$real/" in "$drive_real"/*) return 0 ;; esac
+    return 1
+}
+
 # Copy $1 into folder $2 on the drive, check it, then remove the original.
 move_item() {
     local src="$1" dest_dir="$2" name dest kb before after
     name="$(basename "$src")"
+    if on_drive "$src"; then info "already on the drive: $name"; return 0; fi
     dest="$dest_dir/$name"
     if [[ -e "$dest" ]]; then # never overwrite: add a number
         local n=2 stem ext
@@ -319,6 +329,11 @@ report() {
 move_folder_contents() { # $1 = folder, $2 = name on the drive, $3 = ask each (1/0)
     local src="$1" name="$2" each="$3" kb p
     [[ -d "$src" ]] || return 0
+    if [[ -L "$src" ]]; then
+        bold "$name"
+        ok "already a link to $(readlink "$src") - nothing on the Mac to move"
+        return 0
+    fi
     bold "Moving $name to the drive ($(human "$(kb_of "$src")"))"
     local dest_dir="$DEST/$name"
     items_by_size "$src" > "${TMPDIR:-/tmp}/kbk-items.$$"
@@ -376,6 +391,8 @@ home_skip_reason() { # an item directly in ~ -> why it stays on the Mac (nothing
         Applications) echo "apps stay on the Mac" ;;
         Public) echo "used by macOS file sharing" ;;
         fuzzy-memory|kbk-system) echo "your KBK tools run from here" ;;
+        Splice) echo "Splice keeps its sounds here: move them in Splice > Settings > Sounds folder" ;;
+        Claude) echo "used by the Claude app" ;;
         Dropbox*|"Google Drive"*|OneDrive*|"Creative Cloud Files"*|"iCloud Drive"*|Box|"Box Sync"|"pCloud Drive")
             echo "a cloud sync folder: moving files out of it deletes them from the cloud. Change its folder in that app's settings" ;;
     esac
@@ -422,6 +439,7 @@ move_home() {
     fi
     [[ $DRY == 1 || $YES == 1 ]] && each=0
     for name in $CONTENT_FOLDERS; do
+        [[ -n "$(home_skip_reason "$HOME/$name")" ]] && continue
         move_folder_contents "$HOME/$name" "$name" "$each"
     done
     local header=0
