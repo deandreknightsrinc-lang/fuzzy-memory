@@ -130,6 +130,18 @@ ol.steps ul { padding-left: 18px; }
 .warnbox h3 { margin: 0 0 6px; font-family: var(--font-cond); color: var(--bad); letter-spacing: .04em; text-transform: uppercase; }
 .warnbox ul { margin: 0; padding-left: 18px; }
 .mode { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; }
+.layout-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.layout-legend i { display: inline-block; width: 12px; height: 12px; border: 1px solid var(--ink); margin-right: 5px; vertical-align: -1px; }
+.sheets { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 620px), 1fr)); gap: 12px; }
+.sheetcard { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 8px 10px 10px; break-inside: avoid; }
+.sheetcard.done { border-color: var(--ok); }
+.sheetcard header { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-family: var(--font-cond); font-size: 16px; }
+.sheetcard header label { display: flex; gap: 6px; align-items: center; font-size: 14px; color: var(--ink); }
+.sheetcard svg { display: block; width: 100%; height: auto; margin: 6px 0; }
+.sheetcard .lp { stroke: var(--ink); stroke-width: .12; }
+.sheetcard .lt { fill: var(--ink); font-family: var(--font-mono); font-weight: 600; }
+.sheetcard .fl { stroke: var(--line); stroke-width: .15; }
+.sheetcard p { margin: 0; font-size: 12.5px; color: var(--muted); }
 .sched-top { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 12px; }
 .sched-top .reset { margin-top: 0; }
 .sched-bar { flex: 1 1 220px; height: 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); overflow: hidden; }
@@ -253,6 +265,8 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
   #printDrawings figcaption { font-size: 8pt; color: #444; margin-top: 2px; }
   body[data-print="cut"] .packet, body[data-print="cut"] #blueprint { display: none !important; }
   body[data-print="bp"] section.block:not(#blueprint), body[data-print="bp"] #printDrawings { display: none !important; }
+  .sheets { grid-template-columns: 1fr 1fr; }
+  .sheetcard header label input { display: none; }
   .bp, :root .bp { --bp-bg: #fff; --bp-paper: #fff; --bp-line: #0b2d55; --bp-dim: #1d6fb8; --bp-cut: #b86e00; --bp-hw: #c2410c; --bp-soft: #33415a; background: #fff !important; padding: 0 !important; }
   .bp .printbar { display: none !important; }
   .bp-card, .bp-hwcard, .bp-ex { break-inside: avoid; }
@@ -412,6 +426,10 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
           <label>Sheet width <input type="number" id="shW" step="1" /><span class="u" data-u></span></label>
           <label>Sheet length <input type="number" id="shL" step="1" /><span class="u" data-u></span></label>
         </div>
+        <label id="fluteRow">Flutes on my sheets run along the <select id="fluteDir">
+          <option value="short">short side (width)</option>
+          <option value="long">long side (length)</option>
+        </select></label>
       </fieldset>
 
       <fieldset>
@@ -476,6 +494,13 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
       <button type="button" class="copy alt" id="copyCut">Copy cut list</button><span class="copied" id="copied" hidden>Copied as a spreadsheet table.</span>
     </div>
     <p class="hint printbar">The cut list prints with a tick box for every part and the total pieces to cut (quantity × layers). The build packet adds the drawings, the desk ↔ road case steps and the build steps. Choose "Save as PDF" in the print window to keep a copy.</p>
+  </section>
+
+  <section class="block" id="layoutBlock">
+    <h2>Sheet layout</h2>
+    <p class="lead" id="layoutLead"></p>
+    <div class="layout-legend" id="layoutLegend"></div>
+    <div class="sheets" id="sheets"></div>
   </section>
 
   <section class="block" id="leatherBlock">
@@ -553,7 +578,7 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     ply12: { t: 0.5, name: '1/2 in plywood', card: false, lw: 1, ls: 1, lr: 1, w: 1.5 },
   };
   const SCREENS = { p156: { w: 14.1, h: 8.9, name: '15.6 in portable monitor' }, p173: { w: 15.7, h: 9.9, name: '17.3 in portable monitor' } };
-  const DEFAULTS = { H: 31, L1: 96, D1: 24, L2: 52, D2: 20, WB: 21, pcPreset: 'mid', pcW: 9, pcD: 18.5, pcH: 18.5, clrS: 1, clrR: 3, shelfA: false, kb: 'glarry', kbL: 49.7, kbD: 8, kbH: 3, kbPlace: 'tray', rackU: '4', screen: 'p156', throwD: 60, throwR: 1.2, hutch: true, screenCase: true, tray: true, keysLid: 'table', glue: 'paste', finish: 'leather', leatherColor: 'black', rollW: 54, lids: true, casters: true, handles: true, sectionMax: 36, paperSkin: true, mat: 'dw', lw: 3, ls: 2, lr: 2, ribH: 1.5, ribS: 4, shW: 48, shL: 96 };
+  const DEFAULTS = { H: 31, L1: 96, D1: 24, L2: 52, D2: 20, WB: 21, pcPreset: 'mid', pcW: 9, pcD: 18.5, pcH: 18.5, clrS: 1, clrR: 3, shelfA: false, kb: 'glarry', kbL: 49.7, kbD: 8, kbH: 3, kbPlace: 'tray', rackU: '4', screen: 'p156', throwD: 60, throwR: 1.2, hutch: true, fluteDir: 'short', screenCase: true, tray: true, keysLid: 'table', glue: 'paste', finish: 'leather', leatherColor: 'black', rollW: 54, lids: true, casters: true, handles: true, sectionMax: 36, paperSkin: true, mat: 'dw', lw: 3, ls: 2, lr: 2, ribH: 1.5, ribS: 4, shW: 48, shL: 96 };
   const LEN = ['H', 'L1', 'D1', 'L2', 'D2', 'WB', 'pcW', 'pcD', 'pcH', 'clrS', 'clrR', 'kbL', 'kbD', 'kbH', 'throwD', 'ribH', 'ribS', 'shW', 'shL', 'rollW', 'sectionMax'];
   const LEATHER = {
     black: { name: 'black', c: ['#1d1c1f', '#2c2a2e', '#121114'], t: ['#2a282c', '#1f1e21', '#141316'] },
@@ -794,6 +819,12 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
       add(C, 'Joint blocks (inside the tops)', 2 * joints, Math.max(p.D1, p.D2) - 2 * g.ribT, p.ribH || 0.75, m.card ? Math.ceil(1.5 / m.t) : 1, m.card ? 'Solid stacks 1-1/2 in wide glued inside the rib grid at each end that meets another piece; the bolts go through them.' : 'Hardwood strips under each joint.');
       add(C, 'Joint plates (1/2 in plywood)', joints, Math.max(p.D1, p.D2) - 2, 6, 1, 'Under each joint, glued and screwed to one piece only: 4 star knobs (2 each side) thread into T-nuts set in the joint blocks, so setup needs no tools. Mark which pieces meet (1A-1B...).');
     }
+    if (g.beam) {
+      add(C, 'Back support beam (1-1/2 in square aluminum tube)', 1, g.kneeMain - 0.25, 1.5, 1, `Spans the leg room ${short(2)} in from the back edge of the main top, top flush with the case tops, so the main top (and its joints) can't sag. Drops into two U-brackets; lifts out for travel and rides strapped to the top pack.`);
+      add(C, 'Beam bracket pads (1/2 in plywood)', 2, 4, 4, 1, 'Glued to the knee-facing case sides at the back, top flush with the case tops; the U-brackets screw to these.');
+    }
+    add(C, 'Locating cleats', 8, 4, 1, m.card ? Math.ceil(0.75 / m.t) : 1, 'Glued under the tops just inside each case\'s top edges (2 per case side). Drop a top on and it settles into place; it can\'t slide off the cases.');
+    add(C, 'Corner joining plates', 2, 10, 6, L('lw'),'Glue under the return top so they reach under the main top; join with screws (ply) or strong hook-and-loop (cardboard).');
     if (g.kbt) {
       const K = 'Keyboard tray';
       const pw = g.kbtW / g.kbtPieces;
@@ -803,12 +834,6 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
       if (g.kbtPieces > 1) add(K, 'Tray joint plate (1/2 in plywood)', 1, g.kbtD - 2, 8, 1, 'Under the middle joint: 4 star knobs into T-nuts in the tray halves.');
       add(K, 'Tray slide rails (1/2 in plywood)', 2, g.kbtSlide, 3, 1, `Glued to the knee-facing sides of both cases (Tower right side, Keys left side), front ends flush with the case fronts, centered ${short(g.kbtDrop)} below the case tops. Fit the handles on these two sides below the rails${p.lids ? ', and the latches 1 in lower' : ''}.`);
     }
-    if (g.beam) {
-      add(C, 'Back support beam (1-1/2 in square aluminum tube)', 1, g.kneeMain - 0.25, 1.5, 1, `Spans the leg room ${short(2)} in from the back edge of the main top, top flush with the case tops, so the main top (and its joints) can't sag. Drops into two U-brackets; lifts out for travel and rides strapped to the top pack.`);
-      add(C, 'Beam bracket pads (1/2 in plywood)', 2, 4, 4, 1, 'Glued to the knee-facing case sides at the back, top flush with the case tops; the U-brackets screw to these.');
-    }
-    add(C, 'Locating cleats', 8, 4, 1, m.card ? Math.ceil(0.75 / m.t) : 1, 'Glued under the tops just inside each case\'s top edges (2 per case side). Drop a top on and it settles into place; it can\'t slide off the cases.');
-    add(C, 'Corner joining plates', 2, 10, 6, L('lw'),'Glue under the return top so they reach under the main top; join with screws (ply) or strong hook-and-loop (cardboard).');
     if (g.sc) {
       const D = 'Screen case (flip-up monitor)';
       add(D, 'Screen case floor', 1, g.hutchW, g.hutchD, L('lw'), 'Sits on the main top, centered on your seat.');
@@ -1684,6 +1709,146 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
       ['Hardware over the leather', `<ul><li>Aluminum angle on every case${p.lids ? ' and lid' : ''} edge: cut to length with 45° ends, drill, and fix over the leather into the ${ply ? 'plywood' : 'backers or glued wood strips'}. It protects the leather's edges.</li><li>Ball corners on every corner${p.lids ? ', butterfly latches across each lid seam (into the backers)' : ''}${p.handles ? ', recessed handles in their openings' : ''}.</li><li>Optional: brass nailhead trim along the front edges of the tops, and stenciled names (TOWER, KEYS CASE) in white paint pen.</li><li>Wipe the leather with a damp cloth; avoid solvent cleaners, which strip the finish.</li></ul>`],
     ];
   }
+  // ---- sheet layout ------------------------------------------------------------------
+  // Every cardboard piece (one per layer) packed onto the sheets with MaxRects (best short side fit).
+  // Laminated parts alternate flute direction layer by layer, so each layer's orientation on the sheet is
+  // fixed by which way the sheet's flutes run; stacked blocks and cleats may turn either way.
+  const LAYOUT_HUES = [24, 205, 135, 290, 45, 175, 330, 95];
+  function layoutPieces(list) {
+    const m = MAT[p.mat];
+    const pieces = [];
+    const SW = p.shL, SH = p.shW;                     // sheet drawn landscape: x = length, y = width
+    const fluteAlongX = p.fluteDir === 'long';
+    const groups = [];
+    for (const x of list) {
+      if (/aluminum/i.test(x.name) || (m.card && /plywood/i.test(x.name))) continue;
+      if (!groups.includes(x.group)) groups.push(x.group);
+      const free = /Corner blocks|riser block|cleats|Joint blocks/i.test(x.name);
+      const band = /Edge banding/i.test(x.name);
+      if (/Corner blocks/i.test(x.name)) {          // two right triangles come from each square
+        for (let q = 0; q < Math.ceil(x.qty * x.layers / 2); q++) pieces.push({ id: x.id, group: x.group, layer: 0, layers: 1, w: x.w + 0.25, h: x.h + 0.25, along: true, free: true, name: x.name, pair: true });
+        continue;
+      }
+      for (let q = 0; q < x.qty; q++) {
+        for (let k = 0; k < x.layers; k++) {
+          // flutes along the piece's long side on odd layers, across on even ones; banding and ribs across
+          const along = band ? false : /ribs/i.test(x.name) ? false : k % 2 === 0;
+          let parts = [[x.w, x.h]];
+          if (band) {                                   // one long strip: cut it in lengths the sheet allows
+            const max = (fluteAlongX ? SH : SW) - 1;
+            const n = Math.ceil(x.w / max);
+            parts = Array.from({ length: n }, (_, i) => [i < n - 1 ? max : x.w - max * (n - 1), x.h]);
+          }
+          for (const [lw, lh] of parts) pieces.push({ id: x.id, group: x.group, layer: k + 1, layers: x.layers, w: lw + 0.25, h: lh + 0.25, along, free, name: x.name });
+        }
+      }
+    }
+    // orientation on the sheet: if flutes run along X, a piece whose flutes run along its long side lies long-side along X
+    for (const pc of pieces) {
+      const longX = pc.along === fluteAlongX;
+      pc.opts = pc.free ? [[pc.w, pc.h], [pc.h, pc.w]] : [longX ? [pc.w, pc.h] : [pc.h, pc.w]];
+    }
+    // Pack day by day, so each day's cutting comes off its own sheets (the order of the build schedule).
+    const dayOf = (grp) => (grp.startsWith('Tower') ? 1 : /^(Keys Case|Front lids|Casters)/.test(grp) ? 2 : 3);
+    const DAY_NAMES = { 1: 'Day 1 · Tower Case', 2: 'Day 2 · Keys Case and lids', 3: 'Day 3 · Desktops and the rest' };
+    pieces.sort((a, b) => dayOf(a.group) - dayOf(b.group) || b.w * b.h - a.w * a.h || b.w - a.w);
+    const sheets = [];
+    const tooBig = [];
+    const fit = (sh, pc) => {
+      let best = null;
+      for (const r of sh.free) for (const [w, h] of pc.opts) {
+        if (w <= r.w + 1e-9 && h <= r.h + 1e-9) {
+          const ss = Math.min(r.w - w, r.h - h), ls = Math.max(r.w - w, r.h - h);
+          if (!best || ss < best.ss || (ss === best.ss && ls < best.ls)) best = { x: r.x, y: r.y, w, h, ss, ls };
+        }
+      }
+      return best;
+    };
+    const place = (sh, rect) => {
+      const out = [];
+      for (const r of sh.free) {
+        if (rect.x >= r.x + r.w || rect.x + rect.w <= r.x || rect.y >= r.y + r.h || rect.y + rect.h <= r.y) { out.push(r); continue; }
+        if (rect.x > r.x) out.push({ x: r.x, y: r.y, w: rect.x - r.x, h: r.h });
+        if (rect.x + rect.w < r.x + r.w) out.push({ x: rect.x + rect.w, y: r.y, w: r.x + r.w - rect.x - rect.w, h: r.h });
+        if (rect.y > r.y) out.push({ x: r.x, y: r.y, w: r.w, h: rect.y - r.y });
+        if (rect.y + rect.h < r.y + r.h) out.push({ x: r.x, y: rect.y + rect.h, w: r.w, h: r.y + r.h - rect.y - rect.h });
+      }
+      sh.free = out.filter((a, i) => !out.some((b, j) => j !== i && a.x >= b.x && a.y >= b.y && a.x + a.w <= b.x + b.w && a.y + a.h <= b.y + b.h && (j < i || a.x !== b.x || a.y !== b.y || a.w !== b.w || a.h !== b.h)));
+    };
+    // MaxRects into fresh sheets; then try to merge each day's two emptiest sheets into one.
+    const pack = (pcs, d) => {
+      const out = [];
+      for (const pc of pcs) {
+        let spot = null, sh = null;
+        for (const s2 of out) { const f = fit(s2, pc); if (f) { spot = f; sh = s2; break; } }
+        if (!spot) { sh = { free: [{ x: 0, y: 0, w: SW, h: SH }], placed: [], day: DAY_NAMES[d] }; out.push(sh); spot = fit(sh, pc); }
+        sh.placed.push({ ...pc, x: spot.x, y: spot.y, pw: spot.w, ph: spot.h });
+        place(sh, spot);
+      }
+      return out;
+    };
+    const area = (sh) => sh.placed.reduce((a, q) => a + q.pw * q.ph, 0);
+    for (const d of [1, 2, 3]) {
+      const pcs = pieces.filter((pc) => dayOf(pc.group) === d && (pc.opts.some(([w, h]) => w <= SW && h <= SH) || (tooBig.push(pc), false)));
+      if (!pcs.length) continue;
+      let day = pack(pcs, d);
+      for (let tries = 0; tries < 6 && day.length > 1; tries++) {
+        day.sort((x, y) => area(y) - area(x));
+        const a = day[day.length - 1], b = day[day.length - 2];
+        if (area(a) + area(b) > SW * SH * 0.97) break;
+        const merged = pack([...a.placed, ...b.placed].map(({ x, y, pw, ph, ...rest }) => rest).sort((u, v) => v.w * v.h - u.w * u.h), d);
+        if (merged.length !== 1) break;
+        day = [...day.slice(0, -2), merged[0]];
+      }
+      day.sort((x, y) => area(y) - area(x));
+      sheets.push(...day);
+    }
+    // A nearly empty sheet: move its pieces into spare room on other sheets (same day first), then drop it.
+    for (let pass = 0; pass < 4; pass++) {
+      const low = sheets.filter((sh) => area(sh) < SW * SH * 0.35).sort((x, y) => area(x) - area(y))[0];
+      if (!low) break;
+      const left = [];
+      for (const q of low.placed.slice().sort((u, v) => v.w * v.h - u.w * u.h)) {
+        const { x, y, pw, ph, ...pc } = q;
+        const targets = sheets.filter((t) => t !== low).sort((t1, t2) => (t2.day === low.day) - (t1.day === low.day));
+        let done = false;
+        for (const t of targets) {
+          const f = fit(t, pc);
+          if (f) { t.placed.push({ ...pc, x: f.x, y: f.y, pw: f.w, ph: f.h }); place(t, f); if (t.day !== low.day) (t.extra = t.extra || new Set()).add(low.day.split(' · ')[0]); done = true; break; }
+        }
+        if (!done) left.push(pc);
+      }
+      const i = sheets.indexOf(low);
+      if (!left.length) sheets.splice(i, 1);
+      else { const re = pack(left.sort((u, v) => v.w * v.h - u.w * u.h), dayOf(left[0].group)); sheets.splice(i, 1, ...re); if (re.length === 1 && area(re[0]) === area(low)) break; }
+    }
+    for (const sh of sheets) sh.used = sh.placed.reduce((a, q) => a + q.pw * q.ph, 0) / (SW * SH);
+    return { sheets, tooBig, groups, SW, SH, fluteAlongX, count: pieces.length };
+  }
+  function renderLayout(lay, list) {
+    const hue = (grp) => LAYOUT_HUES[lay.groups.indexOf(grp) % LAYOUT_HUES.length];
+    $('layoutLead').textContent = `${lay.count} cuts on ${lay.sheets.length} sheets of ${p.shW}×${p.shL} in, every layer counted, each drawn 1/4 in oversize for the saw kerf and trimming. Flutes run along the sheet's ${p.fluteDir === 'long' ? 'length' : 'width'} (the faint lines; change it above if yours differ). Laminated parts alternate: layer 1 with its long side along the flutes, layer 2 across, and so on, so the layers cross when you stack them. Corner-block squares (◩) are cut corner to corner into two triangles. Write the label on each piece as you cut it, and get a sheet or two spare for mistakes and damaged board.${lay.tooBig.length ? ` ${lay.tooBig.length} pieces are bigger than a sheet: splice them from two pieces with staggered joints.` : ''}`;
+    $('layoutLegend').innerHTML = lay.groups.map((grp) => `<span><i style="background:hsl(${hue(grp)} 60% 60% / .45)"></i>${esc(list.find((x) => x.group === grp).id.replace(/\d+$/, ''))} · ${esc(grp)}</span>`).join('');
+    const { SW, SH } = lay;
+    $('sheets').innerHTML = lay.sheets.map((sh, i) => {
+      const id = `sheet-${i + 1}`;
+      let svg = `<svg viewBox="-0.5 -0.5 ${SW + 1} ${SH + 1}" role="img" aria-label="Sheet ${i + 1} layout"><rect x="0" y="0" width="${SW}" height="${SH}" fill="var(--bg)" class="lp"/>`;
+      if (lay.fluteAlongX) for (let y = 2; y < SH; y += 2) svg += `<path class="fl" d="M0 ${y}H${SW}"/>`;
+      else for (let x = 2; x < SW; x += 2) svg += `<path class="fl" d="M${x} 0V${SH}"/>`;
+      for (const q of sh.placed) {
+        svg += `<rect x="${q.x.toFixed(2)}" y="${q.y.toFixed(2)}" width="${q.pw.toFixed(2)}" height="${q.ph.toFixed(2)}" fill="hsl(${hue(q.group)} 60% 60% / .45)" class="lp"/>`;
+        const fs = Math.min(3.2, q.ph * 0.55, q.pw / (q.id.length + (q.layers > 1 ? 2 : 0)) * 1.6);
+        if (fs >= 0.9) svg += `<text class="lt" x="${(q.x + q.pw / 2).toFixed(2)}" y="${(q.y + q.ph / 2 + fs * 0.35).toFixed(2)}" font-size="${fs.toFixed(2)}" text-anchor="middle">${esc(q.id)}${q.pair ? '◩' : q.layers > 1 ? `·${q.layer}` : ''}</text>`;
+        if (q.pair) svg += `<path class="lp" d="M${q.x.toFixed(2)} ${(q.y + q.ph).toFixed(2)}L${(q.x + q.pw).toFixed(2)} ${q.y.toFixed(2)}" fill="none"/>`;
+      }
+      svg += '</svg>';
+      const counts = {};
+      for (const q of sh.placed) counts[q.id] = (counts[q.id] || 0) + (q.pair ? 2 : 1);
+      const what = Object.entries(counts).map(([k, n]) => `${k} ×${n}`).join(', ');
+      return `<div class="sheetcard${ticks[id] ? ' done' : ''}"><header><b>Sheet ${i + 1} of ${lay.sheets.length} · ${esc(sh.day)}${sh.extra ? ` (+ ${esc([...sh.extra].join(', '))} parts)` : ''} · ${Math.round(sh.used * 100)}% used</b><label><input type="checkbox" data-task="${id}"${ticks[id] ? ' checked' : ''} /> Cut</label></header>${svg}<p>${esc(what)}</p></div>`;
+    }).join('');
+  }
+
   // Day-by-day build schedule. Task ids are fixed strings so ticks survive changes to the settings.
   const SCHED_KEY = 'casedesk.sched.v1';
   let ticks = (() => { try { return JSON.parse(localStorage.getItem(SCHED_KEY) || '{}') || {}; } catch { return {}; } })();
@@ -1846,12 +2011,14 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     $('checks').innerHTML = checks(g).map((c) => `<div class="chk"><span class="pill ${c.lvl}">${c.lvl === 'ok' ? 'Fits' : c.lvl === 'warn' ? 'Check' : 'Fix'}</span><b>${esc(c.title)}</b><span class="d">${esc(c.detail)}</span></div>`).join('');
     const list = parts(g);
     const tot = totals(list, g);
+    const lay = layoutPieces(list);
+    if (lay.sheets.length) tot.sheets = lay.sheets.length;
     const m = MAT[p.mat];
     $('cutLead').textContent = m.card
       ? `Every size is a finished panel; cut each one once per layer. Panels marked with several layers are laminated with the corrugation crossing. Built in ${m.name}, walls ${short(g.tw)} thick, desktops ${short(g.T)}.`
       : `Finished sizes in ${m.name}. Desktops are 3/4 in plywood.`;
     $('totals').innerHTML = [
-      [tot.sheets, `sheets ${p.shW}×${p.shL}`],
+      [tot.sheets, `sheets ${p.shW}×${p.shL} (laid out below)`],
       [Math.round(tot.sqft), 'sq ft of material'],
       [`${Math.round(tot.weight)} lb`, 'estimated weight'],
       ...(m.card ? [p.glue === 'paste' ? [`${tot.pasteBatches} cups`, 'flour for wheat paste (estimate)'] : [tot.glueOz > 64 ? `${(tot.glueOz / 128).toFixed(1)} gal` : `${tot.glueOz} oz`, 'wood glue (estimate)']] : []),
@@ -1899,6 +2066,7 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     $('steps').innerHTML = steps(g, tot).map(([h, b]) => `<li><div><h3>${esc(h)}</h3>${b}</div></li>`).join('');
     renderBlueprint(g, list);
     renderSchedule(g, list, tot, lea);
+    renderLayout(lay, list);
     window.__cut = list;
   }
 
@@ -1973,6 +2141,13 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     } catch { fallback(text, done); }
   };
   $('schedule').addEventListener('change', (e) => {
+    const id = e.target.dataset && e.target.dataset.task;
+    if (!id) return;
+    if (e.target.checked) ticks[id] = true; else delete ticks[id];
+    saveTicks();
+    render();
+  });
+  $('sheets').addEventListener('change', (e) => {
     const id = e.target.dataset && e.target.dataset.task;
     if (!id) return;
     if (e.target.checked) ticks[id] = true; else delete ticks[id];
