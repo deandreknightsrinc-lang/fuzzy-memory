@@ -309,17 +309,23 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
 
       <fieldset>
         <legend>Keys &amp; gear</legend>
-        <label>Keyboard on the return wing <select id="kb">
+        <label>Keyboard <select id="kb">
           <option value="0">None</option>
           <option value="25">25 keys (about 19 in)</option>
           <option value="49">49 keys (about 32 in)</option>
           <option value="61" selected>61 keys (about 39 in)</option>
           <option value="88">88 keys (about 52 in)</option>
+          <option value="glarry">Glarry 88-key foldable (49.7 × 8 in)</option>
+        </select></label>
+        <label>Where it goes <select id="kbPlace">
+          <option value="tray">Sliding tray under the main desktop</option>
+          <option value="wing">On the return wing</option>
         </select></label>
         <div class="row">
           <label>Keyboard length <input type="number" id="kbL" step="0.25" /><span class="u" data-u></span></label>
           <label>Keyboard depth <input type="number" id="kbD" step="0.25" /><span class="u" data-u></span></label>
         </div>
+        <label id="kbHRow">Keyboard height (without music rest) <input type="number" id="kbH" step="0.25" /><span class="u" data-u></span></label>
         <label>Rack space in the Keys Case <select id="rackU">
           <option value="0">None</option>
           <option value="2">2U (3.5 in)</option>
@@ -513,7 +519,7 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
 <script>
 (() => {
   const PC = { itx: [8, 14, 12], matx: [8.3, 16, 16], mid: [9, 18.5, 18.5], full: [9.5, 22, 22] };
-  const KB = { 0: [0, 0], 25: [19, 9], 49: [32, 11], 61: [39, 11.5], 88: [52, 12] };
+  const KB = { 0: [0, 0], 25: [19, 9], 49: [32, 11], 61: [39, 11.5], 88: [52, 12], glarry: [49.7, 8] };
   const MAT = {
     sw: { t: 0.125, name: 'single-wall cardboard', card: true, lw: 5, ls: 3, lr: 3, w: 0.09 },
     dw: { t: 0.25, name: 'double-wall cardboard', card: true, lw: 3, ls: 2, lr: 2, w: 0.17 },
@@ -522,8 +528,8 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     ply12: { t: 0.5, name: '1/2 in plywood', card: false, lw: 1, ls: 1, lr: 1, w: 1.5 },
   };
   const SCREENS = { p156: { w: 14.1, h: 8.9, name: '15.6 in portable monitor' }, p173: { w: 15.7, h: 9.9, name: '17.3 in portable monitor' } };
-  const DEFAULTS = { H: 29, L1: 72, D1: 24, L2: 52, D2: 20, WB: 21, pcPreset: 'mid', pcW: 9, pcD: 18.5, pcH: 18.5, clrS: 1, clrR: 3, shelfA: false, kb: '61', kbL: 39, kbD: 11.5, rackU: '4', screen: 'p156', throwD: 60, throwR: 1.2, hutch: true, screenCase: true, tray: true, keysLid: 'table', glue: 'paste', finish: 'leather', leatherColor: 'black', rollW: 54, lids: true, casters: true, handles: true, sectionMax: 36, paperSkin: true, mat: 'dw', lw: 3, ls: 2, lr: 2, ribH: 1.5, ribS: 4, shW: 48, shL: 96 };
-  const LEN = ['H', 'L1', 'D1', 'L2', 'D2', 'WB', 'pcW', 'pcD', 'pcH', 'clrS', 'clrR', 'kbL', 'kbD', 'throwD', 'ribH', 'ribS', 'shW', 'shL', 'rollW', 'sectionMax'];
+  const DEFAULTS = { H: 31, L1: 96, D1: 24, L2: 52, D2: 20, WB: 21, pcPreset: 'mid', pcW: 9, pcD: 18.5, pcH: 18.5, clrS: 1, clrR: 3, shelfA: false, kb: 'glarry', kbL: 49.7, kbD: 8, kbH: 3, kbPlace: 'tray', rackU: '4', screen: 'p156', throwD: 60, throwR: 1.2, hutch: true, screenCase: true, tray: true, keysLid: 'table', glue: 'paste', finish: 'leather', leatherColor: 'black', rollW: 54, lids: true, casters: true, handles: true, sectionMax: 36, paperSkin: true, mat: 'dw', lw: 3, ls: 2, lr: 2, ribH: 1.5, ribS: 4, shW: 48, shL: 96 };
+  const LEN = ['H', 'L1', 'D1', 'L2', 'D2', 'WB', 'pcW', 'pcD', 'pcH', 'clrS', 'clrR', 'kbL', 'kbD', 'kbH', 'throwD', 'ribH', 'ribS', 'shW', 'shL', 'rollW', 'sectionMax'];
   const LEATHER = {
     black: { name: 'black', c: ['#1d1c1f', '#2c2a2e', '#121114'], t: ['#2a282c', '#1f1e21', '#141316'] },
     espresso: { name: 'espresso brown', c: ['#3b2a22', '#4a362c', '#2a1d17'], t: ['#4c372c', '#3d2c23', '#2d201a'] },
@@ -589,7 +595,7 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     // With lids, the Tower Case lid is the leg panel (its rim makes it a stable channel).
     g.legT = p.lids ? g.lidD + tw : m.card ? T : 0.75;
     g.kneeReturn = p.L2 - g.DA - g.legT;
-    const kb = { L: +p.kb ? p.kbL : 0, D: +p.kb ? p.kbD : 0 };
+    const kb = { L: p.kb !== '0' ? p.kbL : 0, D: p.kb !== '0' ? p.kbD : 0 };
     g.kb = kb;
     g.retTopL = p.L2 - p.D1;
     g.sec2 = Math.max(1, Math.ceil(g.retTopL / Math.max(12, p.sectionMax)));
@@ -610,6 +616,19 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     g.trayH = p.tray ? 2.5 : 0;
     g.slideL = [22, 20, 18, 16, 14, 12, 10].find((l) => l <= g.inDB - 1) || 10;
     g.table = p.lids && p.keysLid === 'table';
+    // Keyboard tray: slides out from under the main top, between the two cases, on slides fixed to their knee-facing sides.
+    g.kbt = p.kbPlace === 'tray' && kb.L > 0;
+    g.kbtW = g.kneeMain - 1;                          // 1/2 in of slide each side
+    g.kbtD = Math.max(12, kb.D + 4);                  // room for the keyboard plus a wrist edge
+    const maxSlide = Math.min(g.DA, g.DB) - 2;
+    g.kbtSlide = [10, 12, 14, 16, 18, 20, 22].find((l) => l >= g.kbtD && l <= maxSlide) || Math.min(22, maxSlide);
+    g.kbtSurf = p.H - T - p.kbH - 1;                  // tray surface: the keyboard clears the desktop by 1 in when pushed in
+    g.kbtKeys = g.kbtSurf + p.kbH * 0.8;              // about where the key tops are
+    g.kbtThigh = g.kbtSurf - 1;                       // underside of tray and slides
+    g.kbtDrop = p.kbH + 1 + 0.375;                    // slide centerline below the case tops
+    g.kbtPieces = g.kbtW > p.sectionMax ? 2 : 1;
+    // Over 4 ft between the cases a cardboard top gets a drop-in support beam along the back, behind the tray.
+    g.beam = MAT[p.mat].card && g.kneeMain > 48;
     g.tableLeg = p.H - g.tw - 0.5;                    // folding leg length under the lid table
     g.imgW = p.throwD / p.throwR; g.imgH = g.imgW * 9 / 16; g.imgDiag = Math.hypot(g.imgW, g.imgH);
     return g;
@@ -627,7 +646,11 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     if (p.shelfA) add(g.aboveShelf >= 3.5 ? 'ok' : 'warn', 'Interface shelf', g.aboveShelf >= 3.5 ? `${short(g.aboveShelf)} of space above the computer: room for a desktop audio interface or 2U half-rack unit.` : `Only ${short(Math.max(0, g.aboveShelf))} above the computer. Skip the shelf or raise the desk.`);
     add(g.kneeMain >= 30 ? 'ok' : g.kneeMain >= 24 ? 'warn' : 'bad', 'Leg room at the main run', `${short(g.kneeMain)} between the cases (30 in is comfortable, 24 in is the least you'd want).`);
     add(g.kneeReturn >= 20 ? 'ok' : g.kneeReturn >= 14 ? 'warn' : 'bad', 'Leg room at the keys wing', `${short(g.kneeReturn)} between the Tower Case and the ${p.lids ? 'Tower lid (the leg)' : 'leg panel'}.`);
-    if (g.kb.L) {
+    if (g.kbt) {
+      const okW = g.kb.L + 1 <= g.kbtW, okD = g.kb.D + 1 <= g.kbtD;
+      add(okW && okD ? 'ok' : 'bad', 'Keyboard fits the tray', okW && okD ? `${short(g.kb.L)} keyboard on a ${short(g.kbtW)} × ${short(g.kbtD)} tray between the cases, ${short((g.kbtW - g.kb.L) / 2)} spare each side. It pulls out ${short(g.kbtSlide)} on full-extension slides.` : `The tray slides between the cases, so it can only be ${short(g.kbtW)} wide; the keyboard needs ${short(g.kb.L + 1)}. Lengthen the main run to at least ${short(g.WA + g.WB + g.kb.L + 2)}, or put the keyboard on the return wing.`);
+      add(g.kbtThigh >= 23 ? 'ok' : g.kbtThigh >= 21.5 ? 'warn' : 'bad', 'Keyboard tray height', `Keys at about ${short(g.kbtKeys)}, ${short(g.kbtThigh)} clear under the tray for your thighs. ${g.kbtThigh >= 23 ? 'Set your chair so your forearms are level with the keys.' : 'Your thighs may touch the tray: raise the desk height or use a lower chair.'} Measure the keyboard's height when it arrives and enter it above.`);
+    } else if (g.kb.L) {
       const room = p.L2 - 2, deep = p.D2 - 2;
       add(g.kb.L <= room && g.kb.D <= deep ? 'ok' : 'bad', 'Keyboard fits the return wing', g.kb.L <= room && g.kb.D <= deep ? `${short(g.kb.L)} × ${short(g.kb.D)} keyboard on a ${short(p.L2)} × ${short(p.D2)} wing.` : `The keyboard needs ${short(g.kb.L + 2)} × ${short(g.kb.D + 2)}; the wing is ${short(p.L2)} × ${short(p.D2)}. Lengthen or deepen the wing.`);
     }
@@ -642,7 +665,7 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     if (g.proj) add(g.imgDiag >= 40 ? 'ok' : 'warn', 'Projector picture', `At ${short(p.throwD)} from the wall with a ${p.throwR}:1 lens: about ${short(g.imgW)} wide, ${Math.round(g.imgDiag)} in diagonal.`);
     const spanMain = p.L1 - g.WA - g.WB;
     const m = MAT[p.mat];
-    if (m.card) add(p.ribS <= 4 && p.ribH >= 1.5 ? 'ok' : 'warn', 'Desktop stiffness', `Torsion-box tops ${short(g.T)} thick with ribs every ${short(p.ribS)} over a ${short(spanMain)} span. ${p.ribS > 4 ? 'Ribs closer than 4 in sag less.' : 'Load-test with books before gear.'}`);
+    if (m.card) add(p.ribS <= 4 && p.ribH >= 1.5 ? 'ok' : 'warn', 'Desktop stiffness', `Torsion-box tops ${short(g.T)} thick with ribs every ${short(p.ribS)} over a ${short(spanMain)} span${g.beam ? ', held up along the back by a drop-in aluminum beam between the cases (it sits behind the keyboard tray)' : ''}. ${p.ribS > 4 ? 'Ribs closer than 4 in sag less.' : 'Load-test with books before gear.'}`);
     if (g.caseH < 20) add('bad', 'Desk height', 'The desk is too low for a computer underneath.');
     if (p.tray) {
       const left = g.inHB - g.trayH - g.rackH - (+p.rackU ? g.tw : 0);
@@ -655,8 +678,8 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
       const narrow = Math.min(g.WA, g.DA + lid, g.WB, g.DB + lid), tall = g.caseH + g.casterH;
       add(narrow <= 29 && tall <= 76 ? 'ok' : 'warn', 'Rolls through a doorway', `Closed, the Tower Case is ${short(g.WA)} × ${short(g.DA + lid)} × ${short(tall)} and the Keys Case ${short(g.WB)} × ${short(g.DB + lid)} × ${short(tall)}. ${narrow <= 29 ? 'Both pass a 30 in door narrow side first.' : 'Wider than a 30 in door on every side.'}`);
     }
-    const longest = Math.max(g.sec1Len, g.sec2Len);
-    add(longest <= p.sectionMax + 0.01 ? 'ok' : 'warn', 'Top pack', `${g.sec1 + g.sec2} top piece${g.sec1 + g.sec2 > 1 ? 's' : ''}, the longest ${short(longest)}${g.sec1 + g.sec2 > 2 ? `, joined with star knobs at ${g.sec1 + g.sec2 - 2} joint${g.sec1 + g.sec2 > 3 ? 's' : ''}` : ''}.`);
+    const longest = Math.max(g.sec1Len, g.sec2Len, g.kbt ? g.kbtW / g.kbtPieces : 0);
+    add(longest <= p.sectionMax + 0.01 ? 'ok' : 'warn', 'Top pack', `${g.sec1 + g.sec2} top piece${g.sec1 + g.sec2 > 1 ? 's' : ''}, the longest ${short(longest)}${g.sec1 + g.sec2 > 2 ? `, joined with star knobs at ${g.sec1 + g.sec2 - 2} joint${g.sec1 + g.sec2 > 3 ? 's' : ''}` : ''}${g.kbt ? `, plus the keyboard tray${g.kbtPieces > 1 ? ' in two halves' : ''}` : ''}${g.beam ? `; the ${short(g.kneeMain - 0.25)} aluminum beam straps alongside` : ''}.`);
     if (p.finish === 'leather') {
       const lea = leather(g);
       add(lea.tooWide.length ? 'warn' : 'ok', 'Leather fits the roll', lea.tooWide.length ? `${lea.tooWide.map((x) => x.name).join(', ')} won't fit a ${short(p.rollW)} roll in one piece; it is planned with a seam. Use a wider roll or shorter pieces.` : `Every piece cuts from a ${short(p.rollW)} roll in one piece: ${lea.yards} yards with 10% extra.`);
@@ -746,6 +769,19 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
       add(C, 'Joint blocks (inside the tops)', 2 * joints, Math.max(p.D1, p.D2) - 2 * g.ribT, p.ribH || 0.75, m.card ? Math.ceil(1.5 / m.t) : 1, m.card ? 'Solid stacks 1-1/2 in wide glued inside the rib grid at each end that meets another piece; the bolts go through them.' : 'Hardwood strips under each joint.');
       add(C, 'Joint plates (1/2 in plywood)', joints, Math.max(p.D1, p.D2) - 2, 6, 1, 'Under each joint, glued and screwed to one piece only: 4 star knobs (2 each side) thread into T-nuts set in the joint blocks, so setup needs no tools. Mark which pieces meet (1A-1B...).');
     }
+    if (g.kbt) {
+      const K = 'Keyboard tray';
+      const pw = g.kbtW / g.kbtPieces;
+      add(K, `Keyboard tray (3/4 in plywood)${g.kbtPieces > 1 ? ' halves' : ''}`, g.kbtPieces, pw, g.kbtD, 1, `Plywood, not cardboard: it spans ${short(g.kbtW)} with nothing under it.${g.kbtPieces > 1 ? ` In two halves for the top pack, joined underneath by a plate and 4 star knobs.` : ''}`);
+      add(K, 'Tray back stop', g.kbtPieces, pw, 1, m.card ? Math.ceil(0.75 / m.t) : 1, 'Glued along the back edge: the keyboard can\'t slide off the back, and it stops the tray at the right depth.');
+      add(K, 'Tray wrist edge', g.kbtPieces, pw, 2, m.card ? Math.ceil(0.5 / m.t) : 1, 'Rounded strip along the front edge to rest your wrists and pull the tray.');
+      if (g.kbtPieces > 1) add(K, 'Tray joint plate (1/2 in plywood)', 1, g.kbtD - 2, 8, 1, 'Under the middle joint: 4 star knobs into T-nuts in the tray halves.');
+      add(K, 'Tray slide rails (1/2 in plywood)', 2, g.kbtSlide, 3, 1, `Glued to the knee-facing sides of both cases (Tower right side, Keys left side), front ends flush with the case fronts, centered ${short(g.kbtDrop)} below the case tops. Fit the handles on these two sides below the rails${p.lids ? ', and the latches 1 in lower' : ''}.`);
+    }
+    if (g.beam) {
+      add(C, 'Back support beam (1-1/2 in square aluminum tube)', 1, g.kneeMain - 0.25, 1.5, 1, `Spans the leg room ${short(2)} in from the back edge of the main top, top flush with the case tops, so the main top (and its joints) can't sag. Drops into two U-brackets; lifts out for travel and rides strapped to the top pack.`);
+      add(C, 'Beam bracket pads (1/2 in plywood)', 2, 4, 4, 1, 'Glued to the knee-facing case sides at the back, top flush with the case tops; the U-brackets screw to these.');
+    }
     add(C, 'Locating cleats', 8, 4, 1, m.card ? Math.ceil(0.75 / m.t) : 1, 'Glued under the tops just inside each case\'s top edges (2 per case side). Drop a top on and it settles into place; it can\'t slide off the cases.');
     add(C, 'Corner joining plates', 2, 10, 6, L('lw'),'Glue under the return top so they reach under the main top; join with screws (ply) or strong hook-and-loop (cardboard).');
     if (g.sc) {
@@ -811,6 +847,7 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     const top = (label, n, len, d) => add(`${label}${n > 1 ? ' piece' : ''}`, n, len + 2 * (g.T + a), d + 2 * (g.T + a), `Top face and all four edges, folded under.${n > 1 ? ' Each piece is wrapped on its own; the joints meet leather to leather.' : ''}`);
     top('Main top', g.sec1, g.sec1Len, p.D1);
     top('Return top', g.sec2, g.sec2Len, p.D2);
+    if (g.kbt) add(`Keyboard tray${g.kbtPieces > 1 ? ' half' : ''}`, g.kbtPieces, g.kbtW / g.kbtPieces + 2 * (0.75 + a), g.kbtD + 2 * (0.75 + a), 'Top and edges, folded under (fold around the back stop and wrist edge).');
     if (g.sc) {
       add('Screen case band', 1, 2 * (g.hutchW + g.hutchD) + a, g.hutchH + 2 * a, 'Round the four sides; seam at a back corner.');
       add('Screen case lid', 1, g.hutchW + 2 * (g.tw + a), g.hutchD + 2 * (g.tw + a), 'Outside face and edges, folded onto the inside.');
@@ -868,6 +905,11 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
       add('3 in swivel casters with brakes', 8, '4 per case. Plate-mount, rated at least 75 lb each.');
       add('1/4-20 × 3/4 in bolts + T-nuts', 32, 'Caster mounting: set the T-nuts into the top of each caster board before it is glued to the case, so the casters can be bolted from below and replaced.');
     }
+    if (g.beam) add(`Aluminum square tube 1-1/2 × 1-1/2 × 1/16 in, ${Math.ceil(g.kneeMain)} in`, 1, 'Back support beam under the main top; plus 2 U-brackets (1-1/2 in channel) with #8 screws.');
+    if (g.kbt) {
+      add(`Full-extension drawer slides with lever disconnect, ${g.kbtSlide} in (1 pair)`, 1, 'Keyboard tray. Side-mount ball-bearing, 100 lb. The levers let the tray lift off for travel.');
+      if (g.kbtPieces > 1) add('1/4-20 star knobs + T-nuts (keyboard tray joint)', 4, 'Joins the two tray halves under the plate.');
+    }
     if (p.tray) add(`Full-extension drawer slides, ${g.slideL} in (1 pair)`, 1, 'Side-mount ball-bearing slides for the tray, about 75 lb. Screw into the plywood rails and tray strips.');
     if (g.sc) {
       add(`Piano hinge, ${Math.floor(g.hutchW)} in (or cut to length)`, 1, 'Along the back edge of the screen case lid.');
@@ -895,6 +937,8 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     const toRoad = [
       ['Power down and unplug.', 'Coil the cables into the Keys Case storage. 2 min'],
       ['Clear the desk.', `${g.sc ? 'Fold the screen case lid down over the monitor (the stays fold flat), snap the draw latches; ' : g.scr ? 'Monitor in its sleeve, ' : ''}${g.proj && !g.sc ? 'projector in its bag, ' : ''}keyboard in its gig bag.${g.sc ? '' : ' The monitor riser comes off.'}${p.tray ? ' Push the tray in.' : ''} 3 min`],
+      ...(g.beam ? [['Lift out the back beam.', 'After the main top comes off, lift the beam out of its brackets and strap it to the top pack.']] : []),
+      ...(g.kbt ? [['Take off the keyboard tray.', `Fold the keyboard into its bag. Pull the tray all the way out, press the slide levers and lift it off${g.kbtPieces > 1 ? '; unscrew the knobs to split it in two' : ''}. 2 min`]] : []),
       ['Separate the tops.', `Pull the return top up off the corner plates (hook-and-loop), then lift the main top off the locating cleats.${pieces > 2 ? ' Unscrew the star knobs and split the pieces; the plates stay screwed to one side.' : ''} 3 min`],
       ['Make the top pack.', `${pieces} top piece${pieces > 1 ? 's' : ''}${g.sc ? ' and the closed screen case on top' : p.hutch ? ' and the riser' : ''}, leather faces together with felt pads between, knobs in a bag, wrapped in the blanket and cam-strapped. 3 min`],
       ...(p.lids ? [['Collect the lids.', `Lift the Tower lid out of ${g.casterH ? 'the riser block (the block goes into the Keys Case storage)' : 'its spot under the keys wing'} and ${g.table ? 'fold the legs of the Keys lid table into its rim' : 'pick up the Keys lid footrest'}.`]] : []),
@@ -905,12 +949,14 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     const toDesk = [
       [`Place the Tower Case${p.casters ? ' and lock its casters' : ''}.`, 'In the corner, 3 in off both walls so the exhaust can breathe.'],
       ['Place the Keys Case.', `At the end of the main run, ${short(g.kneeMain)} from the Tower Case. Tip: cut a stick that long and keep it in the top pack as a spacer.`],
+      ...(g.kbt ? [['Hang the keyboard tray.', `${g.kbtPieces > 1 ? 'Knob the halves together, then h' : 'H'}ook the tray onto both slides and push it in before you lock the Keys Case casters: the tray sets the gap exactly.`]] : []),
       ...(p.lids ? [
         ['Open the lids.', 'Unlatch both and lift them off.'],
         ['Tower lid becomes the leg.', `Stand it on end ${short(p.L2)} from the back wall, rim facing the wall${g.casterH ? `, in the groove of the riser block` : ''}. Its rim makes it a channel, so it can't fold over.`],
         g.table ? ['Keys lid becomes a side table.', 'Unfold its legs until the braces lock and stand it beside the Keys Case: extra surface at desk height.'] : ['Keys lid becomes the footrest.', 'Lay it rim-down under the main run; the rim tilts it toward you.'],
       ] : []),
       ...(pieces > 2 ? [['Join the top pieces.', 'Face down on the blanket, match the labels (1A-1B), thread in the star knobs and snug them by hand.']] : []),
+      ...(g.beam ? [['Drop in the back beam.', 'Into its two brackets between the cases, behind the tray.']] : []),
       ['Drop on the main top.', 'The cleats underneath find the case edges.'],
       ['Drop on the return top.', 'It rests on the Tower Case and the leg; press the corner plates up under the main top.'],
       ['Set up and power on.', `${g.sc ? 'Set the screen case on the main top, unlatch it and lift the lid: the monitor comes up with it and the stays hold it at your angle' : `Riser${g.scr ? ', monitor' : ''}`}${g.proj ? ', projector' : ''}, keyboard, cables through the pass-throughs.`],
@@ -923,6 +969,8 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
       [`Main top${g.sec1 > 1 ? ` (${g.sec1} pieces)` : ''}`, 'Desktop over the leg room', 'Top pack'],
       [`Return top${g.sec2 > 1 ? ` (${g.sec2} pieces)` : ''}`, 'Keys wing', 'Top pack'],
       ...(g.sc ? [['Screen case', 'Lid up: the monitor at eye height, angle set by the stays', 'Closed over the monitor, latched, in the top pack']] : p.hutch ? [['Monitor riser', 'Screen at eye height', 'Top pack']] : []),
+      ...(g.beam ? [['Back support beam', 'Holds up the back of the main top between the cases', 'Strapped to the top pack']] : []),
+      ...(g.kbt ? [['Keyboard tray', 'Slides out from under the main top with the keyboard on it', 'Lifted off its slides, in the top pack']] : []),
       ...(p.tray ? [['Slide-out tray', 'Pulls out for a laptop, mouse or controller', 'Pushed in, behind the Keys lid']] : []),
       ...(pieces > 2 ? [['Joint plates and knobs', 'Lock the top pieces flat', 'Plates stay on their pieces; knobs in a bag']] : []),
       ['Corner plates', 'Join the L', 'Stay glued to the return top'],
@@ -968,11 +1016,18 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     s += `<text class="t-oncase" x="${g.WA / 2 + pad}" y="${g.DA - 3 + pad}" font-size="${fs}" text-anchor="middle">TOWER</text>`;
     s += `<text class="t-oncase" x="${p.L1 - g.WB / 2 + pad}" y="${g.DB - 3 + pad}" font-size="${fs}" text-anchor="middle">KEYS CASE</text>`;
     // keyboard
-    if (g.kb.L) {
+    if (g.kbt) {
+      s += R(g.WA + 0.5, p.D1 - g.kbtD, g.kbtW, g.kbtD, 'f-paper', 'opacity=".55" stroke="currentColor" stroke-width=".3" stroke-dasharray="1.2 .8"');
+      const kx = g.WA + (g.kneeMain - g.kb.L) / 2, ky = p.D1 - g.kbtD + 2;
+      s += R(kx, ky, g.kb.L, g.kb.D, 'f-paper', 'stroke="currentColor" stroke-width=".3"');
+      for (let i = 1; i < g.kb.L; i += 0.92) s += `<path class="s-thin" d="M${kx + i + pad} ${ky + g.kb.D * 0.45 + pad}V${ky + g.kb.D + pad}"/>`;
+      s += `<text class="t-mut" x="${g.WA + g.kneeMain / 2 + pad}" y="${p.D1 + 3 + pad}" font-size="${fs * 0.7}" text-anchor="middle">↑ keyboard tray slides out toward you ↓</text>`;
+    }
+    if (g.kb.L && !g.kbt) {
       const kx = p.D2 - g.kb.D - 1, ky = Math.max(1, (p.L2 - g.kb.L) / 2);
       s += R(kx, ky, g.kb.D, g.kb.L, 'f-paper', 'stroke="currentColor" stroke-width=".3"');
       for (let i = 1; i < g.kb.L; i += 0.92) s += `<path class="s-thin" d="M${kx + g.kb.D * 0.35 + pad} ${ky + i + pad}H${kx + g.kb.D + pad}"/>`;
-      s += `<text class="t-lab" x="${kx + g.kb.D * 0.18 + pad}" y="${ky + g.kb.L / 2 + pad}" font-size="${fs * 0.75}" text-anchor="middle" transform="rotate(90 ${kx + g.kb.D * 0.18 + pad} ${ky + g.kb.L / 2 + pad})">${p.kb}-KEY</text>`;
+      s += `<text class="t-lab" x="${kx + g.kb.D * 0.18 + pad}" y="${ky + g.kb.L / 2 + pad}" font-size="${fs * 0.75}" text-anchor="middle" transform="rotate(90 ${kx + g.kb.D * 0.18 + pad} ${ky + g.kb.L / 2 + pad})">${p.kb === 'glarry' ? 88 : p.kb}-KEY</text>`;
     }
     // riser + screen
     const cx = g.WA + g.kneeMain / 2;
@@ -985,8 +1040,8 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     }
     // chairs
     s += `<circle cx="${cx + pad}" cy="${p.D1 + 13 + pad}" r="9" class="s-ink" stroke-width=".5"/><text class="t-mut" x="${cx + pad}" y="${p.D1 + 14 + pad}" font-size="${fs * 0.8}" text-anchor="middle">you</text>`;
-    if (g.kb.L) s += `<text class="t-mut" x="${p.D2 + 3 + pad}" y="${Math.max(1, (p.L2 - g.kb.L) / 2) + g.kb.L * 0.75 + pad}" font-size="${fs * 0.75}">← turn left to play</text>`;
-    s += `<text class="t-mut" x="${cx + pad}" y="${p.D1 / 2 + 6 + pad}" font-size="${fs * 0.8}" text-anchor="middle">leg room ${esc(short(g.kneeMain))}</text>`;
+ if (g.kb.L && !g.kbt) s += `<text class="t-mut" x="${p.D2 + 3 + pad}" y="${Math.max(1, (p.L2 - g.kb.L) / 2) + g.kb.L * 0.75 + pad}" font-size="${fs * 0.75}">← turn left to play</text>`;
+    s += `<text class="t-mut" x="${cx + pad}" y="${(g.kbt ? p.D1 + 6.5 : p.D1 / 2 + 6) + pad}" font-size="${fs * 0.8}" text-anchor="middle">leg room ${esc(short(g.kneeMain))}</text>`;
     // dims
     s += dimH(pad, p.L1 + pad, Hh - 4, `main run ${short(p.L1)}`, fs);
     s += dimV(p.L1 + pad + 6, pad, p.D1 + pad, short(p.D1), fs);
@@ -1168,6 +1223,7 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     // slide-out tray (shown pulled out) and rack faces on the Keys Case front
     if (p.tray) body += box(p.L1 - g.WB + g.tw + 0.5, g.DB - g.slideL * 0.35, z0 + g.caseH - g.tw - g.trayH + 0.6, g.inWB - 1, g.slideL * 0.6, 1, TOP);
     if (+p.rackU) for (let u = 0; u < +p.rackU; u++) { const zz = z0 + g.caseH - g.tw - g.trayH - (u + 1) * 1.75; body += `<polygon points="${[P(p.L1 - g.WB + g.tw, g.DB + 0.01, zz + 0.1), P(p.L1 - g.tw, g.DB + 0.01, zz + 0.1), P(p.L1 - g.tw, g.DB + 0.01, zz + 1.65), P(p.L1 - g.WB + g.tw, g.DB + 0.01, zz + 1.65)].join(' ')}" class="f-case3" style="stroke: var(--alu)" stroke-width=".2"/>`; }
+    if (g.beam) body += box(g.WA, 2, z0 + g.caseH - 1.5, g.kneeMain, 1.5, 1.5, ['f-alu', 'f-alu', 'f-case2']);
     // tops
     body += box(0, 0, z0 + g.caseH, p.L1, p.D1, g.T, TOP);
     body += box(0, p.D1, z0 + g.caseH, p.D2, g.retTopL, g.T, TOP);
@@ -1195,7 +1251,15 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
       for (const [lx, ly] of [[1.5, 1.5], [g.WB - 2.5, 1.5], [1.5, g.caseH - 2.5], [g.WB - 2.5, g.caseH - 2.5]]) body += box(tableAt + lx, ly, 0, 1, 1, p.H - g.tw - g.lidD, ['f-alu', 'f-case3', 'f-case2']);
       body += box(tableAt, 0, p.H - g.tw - g.lidD, g.WB, g.caseH, g.lidD + g.tw, CASE, '');
     }
-    if (g.kb.L) {
+    if (g.kbt) {
+      // keyboard tray pulled part way out from under the main top
+      const ty = p.D1 - g.kbtD + g.kbtSlide * 0.6, tz = g.kbtSurf - 0.75;
+      body += box(g.WA + 0.5, ty, tz, g.kbtW, g.kbtD, 0.75, TOP);
+      const kx = g.WA + (g.kneeMain - g.kb.L) / 2, ky = ty + 2;
+      body += box(kx, ky, g.kbtSurf, g.kb.L, g.kb.D, Math.min(p.kbH, 2.5), ['f-paper', 'f-case', 'f-case3']);
+      for (let i = 0.6; i < g.kb.L - 0.4; i += 0.92) body += `<polyline points="${P(kx + i, ky + g.kb.D * 0.4, g.kbtSurf + Math.min(p.kbH, 2.5) + 0.02)} ${P(kx + i, ky + g.kb.D - 0.4, g.kbtSurf + Math.min(p.kbH, 2.5) + 0.02)}" class="s-thin" stroke-width=".18"/>`;
+    }
+    if (g.kb.L && !g.kbt) {
       const kx = p.D2 - g.kb.D - 1, ky = Math.max(1, (p.L2 - g.kb.L) / 2);
       body += box(kx, ky, zTop, g.kb.D, g.kb.L, 1.6, ['f-paper', 'f-case', 'f-case3']);
       for (let i = 0.6; i < g.kb.L - 0.4; i += 0.92) body += `<polyline points="${P(kx + g.kb.D * 0.4, ky + i, zTop + 1.62)} ${P(kx + g.kb.D - 0.4, ky + i, zTop + 1.62)}" class="s-thin" stroke-width=".18"/>`;
@@ -1203,7 +1267,7 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     const xs = pts.map((q) => q[0]), ys = pts.map((q) => q[1]);
     const minX = Math.min(...xs) - 6, minY = Math.min(...ys) - 6, w = Math.max(...xs) - minX + 6, h = Math.max(...ys) - minY + 6;
     const s = `<svg viewBox="${minX.toFixed(1)} ${minY.toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)}" role="img" aria-label="3D overview of the desk">${body}</svg>`;
-    return { svg: s, cap: `The assembled L: Tower Case at the corner with the computer behind the vented door, Keys Case with ${+p.rackU ? `${p.rackU}U of rack` : 'storage'} at the end of the main run, ${p.lids ? `the Tower lid standing in as the leg under the keys wing and the Keys lid as a ${g.table ? 'side table on folding legs at the right' : 'footrest'}` : 'the leg panel under the keys wing'}${p.tray ? ', the slide-out tray pulled out of the Keys Case' : ''}${g.sc ? ', the screen case open with the monitor standing in its lid' : ''}${p.casters ? ', both cases on locking casters' : ''}${g.sec1 + g.sec2 > 2 ? ', tops in travel pieces (thin lines are the joints)' : ''}${g.scr && !g.sc ? `, ${g.scr.name.replace(' portable monitor', '')} portable monitor on the riser` : ''}${g.proj ? ', projector on the riser aimed at the wall' : ''}.` };
+    return { svg: s, cap: `The assembled L: Tower Case at the corner with the computer behind the vented door, Keys Case with ${+p.rackU ? `${p.rackU}U of rack` : 'storage'} at the end of the main run, ${p.lids ? `the Tower lid standing in as the leg under the keys wing and the Keys lid as a ${g.table ? 'side table on folding legs at the right' : 'footrest'}` : 'the leg panel under the keys wing'}${g.kbt ? ', the keyboard tray pulled out from under the main top' : ''}${p.tray ? ', the slide-out tray pulled out of the Keys Case' : ''}${g.sc ? ', the screen case open with the monitor standing in its lid' : ''}${p.casters ? ', both cases on locking casters' : ''}${g.sec1 + g.sec2 > 2 ? ', tops in travel pieces (thin lines are the joints)' : ''}${g.scr && !g.sc ? `, ${g.scr.name.replace(' portable monitor', '')} portable monitor on the riser` : ''}${g.proj ? ', projector on the riser aimed at the wall' : ''}.` };
   }
 
   function drawRoad(g) {
@@ -1254,6 +1318,7 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     const stack = [];
     for (let i = 0; i < g.sec1; i++) stack.push([g.sec1Len, p.D1, g.T]);
     for (let i = 0; i < g.sec2; i++) stack.push([g.sec2Len, p.D2, g.T]);
+    if (g.kbt) for (let i = 0; i < g.kbtPieces; i++) stack.push([g.kbtW / g.kbtPieces, g.kbtD, 1]);
     stack.sort((u, v) => v[0] * v[1] - u[0] * u[1]);
     body += box(xT, 0, 0, pd, pl, 0.6, ['f-case3', 'f-case3', 'f-case3'], false);
     z = 0.6;
@@ -1334,6 +1399,13 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     }
     if (n === 'Corner joining plates') { hid(1, 1, 3.5, H - 2, 'Hook-and-loop pad: glue the plate under the return top so this end reaches under the main top'); }
     if (n === 'Riser back strip') cut(W / 2 - 1.5, 0, 3, 1.25, 'Cable notch');
+    if (n.startsWith('Keyboard tray (')) {
+      hid(0, 0, 0.5, H, 'Drawer half of the slide along each outer end');
+      if (g.kbtPieces > 1) for (const fy of [0.3, 0.7]) hole(W - 1.5, H * fy, 0.25, 'Star-knob T-nut (joining end only)');
+      txt(W / 2, H - 0.8, 'FRONT');
+    }
+    if (n.startsWith('Tray slide rails')) for (let xx = 1; xx < W; xx += (W - 2) / 3) hole(xx, H / 2, 0.15, 'Slide screw holes (#8 × 5/8 in)');
+    if (n.startsWith('Tray joint plate')) { f.push({ t: 'line', x: 0, y: H / 2, x2: W, y2: H / 2, note: 'Joint between the tray halves' }); for (const fx of [0.3, 0.7]) for (const fy of [0.25, 0.75]) hole(W * fx, H * fy, 0.3, '1/4-20 star knob into a T-nut'); }
     if (n === 'Slide-out tray') { hid(0, 0, 0.5, H, 'Drawer slide (drawer half) along each side edge'); hid(W - 0.5, 0, 0.5, H, 'Drawer slide (drawer half) along each side edge'); txt(W / 2, H - 1, 'FRONT'); }
     if (n === 'Tray front lip') cut(W / 2 - 2, 0, 4, 0.75, 'Finger notch');
     if (n.startsWith('Slide mounting rails')) for (let xx = 1; xx < W; xx += (W - 2) / 3) hole(xx, H / 2, 0.15, 'Slide screw holes (#8 × 5/8 in)');
@@ -1406,6 +1478,11 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     }
     if (p.handles) add('handle', 'Recessed spring handle', 'Flush dish with a spring-return bar; the dish sits in the 5 × 2 in opening.', 4, `2 per case on the sides (${id('Sides', 'Tower')}, ${id('Sides', 'Keys')}), into the backer pads`);
     if (p.lids || p.handles) add('screw', '#8 × 1 in pan-head screw', 'Through the leather and the cardboard wall into the plywood backer pads.', (p.lids ? 64 : 0) + (p.handles ? 16 : 0), `Latches${p.handles ? ' and handles' : ''}`);
+    if (g.beam) add('angle', 'Back support beam + 2 U-brackets', `1-1/2 in square aluminum tube, ${short(g.kneeMain - 0.25)}; the brackets screw to the plywood pads and the beam drops in.`, '1 + 2', `${id('Beam bracket pads')} ← ${id('Back support beam')}`);
+    if (g.kbt) {
+      add('slide', `Keyboard tray slides, ${g.kbtSlide} in, lever disconnect (pair)`, 'Full extension, 100 lb. Cabinet half on the plywood rails, drawer half on the tray ends; #8 × 5/8 in screws, 8 per slide.', '1 pair', `${id('Tray slide rails')} → ${id('Keyboard tray')}`);
+      if (g.kbtPieces > 1) add('knob', '1/4-20 star knob + T-nut (tray joint)', 'Hand-tight: joins the tray halves.', 4, `${id('Tray joint plate')} → ${id('Keyboard tray')}`);
+    }
     if (p.tray) add('slide', `Full-extension drawer slides, ${g.slideL} in (pair)`, 'Ball-bearing, side mount. #8 × 5/8 in screws into the plywood rails and tray strips.', '1 pair', `${id('Slide mounting rails')} → ${id('Slide-out tray')}`);
     if (g.sc) {
       add('hinge', 'Piano hinge (screen case lid)', `Cut to ${short(g.hutchW)}; #4 × 1/2 in screws into plywood strips.`, 1, `${id('Screen case lid')} to ${id('Screen case front & back')}`);
@@ -1564,6 +1641,7 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     const out = [];
     if (p.lids) out.push(['Build the lids', `<ul><li>Laminate each lid panel the same size as its case front (${esc(short(g.WA))} × ${esc(short(g.caseH))} and ${esc(short(g.WB))} × ${esc(short(g.caseH))}).${card ? ' The Tower lid gets an extra layer: it becomes the leg.' : ''}</li><li>Glue the ${esc(short(g.lidD))} rim around the edges, flush with the outside, with a corner block in every corner. Check square by the diagonals.</li><li>Glue the lip strips inside the rim so they stand 3/4 in proud. Test-fit on the case: the lip should drop into the case mouth with a little play (felt takes it up later). Hang the case doors 1 in back from the front edge so the lip clears them.</li>${g.casterH ? `<li>Build the riser block: stack a strip ${esc(short(g.WA))} long and 3 in wide to ${esc(short(g.casterH))} tall, and cut a ${esc(short(g.lidD + g.tw + 0.125))} groove down the middle. The Tower lid stands in it as the leg.</li>` : ''}</ul>`]);
     if (p.casters) out.push(['Caster boards', `<ul><li>Cut two boards of 1/2 in plywood, one per case footprint (${esc(short(g.WA))} × ${esc(short(g.DA))} and ${esc(short(g.WB))} × ${esc(short(g.DB))}).</li><li>Mark the 4 caster plates 1 in in from the corners, drill, and hammer T-nuts in from the top face.</li><li>Glue the board to the case bottom with a generous layer of wood glue${card ? ' over a full extra cardboard layer, so the glue grabs the whole floor and not just the wall edges' : ''}, and screw up through it into the walls${card ? ' with large washers' : ''}. Weight it overnight.</li><li>Bolt the casters on from below. Paint the board edges black.</li></ul>`]);
+    if (g.kbt) out.push(['Keyboard tray', `<ul><li>Cut the tray from 3/4 in plywood, ${esc(short(g.kbtW))} × ${esc(short(g.kbtD))}${g.kbtPieces > 1 ? ' in two halves' : ''}. Glue on the back stop and the rounded wrist edge.${g.kbtPieces > 1 ? ' Fit the joint plate and T-nuts so the halves knob together dead flat.' : ''}</li><li>Glue the plywood rails to the knee-facing sides of both cases, front ends flush, centered ${esc(short(g.kbtDrop))} below the case tops, dead level. Weight them overnight, then add two screws each through the wall into a backer strip inside.</li><li>Screw the slides' cabinet halves to the rails and the drawer halves to the tray ends. Set the cases in place, hang the tray, and check it runs smoothly with ${esc(short(1))} of clearance under the desktop for the keyboard.</li><li>The music rest won't fit under the desktop: take it off before pushing the tray in.</li></ul>`]);
     if (p.tray) out.push(['Slide-out tray', `<ul><li>Glue the two plywood slide rails inside the Keys Case walls, level with each other, ${esc(short(g.tw + g.trayH - 1.5))} below the top. Glue the tray shelf in under them.</li><li>Make the tray ${esc(short(g.inWB - 1))} × ${esc(short(g.slideL))}${card ? ' with a 1/2 in plywood strip glued along each side edge' : ''}, and the front lip with a finger notch.</li><li>Screw the slides to the rails (cabinet half) and the tray (drawer half), 1/2 in clearance each side. Check it runs smoothly and stops flush with the front, behind where the lid lip lands.</li></ul>`]);
     if (g.sc) out.push(['Flip-up screen case', `<ul><li>Glue the floor, front, back and ends into a shallow box, ${esc(short(g.hutchW))} × ${esc(short(g.hutchD))} × ${esc(short(g.hutchH))}, with corner blocks.${g.proj ? ' Cut the 5 × 3 in projector window in the back.' : ''}</li><li>Laminate the lid with an extra layer and glue the plywood monitor plate to its inside face, centered. Drill it for the thumb screw that goes into the monitor's tripod socket (or VESA 75 holes).</li><li>Hinge the lid along the back with the piano hinge (glue a plywood strip under each leaf in cardboard). Fit a lid-stay arm at each end: open the lid to the angle you like and the friction stays hold it there.</li><li>Small draw latches on the front hold it shut on the road; felt strips stop the monitor rubbing.</li></ul>`]);
     if (g.table) out.push(['Keys lid side table', `<ul><li>Glue the two plywood leg pads inside the Keys lid, one at each end, inside the rim.</li><li>Screw the folding legs (${esc(short(g.tableLeg))}) to the pads so they fold flat inside the rim; check the lid still closes over the case with the legs folded.</li><li>Unfolded, the braces lock and the lid stands rim-down as a side table at desk height.</li></ul>`]);
@@ -1694,6 +1772,7 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     $('ribRow').hidden = !card;
     $('leatherRow').hidden = p.finish !== 'leather';
     $('screenCaseRow').hidden = !p.hutch;
+    $('kbHRow').hidden = p.kbPlace !== 'tray';
     $('keysLidRow').hidden = !p.lids;
   }
   $('form').addEventListener('input', (e) => {
@@ -1707,7 +1786,7 @@ b.pid, .pid { font-family: var(--font-mono); font-weight: 600; color: var(--acce
     if (['pcW', 'pcD', 'pcH'].includes(k)) p.pcPreset = 'custom';
     if (k === 'kb') [p.kbL, p.kbD] = KB[p.kb];
     if (k === 'mat') { const m = MAT[p.mat]; p.lw = m.lw; p.ls = m.ls; p.lr = m.lr; }
-    if (['pcPreset', 'kb', 'mat', 'pcW', 'pcD', 'pcH', 'finish', 'hutch', 'lids'].includes(k)) fill();
+    if (['pcPreset', 'kb', 'mat', 'pcW', 'pcD', 'pcH', 'finish', 'hutch', 'lids', 'kbPlace'].includes(k)) fill();
     save();
     render();
   });
