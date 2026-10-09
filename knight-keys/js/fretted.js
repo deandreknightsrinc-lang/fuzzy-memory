@@ -2,7 +2,7 @@
 // and play-along chord charts for the guitar and bass courses.
 
 import { parseChordSymbol, parseChords } from './songs.js';
-import { writeMidi } from './midi-file.js';
+import { writeMidi, clickBeats } from './midi-file.js';
 
 /** Open strings by string number (1 = the thinnest, highest string), standard tuning. */
 export const TUNINGS = {
@@ -123,11 +123,14 @@ export function chartTimeline(step, songs = []) {
   const windows = all.map((c) => ({ symbol: c.symbol, start: (countIn + c.beat) * spb, end: (countIn + c.beat + c.beats) * spb, ...chordTarget(c.symbol) }));
   const ev = [{ time: 0, bytes: [0xff, 0x58, 0x04, time[0], Math.log2(time[1]), 0x18, 0x08] }, { time: 0, bytes: [0xc0, 115] }];
   const total = countIn + length * reps;
-  for (let b = 0; b < total; b++) {
-    const accent = b % beatsPerBar === 0;
-    ev.push({ time: b * spb, bytes: [0x90, accent ? 84 : 79, accent ? 100 : 65] });
-    ev.push({ time: (b + 0.1) * spb, bytes: [0x80, accent ? 84 : 79, 0] });
-  }
+  for (let bar = 0; bar * beatsPerBar < total - 1e-9; bar++)
+    for (const c of clickBeats(time)) {
+      const b = bar * beatsPerBar + c;
+      if (b >= total - 1e-9) break;
+      const accent = c === 0;
+      ev.push({ time: b * spb, bytes: [0x90, accent ? 84 : 79, accent ? 100 : 65] });
+      ev.push({ time: (b + 0.1) * spb, bytes: [0x80, accent ? 84 : 79, 0] });
+    }
   return { bpm, windows, countIn: countIn * spb, bytes: writeMidi(ev, { bpm, name: step.name || 'Play along' }) };
 }
 

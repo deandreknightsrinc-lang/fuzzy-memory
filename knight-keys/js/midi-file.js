@@ -271,6 +271,18 @@ export function buildSong(parsed) {
 /**
  * Write a format-0 MIDI file. `events` are { time: seconds, bytes: [status, d1, d2?] }.
  */
+/**
+ * Where a click falls in a bar, in quarter-note beats: every beat in simple time,
+ * every dotted quarter in compound time (6/8, 9/8, 12/8 are felt in 2, 3 and 4).
+ */
+export function clickBeats([num, den] = [4, 4]) {
+  const beatsPerBar = (num * 4) / den;
+  const step = den === 8 && num % 3 === 0 ? 1.5 : 1;
+  const out = [];
+  for (let b = 0; b < beatsPerBar - 1e-9; b += step) out.push(b);
+  return out;
+}
+
 export function writeMidi(events, { ppq = 480, bpm = 120, name = 'Knight Keys recording' } = {}) {
   const ticksPerSec = (ppq * bpm) / 60;
   const body = [];
