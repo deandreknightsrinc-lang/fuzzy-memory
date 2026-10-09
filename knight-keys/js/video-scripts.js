@@ -1,4 +1,4 @@
-// Filming scripts for the video lessons (drums, bass, guitar and the piano scales unit): what the teacher says,
+// Filming scripts for the video lessons (drums, bass, guitar, and the newer piano and voice units): what the teacher says,
 // what the camera shows and what appears on screen, scene by scene. Written to
 // match each lesson's steps exactly, so the video teaches what the lesson then
 // asks you to play. Paste one into an AI video tool (HeyGen, Synthesia,
@@ -14,6 +14,7 @@ import { teacherById } from './teachers.js';
 const BEAT = 'beat-knight';
 const JORDAN = 'strings-jordan';
 const MAESTRO = 'maestro-k';
+const GRACE = 'melody-grace';
 
 export const VIDEO_SCRIPTS = {
   // ---- Drums: Meet the kit ---------------------------------------------------------
@@ -254,6 +255,144 @@ export const VIDEO_SCRIPTS = {
       { shot: 'Over-the-shoulder on the app.', say: 'Here the song waits for you, so learn every hit slowly first. Fast comes from slow, every single time.' },
       { shot: 'Medium shot, wiping forehead and laughing.', say: 'Stay relaxed. Tight arms get tired, loose arms keep going. Locked in! That\'s the pocket!' },
       { shot: 'Medium shot.', say: 'Then take it to Stage and go for the crowns. Practice slow, play it clean, and I\'ll catch you on the next beat.' },
+    ],
+  },
+
+  // ---- Voice: Warm-ups and technique --------------------------------------------------
+  'v-liptrill': {
+    teacher: GRACE,
+    scenes: [
+      { shot: 'Medium shot by the studio microphone, stained-glass light behind.', say: 'Hey singers! Let\'s warm up that beautiful voice. Today: the warm-up every singer loves, and everyone laughs at the first time. The lip trill.' },
+      { shot: 'Close-up on her lips fluttering, "brrr".', say: 'Close your lips loosely and blow, so they flutter like a little motorboat. Brrrr. Now add your voice to it.', screen: 'Lips loose · blow · add voice: "brrr"' },
+      { shot: 'Close-up: fingertips pressing gently into the cheeks.', say: 'If your lips won\'t flutter, press one finger gently into each cheek. That takes the weight off and lets them buzz.' },
+      { shot: 'Medium shot, trilling up and down Do Re Mi Re Do.', say: 'Why do we do this? It balances your air and your voice, so the high notes come easier and nothing gets squeezed. Do, Re, Mi, Re, Do.', screen: 'Do Re Mi Re Do · then Do Mi Sol Mi Do' },
+      { shot: 'Medium shot.', say: 'If the trill stops, just sing "ah". Drink some water, keep singing, and I\'ll see you soon.' },
+    ],
+  },
+  'v-hum': {
+    teacher: GRACE,
+    scenes: [
+      { shot: 'Medium shot, hand on her face near the nose.', say: 'Hey singers! Let\'s warm up that beautiful voice. Today we find your ring. It starts with a hum.' },
+      { shot: 'Close-up: lips closed, a slight smile.', say: 'Lips closed, teeth apart, and hum: mmmm. Can you feel a buzz on your lips and around your nose? That buzz is resonance.', screen: 'Lips closed · teeth apart · feel the buzz' },
+      { shot: 'Medium shot, humming down Sol Fa Mi Re Do.', say: 'Resonance is the ring that makes your voice carry across a room without pushing. Hum down with me: Sol, Fa, Mi, Re, Do.' },
+      { shot: 'Close-up, humming then opening to "ah" on one note.', say: 'Now the magic: hum on Do, then open to "ah" and keep that same buzz. Mmmm-aaah. Hear how bright it stays?', screen: '"mm…" → "…ah": keep the buzz' },
+      { shot: 'Medium shot.', say: 'Yes! I heard that, right in tune! Drink some water, keep singing, and I\'ll see you soon.' },
+    ],
+  },
+  'v-vowels': {
+    teacher: GRACE,
+    scenes: [
+      { shot: 'Medium shot.', say: 'Hey singers! Let\'s warm up that beautiful voice. Today we talk about the secret of choirs that sound like one voice: vowels.' },
+      { shot: 'Close-ups of her mouth shaping each vowel.', say: 'Words are carried by vowels. Tall "ah". Bright "eh". Narrow "ee". Round "oh". Small "oo".', screen: 'ah · eh · ee · oh · oo' },
+      { shot: 'Medium shot, singing one note through all five vowels.', say: 'Now one note, five vowels. The pitch stays perfectly still; only your mouth changes. Ah, eh, ee, oh, oo.' },
+      { shot: 'Graphic: a choir with matching mouth shapes.', say: 'When everyone in a choir shapes the same vowel the same way, the sound locks together. That\'s the blend you hear in the best choirs.', screen: 'Same vowel shape = choir blend' },
+      { shot: 'Medium shot.', say: 'Drink some water, keep singing, and I\'ll see you soon.' },
+    ],
+  },
+  'v-longnotes': {
+    teacher: GRACE,
+    scenes: [
+      { shot: 'Medium shot, hands on her sides.', say: 'Hey singers! Let\'s warm up that beautiful voice. Today: holding a long note, steady all the way to the end.' },
+      { shot: 'Close-up: her sides and belly expanding as she breathes in.', say: 'Breathe in low. Your belly and your sides move out, your shoulders stay still. That\'s your fuel tank.', screen: 'Breathe low: belly and sides, not shoulders' },
+      { shot: 'Medium shot, holding a long note, the app\'s hold bar filling.', say: 'Here\'s the secret: long notes need steady air, not more air. Let it out slowly, like you\'re trying to make it last.', screen: 'Steady air, not more air' },
+      { shot: 'Close-up, the end of the note staying in tune.', say: 'Listen to the very end of the note. If it wobbles or goes flat, take a bigger breath next time and spend it slower.' },
+      { shot: 'Medium shot.', say: 'Three seconds, then five. You can do it. Drink some water, keep singing, and I\'ll see you soon.' },
+    ],
+  },
+  'v-dynamics': {
+    teacher: GRACE,
+    scenes: [
+      { shot: 'Medium shot, leaning toward the mic softly.', say: 'Hey singers! Let\'s warm up that beautiful voice. Today we play with volume: soft and strong.' },
+      { shot: 'Close-up, singing a soft, floating note.', say: 'Soft singing still needs your breath underneath it. A soft note should float and stay in tune. Not breathy, not shaky. Like a lullaby.', screen: 'Soft = supported, not breathy' },
+      { shot: 'Medium shot, the same note strong and full.', say: 'Now the same note, strong. Full and bright, like the big chorus. But no shouting and no squeezing your throat. The power comes from your breath.', screen: 'Strong = full, not shouting' },
+      { shot: 'Medium shot, growing louder up Do Mi Sol Do.', say: 'Let\'s grow as we climb: Do, Mi, Sol, Do, starting soft and arriving strong.' },
+      { shot: 'Medium shot.', say: 'Yes! I heard that, right in tune! Drink some water, keep singing, and I\'ll see you soon.' },
+    ],
+  },
+
+  // ---- Voice: Ear training ---------------------------------------------------------------
+  'v-intervals': {
+    teacher: GRACE,
+    scenes: [
+      { shot: 'Medium shot by the piano.', say: 'Hey singers! Let\'s warm up that beautiful voice. Big jumps in a melody can feel scary. Today I\'ll give you a trick that makes them easy.' },
+      { shot: 'Graphic: Do → Fa with "Amazing Grace" underneath.', say: 'Link each jump to a song you already know. Do up to Fa is called a fourth. It\'s the start of Amazing Grace: "A-ma".', screen: '4th: Do → Fa · "A-ma-zing Grace"' },
+      { shot: 'Graphic: Do → Sol with "Twinkle, Twinkle" underneath.', say: 'Do up to Sol is a fifth. That\'s Twinkle, Twinkle: "Twin-kle".', screen: '5th: Do → Sol · "Twin-kle, twin-kle"' },
+      { shot: 'Close-up, eyes closed, then singing the jump.', say: 'Hear the song in your head first, then sing the jump. Your ear already knows these. You\'re just borrowing them.' },
+      { shot: 'Medium shot.', say: 'Drink some water, keep singing, and I\'ll see you soon.' },
+    ],
+  },
+  'v-minor': {
+    teacher: GRACE,
+    scenes: [
+      { shot: 'Medium shot, softer lighting.', say: 'Hey singers! Let\'s warm up that beautiful voice. Today we sing in minor, the sound of prayer and longing.' },
+      { shot: 'Medium shot, singing Do Mi Sol, then La Do Mi.', say: 'Major melodies center on Do. Minor melodies center on La. Listen: Do, Mi, Sol. Now La, Do, Mi. Feel the difference?', screen: 'Major: Do Mi Sol · Minor: La Do Mi' },
+      { shot: 'Close-up, singing La Ti Do Re Mi slowly.', say: 'Now up the minor five: La, Ti, Do, Re, Mi. And gently back down to La. Let it be tender.' },
+      { shot: 'Medium shot, hand on heart.', say: 'Many spirituals and worship songs live in minor. When you know how it feels, you\'ll sing them with real feeling.' },
+      { shot: 'Medium shot.', say: 'Drink some water, keep singing, and I\'ll see you soon.' },
+    ],
+  },
+  'v-noref': {
+    teacher: GRACE,
+    scenes: [
+      { shot: 'Medium shot, playful.', say: 'Hey singers! Let\'s warm up that beautiful voice. Today we take the training wheels off: singing without the piano helping.' },
+      { shot: 'Close-up at the piano, one key: Do.', say: 'You\'ll hear Do one time. Sing it, and remember it. That\'s your home base.', screen: 'Hear Do once · remember it' },
+      { shot: 'Medium shot, eyes closed, singing up the scale on her own.', say: 'Then up the scale on your own: Re, Mi, Fa, Sol, and back down to Do. Before each note, hear it in your head first. Then sing it.', screen: 'Hear it inside, then sing it' },
+      { shot: 'Medium shot.', say: 'That inner hearing is what keeps a whole choir in tune when the band drops out. It grows every time you practice it.' },
+      { shot: 'Medium shot.', say: 'Yes! I heard that, right in tune! Drink some water, keep singing, and I\'ll see you soon.' },
+    ],
+  },
+
+  // ---- Voice: Worship singing --------------------------------------------------------------
+  'v-runs': {
+    teacher: GRACE,
+    scenes: [
+      { shot: 'Medium shot, big smile.', say: 'Hey singers! Let\'s warm up that beautiful voice. You asked for it: your first gospel run!' },
+      { shot: 'Graphic: "Ye-e-e-es" with notes stepping down.', say: 'A run is several notes on one word. "Ye-e-e-es." The secret every great gospel singer knows: learn it slow first. Every single note clean.', screen: 'Run = many notes on one word' },
+      { shot: 'Medium shot, singing Sol Fa Mi Re Do slowly on "yes".', say: 'Down the scale from Sol to Do, on "yes". Sol, Fa, Mi, Re, Do. Slow. Clean.' },
+      { shot: 'Close-up, a lighter, quicker turn on "Lord".', say: 'Now a little turn on "Lord": Mi, Re, Do, Re, Do. Lighter and quicker, like a ribbon.' },
+      { shot: 'Medium shot.', say: 'Speed comes later. Clean comes first. Drink some water, keep singing, and I\'ll see you soon.' },
+    ],
+  },
+  'v-harmony3': {
+    teacher: GRACE,
+    scenes: [
+      { shot: 'Medium shot.', say: 'Hey singers! Let\'s warm up that beautiful voice. Today you learn to sing harmony. And it\'s easier than you think.' },
+      { shot: 'Graphic: melody Do Re Mi with Mi Fa Sol above it.', say: 'The easiest harmony sits a third above the melody. When the melody sings Do, you sing Mi. Re, you sing Fa. Mi, you sing Sol.', screen: 'Melody Do Re Mi → Harmony Mi Fa Sol' },
+      { shot: 'Medium shot, singing the melody, then the harmony line.', say: 'It moves the same way as the tune, just higher. Melody: Do, Re, Mi, Re, Do. Harmony: Mi, Fa, Sol, Fa, Mi.' },
+      { shot: 'Close-up, singing the harmony alone with eyes closed.', say: 'Learn the harmony line on its own first. Then sing it while you hum the melody in your head underneath.' },
+      { shot: 'Medium shot.', say: 'Grab a friend: one sings melody, one sings harmony. That\'s the start of a choir. Drink some water, keep singing, and I\'ll see you soon.' },
+    ],
+  },
+  'v-joyful': {
+    teacher: GRACE,
+    scenes: [
+      { shot: 'Medium shot, beaming.', say: 'Hey singers! Let\'s warm up that beautiful voice. Today we sing a bright hymn: Joyful, Joyful, We Adore Thee.' },
+      { shot: 'Close-up, singing with a smile, then without.', say: 'Here\'s a real singer\'s trick: smile while you sing it. Listen. Without a smile... with a smile. It really changes the sound.', screen: 'Smile: it brightens the sound' },
+      { shot: 'Over the shoulder on the app, the melody waiting for her notes.', say: 'The song waits for each note, so take your time. Any octave counts, so sing where it\'s comfortable.' },
+      { shot: 'Medium shot, singing a phrase joyfully.', say: 'Breathe at the end of each line, and let the words shine.' },
+      { shot: 'Close-up, pointing to the melody climbing on screen.', say: 'Watch the part where the melody climbs: lift your eyebrows and think up, and the higher notes float out instead of getting pushed.' },
+      { shot: 'Medium shot.', say: 'Drink some water, keep singing, and I\'ll see you soon.' },
+    ],
+  },
+  'v-saints': {
+    teacher: GRACE,
+    scenes: [
+      { shot: 'Medium shot, clapping on 2 and 4.', say: 'Hey singers! Let\'s warm up that beautiful voice. Let\'s sing a big, happy one: When the Saints Go Marching In.' },
+      { shot: 'Close-up, a big low breath before the line.', say: 'This song is big and joyful, so take a strong breath before every line. "Oh, when the saints..."', screen: 'Big breath before each line' },
+      { shot: 'Medium shot, holding a long note.', say: 'Let the long notes ring all the way through. "Marching in" holds: don\'t cut it short.' },
+      { shot: 'Over the shoulder on the app.', say: 'The song waits for you to sing each note, any octave. Take it at your pace.' },
+      { shot: 'Medium shot.', say: 'Yes! I heard that, right in tune! Drink some water, keep singing, and I\'ll see you soon.' },
+    ],
+  },
+  'v-doxology': {
+    teacher: GRACE,
+    scenes: [
+      { shot: 'Medium shot, reverent, stained-glass light.', say: 'Hey singers! Let\'s warm up that beautiful voice. Today we sing the song so many churches sing every Sunday: the Doxology.' },
+      { shot: 'Graphic: "Praise God, from whom all blessings flow".', say: 'Praise God, from whom all blessings flow. The notes are steady and even, almost all the same length. Like walking together.', screen: 'Steady, even notes' },
+      { shot: 'Close-up, one breath per line.', say: 'One breath per line. Breathe before "Praise God", sing the whole line on it, then breathe again.', screen: 'One breath per line' },
+      { shot: 'Medium shot, singing a line.', say: 'Sing it like you mean every word. That matters more than any technique.' },
+      { shot: 'Close-up on the final "Amen".', say: 'And at the end, the Amen: two long notes. Hold them together with everyone, and let them fade gently.' },
+      { shot: 'Medium shot.', say: 'Drink some water, keep singing, and I\'ll see you soon.' },
     ],
   },
 
