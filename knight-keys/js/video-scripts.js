@@ -1,4 +1,4 @@
-// Filming scripts for the drum and bass video lessons: what the teacher says,
+// Filming scripts for the video lessons (drums, bass, and the newer guitar lessons): what the teacher says,
 // what the camera shows and what appears on screen, scene by scene. Written to
 // match each lesson's steps exactly, so the video teaches what the lesson then
 // asks you to play. Paste one into an AI video tool (HeyGen, Synthesia,
@@ -253,6 +253,135 @@ export const VIDEO_SCRIPTS = {
       { shot: 'Over-the-shoulder on the app.', say: 'Here the song waits for you, so learn every hit slowly first. Fast comes from slow, every single time.' },
       { shot: 'Medium shot, wiping forehead and laughing.', say: 'Stay relaxed. Tight arms get tired, loose arms keep going. Locked in! That\'s the pocket!' },
       { shot: 'Medium shot.', say: 'Then take it to Stage and go for the crowns. Practice slow, play it clean, and I\'ll catch you on the next beat.' },
+    ],
+  },
+
+  // ---- Guitar: More open chords ---------------------------------------------------------
+  'g-e-a': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up on the stool, acoustic guitar on the right leg.', say: 'Hey friend, grab your guitar, let\'s play something good. Two big bright chords today: E and A.' },
+      { shot: 'Close-up on the left hand making Em, then adding finger 1.', say: 'You know E minor. Now add your first finger on the first fret of the G string. That\'s E major. One finger turns sad into happy. Listen: E minor... E.', screen: 'E = Em + finger 1 on G string, fret 1' },
+      { shot: 'Close-up: three fingers side by side on the 2nd fret.', say: 'A: three fingers squeezed side by side on the second fret: D, G and B strings. Skip the low E string.', screen: 'A: fingers 1 2 3 on fret 2 (D G B) · skip low E' },
+      { shot: 'Medium shot, strumming A, E, A, D.', say: 'Now A, E, A, D. Those three chords play a huge number of songs in the key of A.' },
+      { shot: 'Medium close-up.', say: 'If A feels crowded, tilt your fingers a little so they fit. Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-dm': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, softer mood.', say: 'Hey friend, grab your guitar, let\'s play something good. Today we meet the minor family.' },
+      { shot: 'Close-up on the left hand forming the Dm triangle.', say: 'D minor: a little triangle on the top strings. G string, second fret, finger two. B string, third fret, finger three. High E, first fret, finger one. Strum just the top four strings.', screen: 'Dm: G2 · B3 · E1 · top 4 strings' },
+      { shot: 'Medium shot, strumming Dm and Am slowly.', say: 'D minor, A minor. Hear that? Minor chords sound thoughtful, a little sad. Perfect for a quiet prayer song.' },
+      { shot: 'Graphic: Am, Dm, Em.', say: 'Am, Dm, Em: the whole minor family. Now you can play them all.', screen: 'The minor family: Am · Dm · Em' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-sevenths': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up.', say: 'Hey friend, grab your guitar, let\'s play something good. Today: seventh chords, the chords that want to go somewhere.' },
+      { shot: 'Close-up on G7: fingers 3, 2 and 1.', say: 'G seven: third finger on the low E, third fret. Second finger on the A string, second fret. First finger on the high E, first fret.', screen: 'G7: E3 · A2 · high E1' },
+      { shot: 'Medium shot: G, G7, then resolving to C.', say: 'Listen to the pull. G... G seven... and home to C. The seven leans toward the next chord, like a question waiting for an answer.', screen: 'G7 → C: the seven leads home' },
+      { shot: 'Close-up on D7 and E7.', say: 'D seven: a little backwards triangle on the top strings. E seven: your E chord with the D-string finger lifted off. D seven leads to G. E seven leads to A minor.' },
+      { shot: 'Medium close-up.', say: 'Sweet, that rang out clean! Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-colors': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, warm lamp light.', say: 'Hey friend, grab your guitar, let\'s play something good. Ever wonder why worship guitar sounds so open and shimmery? Two chords: Cadd9 and Dsus4.' },
+      { shot: 'Close-up on Cadd9.', say: 'C add nine: second finger on the A string, third fret. First finger on the D string, second fret. Third finger on the B string, third fret.', screen: 'Cadd9: A3 · D2 · B3' },
+      { shot: 'Medium shot, G to Cadd9 and back.', say: 'G to C add nine. It rings bright, and it sits so close to G that the change is easy.' },
+      { shot: 'Close-up on Dsus4, then finger 3 lifting to D.', say: 'D sus four is a D that leans. Play it, then move your third finger from the third fret down to the second. That\'s D. The lean resolves. Lean, rest. Lean, rest.', screen: 'Dsus4 → D: lean, then rest' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-easyf': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, a knowing smile.', say: 'Hey friend, grab your guitar, let\'s play something good. Today we take on the chord everybody worries about: F. But we\'ll sneak up on it.' },
+      { shot: 'Close-up on Fmaj7.', say: 'First, F major seven: third finger on the D string, third fret. Second on the G string, second fret. First on the B string, first fret. High E open. Top four strings.', screen: 'Fmaj7: D3 · G2 · B1 · E open' },
+      { shot: 'Medium shot, C to Fmaj7.', say: 'C to F major seven. Dreamy, right? Same fingers almost. Get comfortable here first.' },
+      { shot: 'Extreme close-up: finger 1 laid flat over the B and high E strings.', say: 'Now lay your first finger flat across the B and high E strings at the first fret. That\'s F. Press with the side of your finger and roll it slightly toward the headstock.', screen: 'F: finger 1 flat over B and E, fret 1' },
+      { shot: 'Medium shot, C, F, G, C.', say: 'C, F, G, C. The one-four-five in C. If a string buzzes, that\'s normal at first. It cleans up in a week or two.' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+
+  // ---- Guitar: Strumming patterns -------------------------------------------------------
+  'g-downup': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, strumming hand in frame.', say: 'Hey friend, grab your guitar, let\'s play something good. Today your strumming hand learns to go both ways.' },
+      { shot: 'Graphic: 1 & 2 & 3 & 4 & over D U D U D U D U.', say: 'Count one and two and three and four and. Down on the numbers, up on the "and". Down, up, down, up.', screen: 'D U D U D U D U' },
+      { shot: 'Slow-motion close-up: the up-strum catching only the top strings.', say: 'The up-strum is lighter. It only catches the top few strings. Don\'t try to hit all six on the way up.' },
+      { shot: 'Medium shot, hand swinging like a pendulum while changing chords.', say: 'The secret: your hand never stops. Like a pendulum. Even when you change chords, keep it swinging.', screen: 'Keep the hand moving' },
+      { shot: 'Medium close-up.', say: 'Play along: G, E minor, C, D. Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-worshipstrum': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, relaxed groove.', say: 'Hey friend, grab your guitar, let\'s play something good. This is the strum you hear in almost every worship song.' },
+      { shot: 'Graphic: D, D U, U D U under 1 2 & & 4 &.', say: 'Down... down up... up down up. Count it: one, two and, and, four and.', screen: 'D · D U · U D U' },
+      { shot: 'Slow-motion close-up on beat 3: the hand goes down but misses the strings.', say: 'Here\'s the trick. On beat three your hand still goes down, but it misses the strings. A ghost strum. That keeps the pendulum going so the up-strums land in the right place.', screen: 'Beat 3: ghost strum (miss the strings)' },
+      { shot: 'Medium shot, strumming the worship four.', say: 'Now the worship four: G, D, E minor, C. Down, down up, up down up.' },
+      { shot: 'Medium close-up.', say: 'Say it out loud while you play until your hand knows it. Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-waltz': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, candlelight feel.', say: 'Hey friend, grab your guitar, let\'s play something good. Let\'s play a carol everyone knows: Silent Night.' },
+      { shot: 'Graphic: 1 2 3 with a big DOWN on 1.', say: 'Silent Night is in three-four. Strum DOWN, down, down. A strong strum on one, two lighter ones on two and three.', screen: '3/4: DOWN down down' },
+      { shot: 'Close-up on C, G7 and F.', say: 'Three chords: C, G seven, and F. You\'ve got them all now.', screen: 'C · G7 · F' },
+      { shot: 'Close-up on the left hand moving from C to G7.', say: 'Watch the change from C to G seven: your fingers move almost as a group. Change on beat three, so the new chord is ready right on one.', screen: 'Change on beat 3' },
+      { shot: 'Medium shot, playing gently along.', say: 'Play it soft and let it sway. This is a song to sing to, not over.' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+
+  // ---- Guitar: Church songs -------------------------------------------------------------
+  'g-saints': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, upbeat.', say: 'Hey friend, grab your guitar, let\'s play something good. A happy one: When the Saints Go Marching In.' },
+      { shot: 'Close-up on C7: the C shape plus the pinky on the G string.', say: 'C, G, C seven and F. C seven is your C chord plus your pinky on the third fret of the G string. It leads right into the F.', screen: 'C7 = C + pinky on G string, fret 3' },
+      { shot: 'Close-up on the left hand: C to G, G back to C.', say: 'Most of the song is C. When G comes, it\'s only for a bar, so be ready to come right back home to C.' },
+      { shot: 'Medium shot, strumming along with energy.', say: 'Keep your strum bright and bouncy. When the song gets to F, that\'s the big moment. Dig in.' },
+      { shot: 'Medium close-up.', say: 'Sweet, that rang out clean! Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-doxology': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, reverent tone.', say: 'Hey friend, grab your guitar, let\'s play something good. Today, the song a lot of churches sing every Sunday: the Doxology.' },
+      { shot: 'Graphic: G, D, C, Em.', say: 'Praise God, from whom all blessings flow. The chords are G, D, C and E minor, and they move fast. Some only last one beat.', screen: 'G · D · C · Em · some last 1 beat' },
+      { shot: 'Close-up on the strumming hand: one down-stroke per beat.', say: 'So keep it simple: one down-strum per beat. And keep your eyes on the next chord, not the one you\'re playing.' },
+      { shot: 'Medium shot, playing along slowly.', say: 'The app starts it slow. Get the changes clean first, then speed comes.' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-barre': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, encouraging.', say: 'Hey friend, grab your guitar, let\'s play something good. Today\'s a big step: your first barre chords. Take a breath. We\'ve got this.' },
+      { shot: 'Extreme close-up: finger 1 flat across the 2nd fret, then the other fingers.', say: 'B minor. Lay your first finger flat across the strings at the second fret, from the A string down. Then ring finger and pinky on the fourth fret of the D and G strings, middle finger on the B string, third fret. Skip the low E.', screen: 'Bm: barre fret 2 · D4 · G4 · B3' },
+      { shot: 'Close-up on the thumb behind the neck.', say: 'Thumb low behind the neck, squeeze gently, roll that first finger a little onto its side. It takes weeks to sound clean. That\'s normal for everybody.', screen: 'It takes weeks: that\'s normal' },
+      { shot: 'Medium shot, strumming D, A, Bm, G.', say: 'D, A, B minor, G. That\'s the worship four in the key of D.' },
+      { shot: 'Close-up on F#m: the Em shape at the 2nd fret.', say: 'F sharp minor: your first finger across all six strings at the second fret, and your E minor shape with fingers three and four on the fourth fret.', screen: 'F#m = Em shape at fret 2' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-ballad68': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, soft light, slow sway.', say: 'Hey friend, grab your guitar, let\'s play something good. Let\'s put it all together in a slow worship ballad.' },
+      { shot: 'Graphic: 1 2 3 4 5 6, strums on 1 and 4.', say: 'It\'s in six-eight. Count one two three four five six, and strum on one and four. Let each chord ring.', screen: '6/8: strum on 1 and 4' },
+      { shot: 'Graphic: G/D → G, A/C# → A, Asus4 → A.', say: 'You\'ll see some slash chords. G over D? Just play G. A over C sharp? Just play A. A sus four leans, then resolves to A.', screen: 'G/D = G · A/C# = A' },
+      { shot: 'Medium shot, playing along gently, including Bm and F#m.', say: 'And yes, there\'s B minor and F sharp minor in there. You know them now. If a barre buzzes, keep going. The song keeps moving and so do you.' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
     ],
   },
 

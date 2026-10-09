@@ -16,6 +16,11 @@ test('every drum and bass lesson has a filming script by its course teacher', ()
       assert.equal(s.teacher, COURSE_TEACHERS[course], `${lesson.id}: taught by the ${course} teacher`);
     }
   }
+  for (const unit of ['guitar-chords2', 'guitar-strum', 'guitar-church'])
+    for (const { lesson } of lessonsOf('guitar').filter((e) => e.unit.id === unit)) {
+      assert.ok(videoScriptFor(lesson.id), `${lesson.id} has a script`);
+      assert.equal(videoScriptFor(lesson.id).teacher, COURSE_TEACHERS.guitar);
+    }
   const ids = new Set(ALL_LESSONS.map((l) => l.id));
   for (const id of Object.keys(VIDEO_SCRIPTS)) assert.ok(ids.has(id), `${id} is a real lesson`);
 });
