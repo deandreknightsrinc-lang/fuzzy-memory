@@ -1506,11 +1506,11 @@ function applyLayout() {
 }
 
 const LAYOUTS = {
-  full: ['score', 'chord', 'mixer', 'drums', 'media', 'loops', 'keyboard', 'controls'],
+  full: ['score', 'chord', 'mixer', 'drums', 'media', 'loops', 'kit', 'keyboard', 'controls'],
   keys: ['keyboard', 'controls', 'chord'],
   score: ['score', 'chord', 'keyboard', 'controls'],
   video: ['media', 'chord', 'keyboard'],
-  drums: ['score', 'chord', 'drums', 'keyboard', 'controls'],
+  drums: ['score', 'chord', 'drums', 'kit', 'keyboard', 'controls'],
 };
 document.querySelectorAll('[data-layout]').forEach((btn) => {
   btn.onclick = () => {
@@ -1783,7 +1783,7 @@ const groove = new GroovePlayer({
 const grooveView = { step: -1, inFill: false };
 
 function flashPad(note, vel) {
-  kitFlash(note);
+  kitFlash(note, vel);
   const el = padEls.get(PAD_ALIAS[note] ?? note);
   if (!el) return;
   el.classList.remove('hit');
@@ -2103,7 +2103,40 @@ function saveKitSoon() {
   kitSaveTimer = setTimeout(saveSettings, 300);
 }
 
-function kitFlash(note) {
+/** Lights up a drum in the Drum kit panel, like a key on the keyboard (brighter for harder hits). */
+function kitPanelFlash(note, vel = 100) {
+  const panel = $('kitPanelStage');
+  const piece = PIECES.find((p) => p.notes.includes(note));
+  if (!piece || panel.closest('.panel')?.classList.contains('hidden')) return;
+  const lane = laneOf(note);
+  for (const el of panel.querySelectorAll(`.kp[data-piece="${piece.id}"]`)) {
+    el.style.setProperty('--v', String(Math.max(0.35, Math.min(1, vel / 127))));
+    el.style.setProperty('--kc', lane >= 0 ? LANES[lane].color : '#ffd60a');
+    el.classList.remove('lit');
+    void el.getBoundingClientRect(); // restart the animation
+    el.classList.add('lit');
+  }
+}
+
+/** The Drum kit panel: the Kit Rack's kit drawing, played by clicking a drum. */
+function initKitPanel() {
+  const panel = $('kitPanelStage');
+  const svg = $('kitStage').querySelector('svg').cloneNode(true);
+  svg.setAttribute('aria-label', 'Drum kit: lights up as each drum is hit; click a drum to play it');
+  panel.append(svg);
+  for (const g of panel.querySelectorAll('.kp')) {
+    const piece = PIECES.find((p) => p.id === g.dataset.piece);
+    if (!piece) continue;
+    g.append(Object.assign(document.createElementNS('http://www.w3.org/2000/svg', 'title'), { textContent: piece.name }));
+    g.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      liveDrum(piece.notes[0], 70 + Math.round(50 * Math.min(1, e.pressure || 0.7)));
+    });
+  }
+}
+
+function kitFlash(note, vel) {
+  kitPanelFlash(note, vel);
   if (!$('kitDlg').open) return;
   const piece = PIECES.find((p) => p.notes.includes(note));
   const els = [
@@ -6893,6 +6926,7 @@ function initHome() {
 syncSettingsUI();
 initDrums();
 initKitRack();
+initKitPanel();
 initStage();
 initLessons();
 initBooth();

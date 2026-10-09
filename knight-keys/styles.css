@@ -501,6 +501,15 @@ dialog.kit-window { width: min(1040px, calc(100vw - 32px)); left: max(16px, calc
 .kp:hover { filter: brightness(1.15); }
 .kp.sel { filter: drop-shadow(0 0 6px #4f8cff) drop-shadow(0 0 2px #fff); }
 .kp.hit { filter: brightness(1.6) drop-shadow(0 0 10px #ffd60a); }
+/* Drum kit panel: the kit lights up like the keyboard. --v is how hard the hit was (0.35..1). */
+.kit-panel-body { display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 4px; }
+.kit-panel { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+.kit-panel svg { width: 100%; height: 100%; max-height: 100%; }
+.kit-panel .kp.lit { animation: kit-lit 0.35s ease-out; }
+@keyframes kit-lit {
+  0% { filter: brightness(calc(1 + 0.9 * var(--v, 1))) drop-shadow(0 0 calc(18px * var(--v, 1)) var(--kc, #ffd60a)) drop-shadow(0 0 4px #fff); }
+  100% { filter: none; }
+}
 .kp.custom > :first-child { stroke: #73d13d; stroke-width: 2; }
 .kit-controls { display: flex; align-items: center; gap: 18px; padding: 10px 14px; background: linear-gradient(#2a2420, #1d1916); border-top: 1px solid #000; flex-wrap: wrap; }
 .kit-piece { min-width: 130px; }
