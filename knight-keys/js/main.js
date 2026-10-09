@@ -15,6 +15,7 @@ import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_C
 import { Player } from './player.js';
 import { KeyboardView, drawStaff, drawControllers, drawGroove, drawPianoRoll, drawDrumHighway, drawFretboard } from './render.js';
 import { TUNINGS, STRING_NAMES, fretNote, chordShape, chordTarget, chartTimeline, ChartJudge, rootPosition } from './fretted.js';
+import { INSTRUMENTS, instrumentById, instrumentHome, songsToShow, tunerLesson } from './home.js';
 import { UNITS, COURSES, unitsFor, readNotes, grooveMidi, DrumJudge, addCourse, removeCourse, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from './lessons.js';
 import { PitchListener, SingJudge, RangeFinder, voiceType, freqToCents, midiToFreq, chromaMatches } from './pitch.js';
 import { GameSession, crownsFor, loadStage, saveStage, recordScore, courseState, scoreKey, PLAYER_COLORS } from './game.js';
@@ -6048,11 +6049,12 @@ async function loadAppChurch() {
   }
 }
 
-/** Open the place a link points at: #lessons, #lessons=<course>, #band, #church, #ask, #puppet, #lyrics, #vocal. */
+/** Open the place a link points at: #home, #home=<instrument>, #lessons, #lessons=<course>, #band, #church, #ask, #puppet, #lyrics, #vocal. */
 function openFromHash() {
   const [where, arg] = decodeURIComponent(location.hash.slice(1)).split('=');
   if (!where) return;
-  if (where === 'lessons') {
+  if (where === 'home') openHome(INSTRUMENTS.some((i) => i.id === arg) ? arg : undefined);
+  else if (where === 'lessons') {
     if (arg && COURSES.some((c) => c.id === arg)) lessonCourse = arg;
     $('btnLessons').click();
     renderLessonMap();
@@ -6440,6 +6442,174 @@ function frame() {
   requestAnimationFrame(frame);
 }
 
+// ---- Home (one screen per instrument) --------------------------------------
+//
+// Like Yousician / Simply Piano: pick your instrument and see your next lesson,
+// your path, the songs you unlock and your practice tools. See home.js.
+
+const TOOLS = {
+  songs: ['🎵 Songs', 'Free songs to learn', () => $('btnSongs').click()],
+  score: ['📜 Sheet music', 'The full score of the open song', () => $('btnScore').click()],
+  learn: ['🎯 Learn mode', 'The song waits until you play the right notes', () => $('btnLearn').click()],
+  grooves: ['🥁 Grooves', 'Play along with drum beats', () => document.querySelector('[data-layout="drums"]')?.click()],
+  kit: ['🎛 Kit Rack', 'Choose and tune your drum kit', () => $('btnKit').click()],
+  booth: ['🎙 Vocal Booth', 'Live pitch graph and tuner for singers', () => openBooth()],
+  lyrics: ['🎤 Lyrics', 'Sing along: the words light up', () => openLyrics()],
+  mic: ['🎤 Microphone', 'Turn listening on or off', () => (micSupported() ? toggleMic() : toast('The microphone works in the Knight Lyfe Ultimate app and on the website.'))],
+  tuner: ['🎚 Tuner', 'Tune your strings', (inst) => {
+    const lesson = tunerLesson(inst.id);
+    if (lesson) openLessonFromHome(lesson, instrumentById(inst.id).courses[0]);
+  }],
+};
+
+const homeSongKeyed = (part) => stageSongs(part).map((song) => ({ ...song, id: stageSongKey(song), entry: song }));
+
+function openHome(instrumentId) {
+  if (instrumentId) settings.homeInstrument = instrumentId;
+  const dlg = $('homeDlg');
+  if (!dlg.open) dlg.show();
+  renderHome();
+}
+
+function openLessonFromHome(lesson, course) {
+  $('homeDlg').close(); // Home steps aside; 🏠 brings it back with your progress
+  lessonCourse = course;
+  $('btnLessons').click();
+  if (lesson) startLesson(lesson);
+  else renderLessonMap();
+}
+
+function playStageFromHome(entry) {
+  $('homeDlg').close();
+  stageRun.part = entry.part;
+  $('btnStage').click();
+  if (stageRun.phase === 'menu') startStage(entry.song.entry);
+}
+
+function renderHome() {
+  const me = stagePlayer();
+  const sel = $('homePlayer');
+  sel.innerHTML = '';
+  for (const p of stage.players) sel.append(new Option(p.name, p.id));
+  sel.value = stage.current;
+  const streak = currentStreak(stage.practice?.[stage.current], todayStr());
+  setText($('homeStreak'), streak ? `🔥 ${streak}-day streak` : '');
+  $('homeAtStart').checked = settings.homeAtStart !== false;
+
+  const opts = { progress: lessonProgress(), stage, playerId: me.id, stageSongs: homeSongKeyed, unlockAll: !!stage.unlockAll };
+  const current = instrumentById(settings.homeInstrument).id;
+
+  // Instrument tabs, each with its progress.
+  const tabs = $('homeTabs');
+  tabs.innerHTML = '';
+  for (const inst of INSTRUMENTS) {
+    const h = instrumentHome(inst.id, opts);
+    const b = Object.assign(document.createElement('button'), { className: `home-tab${inst.id === current ? ' on' : ''}` });
+    b.innerHTML = '<span class="ht-icon"></span><span class="ht-name"></span><span class="ht-meta"></span>';
+    b.querySelector('.ht-icon').textContent = inst.icon;
+    b.querySelector('.ht-name').textContent = inst.name;
+    b.querySelector('.ht-meta').textContent = `${h.lessons.done}/${h.lessons.total} lessons`;
+    b.setAttribute('aria-pressed', String(inst.id === current));
+    b.onclick = () => {
+      settings.homeInstrument = inst.id;
+      saveSettings();
+      renderHome();
+    };
+    tabs.append(b);
+  }
+
+  const home = instrumentHome(current, opts);
+  const { instrument: inst, lessons } = home;
+
+  // Hero: progress and the next lesson.
+  const hero = $('homeHero');
+  hero.innerHTML = `<div class="hh-icon"></div>
+    <div><div class="hh-name"></div><div class="hh-rank"></div><progress max="1"></progress></div>
+    <div class="hh-next"><span class="small"></span><button class="primary"></button></div>
+    <p class="hh-plays"></p>`;
+  hero.querySelector('.hh-icon').textContent = inst.icon;
+  hero.querySelector('.hh-name').textContent = inst.name;
+  hero.querySelector('.hh-rank').textContent = `${lessons.rank} · ${lessons.done} of ${lessons.total} lessons · ★ ${lessons.stars}/${lessons.maxStars}`;
+  hero.querySelector('progress').value = lessons.share;
+  const go = hero.querySelector('.hh-next button');
+  if (home.next) {
+    setText(hero.querySelector('.hh-next span'), lessons.done ? 'Up next' : 'Start here');
+    go.textContent = `${lessons.done ? 'Continue' : 'Start'}: ${home.next.lesson.title} ▶`;
+    go.onclick = () => openLessonFromHome(home.next.lesson, home.next.course);
+  } else {
+    setText(hero.querySelector('.hh-next span'), lessons.total ? 'Every lesson passed 🎉' : '');
+    go.textContent = 'All lessons';
+    go.onclick = () => openLessonFromHome(null, inst.courses[0]);
+  }
+  hero.querySelector('.hh-plays').textContent = `Plays with: ${inst.plays}`;
+
+  // The path: units with progress.
+  const units = $('homeUnits');
+  units.innerHTML = '';
+  for (const u of home.units) {
+    const b = Object.assign(document.createElement('button'), { className: `home-unit${u.unlocked ? '' : ' locked'}` });
+    b.innerHTML = '<div class="hu-title"></div><div class="hu-meta"></div><progress></progress>';
+    b.querySelector('.hu-title').textContent = `${u.unit.icon || ''} ${u.unit.title}`.trim();
+    b.querySelector('.hu-meta').textContent = u.unlocked ? `${u.done}/${u.total} lessons · ★ ${u.stars}` : '🔒 Pass the lessons before it';
+    Object.assign(b.querySelector('progress'), { max: u.total || 1, value: u.done });
+    b.onclick = () => {
+      if (!u.unlocked) return toast('Pass the lessons before this unit to open it.');
+      const first = u.unit.lessons.find((l) => !lessonProgress()[l.id]) || u.unit.lessons[0];
+      openLessonFromHome(first, u.course);
+    };
+    units.append(b);
+  }
+
+  // Songs: the next ones to play, then what's coming.
+  const songs = $('homeSongs');
+  songs.innerHTML = '';
+  setText($('homeSongsNote'), inst.stageParts.length ? `(Stage · ${stageRun.course === 'church' ? 'Church & Worship' : stageRun.course === 'starter' ? 'Starter' : 'My Songs'}: earn a 👑 to open the next)` : '(pass a song lesson to open the next)');
+  const list = songsToShow(home.songs, 8);
+  if (!list.length) songs.append(Object.assign(document.createElement('p'), { className: 'small', textContent: 'No songs yet for this instrument.' }));
+  for (const entry of list) {
+    const b = Object.assign(document.createElement('button'), { className: `home-song${entry.unlocked ? '' : ' locked'}` });
+    b.innerHTML = '<span class="hs-badge"></span><div class="hs-title"></div><div class="hs-meta"></div>';
+    b.querySelector('.hs-title').textContent = entry.title;
+    if (entry.kind === 'stage') {
+      b.querySelector('.hs-badge').textContent = entry.unlocked ? '👑'.repeat(entry.crowns) || '▶' : '🔒';
+      b.querySelector('.hs-meta').textContent = `Stage · ${entry.partName}${entry.song.level ? ` · ${entry.song.level}` : ''}`;
+      b.onclick = () => (entry.unlocked ? playStageFromHome(entry) : toast('Earn at least one 👑 on the song before this one to unlock it.'));
+    } else {
+      b.querySelector('.hs-badge').textContent = entry.unlocked ? (entry.stars ? '★'.repeat(entry.stars) : '▶') : '🔒';
+      b.querySelector('.hs-meta').textContent = 'Song lesson';
+      b.onclick = () => (entry.unlocked ? openLessonFromHome(entry.lesson, entry.course) : toast('Pass the lesson before it to open this song.'));
+    }
+    songs.append(b);
+  }
+
+  // Tools.
+  const tools = $('homeTools');
+  tools.innerHTML = '';
+  for (const id of inst.tools) {
+    const [label, title, run] = TOOLS[id];
+    if (id === 'tuner' && !tunerLesson(inst.id)) continue;
+    const b = Object.assign(document.createElement('button'), { textContent: label, title });
+    b.onclick = () => run(inst);
+    tools.append(b);
+  }
+}
+
+function initHome() {
+  const dlg = $('homeDlg');
+  $('btnHome').onclick = () => openHome();
+  dlg.querySelector('[data-close]').onclick = () => dlg.close();
+  makeDraggable(dlg);
+  $('homePlayer').onchange = (e) => {
+    stage.current = e.target.value;
+    saveStage(stage);
+    renderHome();
+  };
+  $('homeAtStart').onchange = (e) => {
+    settings.homeAtStart = e.target.checked;
+    saveSettings();
+  };
+}
+
 // ---- Boot ----------------------------------------------------------------
 
 syncSettingsUI();
@@ -6457,6 +6627,7 @@ initAsk();
 initPuppet();
 initConverter();
 initSongs();
+initHome();
 applyLayout();
 applyLiveInstruments();
 buildMixer();
@@ -6476,5 +6647,8 @@ document.addEventListener('fullscreenchange', markDirty);
 window.addEventListener('pointerdown', () => synth.ensure(), { once: true });
 window.addEventListener('keydown', () => synth.ensure(), { once: true });
 requestAnimationFrame(frame);
-loadAppChurch().then(openFromHash);
+loadAppChurch().then(() => {
+  openFromHash();
+  if (!location.hash && settings.homeAtStart !== false) openHome();
+});
 window.addEventListener('hashchange', openFromHash);

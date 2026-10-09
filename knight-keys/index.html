@@ -55,6 +55,7 @@
           </div>
         </div>
       </details>
+      <button id="btnHome" class="home-btn" title="Home: your instruments, with your next lesson, songs to unlock and practice tools for each">🏠 Home</button>
       <button id="btnLessons" class="lessons-btn" title="Lessons: step-by-step piano and voice courses, like a teacher at your side">🎓 Lessons</button>
       <button id="btnBooth" class="booth-btn" title="Vocal Booth: live pitch graph and tuner for singers, plus four-part choir parts for any song">🎙 Vocal</button>
       <button id="btnChurch" class="church-btn" title="Virtual church: plan and run a worship service with big slides, worship with lyrics and a stream screen for YouTube or Facebook Live">⛪ Church</button>
@@ -550,6 +551,26 @@ Every evening I will sing"></textarea>
           <button id="lpDoneMap">All lessons</button>
         </div>
       </section>
+    </div>
+  </dialog>
+
+  <dialog id="homeDlg" class="tool-window home-window" aria-labelledby="homeTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="homeTitle">🏠 Home</h2>
+      <span id="homeStreak" class="lp-streak"></span>
+      <select id="homePlayer" title="Who's playing?"></select>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="tool-body">
+      <nav id="homeTabs" class="home-tabs" aria-label="Instruments"></nav>
+      <section id="homeHero" class="home-hero"></section>
+      <h3 class="home-h">Your path</h3>
+      <div id="homeUnits" class="home-units"></div>
+      <h3 class="home-h">Songs to unlock <span id="homeSongsNote" class="small"></span></h3>
+      <div id="homeSongs" class="home-songs"></div>
+      <h3 class="home-h">Practice tools</h3>
+      <div id="homeTools" class="home-tools"></div>
+      <label class="home-start small"><input id="homeAtStart" type="checkbox" /> Open Home when Knight Keys starts</label>
     </div>
   </dialog>
 
