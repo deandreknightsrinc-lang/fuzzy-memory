@@ -201,6 +201,76 @@ export const UNITS = [
       { id: 'joyful-both', title: 'Both hands: Joyful, Joyful', steps: [{ type: 'song', song: 'joyful', part: '0,1', text: 'Your graduation song: both hands together.' }] },
     ],
   },
+  {
+    id: 'scales',
+    title: 'Scales and chords',
+    icon: '🎯',
+    lessons: [
+      {
+        id: 'p-scale-c',
+        title: 'The C major scale',
+        steps: [
+          { type: 'info', keys: [60, 62, 64, 65, 67, 69, 71, 72], text: 'A scale walks up every note of a key. C major is all white keys from C to C. Right hand fingers: 1 2 3, then tuck your thumb under to F, then 1 2 3 4 5. Keep your wrist level and let the thumb pass under smoothly.' },
+          { type: 'notes', notes: [60, 62, 64, 65, 67, 69, 71, 72], fingers: [1, 2, 3, 1, 2, 3, 4, 5], text: 'Up: C D E F G A B C. Thumb under after finger 3.' },
+          { type: 'notes', notes: [72, 71, 69, 67, 65, 64, 62, 60], fingers: [5, 4, 3, 2, 1, 3, 2, 1], text: 'Down: finger 3 crosses over the thumb after F.' },
+        ],
+      },
+      {
+        id: 'p-scale-c-lh',
+        title: 'C major scale: left hand',
+        steps: [
+          { type: 'info', keys: [48, 50, 52, 53, 55, 57, 59, 60], text: 'The left hand is the mirror: 5 4 3 2 1 from C to G, then finger 3 crosses over the thumb to A, then 2 1. Going down, the thumb tucks under after G.' },
+          { type: 'notes', notes: [48, 50, 52, 53, 55, 57, 59, 60], fingers: [5, 4, 3, 2, 1, 3, 2, 1], text: 'Left hand up, an octave below middle C.' },
+          { type: 'notes', notes: [60, 59, 57, 55, 53, 52, 50, 48], fingers: [1, 2, 3, 1, 2, 3, 4, 5], text: 'And back down.' },
+        ],
+      },
+      {
+        id: 'p-scale-g',
+        title: 'G major: your first sharp',
+        steps: [
+          { type: 'info', keys: [67, 69, 71, 72, 74, 76, 78, 79], text: 'Start a major scale on G and one black key appears: F♯. That\'s why songs in G have one sharp. Same fingering as C: 1 2 3, thumb under, 1 2 3 4 5.' },
+          { type: 'notes', notes: [67, 69, 71, 72, 74, 76, 78, 79], fingers: [1, 2, 3, 1, 2, 3, 4, 5], text: 'Up: G A B C D E F♯ G. Finger 4 plays the black key.' },
+          { type: 'notes', notes: [79, 78, 76, 74, 72, 71, 69, 67], fingers: [5, 4, 3, 2, 1, 3, 2, 1], text: 'And down.' },
+        ],
+      },
+      {
+        id: 'p-scale-am',
+        title: 'A minor: the relative minor',
+        steps: [
+          { type: 'info', keys: [69, 71, 72, 74, 76, 77, 79, 81], text: 'A minor uses the same white keys as C major, but starts on A. Same notes, a different home: it sounds thoughtful instead of bright. Every major key has a "relative minor" like this, starting on its 6th note.' },
+          { type: 'notes', notes: [69, 71, 72, 74, 76, 77, 79, 81], fingers: [1, 2, 3, 1, 2, 3, 4, 5], text: 'Up: A B C D E F G A.' },
+          { type: 'notes', notes: [81, 79, 77, 76, 74, 72, 71, 69], fingers: [5, 4, 3, 2, 1, 3, 2, 1], text: 'And down.' },
+        ],
+      },
+      {
+        id: 'p-major-minor',
+        title: 'Major and minor chords',
+        steps: [
+          { type: 'info', keys: [60, 63, 67], text: 'To turn a major chord minor, lower the middle note by one key. C major is C E G; C minor is C E♭ G. Major sounds bright; minor sounds tender.' },
+          { type: 'chords', chords: [[60, 64, 67], [60, 63, 67], [67, 71, 74], [67, 70, 74]], names: ['C', 'Cm', 'G', 'Gm'], text: 'Major, then minor: C, Cm, G, Gm.' },
+          { type: 'chords', chords: [[69, 72, 76], [62, 65, 69], [64, 67, 71]], names: ['Am', 'Dm', 'Em'], text: 'The three minor chords of C major: all white keys.' },
+        ],
+      },
+      {
+        id: 'p-inversions',
+        title: 'Inversions',
+        steps: [
+          { type: 'info', keys: [64, 67, 72], text: 'An inversion is the same chord with a different note at the bottom. Move C up an octave and C E G becomes E G C ("C over E"); do it again for G C E ("C over G"). Church players use inversions so their hands barely move between chords.' },
+          { type: 'chords', chords: [[60, 64, 67], [64, 67, 72], [67, 72, 76]], names: ['C', 'C/E', 'C/G'], text: 'C in root position, then its two inversions.' },
+          { type: 'chords', chords: [[60, 64, 67], [60, 65, 69], [59, 62, 67], [60, 64, 67]], names: ['C', 'F/C', 'G/B', 'C'], text: 'Inversions in action: C, F, G, C with your hand staying in one place.' },
+        ],
+      },
+      {
+        id: 'p-sevenths',
+        title: 'Seventh chords',
+        steps: [
+          { type: 'info', keys: [67, 71, 74, 77], text: 'Add one more note, a 7th, and a chord starts pulling toward the next one. G7 is G B D F: it leans hard toward C. Gospel players put sevenths everywhere.' },
+          { type: 'chords', chords: [[67, 71, 74], [67, 71, 74, 77], [60, 64, 67, 72]], names: ['G', 'G7', 'C'], text: 'G, then G7, then home to C. Hear the pull?' },
+          { type: 'chords', chords: [[60, 64, 67, 70], [65, 69, 72], [62, 66, 69, 72], [67, 71, 74]], names: ['C7', 'F', 'D7', 'G'], text: 'C7 leads to F, D7 leads to G.' },
+        ],
+      },
+    ],
+  },
 
   // ---- Voice ----------------------------------------------------------------
   // Sing steps count any octave, so men, women and kids all sing the same lessons.
@@ -957,6 +1027,41 @@ export const UNITS = [
       },
     ],
   },
+  {
+    id: 'guitar-scales',
+    course: 'guitar',
+    title: 'Scales and solos',
+    icon: '🎯',
+    lessons: [
+      {
+        id: 'g-pent-open',
+        title: 'E minor pentatonic',
+        steps: [
+          { type: 'info', text: 'The pentatonic scale has five notes and almost no wrong notes: it\'s what most guitar solos and worship fills are made of. E minor pentatonic in open position: two notes on every string, open strings and frets 2 and 3.', fretboard: { instrument: 'guitar', dots: [[6, 0, 'o'], [6, 3, 3], [5, 0, 'o'], [5, 2, 2], [4, 0, 'o'], [4, 2, 2], [3, 0, 'o'], [3, 2, 2], [2, 0, 'o'], [2, 3, 3], [1, 0, 'o'], [1, 3, 3]] } },
+          { type: 'fret', instrument: 'guitar', notes: [[6, 0], [6, 3], [5, 0], [5, 2], [4, 0], [4, 2], [3, 0], [3, 2], [2, 0], [2, 3], [1, 0]], fingers: [0, 3, 0, 2, 0, 2, 0, 2, 0, 3, 0], text: 'Up: E G A B D E G A B D E.' },
+          { type: 'fret', instrument: 'guitar', notes: [[1, 0], [2, 3], [2, 0], [3, 2], [3, 0], [4, 2], [4, 0], [5, 2], [5, 0], [6, 3], [6, 0]], fingers: [0, 3, 0, 2, 0, 2, 0, 2, 0, 3, 0], text: 'And back down.' },
+        ],
+      },
+      {
+        id: 'g-major-scale',
+        title: 'The G major scale',
+        steps: [
+          { type: 'info', text: 'The G major scale in 2nd position: start with finger 2 on G (low E string, 3rd fret) and give each finger one fret, 2 to 5. Your hand stays still; only your fingers move.', fretboard: { instrument: 'guitar', dots: [[6, 3, 2], [6, 5, 4], [5, 2, 1], [5, 3, 2], [5, 5, 4], [4, 2, 1], [4, 4, 3], [4, 5, 4]] } },
+          { type: 'fret', instrument: 'guitar', notes: [[6, 3], [6, 5], [5, 2], [5, 3], [5, 5], [4, 2], [4, 4], [4, 5]], fingers: [2, 4, 1, 2, 4, 1, 3, 4], text: 'Up: G A B C D E F♯ G.' },
+          { type: 'fret', instrument: 'guitar', notes: [[4, 5], [4, 4], [4, 2], [5, 5], [5, 3], [5, 2], [6, 5], [6, 3]], fingers: [4, 3, 1, 4, 2, 1, 4, 2], text: 'And back down.' },
+        ],
+      },
+      {
+        id: 'g-pent-box',
+        title: 'The pentatonic box',
+        steps: [
+          { type: 'info', text: 'The most famous shape on guitar: A minor pentatonic at the 5th fret. Finger 1 plays fret 5 on every string; fingers 3 and 4 play frets 7 and 8. Learn it once and you can solo over any song in A minor or C major.', fretboard: { instrument: 'guitar', dots: [[6, 5, 1], [6, 8, 4], [5, 5, 1], [5, 7, 3], [4, 5, 1], [4, 7, 3], [3, 5, 1], [3, 7, 3], [2, 5, 1], [2, 8, 4], [1, 5, 1], [1, 8, 4]] } },
+          { type: 'fret', instrument: 'guitar', notes: [[6, 5], [6, 8], [5, 5], [5, 7], [4, 5], [4, 7], [3, 5], [3, 7], [2, 5], [2, 8], [1, 5]], fingers: [1, 4, 1, 3, 1, 3, 1, 3, 1, 4, 1], text: 'Up the box: A C D E G A C D E G A.' },
+          { type: 'fret', instrument: 'guitar', notes: [[1, 5], [2, 8], [2, 5], [3, 7], [3, 5], [4, 7], [4, 5], [5, 7], [5, 5], [6, 8], [6, 5]], fingers: [1, 4, 1, 3, 1, 3, 1, 3, 1, 4, 1], text: 'And down.' },
+        ],
+      },
+    ],
+  },
 
   // ---- Bass ----------------------------------------------------------------------
   // Strings: 1 = thinnest (G), 4 = thickest (low E). The microphone listens lower in
@@ -1112,6 +1217,33 @@ export const UNITS = [
           { type: 'info', text: 'The sound of gospel: the 2-5-1. In the key of C that\'s Dm7, G7, Cmaj7: roots D, G, C, falling by fifths. This vamp adds A7, F and Em7 too: A is the open A string, F the E string 1st fret, E the open E string.', fretboard: { instrument: 'bass', dots: [[3, 5, 'D'], [4, 3, 'G'], [3, 3, 'C']] } },
           { type: 'fret', instrument: 'bass', notes: [[3, 5], [4, 3], [3, 3]], fingers: [4, 2, 2], text: 'The 2-5-1 roots: D, G, C.' },
           { type: 'chart', match: 'root', instrument: 'bass', song: 'gospelvamp', bpm: 72, text: 'Play along: the gospel 2-5-1 vamp in C.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'bass-scales',
+    course: 'bass',
+    title: 'Arpeggios and pentatonics',
+    icon: '🎯',
+    lessons: [
+      {
+        id: 'b-arpeggios',
+        title: 'Major and minor arpeggios',
+        steps: [
+          { type: 'info', text: 'An arpeggio is a chord played one note at a time: root, 3rd, 5th, octave. It\'s the backbone of a bass line. G major: G (E string 3), B (A string 2), D (A string 5), G (D string 5).', fretboard: { instrument: 'bass', dots: [[4, 3, 'R'], [3, 2, '3'], [3, 5, '5'], [2, 5, '8']] } },
+          { type: 'fret', instrument: 'bass', notes: [[4, 3], [3, 2], [3, 5], [2, 5], [3, 5], [3, 2], [4, 3]], fingers: [2, 1, 4, 4, 4, 1, 2], text: 'G major arpeggio: up and back down.' },
+          { type: 'info', text: 'For minor, the 3rd moves down one fret. A minor at the 5th fret: A (E string 5), C (E string 8), E (A string 7), A (D string 7).', fretboard: { instrument: 'bass', dots: [[4, 5, 'R'], [4, 8, 'b3'], [3, 7, '5'], [2, 7, '8']] } },
+          { type: 'fret', instrument: 'bass', notes: [[4, 5], [4, 8], [3, 7], [2, 7], [3, 7], [4, 8], [4, 5]], fingers: [1, 4, 3, 3, 3, 4, 1], text: 'A minor arpeggio: up and back down.' },
+        ],
+      },
+      {
+        id: 'b-pent',
+        title: 'The minor pentatonic',
+        steps: [
+          { type: 'info', text: 'Five notes that fit almost any groove: A minor pentatonic at the 5th fret. Finger 1 on fret 5, then fingers 3 or 4. Gospel and funk bass fills live here.', fretboard: { instrument: 'bass', dots: [[4, 5, 1], [4, 8, 4], [3, 5, 1], [3, 7, 3], [2, 5, 1], [2, 7, 3]] } },
+          { type: 'fret', instrument: 'bass', notes: [[4, 5], [4, 8], [3, 5], [3, 7], [2, 5], [2, 7]], fingers: [1, 4, 1, 3, 1, 3], text: 'Up: A C D E G A.' },
+          { type: 'fret', instrument: 'bass', notes: [[2, 7], [2, 5], [3, 7], [3, 5], [4, 8], [4, 5]], fingers: [3, 1, 3, 1, 4, 1], text: 'And down.' },
         ],
       },
     ],

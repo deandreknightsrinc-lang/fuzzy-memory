@@ -105,3 +105,25 @@ test('quizzes: random but valid, never the same chord twice in a row', () => {
   assert.deepEqual(quizLesson('piano', 'Major chords', { rand: rng(3) }).steps, quizLesson('piano', 'Major chords', { rand: rng(3) }).steps, 'same seed, same quiz');
   assert.match(quizLesson('bass', 'Every note').title, /^Note quiz/);
 });
+
+test('the scale lessons teach exactly what the practice drills play', async () => {
+  const { ALL_LESSONS } = await import('../js/lessons.js');
+  const step = (id, i) => ALL_LESSONS.find((l) => l.id === id).steps[i];
+  const same = (id, i, pos) => {
+    assert.deepEqual(step(id, i).notes, pos.notes, `${id} step ${i}: notes`);
+    assert.deepEqual(step(id, i).fingers, pos.fingers, `${id} step ${i}: fingers`);
+  };
+  same('g-pent-open', 1, fretScale('guitar', 4, SCALES.pentMinor.ints, { octaves: 2 }));
+  same('g-major-scale', 1, fretScale('guitar', 7, SCALES.major.ints));
+  same('g-pent-box', 1, fretScale('guitar', 9, SCALES.pentMinor.ints, { octaves: 2 }));
+  same('b-pent', 1, fretScale('bass', 9, SCALES.pentMinor.ints));
+  same('b-scale', 1, fretScale('bass', 7, SCALES.major.ints));
+  for (const [id, root, scale] of [['p-scale-c', 0, 'major'], ['p-scale-g', 7, 'major'], ['p-scale-am', 9, 'minor']]) same(id, 1, pianoScale(root, scale));
+  same('p-scale-c-lh', 1, pianoScale(0, 'major', { hand: 'left' }));
+  const g = fretScale('bass', 7, CHORDS.maj.ints);
+  assert.deepEqual(step('b-arpeggios', 1).notes.slice(0, 4), g.notes, 'bass G major arpeggio');
+  const a = fretScale('bass', 9, CHORDS.min.ints);
+  assert.deepEqual(step('b-arpeggios', 3).notes.slice(0, 4), a.notes, 'bass A minor arpeggio');
+  for (const [id, i, chords] of [['p-major-minor', 1, [pianoChord(0, 'maj').notes, pianoChord(0, 'min').notes, pianoChord(7, 'maj').notes, pianoChord(7, 'min').notes]], ['p-inversions', 1, pianoChord(0, 'maj').inversions]])
+    assert.deepEqual(step(id, i).chords, chords, id);
+});
