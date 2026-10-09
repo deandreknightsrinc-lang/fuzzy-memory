@@ -172,6 +172,90 @@ export const VIDEO_SCRIPTS = {
     ],
   },
 
+  // ---- Drums: Colour and control -------------------------------------------------------
+  'd-openhat': {
+    teacher: BEAT,
+    scenes: [
+      { shot: 'Medium shot behind the kit, left foot visible on the hi-hat pedal.', say: 'What\'s up, drummers! Today we add some sizzle to the basic beat: the open hi-hat.' },
+      { shot: 'Close-up on the hi-hat as the foot lifts and the cymbals part.', say: 'Lift your left foot a little and the two cymbals come apart. Hit it now and you get a long "tssss" instead of a short "tick".', screen: 'Foot up = open "tssss"' },
+      { shot: 'Graphic: 1 & 2 & 3 & 4 &, the last "&" glowing.', say: 'We open it on the very last hit of the bar: the "and" of four. One and two and three and four AND.', screen: 'Open on the "and" of 4' },
+      { shot: 'Close-up on the foot pressing down exactly as the next bar starts.', say: 'Then press your foot down right on the next one to close it. Open on the "and", closed on one. Tick, tick, tick, tsss, CLOSE.', screen: 'Close it on the next 1' },
+      { shot: 'Medium shot, full groove at tempo.', say: 'Listen to that. Same basic beat, but now it breathes at the end of every bar. Locked in! That\'s the pocket!' },
+      { shot: 'Medium shot.', say: 'Learn it with the app, then play it in time. Practice slow, play it clean, and I\'ll catch you on the next beat.' },
+    ],
+  },
+  'd-ride': {
+    teacher: BEAT,
+    scenes: [
+      { shot: 'Medium shot, stick tapping the ride cymbal on the right.', say: 'What\'s up, drummers! How do you make a chorus feel bigger without playing louder? Move to the ride.' },
+      { shot: 'Close-up on the ride cymbal, playing eighths: ding, ding.', say: 'This is the ride cymbal, on your right. Same eighth notes your hand plays on the hi-hat, but it rings wide: ding, ding, ding, ding.', screen: 'RIDE: same 8ths, bigger sound' },
+      { shot: 'Wide shot: a bar on the hi-hat, then crash and over to the ride.', say: 'Verse on the hi-hat. Then the chorus comes: crash on one, and your right hand stays out on the ride. Kick and snare don\'t change at all.', screen: 'Verse: hi-hat · Chorus: crash → ride' },
+      { shot: 'Close-up on the right arm travelling from crash to ride.', say: 'The crash and the ride are close together, so it\'s a short trip. Crash, and land on the ride for the "and".' },
+      { shot: 'Medium shot.', say: 'Learn the ride beat, then play a verse bar and a chorus bar. Practice slow, play it clean, and I\'ll catch you on the next beat.' },
+    ],
+  },
+  'd-16ths': {
+    teacher: BEAT,
+    scenes: [
+      { shot: 'Medium shot, slow tempo, relaxed.', say: 'What\'s up, drummers! Slow song, but you want it to feel alive? Sixteenth notes on the hi-hat.' },
+      { shot: 'Graphic: 1 e & a 2 e & a 3 e & a 4 e & a.', say: 'Four hi-hats on every beat. Count it: one-e-and-a, two-e-and-a, three-e-and-a, four-e-and-a. Sixteen per bar.', screen: '1 e & a · 2 e & a · 3 e & a · 4 e & a' },
+      { shot: 'Close-up, right hand alone on the hi-hat, light and even.', say: 'At slow tempos one hand does it. Keep it light: small motions, stick close to the cymbal. Even, like rain.' },
+      { shot: 'Medium shot, adding kick on 1 and 3, snare on 2 and 4.', say: 'Kick on one and three, snare on two and four, same as always. The hi-hat just got busier.', screen: 'Kick 1 & 3 · Snare 2 & 4' },
+      { shot: 'Medium shot.', say: 'Slow first: the app starts you at fifty. Even beats fast. Practice slow, play it clean, and I\'ll catch you on the next beat.' },
+    ],
+  },
+  'd-accents': {
+    teacher: BEAT,
+    scenes: [
+      { shot: 'Medium shot, sticks over the snare.', say: 'What\'s up, drummers! Today we learn to talk with the sticks. Loud and soft. It\'s called an accent.' },
+      { shot: 'Close-up: one stick raised high, the other low near the head.', say: 'An accent is one note louder than the rest. The secret is height, not muscle. Loud note: stick starts high. Soft note: stick starts low, just a couple of inches.', screen: 'Loud = stick high · Soft = stick low' },
+      { shot: 'Overhead: sixteenths R L R L on the snare, accents on each beat.', say: 'Sixteenths on the snare, right left right left, and an accent on every beat. ONE-e-and-a, TWO-e-and-a. Loud, soft, soft, soft.', screen: 'ONE e & a · TWO e & a' },
+      { shot: 'Close-up, slow motion: after the accent the stick stops low.', say: 'After the loud note, stop the stick low, ready for the soft ones. Down-stroke, then taps.' },
+      { shot: 'Medium shot.', say: 'The app checks your timing; your ears check the accents. Practice slow, play it clean, and I\'ll catch you on the next beat.' },
+    ],
+  },
+
+  // ---- Drums: More church drumming -----------------------------------------------------
+  'd-68': {
+    teacher: BEAT,
+    scenes: [
+      { shot: 'Medium shot, soft warm lights, slow sway.', say: 'What\'s up, drummers! The altar call, the slow worship song that makes everybody close their eyes. A lot of those are in six-eight.' },
+      { shot: 'Graphic: 1 2 3 4 5 6, with 1 and 4 big.', say: 'Count six: one, two, three, four, five, six. But feel it in two big beats: ONE two three, FOUR five six. Like a slow rocking.', screen: '6/8: 1 2 3 4 5 6 · felt on 1 and 4' },
+      { shot: 'Close-up: hi-hat on all six, kick on 1, snare on 4.', say: 'Hi-hat on all six. Kick on one. Snare on four. Boom, tick, tick, crack, tick, tick.', screen: 'Hi-hat ×6 · Kick 1 · Snare 4' },
+      { shot: 'Medium shot, eyes closed, playing gently.', say: 'The click only pulses on one and four, the big beats. Let it breathe. Don\'t fill every space.' },
+      { shot: 'Medium shot.', say: 'Learn it, then play it in time. Practice slow, play it clean, and I\'ll catch you on the next beat.' },
+    ],
+  },
+  'd-stops': {
+    teacher: BEAT,
+    scenes: [
+      { shot: 'Medium shot, finger to lips.', say: 'What\'s up, drummers! Here\'s something they don\'t tell beginners: what you don\'t play matters as much as what you do. Today: hits and stops.' },
+      { shot: 'Wide shot: the band (graphic) hitting together, then silence.', say: 'A hit is when the whole band plays the same notes together, then stops. Your job: kick and crash on the hits, and leave the silence empty.', screen: 'Hits: everyone together · then silence' },
+      { shot: 'Graphic: 1 & 2 &, hits on 1 and the "&" of 2.', say: 'Our hits are on one and on the "and" of two. Crash-kick, ... crash-kick. Then nothing till the next bar.', screen: 'Hits on 1 and the "and" of 2' },
+      { shot: 'Medium shot, nodding silently through the rest.', say: 'Count through the silence in your head: three and four and. Don\'t rush back in. The space is the exciting part.' },
+      { shot: 'Medium shot.', say: 'A bar of beat, then the hits. Practice slow, play it clean, and I\'ll catch you on the next beat.' },
+    ],
+  },
+  'd-song-saints': {
+    teacher: BEAT,
+    scenes: [
+      { shot: 'Medium shot, big grin.', say: 'What\'s up, drummers! Time for a happy one. When the Saints Go Marching In.' },
+      { shot: 'Over-the-shoulder on the app, the drum highway scrolling.', say: 'It\'s bright and it bounces. You\'re playing the drum part from start to finish, and the song waits for every hit, so learn it at your own speed.' },
+      { shot: 'Medium shot, playing along.', say: 'Listen for the big moments and lean in with the crash. Smile while you play this one. It\'s a celebration.', screen: 'Bright · steady · celebrate' },
+      { shot: 'Medium shot.', say: 'When you\'ve got it, take it to Stage and speed it up. Practice slow, play it clean, and I\'ll catch you on the next beat.' },
+    ],
+  },
+  'd-song-praise': {
+    teacher: BEAT,
+    scenes: [
+      { shot: 'Medium shot, lights flashing orange, high energy.', say: 'What\'s up, drummers! This is it. Shout music. The Praise Break.' },
+      { shot: 'Close-up on the kick foot, four on the floor.', say: 'Remember the two-step? Kick on every beat, snare on two and four, hats in eighths. Now it goes full speed: about a hundred thirty beats a minute in church.', screen: 'Two-step at full energy' },
+      { shot: 'Over-the-shoulder on the app.', say: 'Here the song waits for you, so learn every hit slowly first. Fast comes from slow, every single time.' },
+      { shot: 'Medium shot, wiping forehead and laughing.', say: 'Stay relaxed. Tight arms get tired, loose arms keep going. Locked in! That\'s the pocket!' },
+      { shot: 'Medium shot.', say: 'Then take it to Stage and go for the crowns. Practice slow, play it clean, and I\'ll catch you on the next beat.' },
+    ],
+  },
+
   // ---- Bass: Getting started ---------------------------------------------------------
   'b-tune': {
     teacher: JORDAN,
@@ -257,6 +341,80 @@ export const VIDEO_SCRIPTS = {
       { shot: 'Close-up on G, C and D on the fretboard.', say: 'The chords are G, C and D. You know these: G on the E string, C and D on the A string.' },
       { shot: 'Medium shot, playing long notes with the song.', say: 'Fewer notes, more feeling. Let each note fill the room.' },
       { shot: 'Medium close-up.', say: 'Sweet, that rang out clean! Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+
+  // ---- Bass: Rhythm and feel -----------------------------------------------------------
+  'b-eighths': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, nodding to an upbeat click.', say: 'Hey friend, grab your bass, let\'s play something good. Want to push a song forward? Eighth notes.' },
+      { shot: 'Graphic: 1 & 2 & 3 & 4 &, a root on each.', say: 'Instead of four notes a bar, play eight. Count: one and two and three and four and. A root on every count.', screen: '8 per bar: 1 & 2 & 3 & 4 &' },
+      { shot: 'Extreme close-up: index and middle fingers alternating fast and even.', say: 'This is where alternating fingers really pays off. Index, middle, index, middle. Never the same finger twice.' },
+      { shot: 'Medium shot, playing four on G then four on C.', say: 'Four on G, four on C. Every note the same volume. That steady drive is what makes an upbeat chorus lift.' },
+      { shot: 'Medium close-up.', say: 'Then play along with the click: G, C and D. Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'b-octave': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up.', say: 'Hey friend, grab your bass, let\'s play something good. Today: the bounciest shape on the bass. Root and octave.' },
+      { shot: 'Fretboard graphic: G on the E string fret 3, octave on the D string fret 5.', say: 'The octave is the same note, just higher. Here\'s the shape: two strings up, two frets up. G on the E string, third fret. Octave G on the D string, fifth fret.', screen: 'Octave = 2 strings up, 2 frets up' },
+      { shot: 'Close-up on the left hand: index on the root, ring finger on the octave.', say: 'Index finger on the root, ring finger on the octave. Root on one, octave on three. G, G, G, G.', screen: 'Root on 1 · octave on 3' },
+      { shot: 'Close-up: the shape moved to C on the A string.', say: 'Same shape for C: A string third fret, and its octave on the G string, fifth fret. Move the shape, keep the bounce.' },
+      { shot: 'Medium close-up.', say: 'That\'s the sound of disco and a lot of gospel. Sweet, that rang out clean! Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'b-scale': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up.', say: 'Hey friend, grab your bass, let\'s play something good. Today you get every note of a key in one spot: the G major scale.' },
+      { shot: 'Fretboard graphic: the eight notes of G major lit up.', say: 'G, A, B, C, D, E, F sharp, G. And here\'s the magic: your hand never moves. Start with your middle finger on G, E string, third fret. One finger per fret.', screen: 'G A B C D E F# G' },
+      { shot: 'Close-up, playing up the scale slowly, naming each note.', say: 'G, A on the same string. B, C, D on the A string. E, F sharp, G on the D string. Up the scale.' },
+      { shot: 'Close-up, playing back down.', say: 'And back down: G, F sharp, E, D, C, B, A, G. Slow and clean.' },
+      { shot: 'Medium close-up.', say: 'Every bass line in G is made from these notes. Learn the shape and you own the key. Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'b-approach': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, smiling.', say: 'Hey friend, grab your bass, let\'s play something good. Today your bass lines learn to walk.' },
+      { shot: 'Graphic: G root, then G A B, arrow to C.', say: 'Instead of jumping from G straight to C, walk there through the scale. G, A, B, then C, right on beat one of the new chord.', screen: 'Walk up: G A B → C' },
+      { shot: 'Close-up on the fretboard, walking up then down.', say: 'Walk up: G, A, B, C. And walk back down from C: C, B, A, G. Open A string in the middle there, nice and easy.', screen: 'Walk down: C B A → G' },
+      { shot: 'Medium shot, playing with a click: root on 1, walk on 2 3 4.', say: 'In a song, play the root on one, then walk on two, three and four. You land on the next root exactly when the chord changes.' },
+      { shot: 'Medium close-up.', say: 'That\'s how a bass line tells the band where the song is going. Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+
+  // ---- Bass: Church bass --------------------------------------------------------------
+  'b-68walk': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, soft lamp light.', say: 'Hey friend, grab your bass, let\'s play something good. Slow worship song tonight, and a secret weapon: the slash chord.' },
+      { shot: 'Graphic: A/C# with "A" over "C#".', say: 'When you see A slash C sharp, the band plays an A chord, but you play C sharp. The note after the slash is yours.', screen: 'A/C#: band plays A · bass plays C#' },
+      { shot: 'Close-up on the A string: frets 5, 4, 2.', say: 'Why? Because it makes the bass walk down smoothly. D, C sharp, B. A string, frets five, four, two. Listen how it falls.', screen: 'D → C# → B' },
+      { shot: 'Medium shot, playing long notes, swaying in 6/8.', say: 'This song is in six-eight. One note per bar, and let it ring through the whole bar. Fewer notes, more feeling.' },
+      { shot: 'Medium close-up.', say: 'Follow the chart, play the note after the slash. Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'b-saints': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, upbeat.', say: 'Hey friend, grab your bass, let\'s play something good. A happy one: When the Saints Go Marching In.' },
+      { shot: 'Fretboard graphic: C, G and F marked.', say: 'Three roots. C, on the A string, third fret. G, on the E string, third fret. And a new one: F, on the E string, first fret.', screen: 'C: A str 3 · G: E str 3 · F: E str 1' },
+      { shot: 'Close-up on the chart: C7 highlighted.', say: 'You\'ll see C7 in there. Seven or not, the root is still C. Just play C.', screen: 'C7 → still play C' },
+      { shot: 'Medium shot, playing along and grinning.', say: 'When the song moves to F, that\'s the big moment. Dig in a little. Sweet, that rang out clean!' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'b-251': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, leaning in.', say: 'Hey friend, grab your bass, let\'s play something good. Today you learn the sound of gospel: the two-five-one.' },
+      { shot: 'Graphic: Dm7 → G7 → Cmaj7, with roots D, G, C.', say: 'In the key of C, the two chord is D minor seven, the five is G seven, the one is C major seven. Your roots: D, G, C. Each one falls a fifth to the next.', screen: '2-5-1 in C: D → G → C' },
+      { shot: 'Close-up on the fretboard: D (A5), G (E3), C (A3).', say: 'D on the A string, fifth fret. G on the E string, third fret. C on the A string, third fret. Feel how it pulls home to C.' },
+      { shot: 'Fretboard graphic: A, F and E marked.', say: 'The vamp adds a few more: A seven, that\'s the open A string. F, on the E string, first fret. And E minor seven, the open E.', screen: 'A: open · F: E str 1 · E: open' },
+      { shot: 'Medium shot, playing along.', say: 'Play the roots with the click. Once it feels good, that two-five-one will be everywhere you listen. Keep those fingertips tough, and I\'ll see you next time.' },
     ],
   },
 };

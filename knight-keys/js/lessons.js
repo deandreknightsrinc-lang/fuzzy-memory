@@ -24,7 +24,7 @@
 
 // Note numbers: middle C = 60. Fingers: 1 thumb, 2 index, 3 middle, 4 ring, 5 pinky.
 const C4 = 60, D4 = 62, E4 = 64, F4 = 65, G4 = 67, A4 = 69, B4 = 71, B3 = 59;
-import { writeMidi } from './midi-file.js';
+import { writeMidi, clickBeats } from './midi-file.js';
 
 const C3 = 48, D3 = 50, E3 = 52, F3 = 53, G3 = 55, A3 = 57, C5 = 72;
 
@@ -625,6 +625,78 @@ export const UNITS = [
       { id: 'd-song-amazing', title: 'Drums for a song: Amazing Grace', steps: [{ type: 'song', song: 'amazing', part: '9', text: 'The hymn waltz in a real song: 3/4, soft and steady.' }] },
     ],
   },
+  {
+    id: 'drums-color',
+    course: 'drums',
+    title: 'Colour and control',
+    icon: '🎨',
+    lessons: [
+      {
+        id: 'd-openhat',
+        title: 'Open hi-hat',
+        steps: [
+          { type: 'info', text: 'Lift your left foot a little and the two hi-hat cymbals open: a longer "tssss". Open it for the "and" of 4, the last hit of the bar, then press your foot down again right on the next 1 to close it.' },
+          { type: 'groove', mode: 'learn', bpm: 60, bars: [{ steps: 8, hh: 'xxxxxxx.', ho: '.......x', kk: 'x...x...', sn: '..x...x.' }], repeat: 2, text: 'The basic beat with an open hi-hat on the "and" of 4.' },
+          { type: 'groove', mode: 'time', bpm: 66, bars: [{ steps: 8, hh: 'xxxxxxx.', ho: '.......x', kk: 'x...x...', sn: '..x...x.' }], repeat: 4, text: 'In time: open on the "and" of 4, closed on 1.' },
+        ],
+      },
+      {
+        id: 'd-ride',
+        title: 'Ride for the chorus',
+        steps: [
+          { type: 'info', text: 'Verses are often on the hi-hat; the chorus moves to the ride cymbal on your right for a bigger, wider sound. Same beat, your right hand just changes cymbals. Start the chorus with a crash on 1.' },
+          { type: 'groove', mode: 'learn', bpm: 66, bars: [{ steps: 8, rd: 'xxxxxxxx', kk: 'x...x...', sn: '..x...x.' }], repeat: 2, text: 'The basic beat on the ride.' },
+          { type: 'groove', mode: 'time', bpm: 66, bars: [{ steps: 8, hh: 'xxxxxxxx', kk: 'x...x...', sn: '..x...x.' }, { steps: 8, cr: 'x.......', rd: '.xxxxxxx', kk: 'x...x...', sn: '..x...x.' }], repeat: 2, text: 'A bar on the hi-hat (verse), then crash into the ride (chorus).' },
+        ],
+      },
+      {
+        id: 'd-16ths',
+        title: 'Sixteenth-note hi-hats',
+        steps: [
+          { type: 'info', text: 'Sixteenths: four hi-hats per beat. Count "1 e and a, 2 e and a". At slow tempos play them with your right hand; snare on 2 and 4, kick on 1 and 3. It makes a slow song feel busy and alive.' },
+          { type: 'groove', mode: 'learn', bpm: 50, bars: [{ steps: 16, hh: 'xxxxxxxxxxxxxxxx', kk: 'x.......x.......', sn: '....x.......x...' }], repeat: 2, text: 'Learn it slowly: 16 hi-hats per bar.' },
+          { type: 'groove', mode: 'time', bpm: 56, bars: [{ steps: 16, hh: 'xxxxxxxxxxxxxxxx', kk: 'x.......x.......', sn: '....x.......x...' }], repeat: 4, text: 'In time. Keep the hi-hats even and light.' },
+        ],
+      },
+      {
+        id: 'd-accents',
+        title: 'Accents',
+        steps: [
+          { type: 'info', text: 'An accent is one note played louder than the rest. Sixteenths on the snare, R L R L, with an accent on every beat: the "1", "2", "3" and "4" are loud (stick starts high), the "e and a" are soft (stick starts low).' },
+          { type: 'groove', mode: 'learn', bpm: 56, bars: [{ steps: 16, sn: 'XxxxXxxxXxxxXxxx' }], repeat: 2, text: 'Learn it: loud, soft, soft, soft. The app checks your timing; your ears check the accents.' },
+          { type: 'groove', mode: 'time', bpm: 62, bars: [{ steps: 16, sn: 'XxxxXxxxXxxxXxxx' }], repeat: 4, text: 'In time with the click.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'drums-church2',
+    course: 'drums',
+    title: 'More church drumming',
+    icon: '🙌',
+    lessons: [
+      {
+        id: 'd-68',
+        title: 'The 6/8 worship ballad',
+        steps: [
+          { type: 'info', text: 'Many slow worship songs and altar calls are in 6/8: count "1 2 3 4 5 6", felt in two big beats (1 and 4). Hi-hat on all six, kick on 1, snare on 4. Let it breathe.' },
+          { type: 'groove', mode: 'learn', bpm: 60, time: [6, 8], bars: [{ steps: 6, hh: 'xxxxxx', kk: 'x.....', sn: '...x..' }], repeat: 2, text: 'Learn the 6/8 groove.' },
+          { type: 'groove', mode: 'time', bpm: 66, time: [6, 8], bars: [{ steps: 6, hh: 'xxxxxx', kk: 'x.....', sn: '...x..' }], repeat: 4, text: 'In time: the click pulses on 1 and 4.' },
+        ],
+      },
+      {
+        id: 'd-stops',
+        title: 'Hits and stops',
+        steps: [
+          { type: 'info', text: 'Bands love "hits": everyone plays the same notes together, then stops. You play kick and crash on the hits and leave the silence empty. Here: 1 and the "and" of 2, then nothing until the next bar.' },
+          { type: 'groove', mode: 'learn', bpm: 60, bars: [{ steps: 8, hh: 'xxxxxxxx', kk: 'x...x...', sn: '..x...x.' }, { steps: 8, cr: 'x..x....', kk: 'x..x....' }], repeat: 1, text: 'A bar of beat, then the two hits.' },
+          { type: 'groove', mode: 'time', bpm: 66, bars: [{ steps: 8, hh: 'xxxxxxxx', kk: 'x...x...', sn: '..x...x.' }, { steps: 8, cr: 'x..x....', kk: 'x..x....' }], repeat: 3, text: 'In time. Count through the silence: don\'t rush back in.' },
+        ],
+      },
+      { id: 'd-song-saints', title: 'Drums for a song: When the Saints', steps: [{ type: 'song', song: 'saints', part: '9', text: 'A bright, happy church song. It waits for every hit; then speed it up on Stage.' }] },
+      { id: 'd-song-praise', title: 'Drums for a song: Praise Break', steps: [{ type: 'song', song: 'praisebreak', part: '9', text: 'The shout music: the two-step at full energy. Learn it here at your own speed, then take it to Stage.' }] },
+    ],
+  },
 
   // ---- Guitar ------------------------------------------------------------------
   // The microphone hears single notes and strummed chords (acoustic guitar, or an
@@ -834,6 +906,85 @@ export const UNITS = [
       { id: 'b-amazing', title: 'Play along: Amazing Grace', steps: [{ type: 'chart', match: 'root', instrument: 'bass', song: 'amazing', bpm: 70, text: 'One root per bar on beat 1, let it ring: G, C, D in 3/4.' }] },
     ],
   },
+  {
+    id: 'bass-feel',
+    course: 'bass',
+    title: 'Rhythm and feel',
+    icon: '🎵',
+    lessons: [
+      {
+        id: 'b-eighths',
+        title: 'Driving eighth notes',
+        steps: [
+          { type: 'info', text: 'Eight notes per bar instead of four: count "1 and 2 and 3 and 4 and" and play the root on every count. Index, middle, index, middle. It pushes a song forward, great for upbeat choruses.' },
+          { type: 'fret', instrument: 'bass', notes: [[4, 3], [4, 3], [4, 3], [4, 3], [3, 3], [3, 3], [3, 3], [3, 3]], fingers: [2, 2, 2, 2, 2, 2, 2, 2], text: 'Four on G, four on C. Even and steady.' },
+          { type: 'chart', match: 'root', instrument: 'bass', chords: ['G', 'G', 'C', 'C', 'G', 'G', 'D', 'G'], beats: 4, bpm: 72, text: 'Eight roots per bar with the click: G, C, D.' },
+        ],
+      },
+      {
+        id: 'b-octave',
+        title: 'Root and octave',
+        steps: [
+          { type: 'info', text: 'The octave is the same note, higher: two strings up and two frets up. G on the E string (3rd fret), its octave on the D string (5th fret). Root on 1, octave on 3: the classic disco and gospel bounce.', fretboard: { instrument: 'bass', dots: [[4, 3, 'R'], [2, 5, '8']] } },
+          { type: 'fret', instrument: 'bass', notes: [[4, 3], [2, 5], [4, 3], [2, 5], [3, 3], [1, 5], [3, 3], [1, 5]], fingers: [1, 3, 1, 3, 1, 3, 1, 3], text: 'G and its octave, then C and its octave.' },
+          { type: 'chart', match: 'root', instrument: 'bass', chords: ['G', 'C', 'G', 'D', 'G', 'C', 'D', 'G'], beats: 4, bpm: 66, text: 'Root on 1, octave on 3, with the click.' },
+        ],
+      },
+      {
+        id: 'b-scale',
+        title: 'The G major scale',
+        steps: [
+          { type: 'info', text: 'Every note of the key of G, in one hand position: G A B C D E F# G. Start with your middle finger on G (E string, 3rd fret); one finger per fret, and your hand never moves.', fretboard: { instrument: 'bass', dots: [[4, 3, 2], [4, 5, 4], [3, 2, 1], [3, 3, 2], [3, 5, 4], [2, 2, 1], [2, 4, 3], [2, 5, 4]] } },
+          { type: 'fret', instrument: 'bass', notes: [[4, 3], [4, 5], [3, 2], [3, 3], [3, 5], [2, 2], [2, 4], [2, 5]], fingers: [2, 4, 1, 2, 4, 1, 3, 4], text: 'Up the scale: G A B C D E F# G.' },
+          { type: 'fret', instrument: 'bass', notes: [[2, 5], [2, 4], [2, 2], [3, 5], [3, 3], [3, 2], [4, 5], [4, 3]], fingers: [4, 3, 1, 4, 2, 1, 4, 2], text: 'And back down: G F# E D C B A G.' },
+        ],
+      },
+      {
+        id: 'b-approach',
+        title: 'Walking to the next chord',
+        steps: [
+          { type: 'info', text: 'Instead of jumping to the next root, walk to it through the scale. From G to C: G, A, B, then C right on the new chord. From C back to G: C, B, A, G. Play the walk on beats 2, 3 and 4.' },
+          { type: 'fret', instrument: 'bass', notes: [[4, 3], [4, 5], [3, 2], [3, 3]], fingers: [2, 4, 1, 2], text: 'Walk up: G A B C.' },
+          { type: 'fret', instrument: 'bass', notes: [[3, 3], [3, 2], [3, 0], [4, 3]], fingers: [2, 1, 0, 2], text: 'Walk down: C B A G.' },
+          { type: 'chart', match: 'root', instrument: 'bass', chords: ['G', 'C', 'G', 'C', 'G', 'C', 'G', 'G'], beats: 4, bpm: 66, text: 'Land on each root on beat 1; walk on 2, 3, 4.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'bass-church',
+    course: 'bass',
+    title: 'Church bass',
+    icon: '⛪',
+    lessons: [
+      {
+        id: 'b-68walk',
+        title: 'Walking down: the 6/8 ballad',
+        steps: [
+          { type: 'info', text: 'A chord like A/C# ("A over C sharp") means: the band plays A, you play C#. Slash chords make the bass walk smoothly: D, C#, B is a walk down on the A string (frets 5, 4, 2). This song is in 6/8: one note per bar, let it ring.' },
+          { type: 'fret', instrument: 'bass', notes: [[3, 5], [3, 4], [3, 2]], fingers: [4, 3, 1], text: 'The walk down: D, C#, B.' },
+          { type: 'chart', match: 'root', instrument: 'bass', song: 'ballad68', bpm: 60, text: 'Play along: the 6/8 worship ballad in D. Follow the bass notes of the slash chords.' },
+        ],
+      },
+      {
+        id: 'b-saints',
+        title: 'Play along: When the Saints',
+        steps: [
+          { type: 'info', text: 'C, G and F. You know C (A string, 3rd fret) and G (E string, 3rd fret). F is the E string, 1st fret. The F part is the big moment of the song: dig in.', fretboard: { instrument: 'bass', dots: [[3, 3, 'C'], [4, 3, 'G'], [4, 1, 'F']] } },
+          { type: 'chart', match: 'root', instrument: 'bass', song: 'saints', bpm: 96, text: 'Roots with the click: C, G, C7 (still C), F.' },
+        ],
+      },
+      {
+        id: 'b-251',
+        title: 'The gospel 2-5-1',
+        steps: [
+          { type: 'info', text: 'The sound of gospel: the 2-5-1. In the key of C that\'s Dm7, G7, Cmaj7: roots D, G, C, falling by fifths. This vamp adds A7, F and Em7 too: A is the open A string, F the E string 1st fret, E the open E string.', fretboard: { instrument: 'bass', dots: [[3, 5, 'D'], [4, 3, 'G'], [3, 3, 'C']] } },
+          { type: 'fret', instrument: 'bass', notes: [[3, 5], [4, 3], [3, 3]], fingers: [4, 2, 2], text: 'The 2-5-1 roots: D, G, C.' },
+          { type: 'chart', match: 'root', instrument: 'bass', song: 'gospelvamp', bpm: 72, text: 'Play along: the gospel 2-5-1 vamp in C.' },
+        ],
+      },
+    ],
+  },
 ];
 
 for (const u of UNITS) u.course ??= 'piano';
@@ -929,11 +1080,12 @@ export function grooveMidi(step, name = 'Drum lesson') {
   const add = (beat, bytes) => ev.push({ time: beat * spb, bytes });
   add(0, [0xff, 0x58, 0x04, num, Math.log2(den), 0x18, 0x08]);
   add(0, [0xc0, 115]); // woodblock click
-  for (let b = 0; b < (bars + 1) * beatsPerBar; b++) {
-    const accent = b % beatsPerBar === 0;
-    add(b, [0x90, accent ? 84 : 79, accent ? 100 : 70]);
-    add(b + 0.1, [0x80, accent ? 84 : 79, 0]);
-  }
+  for (let bar = 0; bar <= bars; bar++)
+    for (const c of clickBeats([num, den])) {
+      const accent = c === 0;
+      add(bar * beatsPerBar + c, [0x90, accent ? 84 : 79, accent ? 100 : 70]);
+      add(bar * beatsPerBar + c + 0.1, [0x80, accent ? 84 : 79, 0]);
+    }
   for (const h of hits) {
     add(beatsPerBar + h.beat, [0x99, h.note, h.vel]);
     add(beatsPerBar + h.beat + 0.1, [0x89, h.note, 0]);

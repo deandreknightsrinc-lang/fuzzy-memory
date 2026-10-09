@@ -355,3 +355,19 @@ test('silence, noise and a single note are not a chord', () => {
   assert.ok(!chromaMatches(one, 0, '', null, chordTarget('C').notes), 'one G string is not a C chord');
   assert.ok(!chromaMatches(one, 4, 'm', null, chordTarget('Em').notes), 'or an Em chord');
 });
+
+test('the click follows the time signature: 6/8 pulses on 1 and 4', async () => {
+  const { clickBeats, parseMidi } = await import('../js/midi-file.js');
+  assert.deepEqual(clickBeats([4, 4]), [0, 1, 2, 3]);
+  assert.deepEqual(clickBeats([3, 4]), [0, 1, 2]);
+  assert.deepEqual(clickBeats([6, 8]), [0, 1.5], '6/8: two dotted-quarter beats');
+  assert.deepEqual(clickBeats([12, 8]), [0, 1.5, 3, 4.5]);
+  const step = ALL_LESSONS.find((l) => l.id === 'd-68').steps.find((s) => s.type === 'groove');
+  const { bytes, countIn } = grooveMidi(step, '6/8');
+  assert.ok(Math.abs(countIn - (3 * 60) / step.bpm) < 1e-9, 'count-in is one 6/8 bar');
+  const { division, tracks } = parseMidi(bytes);
+  const clicks = tracks.flat().filter((e) => e.kind === 'ch' && e.type === 0x90 && e.ch === 0 && e.d2 > 0);
+  assert.equal(clicks.length, (step.repeat + 1) * 2, 'two clicks per bar, count-in included');
+  assert.deepEqual(clicks.slice(0, 4).map((e) => e.tick / division), [0, 1.5, 3, 4.5], 'on beats 1 and 4 (dotted quarters)');
+  assert.deepEqual(clicks.slice(0, 2).map((e) => e.d1), [84, 79], 'accent on 1');
+});
