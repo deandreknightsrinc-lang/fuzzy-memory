@@ -350,7 +350,8 @@ void SoundEngine::routeToEngines (const Command& c, int offset)
 
 void SoundEngine::routeHostMessage (const juce::MidiMessage& m, int offset)
 {
-    if (m.getChannel() == 10)
+    const bool isDrum = m.getChannel() == 10 || (hostDrumsEverywhere.load() && m.isNoteOnOrOff());
+    if (isDrum)
     {
         if (m.isNoteOn())
             drums.trigger (m.getNoteNumber(), m.getVelocity(), uiGains[(size_t) ui::groove].load(), offset);
@@ -361,12 +362,14 @@ void SoundEngine::routeHostMessage (const juce::MidiMessage& m, int offset)
     }
 
     // Tell the interface (notes, pedals, wheels) so it can light up and run learn mode.
+    // Drum notes go on channel 10, where the interface expects them.
     if (m.isNoteOnOrOff() || m.isController() || m.isPitchWheel())
     {
         const auto* raw = m.getRawData();
+        const auto status = isDrum ? (juce::uint8) ((raw[0] & 0xf0) | 9) : raw[0];
         const auto scope = hostFifo.write (1);
         if (scope.blockSize1 > 0)
-            hostSlots[(size_t) scope.startIndex1] = { raw[0], raw[1], (juce::uint8) (m.getRawDataSize() > 2 ? raw[2] : 0) };
+            hostSlots[(size_t) scope.startIndex1] = { status, raw[1], (juce::uint8) (m.getRawDataSize() > 2 ? raw[2] : 0) };
     }
 }
 

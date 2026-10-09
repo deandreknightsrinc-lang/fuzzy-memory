@@ -67,14 +67,16 @@ export function chordShape(symbol) {
 /** The notes a shape sounds (low to high). */
 export const shapeNotes = (shape) => shape.frets.map((f, i) => (f < 0 ? null : fretNote('guitar', 6 - i, f))).filter((n) => n !== null);
 
-/** Root (pitch class) and major/minor of a chord symbol, as the chord detector hears it. */
+/** Root (pitch class), major/minor and notes of a chord symbol, as the chord detector hears it. */
 export function chordTarget(symbol) {
   const c = parseChordSymbol(symbol);
   const minor = c.intervals.includes(3) && !c.intervals.includes(4);
   // Suspended chords have no third: the 4th (or 2nd) takes its place.
   const sus = !c.intervals.includes(3) && !c.intervals.includes(4) ? (c.intervals.includes(5) ? 5 : c.intervals.includes(2) ? 2 : 0) : 0;
   const middle = sus || (minor ? 3 : 4);
-  return { root: c.root, bass: c.bass ?? c.root, quality: minor ? 'm' : '', sus: !!sus, pcs: [c.root, (c.root + middle) % 12, (c.root + 7) % 12] };
+  // notes: every pitch class of the chord (root first), so E7 is heard as E7, not just E.
+  const notes = [...new Set(c.intervals.map((i) => (c.root + i) % 12))];
+  return { root: c.root, bass: c.bass ?? c.root, quality: minor ? 'm' : '', sus: !!sus, pcs: [c.root, (c.root + middle) % 12, (c.root + 7) % 12], notes };
 }
 
 /** Where to play a pitch class low on the neck: [string, fret] (bass: E then A string, frets 0-5). */

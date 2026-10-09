@@ -19,6 +19,7 @@ public:
 private:
     void timerCallback() override;
     void sendTransport();
+    void sendListening();
     void saveFile (const juce::var& request);
     juce::WebBrowserComponent::Options makeOptions();
 
@@ -29,6 +30,8 @@ private:
     std::vector<knightlyfe::SoundEngine::HostMessage> hostMessages;
     knightlyfe::SoundEngine::HostPosition lastTransport;
     int idleTransportTicks = 0;
+    knightlyfe::AudioListener::Result heard;
+    int listenTick = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KnightLyfeEditor)
 };

@@ -840,3 +840,48 @@ dialog.puppet-window { width: min(640px, calc(100vw - 24px)); left: 16px; top: 7
 .kit-route-name:hover { color: #ff7a45; }
 .kit-route select { min-width: 0; width: 100%; font-size: 12px; }
 .kit-route-sum { margin-top: 6px; opacity: .8; }
+
+/* Home: one screen per instrument */
+#btnHome.home-btn { background: linear-gradient(135deg, #73d13d, #36cfc9); border-color: transparent; color: #fff; font-weight: 600; }
+dialog.home-window { width: min(900px, calc(100vw - 24px)); left: max(12px, calc(50% - 450px)); top: 56px; max-height: calc(100vh - 70px); }
+.home-window .tool-head { display: flex; align-items: center; gap: 10px; }
+.home-window .tool-head h2 { margin: 0; flex: 1; }
+.home-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.home-tab { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 92px; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); }
+.home-tab .ht-icon { font-size: 26px; line-height: 1.1; }
+.home-tab .ht-meta { font-size: 11px; color: var(--muted); }
+.home-tab.on { border-color: var(--accent); background: linear-gradient(160deg, #24365a, #181a22); }
+.home-hero { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--border); background: linear-gradient(135deg, #1f3347, #181a22 70%); }
+.home-hero .hh-icon { font-size: 44px; }
+.home-hero .hh-name { font-size: 20px; font-weight: 700; }
+.home-hero .hh-rank { font-size: 12px; color: var(--muted); }
+.home-hero progress { width: 100%; max-width: none; height: 8px; accent-color: #73d13d; }
+.home-hero .hh-next { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; text-align: right; }
+.home-hero .hh-plays { grid-column: 1 / -1; font-size: 12px; color: var(--muted); margin: 0; }
+.home-h { margin: 16px 0 6px; font-size: 14px; }
+.home-units, .home-songs { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.home-unit, .home-song { text-align: left; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: linear-gradient(160deg, #23303a, #181a22); color: var(--text); cursor: pointer; }
+.home-unit:hover, .home-song:hover { border-color: var(--accent); }
+.home-unit.locked, .home-song.locked { opacity: .5; }
+.home-unit .hu-title, .home-song .hs-title { font-weight: 600; }
+.home-song .hs-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 26px; }
+.home-unit .hu-meta, .home-song .hs-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.home-unit progress { width: 100%; height: 5px; margin-top: 6px; accent-color: var(--accent); }
+.home-song { position: relative; }
+.home-song .hs-badge { position: absolute; top: 10px; right: 10px; font-size: 13px; }
+.home-tools { display: flex; gap: 8px; flex-wrap: wrap; }
+.home-start { display: flex; align-items: center; gap: 6px; margin-top: 16px; }
+@media (max-width: 560px) {
+  .home-hero { grid-template-columns: auto 1fr; }
+  .home-hero .hh-next { grid-column: 1 / -1; align-items: stretch; text-align: left; }
+}
+
+/* Video lessons */
+dialog.video-window { width: min(820px, calc(100vw - 24px)); left: max(12px, calc(50% - 410px)); top: 64px; z-index: 1520; }
+.video-window .tool-head { display: flex; align-items: center; gap: 10px; }
+.video-window .tool-head h2 { margin: 0; flex: 1; font-size: 16px; }
+.vd-add { margin-top: 8px; }
+.vd-add input[type="url"] { flex: 1; min-width: 220px; }
+.home-video .hs-meta { display: flex; gap: 6px; }
+.home-video.made .hs-title::before { content: "▶ "; color: var(--accent); }
+.home-video.seen .hs-title::before { content: "✓ "; color: #73d13d; }

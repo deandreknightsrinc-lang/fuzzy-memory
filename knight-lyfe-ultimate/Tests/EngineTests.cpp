@@ -1,4 +1,5 @@
 // Offline tests for the Knight Lyfe sound engine: renders notes and checks the audio.
+#include "Engine/AudioListener.h"
 #include "Engine/SoundEngine.h"
 
 #include <array>
@@ -66,6 +67,14 @@ static int firstSound (const juce::AudioBuffer<float>& b, float threshold = 0.01
     return -1;
 }
 
+static double AudioListenerPitchCheck (double sr)
+{
+    std::vector<float> buf (2048);
+    for (size_t i = 0; i < buf.size(); ++i)
+        buf[i] = (float) (0.5 * std::sin (juce::MathConstants<double>::twoPi * 440.0 * (double) i / sr));
+    return knightlyfe::AudioListener::detectPitch (buf.data(), (int) buf.size(), sr);
+}
+
 int main()
 {
 
@@ -111,6 +120,32 @@ int main()
     juce::MidiBuffer off;
     off.addEvent (juce::MidiMessage::noteOff (1, 67), 0);
     r.run (1.5, off);
+
+    std::printf ("Drum Track (Logic drum track / e-kit on any channel)\n");
+    {
+        juce::MidiBuffer hit;
+        hit.addEvent (juce::MidiMessage::noteOn (1, 36, (juce::uint8) 110), 0);
+        r.engine.drainHostMidi (forUi); // the note-off above
+        r.engine.setHostDrumsOnAllChannels (true);
+        CHECK (peak (r.run (0.3, hit)) > 0.1f, "a channel 1 note plays a drum");
+        forUi.clear();
+        r.engine.drainHostMidi (forUi);
+        CHECK (forUi.size() == 1 && forUi[0].status == 0x99 && forUi[0].data1 == 36, "and reaches the interface as a channel 10 drum hit");
+        r.run (1.0);
+        r.engine.setChannelGain (18, 0.0f); // drum level off: a drum is silent, the piano would not be
+        CHECK (peak (r.run (0.3, hit)) < 0.001f, "it is the drum kit, not the piano");
+        r.engine.setChannelGain (18, 1.0f);
+        r.engine.setHostDrumsOnAllChannels (false);
+        r.engine.drainHostMidi (forUi);
+        r.run (0.3, hit);
+        forUi.clear();
+        r.engine.drainHostMidi (forUi);
+        CHECK (forUi.size() == 1 && forUi[0].status == 0x90, "switched off: channel 1 is the piano again");
+        juce::MidiBuffer hitOff;
+        hitOff.addEvent (juce::MidiMessage::noteOff (1, 36), 0);
+        r.run (1.5, hitOff);
+        r.engine.drainHostMidi (forUi);
+    }
 
     std::printf ("Sustain pedal\n");
     juce::MidiBuffer ped;
@@ -399,6 +434,59 @@ int main()
         stop = true;
         writer.join();
         CHECK (consistent, "position reads are never torn");
+    }
+
+    std::printf ("Listening (guitar / voice input for lessons)\n");
+    {
+        knightlyfe::AudioListener l;
+        const double sr = 48000.0;
+        l.prepare (sr);
+        // A note with a few overtones, as a plucked string: A3 (220 Hz).
+        auto tone = [sr] (double hz, int n, int offset) {
+            juce::AudioBuffer<float> b (1, n);
+            for (int i = 0; i < n; ++i)
+            {
+                const double t = (offset + i) / sr;
+                b.setSample (0, i, (float) (0.3 * std::sin (juce::MathConstants<double>::twoPi * hz * t)
+                                            + 0.15 * std::sin (juce::MathConstants<double>::twoPi * 2 * hz * t)
+                                            + 0.08 * std::sin (juce::MathConstants<double>::twoPi * 3 * hz * t)));
+            }
+            return b;
+        };
+        knightlyfe::AudioListener::Result r;
+        l.push (tone (220.0, 8192, 0), 8192);
+        l.analyse (r);
+        CHECK (! r.hasPitch && r.rms < 1e-6f, "nothing is heard while listening is off");
+
+        l.setActive (true);
+        for (int block = 0; block < 24; ++block) // 24 blocks of 512: about a quarter second
+            l.push (tone (220.0, 512, block * 512), 512);
+        l.analyse (r);
+        std::printf ("       heard note %.2f (A3 = 57), level %.3f\n", r.note, r.rms);
+        CHECK (r.hasPitch && std::abs (r.note - 57.0) < 0.1, "the pitch of a note is heard");
+        int peakBin = 1;
+        for (int k = 1; k < (int) r.spectrumDb.size(); ++k)
+            if (r.spectrumDb[(size_t) k] > r.spectrumDb[(size_t) peakBin])
+                peakBin = k;
+        const double peakHz = peakBin * sr / r.fftSize;
+        CHECK (std::abs (peakHz - 220.0) < sr / r.fftSize, "the spectrum's loudest bin is the note");
+        CHECK (r.spectrumDb.size() >= (size_t) (1200.0 * r.fftSize / sr), "the spectrum reaches the chord detector's range (1200 Hz)");
+        CHECK (r.spectrumDb[(size_t) peakBin] > -40.0f && r.spectrumDb[(size_t) peakBin] < 0.0f, "levels in dB like the browser's analyser");
+
+        l.setActive (false);
+        juce::AudioBuffer<float> silence (1, 8192);
+        silence.clear();
+        l.setActive (true);
+        l.push (silence, 8192);
+        l.analyse (r);
+        CHECK (! r.hasPitch, "silence has no pitch");
+
+        l.setBassRange (true);
+        for (int block = 0; block < 32; ++block)
+            l.push (tone (41.2, 512, block * 512), 512); // a bass guitar's low E
+        l.analyse (r);
+        CHECK (r.hasPitch && std::abs (r.note - 28.0) < 0.15, "bass range hears the low E (41 Hz)");
+        CHECK (std::abs (AudioListenerPitchCheck (sr) - 440.0) < 1.0, "pitch detection matches the website's on A440");
     }
 
     std::printf (failures == 0 ? "\nAll engine tests passed\n" : "\n%d engine test(s) FAILED\n", failures);

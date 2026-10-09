@@ -33,6 +33,14 @@ juce::WebBrowserComponent::Options KnightLyfeEditor::makeOptions()
         .withResourceProvider ([this] (const juce::String& url) { return assets.get (url); })
         .withEventListener ("kk", [this] (const juce::var& v) { processor.handleInterfaceBatch (v); })
         .withEventListener ("kkSave", [this] (const juce::var& v) { saveFile (v); })
+        .withEventListener ("kkHostInfo", [this] (const juce::var&) {
+            auto* info = new juce::DynamicObject();
+            info->setProperty ("canListen", processor.getBusCount (true) > 0); // the standalone app has an input
+            browser.emitEventIfBrowserIsVisible ("hostInfo", juce::var (info));
+        })
+        .withEventListener ("kkListen", [this] (const juce::var& v) {
+            processor.setListening ((bool) v.getProperty ("on", false), v.getProperty ("range", "") == juce::var ("bass"));
+        })
         .withEventListener ("kkKitQuery", [this] (const juce::var&) {
             browser.emitEventIfBrowserIsVisible ("kkKitState", processor.getEngine().getKitState());
         })
@@ -58,6 +66,7 @@ void KnightLyfeEditor::resized()
 void KnightLyfeEditor::timerCallback()
 {
     sendTransport();
+    sendListening();
 
     // Forward MIDI the host received so the keyboard, chords and learn mode follow it.
     hostMessages.clear();
@@ -116,4 +125,25 @@ void KnightLyfeEditor::saveFile (const juce::var& request)
                               if (file != juce::File())
                                   file.replaceWithData (data->getData(), data->getSize());
                           });
+}
+
+void KnightLyfeEditor::sendListening()
+{
+    // About 30 times a second while a lesson listens: { note | null, rms, sr, fftSize,
+    // db: [dB per bin up to 1500 Hz] } for HostListener in knight-keys/js/host.js.
+    auto& listener = processor.getListener();
+    if (! listener.isActive() || ++listenTick % 2 != 0)
+        return;
+    listener.analyse (heard);
+    juce::Array<juce::var> db;
+    db.ensureStorageAllocated ((int) heard.spectrumDb.size());
+    for (const auto v : heard.spectrumDb)
+        db.add (std::round (v * 10.0f) / 10.0f);
+    auto* obj = new juce::DynamicObject();
+    obj->setProperty ("note", heard.hasPitch ? juce::var (heard.note) : juce::var());
+    obj->setProperty ("rms", heard.rms);
+    obj->setProperty ("sr", heard.sampleRate);
+    obj->setProperty ("fftSize", heard.fftSize);
+    obj->setProperty ("db", db);
+    browser.emitEventIfBrowserIsVisible ("hostListen", juce::var (obj));
 }

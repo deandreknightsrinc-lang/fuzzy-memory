@@ -15,6 +15,8 @@ import { Synth, PRESETS, LIVE_CHANNEL, LIVE_LEFT_CHANNEL, DRUM_CHANNEL, GROOVE_C
 import { Player } from './player.js';
 import { KeyboardView, drawStaff, drawControllers, drawGroove, drawPianoRoll, drawDrumHighway, drawFretboard } from './render.js';
 import { TUNINGS, STRING_NAMES, fretNote, chordShape, chordTarget, chartTimeline, ChartJudge, rootPosition } from './fretted.js';
+import { INSTRUMENTS, instrumentById, instrumentHome, songsToShow, tunerLesson } from './home.js';
+import { videoLessons, videoSummary, videosToShow, watchedBy, markWatched } from './videos.js';
 import { UNITS, COURSES, unitsFor, readNotes, grooveMidi, DrumJudge, addCourse, removeCourse, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from './lessons.js';
 import { PitchListener, SingJudge, RangeFinder, voiceType, freqToCents, midiToFreq, chromaMatches } from './pitch.js';
 import { GameSession, crownsFor, loadStage, saveStage, recordScore, courseState, scoreKey, PLAYER_COLORS } from './game.js';
@@ -23,7 +25,7 @@ import { detectChord, noteName, pcName, solfege, keyName } from './theory.js';
 import { createDemoMidi } from './demo.js';
 import { GROOVES, GroovePlayer } from './grooves.js';
 import { SONGS, LEVELS, LEVEL_NAMES, DRUM_STYLE_NAMES, parsePitch, songToMidi, chartToChords, validateSong, loadMySongs, saveMySongs } from './songs.js';
-import { HostSynth, HostTransport, IN_HOST, onHostMidi, onHostTransport, hostSave, queryHostKit } from './host.js';
+import { HostSynth, HostTransport, HostListener, IN_HOST, hostCanListen, onHostMidi, onHostTransport, hostSave, queryHostKit } from './host.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -2487,7 +2489,7 @@ function showLessonStep(i) {
   Object.assign(lessonRun, { stepIdx: i, step, pos: 0, mistakes: 0, quizTries: 0, done: step.type === 'info', hint: false, missesHere: 0, readList: step.type === 'read' ? readNotes(step) : [] });
   setText($('lpText'), (step.type === 'quiz' ? step.question : step.text || '') + (step.type === 'chords' && micListener?.active ? ' (Chords need a USB keyboard or the on-screen keys: the microphone hears one note at a time.)' : ''));
   micListener?.setRange(step.instrument === 'bass' ? 'bass' : 'normal');
-  if (step.type === 'fret' || step.type === 'strum' || step.type === 'chart') lessonFeedback(micSupported() ? (step.type === 'chart' ? 'Count-in: one bar of clicks, then play!' : 'Your turn! (Turn on 🎤 so it can hear your guitar.)') : 'Play it on a MIDI keyboard or the keys below (the microphone works on the website).');
+  if (step.type === 'fret' || step.type === 'strum' || step.type === 'chart') lessonFeedback(micSupported() ? (step.type === 'chart' ? 'Count-in: one bar of clicks, then play!' : 'Your turn! (Turn on 🎤 so it can hear your guitar.)') : 'Play it on a MIDI keyboard or the keys below (the microphone works in the Knight Lyfe Ultimate app and on the website).');
   else if (step.type === 'hits' || step.type === 'groove') lessonFeedback(step.type === 'hits' ? 'Your turn: hit the drum that\'s lit up.' : step.mode === 'time' ? 'Count-in: one bar of clicks, then play!' : 'The beat waits for each hit. Follow the highway.');
   else lessonFeedback(step.type === 'info' ? '' : step.type === 'song' ? (step.voice ? 'The song is playing. Sing the yellow notes.' : step.noHints ? 'The song is playing. Read the staff and play.' : 'The song is playing. The yellow keys are yours.') : step.type === 'read' ? 'Which note is it? Play it.' : 'Your turn: the yellow key is next.');
   $('lpSing').hidden = step.type !== 'sing' && step.type !== 'range';
@@ -2667,7 +2669,8 @@ function leaveLesson() {
 
 // Microphone: notes heard from any piano, keyboard or singer count like keys you played.
 let micListener = null;
-const micSupported = () => !IN_HOST && !!navigator.mediaDevices?.getUserMedia;
+// In the app the C++ engine listens (the standalone app's mic or audio interface).
+const micSupported = () => (IN_HOST ? hostCanListen() : !!navigator.mediaDevices?.getUserMedia);
 const showMicOn = (on) => ['lpMic', 'boothMic'].forEach((id) => $(id).classList.toggle('on', on));
 
 /** Singers: a note in any octave counts as the one the song is waiting for. */
@@ -2689,7 +2692,7 @@ async function toggleMic(force) {
   }
   try {
     const ctx = synth.ensure();
-    micListener ??= new PitchListener((on, heard) => {
+    micListener ??= new (IN_HOST ? HostListener : PitchListener)((on, heard) => {
       const midi = on ? foldForSinger(heard) : (micHeld.get(heard) ?? heard);
       if (on) micHeld.set(heard, midi);
       else micHeld.delete(heard);
@@ -2803,7 +2806,7 @@ function startStrum(step) {
   strumRun.off = onChroma((chroma) => {
     if (lessonRun.step !== step || lessonRun.done || !chroma || performance.now() < strumRun.quietUntil) return;
     const t = chordTarget(step.chords[lessonRun.pos]);
-    if (chromaMatches(chroma, t.root, t.quality, t.sus ? t.pcs : null)) {
+    if (chromaMatches(chroma, t.root, t.quality, t.sus ? t.pcs : null, t.notes)) {
       if (++strumRun.count >= 3) strumHit();
     } else strumRun.count = 0;
   });
@@ -2825,7 +2828,7 @@ function startChart(step) {
     if (w) {
       const keys = [...liveNotesDown()].map((n) => n % 12);
       if (step.match === 'root') ok = keys.includes(w.bass) || (chartRun.pitch !== null && ((Math.round(chartRun.pitch) % 12) + 12) % 12 === w.bass);
-      else ok = w.pcs.every((pc) => keys.includes(pc)) || (!!chartRun.chroma && chromaMatches(chartRun.chroma, w.root, w.quality, w.sus ? w.pcs : null));
+      else ok = w.pcs.every((pc) => keys.includes(pc)) || (!!chartRun.chroma && chromaMatches(chartRun.chroma, w.root, w.quality, w.sus ? w.pcs : null, w.notes));
       chartRun.judge.frame(t, ok);
     }
     if (i !== chartRun.index) {
@@ -2987,7 +2990,7 @@ function startSinging(step) {
       lessonRun.done = true;
       lessonRun.stars[lessonRun.stepIdx] = 0;
       $('lpNext').disabled = false;
-      lessonFeedback(IN_HOST ? 'Singing needs the microphone: open Knight Keys in Safari or Chrome for this step. Skip it for now with Next.' : 'This browser can\'t use a microphone. Skip this step with Next.', 'bad');
+      lessonFeedback(IN_HOST ? 'Singing needs the microphone: open the Knight Lyfe Ultimate app (the Logic plug-in can\'t hear a mic) or the website. Skip it for now with Next.' : 'This browser can\'t use a microphone. Skip this step with Next.', 'bad');
     }
     return;
   }
@@ -3126,48 +3129,78 @@ function renderTeacherCard() {
   box.append(teacherAvatar(t), name);
 }
 
-let videoUrl = null;
+/**
+ * Puts a lesson video in `box`: a file (or one kept in this browser), YouTube or
+ * Vimeo. onWatched() fires when it's (nearly) all watched, or from "I watched it"
+ * for embedded players, which don't say when they end. Returns false when there's
+ * no video to show.
+ */
+const videoUrls = new Map(); // box -> object URL of a file kept in this browser
+async function mountVideo(box, src, { onWatched = () => {}, onError = () => {}, watchedButton = true } = {}) {
+  box.innerHTML = '';
+  if (videoUrls.has(box)) URL.revokeObjectURL(videoUrls.get(box));
+  videoUrls.delete(box);
+  if (src?.startsWith('idb:')) {
+    const blob = await loadVideoFile(src.slice(4));
+    src = null;
+    if (blob) {
+      src = URL.createObjectURL(blob);
+      videoUrls.set(box, src);
+    }
+  }
+  const v = videoSource(src);
+  if (!v) return false;
+  if (v.kind === 'file') {
+    const el = Object.assign(document.createElement('video'), { src: v.embed, controls: true, playsInline: true });
+    el.addEventListener('ended', onWatched);
+    el.addEventListener('timeupdate', () => el.duration && el.currentTime / el.duration >= 0.9 && onWatched());
+    el.addEventListener('error', onError);
+    box.append(el);
+  } else {
+    const frame = Object.assign(document.createElement('iframe'), { src: v.embed, allow: 'autoplay; fullscreen; picture-in-picture', allowFullscreen: true });
+    box.append(frame);
+    if (watchedButton) {
+      const watched = Object.assign(document.createElement('button'), { textContent: '✓ I watched it', className: 'mini' });
+      watched.onclick = onWatched;
+      box.append(watched);
+    }
+  }
+  return true;
+}
+
+/** Remember that the current player watched this lesson's video. */
+function rememberWatched(lessonId) {
+  if (markWatched(stage, stage.current, lessonId)) saveStage(stage);
+}
+
 async function renderVideoStep(step) {
   const box = $('lpVideo');
-  box.innerHTML = '';
-  if (videoUrl) URL.revokeObjectURL(videoUrl);
-  videoUrl = null;
   box.hidden = step.type !== 'video';
-  if (step.type !== 'video') return;
+  if (step.type !== 'video') {
+    await mountVideo(box, null);
+    return;
+  }
+  const lessonId = (lessonRun.lesson.base || lessonRun.lesson).id;
   const done = () => {
     if (lessonRun.step !== step || lessonRun.done) return;
     lessonRun.done = true;
     lessonRun.stars[lessonRun.stepIdx] = 0; // watching doesn't change the stars
     $('lpNext').disabled = false;
+    if (step.src) rememberWatched(lessonId);
     lessonFeedback('✓ Watched. Press Next when you\'re ready.', 'good');
   };
-  let src = step.src;
-  if (src?.startsWith('idb:')) {
-    const blob = await loadVideoFile(src.slice(4));
-    src = blob ? (videoUrl = URL.createObjectURL(blob)) : null;
-  }
-  const v = videoSource(src);
-  if (!v) {
-    // No video made yet: the teacher's script reads along instead, so the course works today.
-    const pre = Object.assign(document.createElement('div'), { className: 'lp-script', textContent: step.script || step.text || '' });
-    box.append(pre);
-    done();
-    return;
-  }
-  if (v.kind === 'file') {
-    const el = Object.assign(document.createElement('video'), { src: v.embed, controls: true, playsInline: true });
-    el.addEventListener('ended', done);
-    el.addEventListener('timeupdate', () => el.duration && el.currentTime / el.duration >= 0.9 && done());
-    el.addEventListener('error', () => {
+  const shown = await mountVideo(box, step.src, {
+    onWatched: done,
+    onError: () => {
       lessonFeedback('This video couldn\'t play here. Check the link in the Course Studio.', 'bad');
       done();
-    });
-    box.append(el);
-  } else {
-    const frame = Object.assign(document.createElement('iframe'), { src: v.embed, allow: 'autoplay; fullscreen; picture-in-picture', allowFullscreen: true });
-    const watched = Object.assign(document.createElement('button'), { textContent: '✓ I watched it', className: 'mini' });
-    watched.onclick = done;
-    box.append(frame, watched);
+    },
+  });
+  if (!shown) {
+    // No video made yet: the teacher's script reads along instead, so the course works today.
+    box.append(Object.assign(document.createElement('div'), { className: 'lp-script', textContent: step.script || step.text || '' }));
+    done();
+    return;
   }
   lessonFeedback('Watch the video, then press Next.');
 }
@@ -6047,11 +6080,12 @@ async function loadAppChurch() {
   }
 }
 
-/** Open the place a link points at: #lessons, #lessons=<course>, #band, #church, #ask, #puppet, #lyrics, #vocal. */
+/** Open the place a link points at: #home, #home=<instrument>, #lessons, #lessons=<course>, #band, #church, #ask, #puppet, #lyrics, #vocal. */
 function openFromHash() {
   const [where, arg] = decodeURIComponent(location.hash.slice(1)).split('=');
   if (!where) return;
-  if (where === 'lessons') {
+  if (where === 'home') openHome(INSTRUMENTS.some((i) => i.id === arg) ? arg : undefined);
+  else if (where === 'lessons') {
     if (arg && COURSES.some((c) => c.id === arg)) lessonCourse = arg;
     $('btnLessons').click();
     renderLessonMap();
@@ -6439,6 +6473,305 @@ function frame() {
   requestAnimationFrame(frame);
 }
 
+// ---- Home (one screen per instrument) --------------------------------------
+//
+// Like Yousician / Simply Piano: pick your instrument and see your next lesson,
+// your path, the songs you unlock and your practice tools. See home.js.
+
+const TOOLS = {
+  songs: ['🎵 Songs', 'Free songs to learn', () => $('btnSongs').click()],
+  score: ['📜 Sheet music', 'The full score of the open song', () => $('btnScore').click()],
+  learn: ['🎯 Learn mode', 'The song waits until you play the right notes', () => $('btnLearn').click()],
+  grooves: ['🥁 Grooves', 'Play along with drum beats', () => document.querySelector('[data-layout="drums"]')?.click()],
+  kit: ['🎛 Kit Rack', 'Choose and tune your drum kit', () => $('btnKit').click()],
+  booth: ['🎙 Vocal Booth', 'Live pitch graph and tuner for singers', () => openBooth()],
+  lyrics: ['🎤 Lyrics', 'Sing along: the words light up', () => openLyrics()],
+  mic: ['🎤 Microphone', 'Turn listening on or off', () => (micSupported() ? toggleMic() : toast('The microphone works in the Knight Lyfe Ultimate app and on the website.'))],
+  tuner: ['🎚 Tuner', 'Tune your strings', (inst) => {
+    const lesson = tunerLesson(inst.id);
+    if (lesson) openLessonFromHome(lesson, instrumentById(inst.id).courses[0]);
+  }],
+};
+
+const homeSongKeyed = (part) => stageSongs(part).map((song) => ({ ...song, id: stageSongKey(song), entry: song }));
+
+function openHome(instrumentId) {
+  if (instrumentId) settings.homeInstrument = instrumentId;
+  const dlg = $('homeDlg');
+  if (!dlg.open) dlg.show();
+  renderHome();
+}
+
+function openLessonFromHome(lesson, course) {
+  $('homeDlg').close(); // Home steps aside; 🏠 brings it back with your progress
+  lessonCourse = course;
+  $('btnLessons').click();
+  if (lesson) startLesson(lesson);
+  else renderLessonMap();
+}
+
+function playStageFromHome(entry) {
+  $('homeDlg').close();
+  stageRun.part = entry.part;
+  $('btnStage').click();
+  if (stageRun.phase === 'menu') startStage(entry.song.entry);
+}
+
+function renderHome() {
+  const me = stagePlayer();
+  const sel = $('homePlayer');
+  sel.innerHTML = '';
+  for (const p of stage.players) sel.append(new Option(p.name, p.id));
+  sel.value = stage.current;
+  const streak = currentStreak(stage.practice?.[stage.current], todayStr());
+  setText($('homeStreak'), streak ? `🔥 ${streak}-day streak` : '');
+  $('homeAtStart').checked = settings.homeAtStart !== false;
+
+  const opts = { progress: lessonProgress(), stage, playerId: me.id, stageSongs: homeSongKeyed, unlockAll: !!stage.unlockAll };
+  const current = instrumentById(settings.homeInstrument).id;
+
+  // Instrument tabs, each with its progress.
+  const tabs = $('homeTabs');
+  tabs.innerHTML = '';
+  for (const inst of INSTRUMENTS) {
+    const h = instrumentHome(inst.id, opts);
+    const b = Object.assign(document.createElement('button'), { className: `home-tab${inst.id === current ? ' on' : ''}` });
+    b.innerHTML = '<span class="ht-icon"></span><span class="ht-name"></span><span class="ht-meta"></span>';
+    b.querySelector('.ht-icon').textContent = inst.icon;
+    b.querySelector('.ht-name').textContent = inst.name;
+    b.querySelector('.ht-meta').textContent = `${h.lessons.done}/${h.lessons.total} lessons`;
+    b.setAttribute('aria-pressed', String(inst.id === current));
+    b.onclick = () => {
+      settings.homeInstrument = inst.id;
+      saveSettings();
+      renderHome();
+    };
+    tabs.append(b);
+  }
+
+  const home = instrumentHome(current, opts);
+  const { instrument: inst, lessons } = home;
+
+  // Hero: progress and the next lesson.
+  const hero = $('homeHero');
+  hero.innerHTML = `<div class="hh-icon"></div>
+    <div><div class="hh-name"></div><div class="hh-rank"></div><progress max="1"></progress></div>
+    <div class="hh-next"><span class="small"></span><button class="primary"></button></div>
+    <p class="hh-plays"></p>`;
+  hero.querySelector('.hh-icon').textContent = inst.icon;
+  hero.querySelector('.hh-name').textContent = inst.name;
+  hero.querySelector('.hh-rank').textContent = `${lessons.rank} · ${lessons.done} of ${lessons.total} lessons · ★ ${lessons.stars}/${lessons.maxStars}`;
+  hero.querySelector('progress').value = lessons.share;
+  const go = hero.querySelector('.hh-next button');
+  if (home.next) {
+    setText(hero.querySelector('.hh-next span'), lessons.done ? 'Up next' : 'Start here');
+    go.textContent = `${lessons.done ? 'Continue' : 'Start'}: ${home.next.lesson.title} ▶`;
+    go.onclick = () => openLessonFromHome(home.next.lesson, home.next.course);
+  } else {
+    setText(hero.querySelector('.hh-next span'), lessons.total ? 'Every lesson passed 🎉' : '');
+    go.textContent = 'All lessons';
+    go.onclick = () => openLessonFromHome(null, inst.courses[0]);
+  }
+  hero.querySelector('.hh-plays').textContent = `Plays with: ${inst.plays}`;
+
+  // The path: units with progress.
+  const units = $('homeUnits');
+  units.innerHTML = '';
+  for (const u of home.units) {
+    const b = Object.assign(document.createElement('button'), { className: `home-unit${u.unlocked ? '' : ' locked'}` });
+    b.innerHTML = '<div class="hu-title"></div><div class="hu-meta"></div><progress></progress>';
+    b.querySelector('.hu-title').textContent = `${u.unit.icon || ''} ${u.unit.title}`.trim();
+    b.querySelector('.hu-meta').textContent = u.unlocked ? `${u.done}/${u.total} lessons · ★ ${u.stars}` : '🔒 Pass the lessons before it';
+    Object.assign(b.querySelector('progress'), { max: u.total || 1, value: u.done });
+    b.onclick = () => {
+      if (!u.unlocked) return toast('Pass the lessons before this unit to open it.');
+      const first = u.unit.lessons.find((l) => !lessonProgress()[l.id]) || u.unit.lessons[0];
+      openLessonFromHome(first, u.course);
+    };
+    units.append(b);
+  }
+
+  // Songs: the next ones to play, then what's coming.
+  const songs = $('homeSongs');
+  songs.innerHTML = '';
+  setText($('homeSongsNote'), inst.stageParts.length ? `(Stage · ${stageRun.course === 'church' ? 'Church & Worship' : stageRun.course === 'starter' ? 'Starter' : 'My Songs'}: earn a 👑 to open the next)` : '(pass a song lesson to open the next)');
+  const list = songsToShow(home.songs, 8);
+  if (!list.length) songs.append(Object.assign(document.createElement('p'), { className: 'small', textContent: 'No songs yet for this instrument.' }));
+  for (const entry of list) {
+    const b = Object.assign(document.createElement('button'), { className: `home-song${entry.unlocked ? '' : ' locked'}` });
+    b.innerHTML = '<span class="hs-badge"></span><div class="hs-title"></div><div class="hs-meta"></div>';
+    b.querySelector('.hs-title').textContent = entry.title;
+    if (entry.kind === 'stage') {
+      b.querySelector('.hs-badge').textContent = entry.unlocked ? '👑'.repeat(entry.crowns) || '▶' : '🔒';
+      b.querySelector('.hs-meta').textContent = `Stage · ${entry.partName}${entry.song.level ? ` · ${entry.song.level}` : ''}`;
+      b.onclick = () => (entry.unlocked ? playStageFromHome(entry) : toast('Earn at least one 👑 on the song before this one to unlock it.'));
+    } else {
+      b.querySelector('.hs-badge').textContent = entry.unlocked ? (entry.stars ? '★'.repeat(entry.stars) : '▶') : '🔒';
+      b.querySelector('.hs-meta').textContent = 'Song lesson';
+      b.onclick = () => (entry.unlocked ? openLessonFromHome(entry.lesson, entry.course) : toast('Pass the lesson before it to open this song.'));
+    }
+    songs.append(b);
+  }
+
+  // Video lessons: open as you reach their lesson.
+  const vlist = videoLessons(current, { progress: lessonProgress(), videos: courseVideos, watched: watchedBy(stage, me.id), unlockAll: !!stage.unlockAll });
+  const vsum = videoSummary(vlist);
+  setText($('homeVideosNote'), vsum.made ? `(${vsum.watched} of ${vsum.made} watched · they open as you reach each lesson)` : '(no videos yet: open a lesson\'s card to add one or copy its script for an AI video tool)');
+  const vbox = $('homeVideos');
+  vbox.innerHTML = '';
+  for (const entry of videosToShow(vlist, 8)) {
+    const b = Object.assign(document.createElement('button'), { className: `home-song home-video${entry.unlocked ? '' : ' locked'}${entry.video ? (entry.watched ? ' seen' : ' made') : ''}` });
+    b.innerHTML = '<span class="hs-badge"></span><div class="hs-title"></div><div class="hs-meta"></div>';
+    b.querySelector('.hs-title').textContent = entry.lesson.title;
+    b.querySelector('.hs-badge').textContent = !entry.unlocked ? '🔒' : entry.video ? (entry.watched ? '✓' : '🎬') : '📝';
+    b.querySelector('.hs-meta').textContent = !entry.unlocked ? 'Opens when you reach this lesson' : entry.video ? (entry.watched ? 'Watched' : 'New video') : 'Script ready · no video yet';
+    b.onclick = () => (entry.unlocked ? openVideoLesson(entry) : toast('This video opens when you reach its lesson.'));
+    vbox.append(b);
+  }
+
+  // Tools.
+  const tools = $('homeTools');
+  tools.innerHTML = '';
+  for (const id of inst.tools) {
+    const [label, title, run] = TOOLS[id];
+    if (id === 'tuner' && !tunerLesson(inst.id)) continue;
+    const b = Object.assign(document.createElement('button'), { textContent: label, title });
+    b.onclick = () => run(inst);
+    tools.append(b);
+  }
+}
+
+// ---- Video lesson player (from Home) -------------------------------------------
+
+const videoRun = { entry: null };
+
+function openVideoLesson(entry) {
+  videoRun.entry = entry;
+  const dlg = $('videoDlg');
+  if (!dlg.open) dlg.show();
+  renderVideoLesson();
+}
+
+async function renderVideoLesson() {
+  const entry = videoRun.entry;
+  if (!entry) return;
+  const { lesson, course } = entry;
+  const video = courseVideos[lesson.id]?.src ? courseVideos[lesson.id] : entry.video;
+  setText($('vdTitle'), `🎬 ${lesson.title}`);
+  const t = teacherForCourse(course);
+  const who = $('vdTeacher');
+  who.innerHTML = '';
+  who.append(teacherAvatar(t, 26), Object.assign(document.createElement('span'), { textContent: `${t.name} · ${entry.unit?.title || ''}` }));
+  const box = $('vdPlayer');
+  const shown = await mountVideo(box, video?.src, {
+    watchedButton: false,
+    onWatched: () => {
+      rememberWatched(lesson.id);
+      setText($('vdNote'), '✓ Watched. Now practise it ▶');
+    },
+    onError: () => setText($('vdNote'), 'This video couldn\'t play here. Check the link, or choose the file again.'),
+  });
+  if (!shown) {
+    const script = lessonScriptFor(lesson, course);
+    box.append(Object.assign(document.createElement('div'), { className: 'lp-script', textContent: script.text }));
+    setText($('vdNote'), `No video for this lesson yet. Here's ${t.name}'s script (about ${Math.max(1, Math.round(script.seconds / 60))} min): copy it into an AI video tool, then add the video here.`);
+  } else setText($('vdNote'), entry.watched || watchedBy(stage, stage.current)[lesson.id] ? '✓ You\'ve watched this one.' : '');
+  const embedded = shown && !/^idb:|\.(mp4|m4v|webm|mov)(\?|$)/i.test(video?.src || '');
+  $('vdWatched').hidden = !embedded;
+  $('vdRemove').hidden = !courseVideos[lesson.id];
+  $('vdAdd').textContent = shown ? '✎ Change video' : '＋ Add video';
+  $('vdAddBox').hidden = true;
+}
+
+/** The teacher's script for a built-in lesson (for AI video tools). */
+function lessonScriptFor(lesson, course) {
+  const c = COURSES.find((x) => x.id === course);
+  const units = unitsFor(course);
+  const unit = units.find((u) => u.lessons.includes(lesson));
+  const number = units.flatMap((u) => u.lessons).indexOf(lesson) + 1;
+  return lessonScript(lesson, { teacher: teacherForCourse(course), course: c?.name || course, unit: unit?.title || '', number, songTitle });
+}
+
+function setLessonVideo(lessonId, video) {
+  if (video) courseVideos[lessonId] = video;
+  else delete courseVideos[lessonId];
+  saveVideos(courseVideos);
+  if (videoRun.entry) videoRun.entry.video = video || null;
+  renderVideoLesson();
+  if ($('homeDlg').open) renderHome();
+}
+
+function initVideoLessons() {
+  const dlg = $('videoDlg');
+  dlg.querySelector('[data-close]').onclick = () => {
+    $('vdPlayer').innerHTML = ''; // stops playback
+    dlg.close();
+  };
+  makeDraggable(dlg);
+  $('vdPractice').onclick = () => {
+    const e = videoRun.entry;
+    $('vdPlayer').innerHTML = '';
+    dlg.close();
+    if (e) openLessonFromHome(e.lesson, e.course);
+  };
+  $('vdWatched').onclick = () => {
+    if (!videoRun.entry) return;
+    rememberWatched(videoRun.entry.lesson.id);
+    setText($('vdNote'), '✓ Watched. Now practise it ▶');
+    if ($('homeDlg').open) renderHome();
+  };
+  $('vdScript').onclick = () => {
+    const e = videoRun.entry;
+    if (!e) return;
+    const text = lessonScriptFor(e.lesson, e.course).text;
+    navigator.clipboard?.writeText(text).then(() => toast('Script copied: paste it into your AI video tool.'), () => download(text, `${e.lesson.title} - script.txt`, 'text/plain'));
+  };
+  $('vdAdd').onclick = () => {
+    $('vdAddBox').hidden = !$('vdAddBox').hidden;
+    $('vdUrl').value = courseVideos[videoRun.entry?.lesson.id]?.src?.startsWith('idb:') ? '' : courseVideos[videoRun.entry?.lesson.id]?.src || '';
+  };
+  $('vdUrlSave').onclick = () => {
+    const url = $('vdUrl').value.trim();
+    if (!videoRun.entry || !url) return;
+    if (!/^https?:\/\//i.test(url)) return toast('Paste a full link, starting with https://');
+    setLessonVideo(videoRun.entry.lesson.id, { src: url });
+    toast('Video added to this lesson.');
+  };
+  $('vdFile').onclick = () => $('vdPick').click();
+  $('vdPick').onchange = async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file || !videoRun.entry) return;
+    const key = videoRun.entry.lesson.id;
+    try {
+      await saveVideoFile(key, file);
+      setLessonVideo(key, { src: `idb:${key}`, name: file.name });
+      toast(`Video added: ${file.name}. It's kept on this computer; for other devices, upload it (YouTube unlisted, Vimeo...) and add the link.`, [], 6000);
+    } catch (err) {
+      toast(`Couldn't keep that video here (${err.message}). Add a link instead.`);
+    }
+  };
+  $('vdRemove').onclick = () => {
+    if (videoRun.entry && confirm('Remove this lesson\'s video? (The lesson stays.)')) setLessonVideo(videoRun.entry.lesson.id, null);
+  };
+}
+
+function initHome() {
+  const dlg = $('homeDlg');
+  $('btnHome').onclick = () => openHome();
+  dlg.querySelector('[data-close]').onclick = () => dlg.close();
+  makeDraggable(dlg);
+  $('homePlayer').onchange = (e) => {
+    stage.current = e.target.value;
+    saveStage(stage);
+    renderHome();
+  };
+  $('homeAtStart').onchange = (e) => {
+    settings.homeAtStart = e.target.checked;
+    saveSettings();
+  };
+}
+
 // ---- Boot ----------------------------------------------------------------
 
 syncSettingsUI();
@@ -6456,6 +6789,8 @@ initAsk();
 initPuppet();
 initConverter();
 initSongs();
+initHome();
+initVideoLessons();
 applyLayout();
 applyLiveInstruments();
 buildMixer();
@@ -6475,5 +6810,8 @@ document.addEventListener('fullscreenchange', markDirty);
 window.addEventListener('pointerdown', () => synth.ensure(), { once: true });
 window.addEventListener('keydown', () => synth.ensure(), { once: true });
 requestAnimationFrame(frame);
-loadAppChurch().then(openFromHash);
+loadAppChurch().then(() => {
+  openFromHash();
+  if (!location.hash && settings.homeAtStart !== false) openHome();
+});
 window.addEventListener('hashchange', openFromHash);

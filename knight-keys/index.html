@@ -55,6 +55,7 @@
           </div>
         </div>
       </details>
+      <button id="btnHome" class="home-btn" title="Home: your instruments, with your next lesson, songs to unlock and practice tools for each">🏠 Home</button>
       <button id="btnLessons" class="lessons-btn" title="Lessons: step-by-step piano and voice courses, like a teacher at your side">🎓 Lessons</button>
       <button id="btnBooth" class="booth-btn" title="Vocal Booth: live pitch graph and tuner for singers, plus four-part choir parts for any song">🎙 Vocal</button>
       <button id="btnChurch" class="church-btn" title="Virtual church: plan and run a worship service with big slides, worship with lyrics and a stream screen for YouTube or Facebook Live">⛪ Church</button>
@@ -550,6 +551,53 @@ Every evening I will sing"></textarea>
           <button id="lpDoneMap">All lessons</button>
         </div>
       </section>
+    </div>
+  </dialog>
+
+  <dialog id="homeDlg" class="tool-window home-window" aria-labelledby="homeTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="homeTitle">🏠 Home</h2>
+      <span id="homeStreak" class="lp-streak"></span>
+      <select id="homePlayer" title="Who's playing?"></select>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="tool-body">
+      <nav id="homeTabs" class="home-tabs" aria-label="Instruments"></nav>
+      <section id="homeHero" class="home-hero"></section>
+      <h3 class="home-h">Your path</h3>
+      <div id="homeUnits" class="home-units"></div>
+      <h3 class="home-h">Songs to unlock <span id="homeSongsNote" class="small"></span></h3>
+      <div id="homeSongs" class="home-songs"></div>
+      <h3 class="home-h">🎬 Video lessons <span id="homeVideosNote" class="small"></span></h3>
+      <div id="homeVideos" class="home-songs home-videos"></div>
+      <h3 class="home-h">Practice tools</h3>
+      <div id="homeTools" class="home-tools"></div>
+      <label class="home-start small"><input id="homeAtStart" type="checkbox" /> Open Home when Knight Keys starts</label>
+    </div>
+  </dialog>
+
+  <dialog id="videoDlg" class="tool-window video-window" aria-labelledby="vdTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="vdTitle">🎬 Video lesson</h2>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="tool-body">
+      <div id="vdTeacher" class="lp-course-info"></div>
+      <div id="vdPlayer" class="lp-video"></div>
+      <p id="vdNote" class="small"></p>
+      <div class="row wrap">
+        <button id="vdPractice" class="primary">Practise this lesson ▶</button>
+        <button id="vdWatched" class="mini">✓ I watched it</button>
+        <button id="vdScript" class="mini" title="Copy the teacher's script, ready for an AI video tool (HeyGen, Synthesia, D-ID...)">📝 Copy script</button>
+        <button id="vdAdd" class="mini" title="Give this lesson a video: a YouTube or Vimeo link, or a video file">＋ Add video</button>
+        <button id="vdRemove" class="mini danger" hidden>Remove video</button>
+      </div>
+      <div id="vdAddBox" class="row wrap vd-add" hidden>
+        <input id="vdUrl" type="url" placeholder="YouTube, Vimeo or .mp4 link" />
+        <button id="vdUrlSave" class="mini primary">Save link</button>
+        <button id="vdFile" class="mini">Choose a video file…</button>
+        <input id="vdPick" type="file" accept="video/*" hidden />
+      </div>
     </div>
   </dialog>
 

@@ -7,6 +7,7 @@
 // "hostMidi" events so the keyboard, chords, score and learn mode follow along.
 
 import { Synth, DRUM_CHANNEL, GROOVE_CHANNEL, LIVE_CHANNEL, LIVE_LEFT_CHANNEL } from './synth.js';
+import { NoteTracker, chromaFromSpectrum } from './pitch.js';
 
 export const juce = typeof window !== 'undefined' && window.__JUCE__?.backend ? window.__JUCE__ : null;
 export const IN_HOST = !!juce;
@@ -232,4 +233,78 @@ export function queryHostKit(fn) {
 /** Listen for Logic's transport. */
 export function onHostTransport(fn) {
   juce?.backend.addEventListener('hostTransport', (pos) => fn(pos));
+}
+
+// ---- Listening (the standalone app's microphone / audio interface) -----------------
+// The web view can't use the microphone, so the C++ engine listens instead and sends
+// "hostListen" about 30 times a second: { note (exact MIDI) | null, rms, sr, fftSize,
+// db: [dB per FFT bin, low bins only] }. The chord detector is the same
+// chromaFromSpectrum the website uses. The Logic plug-in has no input: canListen() says.
+
+let canListen = false;
+juce?.backend.addEventListener('hostInfo', (info) => (canListen = !!info?.canListen));
+juce?.backend.emitEvent('kkHostInfo', {});
+
+/** Can the app hear a microphone or audio interface? (The standalone app can; the Logic plug-in can't.) */
+export const hostCanListen = () => canListen;
+
+/** Same interface as PitchListener (pitch.js), fed by the C++ engine. */
+export class HostListener {
+  constructor(onNote) {
+    this.tracker = new NoteTracker(onNote);
+    this.pitchListeners = new Set();
+    this.chromaListeners = new Set();
+    this.range = 'normal';
+    this.running = false;
+    this.spectrum = null;
+    juce?.backend.addEventListener('hostListen', (frame) => this.frame(frame));
+  }
+
+  get active() {
+    return this.running;
+  }
+
+  addPitchListener(fn) {
+    this.pitchListeners.add(fn);
+    return () => this.pitchListeners.delete(fn);
+  }
+
+  addChromaListener(fn) {
+    this.chromaListeners.add(fn);
+    return () => this.chromaListeners.delete(fn);
+  }
+
+  setRange(kind) {
+    this.range = kind === 'bass' ? 'bass' : 'normal';
+    if (this.running) juce.backend.emitEvent('kkListen', { on: true, range: this.range });
+  }
+
+  async start() {
+    if (!canListen) throw new Error('the Logic plug-in has no microphone input; open the Knight Lyfe Ultimate app to play into the mic');
+    this.running = true;
+    juce.backend.emitEvent('kkListen', { on: true, range: this.range });
+  }
+
+  stop() {
+    this.running = false;
+    this.tracker.reset();
+    juce?.backend.emitEvent('kkListen', { on: false });
+  }
+
+  /** One analysis frame from the engine. */
+  frame({ note = null, rms = 0, sr = 48000, fftSize = 8192, db = [] } = {}) {
+    if (!this.running) return;
+    const exact = typeof note === 'number' && Number.isFinite(note) ? note : null;
+    this.tracker.push(exact === null ? null : Math.round(exact));
+    for (const fn of this.pitchListeners) fn(exact, 0.033);
+    if (!this.chromaListeners.size) return;
+    let chroma = null;
+    if (rms > 0.01) {
+      if (this.spectrum?.length !== fftSize / 2) this.spectrum = new Float32Array(fftSize / 2);
+      this.spectrum.fill(-140);
+      this.spectrum.set(db.slice(0, this.spectrum.length));
+      chroma = chromaFromSpectrum(this.spectrum, sr);
+    }
+    for (const fn of this.chromaListeners) fn(chroma);
+  }
 }
