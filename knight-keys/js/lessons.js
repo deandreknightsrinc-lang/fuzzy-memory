@@ -426,6 +426,125 @@ export const UNITS = [
       },
     ],
   },
+  {
+    id: 'voice-technique',
+    course: 'voice',
+    title: 'Warm-ups and technique',
+    icon: '🔥',
+    lessons: [
+      {
+        id: 'v-liptrill',
+        title: 'Lip trills',
+        steps: [
+          { type: 'info', text: 'A lip trill is the singer\'s favourite warm-up: close your lips loosely and blow so they flutter, like a motorboat ("brrr"), then add your voice. It balances air and voice, so high notes come easier. If your lips won\'t flutter, press a finger gently into each cheek.' },
+          { type: 'sing', notes: [60, 62, 64, 62, 60], hear: true, hold: 0.6, names: ['brr', 'brr', 'brr', 'brr', 'brr'], text: 'Lip trill on Do Re Mi Re Do (or sing "ah" if the trill stops).' },
+          { type: 'sing', notes: [60, 64, 67, 64, 60], hear: true, hold: 0.6, names: ['brr', 'brr', 'brr', 'brr', 'brr'], text: 'Now Do Mi Sol Mi Do: a bigger stretch, same easy air.' },
+        ],
+      },
+      {
+        id: 'v-hum',
+        title: 'Humming and resonance',
+        steps: [
+          { type: 'info', text: 'Hum with your lips closed and your teeth apart: you should feel a buzz on your lips and nose. That buzz is resonance, the ring that makes a voice carry without pushing. Keep it when you open into "ah".' },
+          { type: 'sing', notes: [67, 65, 64, 62, 60], hear: true, hold: 0.8, names: ['mm', 'mm', 'mm', 'mm', 'mm'], text: 'Hum down: Sol Fa Mi Re Do.' },
+          { type: 'sing', notes: [60, 60], hear: true, hold: 1.5, names: ['mm…', '…ah'], text: 'Hum on Do, then open to "ah" on the same note: keep the buzz.' },
+        ],
+      },
+      {
+        id: 'v-vowels',
+        title: 'Clear vowels',
+        steps: [
+          { type: 'info', text: 'Words are carried by vowels. Choirs sound together when everyone shapes them the same way: tall "ah", bright "eh", narrow "ee", round "oh", small "oo". Keep the note steady while only your mouth changes.' },
+          { type: 'sing', notes: [62, 62, 62, 62, 62], hear: true, hold: 0.8, names: ['ah', 'eh', 'ee', 'oh', 'oo'], text: 'One note, five vowels: ah, eh, ee, oh, oo. The pitch shouldn\'t move.' },
+          { type: 'sing', notes: [65, 65, 65, 65, 65], hear: true, hold: 0.8, names: ['oo', 'oh', 'ah', 'eh', 'ee'], text: 'A little higher, vowels backwards.' },
+        ],
+      },
+      {
+        id: 'v-longnotes',
+        title: 'Long notes and breath control',
+        steps: [
+          { type: 'info', text: 'Long notes need steady air, not more air. Breathe in low (belly and sides), then let the air out slowly, as if you\'re trying to make it last. If the note wobbles or goes flat at the end, start with a bigger breath.' },
+          { type: 'sing', notes: [60, 64], hear: true, hold: 3, text: 'Hold each note for 3 seconds: Do, then Mi.' },
+          { type: 'sing', notes: [67], hear: true, hold: 5, text: 'Sol, held for 5 seconds. Steady to the very end.' },
+        ],
+      },
+      {
+        id: 'v-dynamics',
+        title: 'Soft and strong',
+        steps: [
+          { type: 'info', text: 'Dynamics are how loud or soft you sing. Soft singing still needs support from your breath: a soft note should stay in tune and float, not go breathy. Then sing the same note strong, without shouting or squeezing your throat.' },
+          { type: 'sing', notes: [64, 64], hear: true, hold: 1.5, names: ['soft', 'strong'], text: 'Mi, soft (like a lullaby), then strong (like a chorus). Same pitch both times.' },
+          { type: 'sing', notes: [60, 64, 67, 72], hear: true, hold: 1, names: ['soft', '', '', 'strong'], text: 'Grow louder as you climb: Do Mi Sol Do.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'voice-ear',
+    course: 'voice',
+    title: 'Ear training',
+    icon: '👂',
+    lessons: [
+      {
+        id: 'v-intervals',
+        title: 'Jumps: the 4th and the 5th',
+        steps: [
+          { type: 'info', text: 'Big jumps are easier when you link them to songs you know. Do to Fa (a 4th) starts "Here Comes the Bride" and "Amazing Grace". Do to Sol (a 5th) starts "Twinkle, Twinkle". Hear the song in your head, then sing the jump.', keys: [60, 65, 67] },
+          { type: 'sing', notes: [60, 65, 60, 65], hear: true, names: ['Do', 'Fa', 'Do', 'Fa'], text: 'The 4th: Do, Fa ("A-ma-").' },
+          { type: 'sing', notes: [60, 67, 60, 67], hear: true, names: ['Do', 'Sol', 'Do', 'Sol'], text: 'The 5th: Do, Sol ("Twin-kle").' },
+        ],
+      },
+      {
+        id: 'v-minor',
+        title: 'The minor sound',
+        steps: [
+          { type: 'info', text: 'Minor melodies feel thoughtful, prayerful. They centre on La instead of Do. La, Do, Mi is a minor chord; sing it slowly and feel how different it is from Do, Mi, Sol.', keys: [57, 60, 64] },
+          { type: 'sing', notes: [57, 60, 64, 60, 57], hear: true, names: ['La', 'Do', 'Mi', 'Do', 'La'], text: 'La Do Mi Do La: the minor chord, one note at a time.' },
+          { type: 'sing', notes: [57, 59, 60, 62, 64, 62, 60, 59, 57], hear: true, names: ['La', 'Ti', 'Do', 'Re', 'Mi', 'Re', 'Do', 'Ti', 'La'], text: 'Up and down the minor five: La Ti Do Re Mi.' },
+        ],
+      },
+      {
+        id: 'v-noref',
+        title: 'On your own: no reference notes',
+        steps: [
+          { type: 'info', text: 'Real singing has no piano playing every note for you. You\'ll hear Do once, then sing the rest from memory. Hear each note in your head before you sing it: that inner hearing is what keeps a choir in tune.' },
+          { type: 'sing', notes: [60], hear: true, hold: 1, names: ['Do'], text: 'Here is Do. Sing it and remember it.' },
+          { type: 'sing', notes: [62, 64, 65, 67, 65, 64, 62, 60], names: ['Re', 'Mi', 'Fa', 'Sol', 'Fa', 'Mi', 'Re', 'Do'], text: 'Now on your own: Re Mi Fa Sol, and back down to Do.' },
+          { type: 'sing', notes: [64, 67, 72, 67, 64, 60], names: ['Mi', 'Sol', 'Do', 'Sol', 'Mi', 'Do'], text: 'And the leaps: Mi Sol high Do, back down.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'voice-worship',
+    course: 'voice',
+    title: 'Worship singing',
+    icon: '🙌',
+    lessons: [
+      {
+        id: 'v-runs',
+        title: 'Your first gospel run',
+        steps: [
+          { type: 'info', text: 'A run (melisma) is several notes on one word: "Ye-e-e-es". Learn it slow and clean, note by note, then speed it up later. A simple one: down the scale from Sol to Do.', keys: [67, 65, 64, 62, 60] },
+          { type: 'sing', notes: [67, 65, 64, 62, 60], hear: true, hold: 0.5, names: ['Ye-', 'e-', 'e-', 'e-', 'es'], text: 'Slowly: Sol Fa Mi Re Do on "yes".' },
+          { type: 'sing', notes: [64, 62, 60, 62, 60], hear: true, hold: 0.35, names: ['Lo-', 'o-', 'o-', 'o-', 'rd'], text: 'A turn: Mi Re Do Re Do on "Lord". Lighter and quicker.' },
+        ],
+      },
+      {
+        id: 'v-harmony3',
+        title: 'Harmony: a third above',
+        steps: [
+          { type: 'info', text: 'The easiest harmony sits a third above the melody: when the melody sings Do, you sing Mi; Re, you sing Fa; Mi, you sing Sol. It moves the same way as the tune, just higher. Learn the harmony line on its own first.', keys: [64, 65, 67] },
+          { type: 'sing', notes: [60, 62, 64, 62, 60], hear: true, names: ['Do', 'Re', 'Mi', 'Re', 'Do'], text: 'The melody: Do Re Mi Re Do.' },
+          { type: 'sing', notes: [64, 65, 67, 65, 64], hear: true, names: ['Mi', 'Fa', 'Sol', 'Fa', 'Mi'], text: 'The harmony, a third above: Mi Fa Sol Fa Mi.' },
+          { type: 'sing', notes: [64, 65, 67, 65, 64], names: ['Mi', 'Fa', 'Sol', 'Fa', 'Mi'], text: 'Harmony again, without help. Hum the melody in your head underneath.' },
+        ],
+      },
+      { id: 'v-joyful', title: 'Sing: Joyful, Joyful', steps: [{ type: 'song', song: 'joyful', part: '0', voice: true, text: 'A bright hymn: smile while you sing it (it really changes the sound). The song waits for each note.' }] },
+      { id: 'v-saints', title: 'Sing: When the Saints', steps: [{ type: 'song', song: 'saints', part: '0', voice: true, text: 'Big and happy: strong breaths before each line, and let the long notes ring.' }] },
+      { id: 'v-doxology', title: 'Sing: the Doxology', steps: [{ type: 'song', song: 'doxology', part: '0', voice: true, text: '"Praise God, from whom all blessings flow": steady, even notes, one breath per line.' }] },
+    ],
+  },
 
   // ---- Reading music -----------------------------------------------------------
   // A note shows on the staff and the keys stay dark: you find it by reading.

@@ -17,6 +17,7 @@ test('every drum, bass and guitar lesson has a filming script by its course teac
     }
   }
   for (const { lesson } of lessonsOf('piano').filter((e) => e.unit.id === 'scales')) assert.equal(videoScriptFor(lesson.id)?.teacher, COURSE_TEACHERS.piano, `${lesson.id}: Maestro K`);
+  for (const { lesson } of lessonsOf('voice').filter((e) => ['voice-technique', 'voice-ear', 'voice-worship'].includes(e.unit.id))) assert.equal(videoScriptFor(lesson.id)?.teacher, COURSE_TEACHERS.voice, `${lesson.id}: Melody Grace`);
   const ids = new Set(ALL_LESSONS.map((l) => l.id));
   for (const id of Object.keys(VIDEO_SCRIPTS)) assert.ok(ids.has(id), `${id} is a real lesson`);
 });

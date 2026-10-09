@@ -1305,12 +1305,16 @@ panels.forEach((panel, order) => {
     <button data-act="color" title="Colors">🎨</button>
     <button data-act="top" title="Always on top" hidden>📌</button>
     <button data-act="float" title="Detach / dock">⧉</button>
+    <button data-act="max" title="Enlarge to fill the window (double-click the title)">⤢</button>
+    <button data-act="full" title="Full screen (Esc to leave)">⛶</button>
     <button data-act="hide" title="Hide panel">✕</button>`;
   panel.prepend(head);
 
   head.addEventListener('click', (e) => {
     const act = e.target.closest('button')?.dataset.act;
     if (act === 'float') setFloating(panel, !panel.classList.contains('floating'));
+    else if (act === 'max') toggleEnlarged(panel);
+    else if (act === 'full') toggleFullscreen(panel);
     else if (act === 'hide') showPanel(id, false);
     else if (act === 'top') {
       const on = !panel.classList.contains('on-top');
@@ -1321,9 +1325,13 @@ panels.forEach((panel, order) => {
     } else if (act === 'color') toggleColorPop(panel);
   });
 
+  head.addEventListener('dblclick', (e) => {
+    if (!e.target.closest('button')) toggleEnlarged(panel);
+  });
+
   // Dragging floating panels by their header.
   head.addEventListener('pointerdown', (e) => {
-    if (!panel.classList.contains('floating') || e.target.closest('button')) return;
+    if (!panel.classList.contains('floating') || panel.classList.contains('enlarged') || e.target.closest('button')) return;
     const ws = workspace.getBoundingClientRect();
     const start = { x: e.clientX, y: e.clientY, left: panel.offsetLeft, top: panel.offsetTop };
     head.setPointerCapture(e.pointerId);
@@ -6153,10 +6161,55 @@ for (const dlg of document.querySelectorAll('dialog.tool-window')) {
   new MutationObserver(() => dlg.open && windowToFront(dlg)).observe(dlg, { attributes: true, attributeFilter: ['open'] });
 }
 
+// ---- Enlarge and full screen (every window and panel) ---------------------------
+
+/** Fill the app window with a window or panel, or put it back. Canvases redraw at the new size. */
+function toggleEnlarged(el, on = !el.classList.contains('enlarged')) {
+  if (!on && document.fullscreenElement === el) document.exitFullscreen?.();
+  el.classList.toggle('enlarged', on);
+  el.querySelectorAll('[data-act="max"], .win-max').forEach((b) => {
+    b.classList.toggle('on', on);
+    b.textContent = on ? '⤡' : '⤢';
+    b.title = on ? 'Back to normal size (double-click the title)' : 'Enlarge to fill the window (double-click the title)';
+  });
+  window.dispatchEvent(new Event('resize'));
+}
+
+/** Full screen for a window or panel (Esc leaves). Falls back to enlarging where full screen isn't allowed. */
+function toggleFullscreen(el) {
+  if (document.fullscreenElement === el) return document.exitFullscreen?.();
+  if (!el.requestFullscreen) return toggleEnlarged(el, true);
+  el.requestFullscreen().catch(() => toggleEnlarged(el, true));
+}
+document.addEventListener('fullscreenchange', () => window.dispatchEvent(new Event('resize')));
+
+/** Adds ⤢ (enlarge) and ⛶ (full screen) to a tool window's title bar. */
+function addWindowControls(dlg) {
+  const head = dlg.querySelector('.tool-head');
+  if (!head || head.querySelector('.win-max')) return;
+  const close = head.querySelector('[data-close]');
+  const max = Object.assign(document.createElement('button'), { className: 'mini win-max', textContent: '⤢', title: 'Enlarge to fill the window (double-click the title)' });
+  const full = Object.assign(document.createElement('button'), { className: 'mini win-full', textContent: '⛶', title: 'Full screen (Esc to leave)' });
+  max.setAttribute('aria-label', 'Enlarge');
+  full.setAttribute('aria-label', 'Full screen');
+  max.onclick = () => toggleEnlarged(dlg);
+  full.onclick = () => toggleFullscreen(dlg);
+  head.insertBefore(max, close);
+  head.insertBefore(full, close);
+  head.addEventListener('dblclick', (e) => {
+    if (!e.target.closest('button, input, select, textarea')) toggleEnlarged(dlg);
+  });
+  // Closing a window puts it back to normal size for next time.
+  dlg.addEventListener('close', () => {
+    if (dlg.classList.contains('enlarged') || document.fullscreenElement === dlg) toggleEnlarged(dlg, false);
+  });
+}
+
 function makeDraggable(dlg) {
+  addWindowControls(dlg);
   const head = dlg.querySelector('.tool-head');
   head.addEventListener('pointerdown', (e) => {
-    if (e.target.closest('button')) return;
+    if (e.target.closest('button') || dlg.classList.contains('enlarged')) return;
     const r = dlg.getBoundingClientRect();
     const dx = e.clientX - r.left;
     const dy = e.clientY - r.top;
