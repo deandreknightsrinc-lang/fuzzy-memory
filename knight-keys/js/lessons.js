@@ -826,6 +826,137 @@ export const UNITS = [
       },
     ],
   },
+  {
+    id: 'guitar-chords2',
+    course: 'guitar',
+    title: 'More open chords',
+    icon: '🎼',
+    lessons: [
+      {
+        id: 'g-e-a',
+        title: 'E and A major',
+        steps: [
+          { type: 'info', text: 'E: your Em shape plus finger 1 on the 1st fret of the G string. A 2nd fret (finger 2), D 2nd fret (finger 3), G 1st fret (finger 1). Strum all six strings.', chord: 'E' },
+          { type: 'strum', chords: ['Em', 'E', 'Em', 'E'], text: 'Em to E: one finger turns minor into major.' },
+          { type: 'info', text: 'A: fingers 1, 2 and 3 side by side on the 2nd fret of the D, G and B strings. Skip the low E string (×).', chord: 'A' },
+          { type: 'strum', chords: ['A', 'E', 'A', 'D'], text: 'A, E, A, D: the three chords of countless songs in A.' },
+        ],
+      },
+      {
+        id: 'g-dm',
+        title: 'D minor and the minor family',
+        steps: [
+          { type: 'info', text: 'Dm: a small triangle on the top three strings: G 2nd fret (finger 2), B 3rd fret (finger 3), high E 1st fret (finger 1). Strum only the top four strings.', chord: 'Dm' },
+          { type: 'strum', chords: ['Dm', 'Am', 'Dm', 'Am'], text: 'Dm and Am: hear how minor chords sound thoughtful, a little sad.' },
+          { type: 'strum', chords: ['Am', 'Dm', 'Em', 'Am'], text: 'The minor family: Am, Dm, Em.' },
+        ],
+      },
+      {
+        id: 'g-sevenths',
+        title: 'Seventh chords',
+        steps: [
+          { type: 'info', text: 'A seventh chord (G7, D7, E7...) adds one note that wants to move: it leads you home to the next chord. G7: low E 3rd fret (finger 3), A 2nd fret (finger 2), high E 1st fret (finger 1).', chord: 'G7' },
+          { type: 'strum', chords: ['G', 'G7', 'C', 'C'], text: 'G, G7, then home to C.' },
+          { type: 'info', text: 'D7: G 2nd fret (finger 2), B 1st fret (finger 1), high E 2nd fret (finger 3); top four strings. E7: your E chord with the D-string finger lifted.', chord: 'D7' },
+          { type: 'strum', chords: ['D7', 'G', 'E7', 'Am'], text: 'D7 leads to G, E7 leads to Am.' },
+        ],
+      },
+      {
+        id: 'g-colors',
+        title: 'Worship colours: Cadd9 and Dsus4',
+        steps: [
+          { type: 'info', text: 'Worship guitarists add colour with Cadd9: A 3rd fret (finger 2), D 2nd fret (finger 1), B 3rd fret (finger 3). It rings bright and open next to G.', chord: 'Cadd9' },
+          { type: 'strum', chords: ['G', 'Cadd9', 'G', 'Cadd9'], text: 'G to Cadd9 and back.' },
+          { type: 'info', text: 'Dsus4 is a D that leans: G 2nd fret (finger 1), B 3rd fret (finger 2), high E 3rd fret (finger 3). Play it, then lift finger 3 onto the 2nd fret for D: the lean resolves.', chord: 'Dsus4' },
+          { type: 'strum', chords: ['Dsus4', 'D', 'Dsus4', 'D'], text: 'Dsus4 resolving to D.' },
+        ],
+      },
+      {
+        id: 'g-easyf',
+        title: 'The easy F',
+        steps: [
+          { type: 'info', text: 'F has a reputation, so we sneak up on it. Fmaj7 first: D 3rd fret (finger 3), G 2nd fret (finger 2), B 1st fret (finger 1), high E open. Top four strings.', chord: 'Fmaj7' },
+          { type: 'strum', chords: ['C', 'Fmaj7', 'C', 'Fmaj7'], text: 'C to Fmaj7: dreamy.' },
+          { type: 'info', text: 'Now lay finger 1 flat across the B and high E strings at the 1st fret: that\'s F. Press with the side of your finger; roll it a little toward the headstock.', chord: 'F' },
+          { type: 'strum', chords: ['C', 'F', 'G', 'C'], text: 'C, F, G, C: the 1-4-5 in C.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'guitar-strum',
+    course: 'guitar',
+    title: 'Strumming patterns',
+    icon: '🪕',
+    lessons: [
+      {
+        id: 'g-downup',
+        title: 'Down-up strumming',
+        steps: [
+          { type: 'info', text: 'Eighth notes: strum down on the beat and up on the "and": "1 and 2 and 3 and 4 and" = D U D U D U D U. The up-strum is lighter and catches only the top few strings. Your hand never stops moving.' },
+          { type: 'chart', match: 'chord', chords: ['G', 'Em', 'C', 'D', 'G', 'Em', 'C', 'G'], beats: 4, bpm: 66, text: 'Down-up on every beat: G, Em, C, D.' },
+        ],
+      },
+      {
+        id: 'g-worshipstrum',
+        title: 'The worship strum',
+        steps: [
+          { type: 'info', text: 'The most-used strum in worship: "D, D U, U D U" counted "1, 2 and, and 4 and". Keep your hand moving down-up all the time and just miss the strings on beat 3 (the "ghost" down-strum).' },
+          { type: 'chart', match: 'chord', chords: ['G', 'D', 'Em', 'C', 'G', 'D', 'Em', 'C'], beats: 4, bpm: 66, text: 'The worship four with the worship strum.' },
+        ],
+      },
+      {
+        id: 'g-waltz',
+        title: 'Waltz strum: Silent Night',
+        steps: [
+          { type: 'info', text: 'In 3/4 time strum "DOWN down down": a strong strum on 1, two lighter ones on 2 and 3. Silent Night uses C, G7 and F.', chord: 'G7' },
+          { type: 'chart', match: 'chord', song: 'silentnight', bpm: 72, text: 'Play along: Silent Night in C.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'guitar-church',
+    course: 'guitar',
+    title: 'Church songs',
+    icon: '⛪',
+    lessons: [
+      {
+        id: 'g-saints',
+        title: 'Play along: When the Saints',
+        steps: [
+          { type: 'info', text: 'C, G, C7 and F. C7 is your C chord plus finger 4 on the 3rd fret of the G string; it leads into the F.', chord: 'C7' },
+          { type: 'chart', match: 'chord', song: 'saints', bpm: 96, text: 'Strum along: When the Saints.' },
+        ],
+      },
+      {
+        id: 'g-doxology',
+        title: 'Play along: Doxology',
+        steps: [
+          { type: 'info', text: 'The Doxology ("Praise God, from whom all blessings flow") moves fast: some chords last only one beat. G, D, C and Em. Strum one down-stroke per beat and keep your eyes on the next chord.' },
+          { type: 'chart', match: 'chord', song: 'doxology', bpm: 60, text: 'Play along: the Doxology in G.' },
+        ],
+      },
+      {
+        id: 'g-barre',
+        title: 'Your first barre chords: Bm and F#m',
+        steps: [
+          { type: 'info', text: 'Bm: lay finger 1 across the strings at the 2nd fret (from the A string down), then finger 3 on the D string 4th fret, finger 4 on the G string 4th fret, finger 2 on the B string 3rd fret. Skip the low E. It takes weeks to sound clean: that\'s normal.', chord: 'Bm' },
+          { type: 'strum', chords: ['D', 'A', 'Bm', 'G'], text: 'D, A, Bm, G: the worship four in D.' },
+          { type: 'info', text: 'F#m: finger 1 flat across all six strings at the 2nd fret, fingers 3 and 4 on the 4th fret of the A and D strings. The Em shape, moved up two frets.', chord: 'F#m' },
+          { type: 'strum', chords: ['Bm', 'F#m', 'Bm', 'F#m'], text: 'Bm to F#m.' },
+        ],
+      },
+      {
+        id: 'g-ballad68',
+        title: 'Play along: the 6/8 worship ballad',
+        steps: [
+          { type: 'info', text: 'A slow 6/8 ballad in D: count "1 2 3 4 5 6" and strum on 1 and 4, letting each chord ring. G/D is just G, A/C# is A, Asus4 resolves to A. You know every shape now, including Bm and F#m.' },
+          { type: 'chart', match: 'chord', song: 'ballad68', bpm: 60, text: 'Play along: the 6/8 worship ballad in D.' },
+        ],
+      },
+    ],
+  },
 
   // ---- Bass ----------------------------------------------------------------------
   // Strings: 1 = thinnest (G), 4 = thickest (low E). The microphone listens lower in
