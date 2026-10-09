@@ -7,6 +7,7 @@ import { parseMidi, buildSong } from '../js/midi-file.js';
 import { laneOf, sameDrum } from '../js/drumkit.js';
 import { TUNINGS, CHORD_SHAPES, fretNote, chordShape, shapeNotes, chordTarget, chartTimeline, ChartJudge, rootPosition } from '../js/fretted.js';
 import { chromaFromSpectrum, chordFromChroma, chromaMatches } from '../js/pitch.js';
+import { strum, analyserDb } from './guitar-sim.js';
 import { makeChoirParts, choirMidi, guessChord, diatonicChord, PARTS } from '../js/choir.js';
 
 test('every lesson step is valid and points at real songs', () => {
@@ -313,4 +314,44 @@ test('play-along charts and their judge', () => {
   const wf = chartTimeline({ song: 'worshipflow', bpm: 66 }, SONGS);
   assert.equal(wf.windows[1].symbol, 'D/F#');
   assert.equal(wf.windows[1].bass, 6);
+});
+
+// A virtual guitar (plucked-string model) strums every chord shape, so recognition
+// is checked on realistic sound: overtones, a slow or fast strum, an out-of-tune
+// guitar, a noisy room, a bright pick.
+test('strummed guitar chords are recognized (virtual guitar)', () => {
+  const symbols = Object.keys(CHORD_SHAPES);
+  let heard = 0;
+  let total = 0;
+  let wrongAccepted = 0;
+  let wrongTotal = 0;
+  const misses = [];
+  for (const sym of symbols)
+    for (const [seed, opts] of [[1, {}], [2, { detuneCents: 15 }], [3, { noise: 0.01 }], [4, { strumMs: 80 }], [5, { bright: 0.9 }]]) {
+      const { audio, sr } = strum(sym, { seed, ...opts });
+      const chroma = chromaFromSpectrum(analyserDb(audio, sr, 0.35), sr);
+      const t = chordTarget(sym);
+      total++;
+      if (chromaMatches(chroma, t.root, t.quality, t.sus ? t.pcs : null, t.notes)) heard++;
+      else misses.push(`${sym} ${JSON.stringify(opts)}`);
+      for (const other of symbols) {
+        const o = chordTarget(other);
+        const related = o.root === t.root && (o.notes.every((pc) => t.notes.includes(pc)) || t.notes.every((pc) => o.notes.includes(pc)));
+        if (related) continue;
+        wrongTotal++;
+        if (chromaMatches(chroma, o.root, o.quality, o.sus ? o.pcs : null, o.notes)) wrongAccepted++;
+      }
+    }
+  assert.ok(heard / total >= 0.95, `recognized ${heard}/${total}; missed ${misses.join(', ')}`);
+  assert.ok(wrongAccepted / wrongTotal <= 0.002, `a wrong chord passed ${wrongAccepted}/${wrongTotal} times`);
+});
+
+test('silence, noise and a single note are not a chord', () => {
+  const sr = 48000;
+  const quiet = chromaFromSpectrum(new Float32Array(4096).fill(-120), sr);
+  assert.ok(!chromaMatches(quiet, 7, ''), 'silence');
+  const { audio } = strum([-1, -1, -1, -1, -1, 3], { seed: 9 }); // just the high G
+  const one = chromaFromSpectrum(analyserDb(audio, sr, 0.35), sr);
+  assert.ok(!chromaMatches(one, 0, '', null, chordTarget('C').notes), 'one G string is not a C chord');
+  assert.ok(!chromaMatches(one, 4, 'm', null, chordTarget('Em').notes), 'or an Em chord');
 });

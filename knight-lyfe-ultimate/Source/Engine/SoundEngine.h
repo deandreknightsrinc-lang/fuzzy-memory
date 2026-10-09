@@ -49,6 +49,9 @@ public:
     void postPanic();
     void setChannelGain (int uiChannel, float gain);
     void setInterfaceVolume (float v) { interfaceVolume = v; }
+    /** Host MIDI on every channel plays drums (a Logic drum track, an e-kit that isn't
+        on channel 10). Off: only channel 10 is drums and the rest plays the piano. */
+    void setHostDrumsOnAllChannels (bool on) noexcept { hostDrumsEverywhere = on; }
 
     /** Applies a batch the interface sent with emitEvent("kk", { batch: [...] }).
         Items: { m: [ch, status, d1, d2, delayMs] }, { g: [ch, gain] }, { off: delayMs },
@@ -138,6 +141,7 @@ private:
     ChannelGains songGains, liveGains;
     std::array<std::atomic<float>, ui::numChannels> uiGains;
     std::atomic<float> interfaceVolume { 1.0f };
+    std::atomic<bool> hostDrumsEverywhere { false };
 
     PianoSynth songPiano { *samples, songGains };
     PianoSynth livePiano { *samples, liveGains };

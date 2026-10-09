@@ -23,7 +23,7 @@ import { detectChord, noteName, pcName, solfege, keyName } from './theory.js';
 import { createDemoMidi } from './demo.js';
 import { GROOVES, GroovePlayer } from './grooves.js';
 import { SONGS, LEVELS, LEVEL_NAMES, DRUM_STYLE_NAMES, parsePitch, songToMidi, chartToChords, validateSong, loadMySongs, saveMySongs } from './songs.js';
-import { HostSynth, HostTransport, IN_HOST, onHostMidi, onHostTransport, hostSave, queryHostKit } from './host.js';
+import { HostSynth, HostTransport, HostListener, IN_HOST, hostCanListen, onHostMidi, onHostTransport, hostSave, queryHostKit } from './host.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -2487,7 +2487,7 @@ function showLessonStep(i) {
   Object.assign(lessonRun, { stepIdx: i, step, pos: 0, mistakes: 0, quizTries: 0, done: step.type === 'info', hint: false, missesHere: 0, readList: step.type === 'read' ? readNotes(step) : [] });
   setText($('lpText'), (step.type === 'quiz' ? step.question : step.text || '') + (step.type === 'chords' && micListener?.active ? ' (Chords need a USB keyboard or the on-screen keys: the microphone hears one note at a time.)' : ''));
   micListener?.setRange(step.instrument === 'bass' ? 'bass' : 'normal');
-  if (step.type === 'fret' || step.type === 'strum' || step.type === 'chart') lessonFeedback(micSupported() ? (step.type === 'chart' ? 'Count-in: one bar of clicks, then play!' : 'Your turn! (Turn on 🎤 so it can hear your guitar.)') : 'Play it on a MIDI keyboard or the keys below (the microphone works on the website).');
+  if (step.type === 'fret' || step.type === 'strum' || step.type === 'chart') lessonFeedback(micSupported() ? (step.type === 'chart' ? 'Count-in: one bar of clicks, then play!' : 'Your turn! (Turn on 🎤 so it can hear your guitar.)') : 'Play it on a MIDI keyboard or the keys below (the microphone works in the Knight Lyfe Ultimate app and on the website).');
   else if (step.type === 'hits' || step.type === 'groove') lessonFeedback(step.type === 'hits' ? 'Your turn: hit the drum that\'s lit up.' : step.mode === 'time' ? 'Count-in: one bar of clicks, then play!' : 'The beat waits for each hit. Follow the highway.');
   else lessonFeedback(step.type === 'info' ? '' : step.type === 'song' ? (step.voice ? 'The song is playing. Sing the yellow notes.' : step.noHints ? 'The song is playing. Read the staff and play.' : 'The song is playing. The yellow keys are yours.') : step.type === 'read' ? 'Which note is it? Play it.' : 'Your turn: the yellow key is next.');
   $('lpSing').hidden = step.type !== 'sing' && step.type !== 'range';
@@ -2667,7 +2667,8 @@ function leaveLesson() {
 
 // Microphone: notes heard from any piano, keyboard or singer count like keys you played.
 let micListener = null;
-const micSupported = () => !IN_HOST && !!navigator.mediaDevices?.getUserMedia;
+// In the app the C++ engine listens (the standalone app's mic or audio interface).
+const micSupported = () => (IN_HOST ? hostCanListen() : !!navigator.mediaDevices?.getUserMedia);
 const showMicOn = (on) => ['lpMic', 'boothMic'].forEach((id) => $(id).classList.toggle('on', on));
 
 /** Singers: a note in any octave counts as the one the song is waiting for. */
@@ -2689,7 +2690,7 @@ async function toggleMic(force) {
   }
   try {
     const ctx = synth.ensure();
-    micListener ??= new PitchListener((on, heard) => {
+    micListener ??= new (IN_HOST ? HostListener : PitchListener)((on, heard) => {
       const midi = on ? foldForSinger(heard) : (micHeld.get(heard) ?? heard);
       if (on) micHeld.set(heard, midi);
       else micHeld.delete(heard);
@@ -2803,7 +2804,7 @@ function startStrum(step) {
   strumRun.off = onChroma((chroma) => {
     if (lessonRun.step !== step || lessonRun.done || !chroma || performance.now() < strumRun.quietUntil) return;
     const t = chordTarget(step.chords[lessonRun.pos]);
-    if (chromaMatches(chroma, t.root, t.quality, t.sus ? t.pcs : null)) {
+    if (chromaMatches(chroma, t.root, t.quality, t.sus ? t.pcs : null, t.notes)) {
       if (++strumRun.count >= 3) strumHit();
     } else strumRun.count = 0;
   });
@@ -2825,7 +2826,7 @@ function startChart(step) {
     if (w) {
       const keys = [...liveNotesDown()].map((n) => n % 12);
       if (step.match === 'root') ok = keys.includes(w.bass) || (chartRun.pitch !== null && ((Math.round(chartRun.pitch) % 12) + 12) % 12 === w.bass);
-      else ok = w.pcs.every((pc) => keys.includes(pc)) || (!!chartRun.chroma && chromaMatches(chartRun.chroma, w.root, w.quality, w.sus ? w.pcs : null));
+      else ok = w.pcs.every((pc) => keys.includes(pc)) || (!!chartRun.chroma && chromaMatches(chartRun.chroma, w.root, w.quality, w.sus ? w.pcs : null, w.notes));
       chartRun.judge.frame(t, ok);
     }
     if (i !== chartRun.index) {
@@ -2987,7 +2988,7 @@ function startSinging(step) {
       lessonRun.done = true;
       lessonRun.stars[lessonRun.stepIdx] = 0;
       $('lpNext').disabled = false;
-      lessonFeedback(IN_HOST ? 'Singing needs the microphone: open Knight Keys in Safari or Chrome for this step. Skip it for now with Next.' : 'This browser can\'t use a microphone. Skip this step with Next.', 'bad');
+      lessonFeedback(IN_HOST ? 'Singing needs the microphone: open the Knight Lyfe Ultimate app (the Logic plug-in can\'t hear a mic) or the website. Skip it for now with Next.' : 'This browser can\'t use a microphone. Skip this step with Next.', 'bad');
     }
     return;
   }

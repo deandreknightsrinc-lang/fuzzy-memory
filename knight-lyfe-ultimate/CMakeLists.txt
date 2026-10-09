@@ -59,7 +59,8 @@ add_dependencies(KnightLyfeAssets KnightLyfeAssetZips)
 set(ENGINE_SOURCES
     Source/Engine/PianoEngine.cpp
     Source/Engine/DrumSynth.cpp
-    Source/Engine/SoundEngine.cpp)
+    Source/Engine/SoundEngine.cpp
+    Source/Engine/AudioListener.cpp)
 
 # ---- Plug-in + standalone app ------------------------------------------------
 juce_add_plugin(KnightLyfeUltimate
@@ -76,6 +77,8 @@ juce_add_plugin(KnightLyfeUltimate
     NEEDS_MIDI_OUTPUT FALSE
     IS_MIDI_EFFECT FALSE
     EDITOR_WANTS_KEYBOARD_FOCUS TRUE
+    MICROPHONE_PERMISSION_ENABLED TRUE
+    MICROPHONE_PERMISSION_TEXT "Knight Lyfe Ultimate listens to your guitar, bass or voice during lessons."
     NEEDS_WEB_BROWSER TRUE
     AU_MAIN_TYPE kAudioUnitType_MusicDevice
     VST3_CATEGORIES Instrument Piano

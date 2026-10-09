@@ -71,3 +71,48 @@ test('host MIDI reaches the interface', () => {
   listeners.hostMidi([[0x90, 60, 100], [0x80, 60, 0]]);
   assert.deepEqual(got, [[0x90, 60, 100], [0x80, 60, 0]]);
 });
+
+test('in the app, the engine listens: notes and strummed chords reach the lessons', async () => {
+  const { HostListener, hostCanListen } = await import('../js/host.js');
+  const { chromaMatches } = await import('../js/pitch.js');
+  const { chordTarget } = await import('../js/fretted.js');
+  const { strum, analyserDb } = await import('./guitar-sim.js');
+
+  const notes = [];
+  const l = new HostListener((on, midi) => notes.push([on, midi]));
+  listeners.hostInfo({ canListen: false }); // the Logic plug-in
+  assert.equal(hostCanListen(), false);
+  await assert.rejects(l.start(), /plug-in/, 'the plug-in explains it has no mic');
+
+  listeners.hostInfo({ canListen: true }); // the standalone app
+  sent.length = 0;
+  await l.start();
+  assert.deepEqual(sent.at(-1), ['kkListen', { on: true, range: 'normal' }]);
+  l.setRange('bass');
+  assert.deepEqual(sent.at(-1), ['kkListen', { on: true, range: 'bass' }]);
+
+  const pitches = [];
+  l.addPitchListener((exact) => pitches.push(exact));
+  for (let i = 0; i < 4; i++) listeners.hostListen({ note: 57.04, rms: 0.2, sr: 48000, fftSize: 8192, db: [] });
+  assert.equal(pitches[0], 57.04, 'exact pitch for singing');
+  assert.deepEqual(notes[0], [true, 57], 'a steady pitch becomes a note-on');
+
+  // A strummed G from the virtual guitar, as the engine sends it (bins up to 1500 Hz).
+  const chromas = [];
+  l.addChromaListener((c) => chromas.push(c));
+  const { audio, sr } = strum('G', { seed: 3 });
+  const db = Array.from(analyserDb(audio, sr, 0.35).slice(0, 260), (v) => Math.round(v * 10) / 10);
+  listeners.hostListen({ note: null, rms: 0.2, sr, fftSize: 8192, db });
+  const g = chordTarget('G');
+  assert.ok(chromaMatches(chromas.at(-1), g.root, g.quality, null, g.notes), 'heard as G');
+  const c = chordTarget('C');
+  assert.ok(!chromaMatches(chromas.at(-1), c.root, c.quality, null, c.notes), 'not C');
+  listeners.hostListen({ note: null, rms: 0.001, sr, fftSize: 8192, db });
+  assert.equal(chromas.at(-1), null, 'too quiet: no chord');
+
+  l.stop();
+  assert.deepEqual(sent.at(-1), ['kkListen', { on: false }]);
+  const before = pitches.length;
+  listeners.hostListen({ note: 60, rms: 0.2, sr, fftSize: 8192, db });
+  assert.equal(pitches.length, before, 'nothing after stop');
+});

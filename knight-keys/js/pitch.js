@@ -233,58 +233,100 @@ export class NoteTracker {
 /**
  * Pitch-class profile ("chroma") of a spectrum: how much of each of the 12 notes
  * is sounding. `db` is an analyser's getFloatFrequencyData() output.
+ *
+ * Tuned on strummed guitar (test/guitar-sim.js): it starts below the low E string
+ * (82 Hz) and stops at 1200 Hz, because higher up the strings' overtones (5th, 7th,
+ * 9th harmonics...) are as loud as real chord notes and would add notes that
+ * aren't in the chord. Peaks are compressed (square root) so one loud string
+ * doesn't drown the others.
  */
-export function chromaFromSpectrum(db, sampleRate, { minHz = 90, maxHz = 2000 } = {}) {
+export function chromaFromSpectrum(db, sampleRate, { minHz = 70, maxHz = 1200 } = {}) {
   const fftSize = db.length * 2;
   const chroma = new Array(12).fill(0);
   const lo = Math.max(1, Math.floor((minHz * fftSize) / sampleRate));
   const hi = Math.min(db.length - 2, Math.ceil((maxHz * fftSize) / sampleRate));
+  let loudest = -Infinity;
+  for (let i = lo; i <= hi; i++) loudest = Math.max(loudest, db[i]);
   for (let i = lo; i <= hi; i++) {
     // Only spectral peaks count, so the skirts of a loud note don't leak into its neighbours.
-    if (db[i] < db[i - 1] || db[i] < db[i + 1] || db[i] < -85) continue;
+    if (db[i] < db[i - 1] || db[i] < db[i + 1] || db[i] < -85 || db[i] < loudest - 50) continue;
     // Parabolic interpolation finds the peak between bins: much finer than the bin spacing.
     const den = db[i - 1] - 2 * db[i] + db[i + 1];
     const delta = den ? (0.5 * (db[i - 1] - db[i + 1])) / den : 0;
     const f = ((i + delta) * sampleRate) / fftSize;
-    const pc = ((Math.round(12 * Math.log2(f / 440) + 69) % 12) + 12) % 12;
-    chroma[pc] += 10 ** (db[i] / 20);
+    const note = 12 * Math.log2(f / 440) + 69;
+    const pc = ((Math.round(note) % 12) + 12) % 12;
+    // A peak halfway between two notes is probably not a note: it counts less.
+    const inTune = Math.abs(note - Math.round(note)) < 0.35 ? 1 : 0.3;
+    chroma[pc] += 10 ** (db[i] / 40) * inTune;
   }
   const total = chroma.reduce((a, b) => a + b, 0);
   return total > 0 ? chroma.map((c) => c / total) : chroma;
 }
 
-const TRIAD_TEMPLATES = [
-  { quality: '', ints: [0, 4, 7] },
-  { quality: 'm', ints: [0, 3, 7] },
+// A chord is heard as a template: its notes plus their first overtones (octave,
+// octave + fifth, two octaves, two octaves + third), the root a little stronger.
+const HARMONICS = [
+  [0, 1],
+  [12, 0.55],
+  [19, 0.35],
+  [24, 0.22],
+  [28, 0.15],
 ];
+
+function chordTemplate(pcs) {
+  const t = new Array(12).fill(0);
+  pcs.forEach((pc, k) => HARMONICS.forEach(([semis, w]) => (t[(pc + semis) % 12] += w * (k === 0 ? 1.2 : 1))));
+  const norm = Math.hypot(...t);
+  return t.map((v) => v / norm);
+}
+
+/** How alike a chroma and a template are (cosine similarity, 0..1). */
+function similarity(chroma, template) {
+  let dot = 0;
+  let sq = 0;
+  for (let i = 0; i < 12; i++) {
+    dot += chroma[i] * template[i];
+    sq += chroma[i] * chroma[i];
+  }
+  return sq ? dot / Math.sqrt(sq) : 0;
+}
+
+/** Every chord a guitarist is likely to play by mistake: the rivals a chord must beat. */
+const CHORD_KINDS = { '': [0, 4, 7], m: [0, 3, 7], 7: [0, 4, 7, 10], m7: [0, 3, 7, 10], maj7: [0, 4, 7, 11], sus4: [0, 5, 7], sus2: [0, 2, 7] };
+const VOCABULARY = [];
+for (let root = 0; root < 12; root++)
+  for (const [kind, ints] of Object.entries(CHORD_KINDS)) {
+    const pcs = ints.map((i) => (root + i) % 12);
+    VOCABULARY.push({ root, kind, pcs, template: chordTemplate(pcs) });
+  }
 
 /** The major or minor chord that best explains a chroma, with a confidence (0..1). */
 export function chordFromChroma(chroma) {
   let best = null;
-  for (let root = 0; root < 12; root++) {
-    for (const t of TRIAD_TEMPLATES) {
-      const pcs = t.ints.map((i) => (root + i) % 12);
-      // Root and fifth weigh a little more than the third, as on a strummed guitar.
-      const inChord = chroma[pcs[0]] * 1.1 + chroma[pcs[1]] + chroma[pcs[2]];
-      const score = inChord - 0.5 * (1 - chroma[pcs[0]] - chroma[pcs[1]] - chroma[pcs[2]]);
-      if (!best || score > best.score) best = { root, quality: t.quality, pcs, score, share: chroma[pcs[0]] + chroma[pcs[1]] + chroma[pcs[2]] };
-    }
+  for (const v of VOCABULARY) {
+    if (v.kind !== '' && v.kind !== 'm') continue;
+    const score = similarity(chroma, v.template);
+    if (!best || score > best.score) best = { root: v.root, quality: v.kind, pcs: v.pcs, score, share: v.pcs.reduce((a, pc) => a + chroma[pc], 0) };
   }
   return best;
 }
 
 /**
- * Does a chroma sound like this chord (root + major/minor)? Suspended chords
- * (no third) pass when their three notes carry most of the sound.
+ * Does a chroma sound like this chord? `notes` are all its pitch classes (root
+ * first; chordTarget(symbol).notes). Without them it's the root's major or minor
+ * triad, or `susPcs` for a suspended chord.
+ *
+ * The chord passes when it explains the sound well and no other likely chord
+ * explains it better. Its own close relatives (E for E7, Am for Am7) don't count as
+ * rivals, so a beginner who leaves off the 7th still passes.
  */
-export function chromaMatches(chroma, root, quality, susPcs = null) {
-  if (susPcs) {
-    // It must explain the sound at least as well as the best plain chord (G is not Dsus4).
-    const share = susPcs.reduce((a, pc) => a + chroma[pc], 0);
-    return share >= 0.55 && chroma[root] >= 0.12 && share >= chordFromChroma(chroma).share - 0.05;
-  }
-  const c = chordFromChroma(chroma);
-  return !!c && c.share >= 0.5 && c.root === root && c.quality === quality;
+export function chromaMatches(chroma, root, quality, susPcs = null, notes = null) {
+  const pcs = notes?.length ? notes : susPcs || (quality === 'm' ? [0, 3, 7] : [0, 4, 7]).map((i) => (root + i) % 12);
+  const score = similarity(chroma, chordTemplate(pcs));
+  if (score < 0.75) return false;
+  const relative = (v) => v.root === root && (v.pcs.every((pc) => pcs.includes(pc)) || pcs.every((pc) => v.pcs.includes(pc)));
+  return VOCABULARY.every((v) => relative(v) || similarity(chroma, v.template) <= score);
 }
 
 /**

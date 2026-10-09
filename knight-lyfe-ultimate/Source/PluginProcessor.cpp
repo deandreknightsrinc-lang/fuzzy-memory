@@ -1,6 +1,10 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#if JucePlugin_Build_Standalone
+ #include <juce_audio_plugin_client/Standalone/juce_StandaloneFilterWindow.h>
+#endif
+
 #include <array>
 
 // Output 1 is the main mix. Outputs 2-16 are drum outputs for Logic's "Multi-Output"
@@ -8,7 +12,12 @@
 // the drum groups unless the Kit Rack routes a drum somewhere else.
 juce::AudioProcessor::BusesProperties KnightLyfeProcessor::makeBuses()
 {
-    auto buses = BusesProperties().withOutput ("Main", juce::AudioChannelSet::stereo(), true);
+    auto buses = BusesProperties();
+    // The standalone app listens to the mic or an audio interface for lessons (guitar,
+    // bass, voice). The plug-ins don't take an input, so Logic sees a plain instrument.
+    if (juce::PluginHostType::getPluginLoadedAs() == wrapperType_Standalone)
+        buses = buses.withInput ("Input", juce::AudioChannelSet::mono(), true);
+    buses = buses.withOutput ("Main", juce::AudioChannelSet::stereo(), true);
     for (const auto* name : { "Kick", "Snare", "Hi-Hat", "Toms", "Cymbals", "Percussion" })
         buses = buses.withOutput (name, juce::AudioChannelSet::stereo(), false);
     for (int i = knightlyfe::numDrumGroups + 1; i <= knightlyfe::numDrumOutputs; ++i)
@@ -30,6 +39,25 @@ KnightLyfeProcessor::KnightLyfeProcessor()
    #endif
     engine.setKitFolder (support.getChildFile ("Knight Lyfe").getChildFile ("Kit"));
     reverbParam = parameters.getRawParameterValue ("reverb");
+    drumTrackParam = parameters.getRawParameterValue ("drumTrack");
+
+    // On a Mac, JUCE's standalone app starts with every MIDI input switched off, so the
+    // keyboard and e-kit stay silent until they're ticked in Options. Turn them all on.
+    if (wrapperType == wrapperType_Standalone)
+    {
+        juce::MessageManager::callAsync ([this] { openAllMidiInputs(); });
+        midiDevicesChanged = juce::MidiDeviceListConnection::make ([this] { openAllMidiInputs(); });
+    }
+}
+
+void KnightLyfeProcessor::openAllMidiInputs()
+{
+   #if JucePlugin_Build_Standalone
+    if (auto* holder = juce::StandalonePluginHolder::getInstance())
+        for (const auto& device : juce::MidiInput::getAvailableDevices())
+            if (! holder->deviceManager.isMidiInputDeviceEnabled (device.identifier))
+                holder->deviceManager.setMidiInputDeviceEnabled (device.identifier, true);
+   #endif
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout KnightLyfeProcessor::createParameters()
@@ -40,11 +68,16 @@ juce::AudioProcessorValueTreeState::ParameterLayout KnightLyfeProcessor::createP
                                                        NormalisableRange<float> (0.0f, 1.5f), 0.9f));
     layout.add (std::make_unique<AudioParameterFloat> (ParameterID { "reverb", 1 }, "Room",
                                                        NormalisableRange<float> (0.0f, 1.0f), 0.2f));
+    // For a Logic drum track (or an e-kit that isn't on channel 10): every note plays drums.
+    layout.add (std::make_unique<AudioParameterBool> (ParameterID { "drumTrack", 1 }, "Drum Track", false));
     return layout;
 }
 
 bool KnightLyfeProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
+    const auto in = layouts.getMainInputChannelSet();
+    if (! in.isDisabled() && in != juce::AudioChannelSet::mono() && in != juce::AudioChannelSet::stereo())
+        return false;
     const auto out = layouts.getMainOutputChannelSet();
     if (out != juce::AudioChannelSet::stereo() && out != juce::AudioChannelSet::mono())
         return false;
@@ -60,6 +93,7 @@ bool KnightLyfeProcessor::isBusesLayoutSupported (const BusesLayout& layouts) co
 void KnightLyfeProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     engine.prepare (sampleRate, samplesPerBlock);
+    listener.prepare (sampleRate);
     monoScratch.setSize (2, samplesPerBlock);
     reverb.prepare ({ sampleRate, (juce::uint32) samplesPerBlock, 2 });
     limiter.prepare ({ sampleRate, (juce::uint32) samplesPerBlock, 2 });
@@ -73,6 +107,14 @@ void KnightLyfeProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
 {
     juce::ScopedNoDenormals noDenormals;
     const int numSamples = buffer.getNumSamples();
+
+    // The input (standalone app): heard by lessons, never played back. Read it before
+    // rendering, since the output shares these channels.
+    if (getBusCount (true) > 0 && listener.isActive())
+    {
+        const auto input = getBusBuffer (buffer, true, 0);
+        listener.push (input, numSamples);
+    }
 
     // Main output (bus 0) and any drum outputs Logic has switched on.
     auto main = getBusBuffer (buffer, false, 0);
@@ -118,6 +160,7 @@ void KnightLyfeProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
                 engine.setHostPosition (hp);
             }
 
+    engine.setHostDrumsOnAllChannels (drumTrackParam->load() >= 0.5f);
     engine.process (*target, midi, anyDrumOut ? &drumOuts : nullptr);
 
     const float room = reverbParam->load();
@@ -156,6 +199,19 @@ void KnightLyfeProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
     }
 
     midi.clear(); // an instrument: nothing goes out
+}
+
+void KnightLyfeProcessor::setListening (bool on, bool bassRange)
+{
+    listener.setBassRange (bassRange);
+    listener.setActive (on);
+   #if JucePlugin_Build_Standalone
+    // JUCE's standalone app mutes its input to avoid feedback; this processor never
+    // plays the input back, so it is safe to let lessons hear it.
+    if (on && wrapperType == wrapperType_Standalone)
+        if (auto* holder = juce::StandalonePluginHolder::getInstance())
+            holder->getMuteInputValue().setValue (false);
+   #endif
 }
 
 void KnightLyfeProcessor::handleInterfaceBatch (const juce::var& v)

@@ -1,8 +1,10 @@
 #pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
+#include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_dsp/juce_dsp.h>
 
+#include "Engine/AudioListener.h"
 #include "Engine/SoundEngine.h"
 
 class KnightLyfeProcessor final : public juce::AudioProcessor
@@ -38,6 +40,10 @@ public:
     void handleInterfaceBatch (const juce::var& batch);
 
     knightlyfe::SoundEngine& getEngine() { return engine; }
+    knightlyfe::AudioListener& getListener() { return listener; }
+    /** Lessons listen to the input (mic or audio interface); the standalone app
+        un-mutes its input for that, since nothing is ever played back from it. */
+    void setListening (bool on, bool bassRange);
     juce::AudioProcessorValueTreeState parameters;
 
 private:
@@ -45,12 +51,18 @@ private:
     static BusesProperties makeBuses();
 
     knightlyfe::SoundEngine engine;
+    knightlyfe::AudioListener listener;
     juce::dsp::Reverb reverb;
     juce::dsp::Limiter<float> limiter; // keeps big chords and drums from clipping in Logic
     juce::AudioBuffer<float> monoScratch; // stereo render target for mono tracks
     juce::SmoothedValue<float> masterGain;
     std::atomic<float>* masterParam = nullptr;
     std::atomic<float>* reverbParam = nullptr;
+    std::atomic<float>* drumTrackParam = nullptr;
+
+    // Standalone app: listen to every MIDI keyboard and e-kit, including ones plugged in later.
+    void openAllMidiInputs();
+    juce::MidiDeviceListConnection midiDevicesChanged;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KnightLyfeProcessor)
 };
