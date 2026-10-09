@@ -875,3 +875,13 @@ dialog.home-window { width: min(900px, calc(100vw - 24px)); left: max(12px, calc
   .home-hero { grid-template-columns: auto 1fr; }
   .home-hero .hh-next { grid-column: 1 / -1; align-items: stretch; text-align: left; }
 }
+
+/* Video lessons */
+dialog.video-window { width: min(820px, calc(100vw - 24px)); left: max(12px, calc(50% - 410px)); top: 64px; z-index: 1520; }
+.video-window .tool-head { display: flex; align-items: center; gap: 10px; }
+.video-window .tool-head h2 { margin: 0; flex: 1; font-size: 16px; }
+.vd-add { margin-top: 8px; }
+.vd-add input[type="url"] { flex: 1; min-width: 220px; }
+.home-video .hs-meta { display: flex; gap: 6px; }
+.home-video.made .hs-title::before { content: "▶ "; color: var(--accent); }
+.home-video.seen .hs-title::before { content: "✓ "; color: #73d13d; }

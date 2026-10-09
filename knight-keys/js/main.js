@@ -16,6 +16,7 @@ import { Player } from './player.js';
 import { KeyboardView, drawStaff, drawControllers, drawGroove, drawPianoRoll, drawDrumHighway, drawFretboard } from './render.js';
 import { TUNINGS, STRING_NAMES, fretNote, chordShape, chordTarget, chartTimeline, ChartJudge, rootPosition } from './fretted.js';
 import { INSTRUMENTS, instrumentById, instrumentHome, songsToShow, tunerLesson } from './home.js';
+import { videoLessons, videoSummary, videosToShow, watchedBy, markWatched } from './videos.js';
 import { UNITS, COURSES, unitsFor, readNotes, grooveMidi, DrumJudge, addCourse, removeCourse, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from './lessons.js';
 import { PitchListener, SingJudge, RangeFinder, voiceType, freqToCents, midiToFreq, chromaMatches } from './pitch.js';
 import { GameSession, crownsFor, loadStage, saveStage, recordScore, courseState, scoreKey, PLAYER_COLORS } from './game.js';
@@ -3128,48 +3129,78 @@ function renderTeacherCard() {
   box.append(teacherAvatar(t), name);
 }
 
-let videoUrl = null;
+/**
+ * Puts a lesson video in `box`: a file (or one kept in this browser), YouTube or
+ * Vimeo. onWatched() fires when it's (nearly) all watched, or from "I watched it"
+ * for embedded players, which don't say when they end. Returns false when there's
+ * no video to show.
+ */
+const videoUrls = new Map(); // box -> object URL of a file kept in this browser
+async function mountVideo(box, src, { onWatched = () => {}, onError = () => {}, watchedButton = true } = {}) {
+  box.innerHTML = '';
+  if (videoUrls.has(box)) URL.revokeObjectURL(videoUrls.get(box));
+  videoUrls.delete(box);
+  if (src?.startsWith('idb:')) {
+    const blob = await loadVideoFile(src.slice(4));
+    src = null;
+    if (blob) {
+      src = URL.createObjectURL(blob);
+      videoUrls.set(box, src);
+    }
+  }
+  const v = videoSource(src);
+  if (!v) return false;
+  if (v.kind === 'file') {
+    const el = Object.assign(document.createElement('video'), { src: v.embed, controls: true, playsInline: true });
+    el.addEventListener('ended', onWatched);
+    el.addEventListener('timeupdate', () => el.duration && el.currentTime / el.duration >= 0.9 && onWatched());
+    el.addEventListener('error', onError);
+    box.append(el);
+  } else {
+    const frame = Object.assign(document.createElement('iframe'), { src: v.embed, allow: 'autoplay; fullscreen; picture-in-picture', allowFullscreen: true });
+    box.append(frame);
+    if (watchedButton) {
+      const watched = Object.assign(document.createElement('button'), { textContent: '✓ I watched it', className: 'mini' });
+      watched.onclick = onWatched;
+      box.append(watched);
+    }
+  }
+  return true;
+}
+
+/** Remember that the current player watched this lesson's video. */
+function rememberWatched(lessonId) {
+  if (markWatched(stage, stage.current, lessonId)) saveStage(stage);
+}
+
 async function renderVideoStep(step) {
   const box = $('lpVideo');
-  box.innerHTML = '';
-  if (videoUrl) URL.revokeObjectURL(videoUrl);
-  videoUrl = null;
   box.hidden = step.type !== 'video';
-  if (step.type !== 'video') return;
+  if (step.type !== 'video') {
+    await mountVideo(box, null);
+    return;
+  }
+  const lessonId = (lessonRun.lesson.base || lessonRun.lesson).id;
   const done = () => {
     if (lessonRun.step !== step || lessonRun.done) return;
     lessonRun.done = true;
     lessonRun.stars[lessonRun.stepIdx] = 0; // watching doesn't change the stars
     $('lpNext').disabled = false;
+    if (step.src) rememberWatched(lessonId);
     lessonFeedback('✓ Watched. Press Next when you\'re ready.', 'good');
   };
-  let src = step.src;
-  if (src?.startsWith('idb:')) {
-    const blob = await loadVideoFile(src.slice(4));
-    src = blob ? (videoUrl = URL.createObjectURL(blob)) : null;
-  }
-  const v = videoSource(src);
-  if (!v) {
-    // No video made yet: the teacher's script reads along instead, so the course works today.
-    const pre = Object.assign(document.createElement('div'), { className: 'lp-script', textContent: step.script || step.text || '' });
-    box.append(pre);
-    done();
-    return;
-  }
-  if (v.kind === 'file') {
-    const el = Object.assign(document.createElement('video'), { src: v.embed, controls: true, playsInline: true });
-    el.addEventListener('ended', done);
-    el.addEventListener('timeupdate', () => el.duration && el.currentTime / el.duration >= 0.9 && done());
-    el.addEventListener('error', () => {
+  const shown = await mountVideo(box, step.src, {
+    onWatched: done,
+    onError: () => {
       lessonFeedback('This video couldn\'t play here. Check the link in the Course Studio.', 'bad');
       done();
-    });
-    box.append(el);
-  } else {
-    const frame = Object.assign(document.createElement('iframe'), { src: v.embed, allow: 'autoplay; fullscreen; picture-in-picture', allowFullscreen: true });
-    const watched = Object.assign(document.createElement('button'), { textContent: '✓ I watched it', className: 'mini' });
-    watched.onclick = done;
-    box.append(frame, watched);
+    },
+  });
+  if (!shown) {
+    // No video made yet: the teacher's script reads along instead, so the course works today.
+    box.append(Object.assign(document.createElement('div'), { className: 'lp-script', textContent: step.script || step.text || '' }));
+    done();
+    return;
   }
   lessonFeedback('Watch the video, then press Next.');
 }
@@ -6582,6 +6613,22 @@ function renderHome() {
     songs.append(b);
   }
 
+  // Video lessons: open as you reach their lesson.
+  const vlist = videoLessons(current, { progress: lessonProgress(), videos: courseVideos, watched: watchedBy(stage, me.id), unlockAll: !!stage.unlockAll });
+  const vsum = videoSummary(vlist);
+  setText($('homeVideosNote'), vsum.made ? `(${vsum.watched} of ${vsum.made} watched · they open as you reach each lesson)` : '(no videos yet: open a lesson\'s card to add one or copy its script for an AI video tool)');
+  const vbox = $('homeVideos');
+  vbox.innerHTML = '';
+  for (const entry of videosToShow(vlist, 8)) {
+    const b = Object.assign(document.createElement('button'), { className: `home-song home-video${entry.unlocked ? '' : ' locked'}${entry.video ? (entry.watched ? ' seen' : ' made') : ''}` });
+    b.innerHTML = '<span class="hs-badge"></span><div class="hs-title"></div><div class="hs-meta"></div>';
+    b.querySelector('.hs-title').textContent = entry.lesson.title;
+    b.querySelector('.hs-badge').textContent = !entry.unlocked ? '🔒' : entry.video ? (entry.watched ? '✓' : '🎬') : '📝';
+    b.querySelector('.hs-meta').textContent = !entry.unlocked ? 'Opens when you reach this lesson' : entry.video ? (entry.watched ? 'Watched' : 'New video') : 'Script ready · no video yet';
+    b.onclick = () => (entry.unlocked ? openVideoLesson(entry) : toast('This video opens when you reach its lesson.'));
+    vbox.append(b);
+  }
+
   // Tools.
   const tools = $('homeTools');
   tools.innerHTML = '';
@@ -6592,6 +6639,121 @@ function renderHome() {
     b.onclick = () => run(inst);
     tools.append(b);
   }
+}
+
+// ---- Video lesson player (from Home) -------------------------------------------
+
+const videoRun = { entry: null };
+
+function openVideoLesson(entry) {
+  videoRun.entry = entry;
+  const dlg = $('videoDlg');
+  if (!dlg.open) dlg.show();
+  renderVideoLesson();
+}
+
+async function renderVideoLesson() {
+  const entry = videoRun.entry;
+  if (!entry) return;
+  const { lesson, course } = entry;
+  const video = courseVideos[lesson.id]?.src ? courseVideos[lesson.id] : entry.video;
+  setText($('vdTitle'), `🎬 ${lesson.title}`);
+  const t = teacherForCourse(course);
+  const who = $('vdTeacher');
+  who.innerHTML = '';
+  who.append(teacherAvatar(t, 26), Object.assign(document.createElement('span'), { textContent: `${t.name} · ${entry.unit?.title || ''}` }));
+  const box = $('vdPlayer');
+  const shown = await mountVideo(box, video?.src, {
+    watchedButton: false,
+    onWatched: () => {
+      rememberWatched(lesson.id);
+      setText($('vdNote'), '✓ Watched. Now practise it ▶');
+    },
+    onError: () => setText($('vdNote'), 'This video couldn\'t play here. Check the link, or choose the file again.'),
+  });
+  if (!shown) {
+    const script = lessonScriptFor(lesson, course);
+    box.append(Object.assign(document.createElement('div'), { className: 'lp-script', textContent: script.text }));
+    setText($('vdNote'), `No video for this lesson yet. Here's ${t.name}'s script (about ${Math.max(1, Math.round(script.seconds / 60))} min): copy it into an AI video tool, then add the video here.`);
+  } else setText($('vdNote'), entry.watched || watchedBy(stage, stage.current)[lesson.id] ? '✓ You\'ve watched this one.' : '');
+  const embedded = shown && !/^idb:|\.(mp4|m4v|webm|mov)(\?|$)/i.test(video?.src || '');
+  $('vdWatched').hidden = !embedded;
+  $('vdRemove').hidden = !courseVideos[lesson.id];
+  $('vdAdd').textContent = shown ? '✎ Change video' : '＋ Add video';
+  $('vdAddBox').hidden = true;
+}
+
+/** The teacher's script for a built-in lesson (for AI video tools). */
+function lessonScriptFor(lesson, course) {
+  const c = COURSES.find((x) => x.id === course);
+  const units = unitsFor(course);
+  const unit = units.find((u) => u.lessons.includes(lesson));
+  const number = units.flatMap((u) => u.lessons).indexOf(lesson) + 1;
+  return lessonScript(lesson, { teacher: teacherForCourse(course), course: c?.name || course, unit: unit?.title || '', number, songTitle });
+}
+
+function setLessonVideo(lessonId, video) {
+  if (video) courseVideos[lessonId] = video;
+  else delete courseVideos[lessonId];
+  saveVideos(courseVideos);
+  if (videoRun.entry) videoRun.entry.video = video || null;
+  renderVideoLesson();
+  if ($('homeDlg').open) renderHome();
+}
+
+function initVideoLessons() {
+  const dlg = $('videoDlg');
+  dlg.querySelector('[data-close]').onclick = () => {
+    $('vdPlayer').innerHTML = ''; // stops playback
+    dlg.close();
+  };
+  makeDraggable(dlg);
+  $('vdPractice').onclick = () => {
+    const e = videoRun.entry;
+    $('vdPlayer').innerHTML = '';
+    dlg.close();
+    if (e) openLessonFromHome(e.lesson, e.course);
+  };
+  $('vdWatched').onclick = () => {
+    if (!videoRun.entry) return;
+    rememberWatched(videoRun.entry.lesson.id);
+    setText($('vdNote'), '✓ Watched. Now practise it ▶');
+    if ($('homeDlg').open) renderHome();
+  };
+  $('vdScript').onclick = () => {
+    const e = videoRun.entry;
+    if (!e) return;
+    const text = lessonScriptFor(e.lesson, e.course).text;
+    navigator.clipboard?.writeText(text).then(() => toast('Script copied: paste it into your AI video tool.'), () => download(text, `${e.lesson.title} - script.txt`, 'text/plain'));
+  };
+  $('vdAdd').onclick = () => {
+    $('vdAddBox').hidden = !$('vdAddBox').hidden;
+    $('vdUrl').value = courseVideos[videoRun.entry?.lesson.id]?.src?.startsWith('idb:') ? '' : courseVideos[videoRun.entry?.lesson.id]?.src || '';
+  };
+  $('vdUrlSave').onclick = () => {
+    const url = $('vdUrl').value.trim();
+    if (!videoRun.entry || !url) return;
+    if (!/^https?:\/\//i.test(url)) return toast('Paste a full link, starting with https://');
+    setLessonVideo(videoRun.entry.lesson.id, { src: url });
+    toast('Video added to this lesson.');
+  };
+  $('vdFile').onclick = () => $('vdPick').click();
+  $('vdPick').onchange = async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file || !videoRun.entry) return;
+    const key = videoRun.entry.lesson.id;
+    try {
+      await saveVideoFile(key, file);
+      setLessonVideo(key, { src: `idb:${key}`, name: file.name });
+      toast(`Video added: ${file.name}. It's kept on this computer; for other devices, upload it (YouTube unlisted, Vimeo...) and add the link.`, [], 6000);
+    } catch (err) {
+      toast(`Couldn't keep that video here (${err.message}). Add a link instead.`);
+    }
+  };
+  $('vdRemove').onclick = () => {
+    if (videoRun.entry && confirm('Remove this lesson\'s video? (The lesson stays.)')) setLessonVideo(videoRun.entry.lesson.id, null);
+  };
 }
 
 function initHome() {
@@ -6628,6 +6790,7 @@ initPuppet();
 initConverter();
 initSongs();
 initHome();
+initVideoLessons();
 applyLayout();
 applyLiveInstruments();
 buildMixer();
