@@ -18,6 +18,7 @@ import { TUNINGS, STRING_NAMES, fretNote, chordShape, chordTarget, chartTimeline
 import { INSTRUMENTS, instrumentById, instrumentHome, songsToShow, tunerLesson } from './home.js';
 import { videoLessons, videoSummary, videosToShow, watchedBy, markWatched } from './videos.js';
 import { videoScriptFor, filmingScriptText, scriptSeconds, scriptsCsvFor } from './video-scripts.js';
+import { KEYS as PR_KEYS, SCALES as PR_SCALES, CHORDS as PR_CHORDS, QUIZ_POOLS, practiceLesson, quizLesson, guitarChordSymbols } from './practice.js';
 import { UNITS, COURSES, unitsFor, readNotes, grooveMidi, DrumJudge, addCourse, removeCourse, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from './lessons.js';
 import { PitchListener, SingJudge, RangeFinder, voiceType, freqToCents, midiToFreq, chromaMatches } from './pitch.js';
 import { GameSession, crownsFor, loadStage, saveStage, recordScore, courseState, scoreKey, PLAYER_COLORS } from './game.js';
@@ -1505,11 +1506,11 @@ function applyLayout() {
 }
 
 const LAYOUTS = {
-  full: ['score', 'chord', 'mixer', 'drums', 'media', 'loops', 'keyboard', 'controls'],
+  full: ['score', 'chord', 'mixer', 'drums', 'media', 'loops', 'kit', 'keyboard', 'controls'],
   keys: ['keyboard', 'controls', 'chord'],
   score: ['score', 'chord', 'keyboard', 'controls'],
   video: ['media', 'chord', 'keyboard'],
-  drums: ['score', 'chord', 'drums', 'keyboard', 'controls'],
+  drums: ['score', 'chord', 'drums', 'kit', 'keyboard', 'controls'],
 };
 document.querySelectorAll('[data-layout]').forEach((btn) => {
   btn.onclick = () => {
@@ -1782,7 +1783,7 @@ const groove = new GroovePlayer({
 const grooveView = { step: -1, inFill: false };
 
 function flashPad(note, vel) {
-  kitFlash(note);
+  kitFlash(note, vel);
   const el = padEls.get(PAD_ALIAS[note] ?? note);
   if (!el) return;
   el.classList.remove('hit');
@@ -2102,7 +2103,40 @@ function saveKitSoon() {
   kitSaveTimer = setTimeout(saveSettings, 300);
 }
 
-function kitFlash(note) {
+/** Lights up a drum in the Drum kit panel, like a key on the keyboard (brighter for harder hits). */
+function kitPanelFlash(note, vel = 100) {
+  const panel = $('kitPanelStage');
+  const piece = PIECES.find((p) => p.notes.includes(note));
+  if (!piece || panel.closest('.panel')?.classList.contains('hidden')) return;
+  const lane = laneOf(note);
+  for (const el of panel.querySelectorAll(`.kp[data-piece="${piece.id}"]`)) {
+    el.style.setProperty('--v', String(Math.max(0.35, Math.min(1, vel / 127))));
+    el.style.setProperty('--kc', lane >= 0 ? LANES[lane].color : '#ffd60a');
+    el.classList.remove('lit');
+    void el.getBoundingClientRect(); // restart the animation
+    el.classList.add('lit');
+  }
+}
+
+/** The Drum kit panel: the Kit Rack's kit drawing, played by clicking a drum. */
+function initKitPanel() {
+  const panel = $('kitPanelStage');
+  const svg = $('kitStage').querySelector('svg').cloneNode(true);
+  svg.setAttribute('aria-label', 'Drum kit: lights up as each drum is hit; click a drum to play it');
+  panel.append(svg);
+  for (const g of panel.querySelectorAll('.kp')) {
+    const piece = PIECES.find((p) => p.id === g.dataset.piece);
+    if (!piece) continue;
+    g.append(Object.assign(document.createElementNS('http://www.w3.org/2000/svg', 'title'), { textContent: piece.name }));
+    g.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      liveDrum(piece.notes[0], 70 + Math.round(50 * Math.min(1, e.pressure || 0.7)));
+    });
+  }
+}
+
+function kitFlash(note, vel) {
+  kitPanelFlash(note, vel);
   if (!$('kitDlg').open) return;
   const piece = PIECES.find((p) => p.notes.includes(note));
   const els = [
@@ -2633,8 +2667,9 @@ function lessonSongDone() {
 
 function finishLesson() {
   const stars = lessonStars(lessonRun.lesson.steps.map((s, i) => (s.type === 'info' ? 0 : lessonRun.stars[i] ?? 1)));
-  const prog = lessonProgress();
-  const first = !prog[lessonRun.lesson.id];
+  const drill = lessonRun.lesson.practice ? lessonRun.lesson : null;
+  const prog = drill ? practiceBest() : lessonProgress(); // drills keep their own best stars, apart from the course path
+  const first = !drill && !prog[lessonRun.lesson.id];
   prog[lessonRun.lesson.id] = Math.max(prog[lessonRun.lesson.id] || 0, stars);
   stage.practice ??= {};
   stage.practice[stage.current] = updateStreak(stage.practice[stage.current], todayStr());
@@ -2647,10 +2682,12 @@ function finishLesson() {
   $('lpDoneStars').innerHTML = starsHtml(stars);
   const streak = stage.practice[stage.current].streak;
   setText($('lpDoneNote'), `${first ? 'The next lesson is open. ' : ''}🔥 ${streak}-day practice streak${streak > 1 ? ': keep it going tomorrow!' : '. Come back tomorrow to make it 2!'}`);
-  const all = unitsFor(courseOfLesson(lessonRun.lesson)).flatMap((u) => u.lessons);
+  const all = drill ? [] : unitsFor(courseOfLesson(lessonRun.lesson)).flatMap((u) => u.lessons);
   const next = all[all.findIndex((l) => l.id === lessonRun.lesson.id) + 1];
-  $('lpDoneNext').hidden = !next;
-  $('lpDoneNext').onclick = () => startLesson(next);
+  $('lpDoneNext').hidden = !next && !drill?.quiz;
+  $('lpDoneNext').textContent = drill?.quiz ? 'New quiz ▶' : 'Next lesson ▶';
+  $('lpDoneNext').onclick = () => (drill?.quiz ? startLesson(quizLesson(drill.quiz.instrument, drill.quiz.poolName, { count: drill.quiz.count })) : startLesson(next));
+  if (drill) setText($('lpDoneNote'), `${drill.title.replace(/^Practice: /, '')}: best ${'★'.repeat(prog[drill.id])}. 🔥 ${stage.practice[stage.current].streak}-day practice streak.`);
   $('lpDoneAgain').onclick = () => startLesson(lessonRun.lesson.base || lessonRun.lesson);
   [60, 64, 67, 72].forEach((n, i) => {
     synth.noteOn(LIVE_CHANNEL, n, 85, synth.now + 0.1 * i + 0.05);
@@ -2767,7 +2804,14 @@ function drawLessonFret() {
   } else if (step?.type === 'info' && step.chord) opts = shapeOpts(step.chord);
   else if (step?.type === 'info' && step.fretboard) {
     const f = step.fretboard;
-    opts = { instrument: f.instrument, open: f.open || [], dots: (f.dots || []).map(([string, fret, label]) => ({ string, fret, label })) };
+    const dots = f.dots || [];
+    // Open strings show as circles at the nut; the neck stretches to the highest fret shown.
+    opts = {
+      instrument: f.instrument,
+      open: [...(f.open || []), ...dots.filter(([, fret]) => fret === 0).map(([string]) => string)],
+      dots: dots.filter(([, fret]) => fret > 0).map(([string, fret, label]) => ({ string, fret, label })),
+      to: Math.max(5, ...dots.map(([, fret]) => fret + 1)),
+    };
   }
   cv.hidden = !opts;
   if (!opts) return;
@@ -3102,7 +3146,7 @@ function initLessons() {
 // ---- Teachers, video and quiz steps (course template) ----------------------------
 
 let courseVideos = loadVideos();
-const courseOfLesson = (lesson) => UNITS.find((u) => u.lessons.some((l) => l.id === lesson.id))?.course || 'piano';
+const courseOfLesson = (lesson) => (lesson.practice && lesson.course) || UNITS.find((u) => u.lessons.some((l) => l.id === lesson.id))?.course || 'piano';
 function teacherForCourse(courseId) {
   const c = COURSES.find((x) => x.id === courseId);
   const t = c?.teacher ?? COURSE_TEACHERS[courseId];
@@ -6081,11 +6125,12 @@ async function loadAppChurch() {
   }
 }
 
-/** Open the place a link points at: #home, #home=<instrument>, #lessons, #lessons=<course>, #band, #church, #ask, #puppet, #lyrics, #vocal. */
+/** Open the place a link points at: #home, #home=<instrument>, #practice, #practice=<instrument>, #lessons, #lessons=<course>, #band, #church, #ask, #puppet, #lyrics, #vocal. */
 function openFromHash() {
   const [where, arg] = decodeURIComponent(location.hash.slice(1)).split('=');
   if (!where) return;
   if (where === 'home') openHome(INSTRUMENTS.some((i) => i.id === arg) ? arg : undefined);
+  else if (where === 'practice') openPractice(arg);
   else if (where === 'lessons') {
     if (arg && COURSES.some((c) => c.id === arg)) lessonCourse = arg;
     $('btnLessons').click();
@@ -6480,6 +6525,7 @@ function frame() {
 // your path, the songs you unlock and your practice tools. See home.js.
 
 const TOOLS = {
+  practice: ['🎯 Scales & Chords', 'Practise any scale or chord, or take a chord quiz', (inst) => openPractice(inst.id)],
   songs: ['🎵 Songs', 'Free songs to learn', () => $('btnSongs').click()],
   score: ['📜 Sheet music', 'The full score of the open song', () => $('btnScore').click()],
   learn: ['🎯 Learn mode', 'The song waits until you play the right notes', () => $('btnLearn').click()],
@@ -6643,6 +6689,92 @@ function renderHome() {
   }
 }
 
+// ---- Scales & Chords practice ------------------------------------------------------
+//
+// Drills built by practice.js and run in the lesson player. Your choices are
+// remembered; each drill keeps its best stars per player.
+
+const practiceBest = () => ((stage.drills ??= {})[stage.current] ??= {});
+const prState = () => (settings.practice ??= { instrument: 'piano', mode: 'scale', root: 0, scale: 'major', chord: 'maj', symbol: 'G', octaves: 1, hand: 'right', pool: {} });
+
+function openPractice(instrument) {
+  if (instrument && ['piano', 'guitar', 'bass'].includes(instrument)) prState().instrument = instrument;
+  const dlg = $('practiceDlg');
+  if (!dlg.open) dlg.show();
+  renderPractice();
+}
+
+/** The drill the current choices make (or null if it can't be played). */
+function currentDrill() {
+  const st = prState();
+  if (st.mode === 'quiz') return quizLesson(st.instrument, st.pool[st.instrument] || Object.keys(QUIZ_POOLS[st.instrument])[0]);
+  if (st.mode === 'chord' && st.instrument === 'guitar') return practiceLesson({ instrument: 'guitar', kind: 'chord', symbol: st.symbol });
+  return practiceLesson({ instrument: st.instrument, kind: st.mode, root: st.root, scale: st.scale, chord: st.chord, octaves: st.octaves, hand: st.hand });
+}
+
+function renderPractice() {
+  const st = prState();
+  const seg = (id, value) => document.querySelectorAll(`#${id} button`).forEach((b) => b.classList.toggle('on', b.dataset.v === value));
+  seg('prInstrument', st.instrument);
+  seg('prMode', st.mode);
+  const fill = (id, options, value) => {
+    const sel = $(id);
+    sel.innerHTML = '';
+    for (const [v, label] of options) sel.append(new Option(label, v));
+    sel.value = String(value);
+  };
+  fill('prKey', PR_KEYS.map((k, i) => [i, k.replace('#', '♯').replace(/b$/, '♭')]), st.root);
+  fill('prScale', Object.entries(PR_SCALES).map(([k, v]) => [k, v.name]), st.scale);
+  fill('prChord', Object.entries(PR_CHORDS).map(([k, v]) => [k, v.name]), st.chord);
+  fill('prShape', guitarChordSymbols().map((c) => [c, c]), st.symbol);
+  const pools = Object.keys(QUIZ_POOLS[st.instrument]);
+  fill('prPool', pools.map((p) => [p, p]), st.pool[st.instrument] || pools[0]);
+  $('prOct').value = String(st.octaves);
+  $('prHand').value = st.hand;
+  const quiz = st.mode === 'quiz';
+  const guitarChord = st.mode === 'chord' && st.instrument === 'guitar';
+  $('prKeyWrap').hidden = quiz || guitarChord;
+  $('prScaleWrap').hidden = st.mode !== 'scale';
+  $('prChordWrap').hidden = st.mode !== 'chord' || st.instrument === 'guitar';
+  $('prShapeWrap').hidden = !guitarChord;
+  $('prPoolWrap').hidden = !quiz;
+  $('prOctWrap').hidden = st.mode !== 'scale' || st.instrument === 'bass';
+  $('prHandWrap').hidden = st.instrument !== 'piano' || quiz;
+  const drill = currentDrill();
+  $('prStart').disabled = !drill;
+  setText($('prPreview'), drill ? (quiz ? `${drill.title}: ${drill.steps[0].text}` : drill.steps[0].text) : 'That one doesn\'t fit on this instrument: pick another.');
+  const best = drill && !quiz ? practiceBest()[drill.id] : 0;
+  setText($('prBest'), best ? `Your best: ${'★'.repeat(best)}` : '');
+}
+
+function initPractice() {
+  const dlg = $('practiceDlg');
+  dlg.querySelector('[data-close]').onclick = () => dlg.close();
+  makeDraggable(dlg);
+  const set = (patch) => {
+    Object.assign(prState(), patch);
+    saveSettings();
+    renderPractice();
+  };
+  document.querySelectorAll('#prInstrument button').forEach((b) => (b.onclick = () => set({ instrument: b.dataset.v })));
+  document.querySelectorAll('#prMode button').forEach((b) => (b.onclick = () => set({ mode: b.dataset.v })));
+  $('prKey').onchange = (e) => set({ root: Number(e.target.value) });
+  $('prScale').onchange = (e) => set({ scale: e.target.value });
+  $('prChord').onchange = (e) => set({ chord: e.target.value });
+  $('prShape').onchange = (e) => set({ symbol: e.target.value });
+  $('prPool').onchange = (e) => set({ pool: { ...prState().pool, [prState().instrument]: e.target.value } });
+  $('prOct').onchange = (e) => set({ octaves: Number(e.target.value) });
+  $('prHand').onchange = (e) => set({ hand: e.target.value });
+  $('prStart').onclick = () => {
+    const drill = currentDrill();
+    if (!drill) return;
+    dlg.close();
+    lessonCourse = drill.course;
+    $('btnLessons').click();
+    startLesson(drill);
+  };
+}
+
 // ---- Video lesson player (from Home) -------------------------------------------
 
 const videoRun = { entry: null };
@@ -6794,6 +6926,7 @@ function initHome() {
 syncSettingsUI();
 initDrums();
 initKitRack();
+initKitPanel();
 initStage();
 initLessons();
 initBooth();
@@ -6808,6 +6941,7 @@ initConverter();
 initSongs();
 initHome();
 initVideoLessons();
+initPractice();
 applyLayout();
 applyLiveInstruments();
 buildMixer();

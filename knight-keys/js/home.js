@@ -23,7 +23,7 @@ export const INSTRUMENTS = [
       { part: '0', name: 'Right hand' },
       { part: '0,1', name: 'Both hands' },
     ],
-    tools: ['songs', 'score', 'learn'],
+    tools: ['practice', 'songs', 'score', 'learn'],
     plays: 'A MIDI keyboard, the keys on screen, or any piano near the microphone.',
   },
   {
@@ -50,7 +50,7 @@ export const INSTRUMENTS = [
     icon: '🎸',
     courses: ['guitar'],
     stageParts: [],
-    tools: ['tuner', 'mic'],
+    tools: ['practice', 'tuner', 'mic'],
     plays: 'An acoustic guitar near the microphone, or an electric through an audio interface. No guitar yet? Play the chords on your keyboard.',
   },
   {
@@ -59,7 +59,7 @@ export const INSTRUMENTS = [
     icon: '🎸',
     courses: ['bass'],
     stageParts: [],
-    tools: ['tuner', 'mic'],
+    tools: ['practice', 'tuner', 'mic'],
     plays: 'A bass through an audio interface, or near the microphone (by the amp). No bass yet? Play the root notes on your keyboard.',
   },
 ];

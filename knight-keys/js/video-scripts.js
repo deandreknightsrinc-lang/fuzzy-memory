@@ -1,4 +1,4 @@
-// Filming scripts for the video lessons (drums, bass, and the newer guitar lessons): what the teacher says,
+// Filming scripts for the video lessons (drums, bass, guitar and the piano scales unit): what the teacher says,
 // what the camera shows and what appears on screen, scene by scene. Written to
 // match each lesson's steps exactly, so the video teaches what the lesson then
 // asks you to play. Paste one into an AI video tool (HeyGen, Synthesia,
@@ -13,6 +13,7 @@ import { teacherById } from './teachers.js';
 
 const BEAT = 'beat-knight';
 const JORDAN = 'strings-jordan';
+const MAESTRO = 'maestro-k';
 
 export const VIDEO_SCRIPTS = {
   // ---- Drums: Meet the kit ---------------------------------------------------------
@@ -253,6 +254,266 @@ export const VIDEO_SCRIPTS = {
       { shot: 'Over-the-shoulder on the app.', say: 'Here the song waits for you, so learn every hit slowly first. Fast comes from slow, every single time.' },
       { shot: 'Medium shot, wiping forehead and laughing.', say: 'Stay relaxed. Tight arms get tired, loose arms keep going. Locked in! That\'s the pocket!' },
       { shot: 'Medium shot.', say: 'Then take it to Stage and go for the crowns. Practice slow, play it clean, and I\'ll catch you on the next beat.' },
+    ],
+  },
+
+  // ---- Piano: Scales and chords ---------------------------------------------------------
+  'p-scale-c': {
+    teacher: MAESTRO,
+    scenes: [
+      { shot: 'Medium shot at the grand piano, warm stage lights.', say: 'Welcome back to the keys, family. Today we learn the scale every pianist plays first: C major.' },
+      { shot: 'Overhead on the keys: C to C lighting up.', say: 'A scale walks up every note of a key. C major is all white keys, from C to the next C. Eight notes.', screen: 'C D E F G A B C' },
+      { shot: 'Close-up on the right hand: fingers 1 2 3, then the thumb passing under.', say: 'Here\'s the secret. Fingers one, two, three: C, D, E. Then your thumb tucks under your hand to F. Then one, two, three, four, five, all the way up to C.', screen: 'RH: 1 2 3 · thumb under · 1 2 3 4 5' },
+      { shot: 'Slow-motion side view of the wrist staying level as the thumb passes.', say: 'Keep your wrist level and quiet. The thumb slides under like it\'s sneaking. No jumping.' },
+      { shot: 'Close-up coming back down: finger 3 crossing over the thumb.', say: 'Coming down, it\'s the opposite: after the thumb lands on F, finger three crosses over to E.', screen: 'Down: 3 crosses over the thumb' },
+      { shot: 'Medium shot.', say: 'Slow and even. Every note the same volume. Keep those fingers curved, and I\'ll see you next lesson.' },
+    ],
+  },
+  'p-scale-c-lh': {
+    teacher: MAESTRO,
+    scenes: [
+      { shot: 'Medium shot at the piano.', say: 'Welcome back to the keys, family. Your left hand wants a scale too.' },
+      { shot: 'Overhead: the left hand on C below middle C.', say: 'Same C major scale, one octave lower. The left hand is a mirror of the right, so the fingering flips.', screen: 'LH: one octave below middle C' },
+      { shot: 'Close-up on the left hand: 5 4 3 2 1, then finger 3 crossing over.', say: 'Five, four, three, two, one: C, D, E, F, G. Then finger three crosses over the thumb to A. Two, one: B, C.', screen: 'LH: 5 4 3 2 1 · 3 over · 2 1' },
+      { shot: 'Close-up coming back down: the thumb tucking under after G.', say: 'Going down, the thumb tucks under after G. It\'s the right hand\'s trick, backwards.' },
+      { shot: 'Medium shot.', say: 'Left hands are usually weaker, so give this one extra love. Keep those fingers curved, and I\'ll see you next lesson.' },
+    ],
+  },
+  'p-scale-g': {
+    teacher: MAESTRO,
+    scenes: [
+      { shot: 'Medium shot at the piano, smiling.', say: 'Welcome back to the keys, family. Today you meet your first black key in a scale. G major.' },
+      { shot: 'Overhead: G to G lighting up, the F sharp glowing.', say: 'Start a major scale on G and one black key shows up: F sharp. G, A, B, C, D, E, F sharp, G.', screen: 'G A B C D E F♯ G' },
+      { shot: 'Graphic: a key signature with one sharp.', say: 'That\'s why songs in G have one sharp in the key signature. The scale tells you the key.', screen: 'Key of G = one sharp (F♯)' },
+      { shot: 'Close-up on the right hand: finger 4 on the F sharp.', say: 'Same fingering as C: one, two, three, thumb under, one, two, three, four, five. Your fourth finger lands right on the black key.' },
+      { shot: 'Medium shot.', say: 'Now that is how it\'s done. Keep those fingers curved, and I\'ll see you next lesson.' },
+    ],
+  },
+  'p-scale-am': {
+    teacher: MAESTRO,
+    scenes: [
+      { shot: 'Medium shot, softer lighting.', say: 'Welcome back to the keys, family. Today: the minor scale, and a little secret about it.' },
+      { shot: 'Overhead: A to A lighting up, all white keys.', say: 'A minor uses the very same white keys as C major. But it starts on A. A, B, C, D, E, F, G, A.', screen: 'A B C D E F G A' },
+      { shot: 'Medium shot, playing C major then A minor.', say: 'Listen. C major sounds bright. A minor, same notes, sounds thoughtful. Same notes, different home.' },
+      { shot: 'Graphic: C major with its 6th note A circled.', say: 'Every major key has a relative minor that starts on its sixth note. For C, that\'s A. Same key signature, different mood.', screen: 'Relative minor = start on the 6th note' },
+      { shot: 'Medium shot.', say: 'Same fingering as C major. Keep those fingers curved, and I\'ll see you next lesson.' },
+    ],
+  },
+  'p-major-minor': {
+    teacher: MAESTRO,
+    scenes: [
+      { shot: 'Medium shot at the piano.', say: 'Welcome back to the keys, family. One little move turns a happy chord into a tender one. Let me show you.' },
+      { shot: 'Overhead: C E G, then the E dropping to E flat.', say: 'C major: C, E, G. Now lower the middle note by one key, to E flat. That\'s C minor.', screen: 'Major → minor: lower the middle note' },
+      { shot: 'Medium shot, playing C then Cm, G then Gm.', say: 'C... C minor. G... G minor. Hear the mood change? Major sounds bright. Minor sounds tender.' },
+      { shot: 'Overhead: A minor, D minor, E minor, all white keys.', say: 'And in the key of C there are three minor chords you can play on white keys: A minor, D minor and E minor.', screen: 'Am · Dm · Em' },
+      { shot: 'Medium shot.', say: 'Keep those fingers curved, and I\'ll see you next lesson.' },
+    ],
+  },
+  'p-inversions': {
+    teacher: MAESTRO,
+    scenes: [
+      { shot: 'Medium shot, leaning in.', say: 'Welcome back to the keys, family. Want to know how church pianists move between chords so smoothly? Inversions.' },
+      { shot: 'Overhead: C E G, then C moving up an octave.', say: 'An inversion is the same chord with a different note on the bottom. Take C, E, G and move the C up. Now it\'s E, G, C. We call that C over E.', screen: 'C/E = E G C' },
+      { shot: 'Overhead: moving E up too.', say: 'Do it again: G, C, E. That\'s C over G. Same three notes, three different shapes.', screen: 'C · C/E · C/G' },
+      { shot: 'Close-up: C, F/C, G/B, C with the hand barely moving.', say: 'Now watch. C, then F with C on the bottom, then G with B on the bottom, then C. My hand hardly moves. That\'s the church sound.' },
+      { shot: 'Medium shot.', say: 'Now that is how it\'s done. Keep those fingers curved, and I\'ll see you next lesson.' },
+    ],
+  },
+  'p-sevenths': {
+    teacher: MAESTRO,
+    scenes: [
+      { shot: 'Medium shot, gospel energy.', say: 'Welcome back to the keys, family. Today we add the spice that gospel players put on everything: seventh chords.' },
+      { shot: 'Overhead: G B D, then F added on top.', say: 'Take G: G, B, D. Add one more note on top, F. That\'s G seven. Four notes.', screen: 'G7 = G B D F' },
+      { shot: 'Medium shot, playing G, G7, then C.', say: 'Listen to the pull. G... G seven... and home to C. The seven leans so hard it almost begs to go home.' },
+      { shot: 'Overhead: C7 to F, D7 to G.', say: 'Every seventh chord points somewhere. C seven leads to F. D seven leads to G.', screen: 'C7 → F · D7 → G' },
+      { shot: 'Medium shot, playing a hymn ending with a G7 before the last chord.', say: 'Next time you hear a hymn end, listen for that seven right before the final chord. Now you know why it feels like coming home.' },
+      { shot: 'Medium shot.', say: 'Keep those fingers curved, and I\'ll see you next lesson.' },
+    ],
+  },
+
+  // ---- Guitar: Scales and solos ----------------------------------------------------------
+  'g-pent-open': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, guitar ready.', say: 'Hey friend, grab your guitar, let\'s play something good. Today you learn the scale behind almost every guitar solo: the pentatonic.' },
+      { shot: 'Graphic: five note names.', say: 'Pentatonic means five notes. And here\'s the best part: there are almost no wrong notes in it. It just sounds good.', screen: '5 notes · almost no wrong notes' },
+      { shot: 'Close-up on the neck, open position: open strings and frets 2 and 3.', say: 'E minor pentatonic in open position: two notes on every string. Open, then fret three on the low E. Open, two. Open, two. Open, two. Open, three. And the open high E.', screen: 'Open strings + frets 2 and 3' },
+      { shot: 'Medium shot, playing it up and down slowly, then a little lick.', say: 'Up and back down. Then mix the notes in any order, and you\'re already playing a little solo.' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-major-scale': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up.', say: 'Hey friend, grab your guitar, let\'s play something good. Today: the G major scale, in one hand position.' },
+      { shot: 'Close-up: finger 2 on G, low E string 3rd fret; one finger per fret.', say: 'Second finger on G, low E string, third fret. Now give each finger one fret: first finger on fret two, up to your pinky on fret five. Your hand stays still.', screen: 'One finger per fret: 2 to 5' },
+      { shot: 'Close-up, playing up the scale and naming notes.', say: 'G, A on the low E. B, C, D on the A string. E, F sharp, G on the D string. That\'s every note of the key of G.', screen: 'G A B C D E F♯ G' },
+      { shot: 'Medium shot, playing back down.', say: 'And back down. Slow and even. The chords you know in G, G, C, D and E minor, are all built from these notes.' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-pent-box': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, playing a quick bluesy lick first.', say: 'Hey friend, grab your guitar, let\'s play something good. That sound? It all comes from one shape. The pentatonic box.' },
+      { shot: 'Close-up: index finger on fret 5 of every string.', say: 'A minor pentatonic at the fifth fret. Your first finger plays fret five on every string. Then your third or fourth finger plays fret seven or eight.', screen: 'Finger 1 on fret 5 · fingers 3/4 on 7/8' },
+      { shot: 'Fretboard graphic of the whole box.', say: 'Low E: five and eight. A and D and G: five and seven. B: five and eight. High E: five and eight. That\'s the box.', screen: 'The box: 5-8 · 5-7 · 5-7 · 5-7 · 5-8 · 5-8' },
+      { shot: 'Medium shot, playing it up and down, then a short solo.', say: 'Learn it once, and you can solo over any song in A minor, or C major. Move it to another fret for another key.' },
+      { shot: 'Medium close-up.', say: 'Sweet, that rang out clean! Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+
+  // ---- Bass: Arpeggios and pentatonics ----------------------------------------------------
+  'b-arpeggios': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, bass on the lap.', say: 'Hey friend, grab your bass, let\'s play something good. Today: arpeggios, the backbone of a bass line.' },
+      { shot: 'Graphic: R 3 5 8.', say: 'An arpeggio is a chord played one note at a time: the root, the third, the fifth, and the octave.', screen: 'Arpeggio: root · 3rd · 5th · octave' },
+      { shot: 'Close-up on G major: E string 3, A string 2, A string 5, D string 5.', say: 'G major: G on the E string, third fret. B on the A string, second fret. D on the A string, fifth fret. And G again on the D string, fifth fret.', screen: 'G B D G' },
+      { shot: 'Close-up on A minor: E string 5 and 8, A string 7, D string 7.', say: 'For minor, the third moves down one fret. A minor: A, C, E, A, at the fifth fret.', screen: 'A C E A' },
+      { shot: 'Medium close-up.', say: 'Up and back down, nice and even. Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'b-pent': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, grooving.', say: 'Hey friend, grab your bass, let\'s play something good. Today, five notes that fit almost any groove: the minor pentatonic.' },
+      { shot: 'Close-up: finger 1 on fret 5 of each string.', say: 'A minor pentatonic at the fifth fret. First finger on fret five. Then fret eight on the E string, and fret seven on the A and D strings.', screen: 'E: 5-8 · A: 5-7 · D: 5-7' },
+      { shot: 'Close-up, playing up and down slowly.', say: 'A, C, D, E, G, A. And back down. Gospel and funk bass fills live right here.' },
+      { shot: 'Medium shot, playing a short fill between two roots.', say: 'Try it: play the root for three beats, then grab two or three pentatonic notes on beat four to fill. Instant groove.' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+
+  // ---- Guitar: Getting started ----------------------------------------------------------
+  'g-tune': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up on the stool, acoustic guitar on the right leg, warm lamps.', say: 'Hey friend, grab your guitar, let\'s play something good. Welcome to guitar! First: how to hold it, and how to tune it.' },
+      { shot: 'Wide shot from the front: body on the right leg, neck angled up to the left.', say: 'Sit with the guitar\'s body on your right leg, the neck pointing left and a little up. Your left hand presses the strings on the neck, thumb behind it. Your right hand strums over the sound hole.', screen: 'Body on the right leg · neck up and left' },
+      { shot: 'Close-up: the six strings lighting up one by one, thickest to thinnest.', say: 'Six strings. From the thickest, number six, to the thinnest, number one: E, A, D, G, B, E. Remember it like this: Eddie Ate Dynamite, Good Bye Eddie.', screen: 'E A D G B E · "Eddie Ate Dynamite, Good Bye Eddie"' },
+      { shot: 'Over the shoulder: the app\'s tuner needle while a string is plucked and a peg turned.', say: 'Now tune. Turn on the microphone in the app. Pluck one string, and turn its tuning peg slowly until the needle sits right in the middle.', screen: '🎤 on · needle in the middle' },
+      { shot: 'Close-up on the tuning pegs, small turns.', say: 'Small turns. A tiny turn changes a lot. Go string by string, six through one.' },
+      { shot: 'Medium close-up.', say: 'A tuned guitar sounds good even with one chord. Tune every time. Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-open': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up.', say: 'Hey friend, grab your guitar, let\'s play something good. Your first notes, and you don\'t even need your left hand.' },
+      { shot: 'Close-up on the right hand picking a single open string, letting it ring.', say: 'An open string is played without pressing any fret. Pick one string with your thumb or a pick, and let it ring.', screen: 'Open string = no frets pressed' },
+      { shot: 'Close-up, picking each string from the thickest to the thinnest, slowly.', say: 'From the thickest to the thinnest: E, A, D, G, B, E. One at a time. Hear each one ring out.' },
+      { shot: 'Close-up, picking back up from the thinnest to the thickest.', say: 'And back the other way: E, B, G, D, A, E. Try to hit only one string each time. That\'s the real skill here.', screen: 'Hit only one string' },
+      { shot: 'Medium close-up.', say: 'The app listens to every note, so take your time. Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+
+  // ---- Guitar: First notes and melodies -----------------------------------------------
+  'g-frets': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up.', say: 'Hey friend, grab your guitar, let\'s play something good. Today your left hand joins in: frets one and three.' },
+      { shot: 'Extreme close-up: fingertip pressing just behind the fret wire.', say: 'Press with the very tip of your finger, just behind the metal fret wire. Not on top of it, just behind. That\'s where it sounds clean.', screen: 'Fingertip, just behind the fret wire' },
+      { shot: 'Close-up: index on fret 1, ring finger on fret 3 of the high E string.', say: 'Finger one, your index, plays fret one. Finger three, your ring finger, plays fret three. On the high E string: open is E, fret one is F, fret three is G.', screen: 'High E string: open E · 1 F · 3 G' },
+      { shot: 'Close-up, playing E F G F E, then on the B string B C D C B.', say: 'E, F, G, F, E. Then the same on the B string: B, C, D, C, B. Up and back down.' },
+      { shot: 'Medium close-up, rubbing fingertips.', say: 'Fingertips sore? That\'s normal for the first couple of weeks. They toughen up. Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-mary': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, playful.', say: 'Hey friend, grab your guitar, let\'s play something good. Time for your first song: Mary Had a Little Lamb.' },
+      { shot: 'Fretboard graphic: E (high E open), D (B fret 3), C (B fret 1), G (high E fret 3).', say: 'Four notes on two strings. E is the open high E string. D is the B string, third fret. C is the B string, first fret. And G is the high E string, third fret.', screen: 'E: open · D: B3 · C: B1 · G: E3' },
+      { shot: 'Close-up, playing the first line slowly while singing along softly.', say: 'Ma-ry had a lit-tle lamb: E, D, C, D, E, E, E. Little lamb: D, D, D. Little lamb: E, G, G.' },
+      { shot: 'Medium shot, playing it through with a smile.', say: 'Sing it in your head while you play. If you know how a song goes, your fingers find it faster.' },
+      { shot: 'Medium close-up.', say: 'Sweet, that rang out clean! Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-joyful': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, warm.', say: 'Hey friend, grab your guitar, let\'s play something good. Today: a hymn with a famous melody. Joyful, Joyful, We Adore Thee.' },
+      { shot: 'Graphic: "Ode to Joy" with the hymn title under it.', say: 'The melody is Beethoven\'s Ode to Joy. Same notes you just learned, on the high E and B strings.', screen: 'Ode to Joy = Joyful, Joyful' },
+      { shot: 'Close-up, playing the first phrase slowly: E E F G G F E D.', say: 'E, E, F, G, G, F, E, D. It climbs up and walks back down, step by step.' },
+      { shot: 'Close-up, the second half: C C D E E D D.', say: 'Then C, C, D, E, E, D, D. Most notes are right next to each other, so your hand barely moves.' },
+      { shot: 'Medium close-up.', say: 'Play it slow and smooth, like you\'re singing it. Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+
+  // ---- Guitar: First chords ----------------------------------------------------------
+  'g-em': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up.', say: 'Hey friend, grab your guitar, let\'s play something good. Today you play your first chords. And the first one is the easiest chord on guitar.' },
+      { shot: 'Close-up: fingers 2 and 3 on the 2nd fret of the A and D strings.', say: 'E minor. Fingers two and three on the second fret of the A and D strings. That\'s it. Now strum all six strings, top to bottom.', screen: 'Em: fingers 2 and 3 on fret 2 (A, D)' },
+      { shot: 'Medium shot, strumming Em and letting it ring.', say: 'Listen to that. A whole chord. Strum it, let it ring, strum it again.' },
+      { shot: 'Close-up: the Em shape moving down a string, finger 1 adding the B string fret 1.', say: 'A minor: move that same shape down one string, onto the D and G strings, and add finger one on the first fret of the B string. And don\'t play the low E string.', screen: 'Am: same shape one string down + finger 1 on B1 · skip low E' },
+      { shot: 'Medium shot, changing slowly Am to Em.', say: 'Now go back and forth. A minor, E minor. Slow is fine. Smooth is the goal.' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-gcd': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, excited.', say: 'Hey friend, grab your guitar, let\'s play something good. Today you learn the three chords behind hundreds of hymns and worship songs: G, C and D.' },
+      { shot: 'Close-up on the G shape: fingers spread wide.', say: 'G: three fingers spread wide. Low E string, third fret, finger two. A string, second fret, finger one. High E, third fret, finger three.', screen: 'G: E3 (2) · A2 (1) · high E3 (3)' },
+      { shot: 'Close-up on the C shape: fingers stepping down from the A string.', say: 'C: fingers three, two, one stepping down from the A string. A string third fret, D string second fret, B string first fret. Skip the low E.', screen: 'C: A3 · D2 · B1 · skip low E' },
+      { shot: 'Close-up on the D triangle, strumming only the top four strings.', say: 'D: a little triangle on the top three strings. G second fret, B third fret, high E second fret. Strum just the top four strings.', screen: 'D: G2 · B3 · E2 · top 4 strings' },
+      { shot: 'Medium shot, G, C, D, G slowly.', say: 'G, C, D, G. Put those together and you can play an amazing number of songs.' },
+      { shot: 'Medium close-up.', say: 'Sweet, that rang out clean! Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-worship4': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, soft worship lighting.', say: 'Hey friend, grab your guitar, let\'s play something good. Today: the four chords of modern worship.' },
+      { shot: 'Graphic: G → D → Em → C, labelled 1 5 6 4.', say: 'G, D, E minor, C. Musicians call it the one-five-six-four. Once you hear it, you\'ll hear it everywhere.', screen: 'The worship four: G · D · Em · C (1-5-6-4)' },
+      { shot: 'Close-up on D/F#: thumb over the neck on the low E string, 2nd fret.', say: 'Worship players love one trick here: D over F sharp. Play D, and put your thumb, or your first finger, on the second fret of the low E string.', screen: 'D/F#: D + low E string fret 2' },
+      { shot: 'Close-up on the low strings: G, F#, E walking down.', say: 'Now listen to the bass: G, F sharp, E. It walks down step by step. Plain D works too, so use whichever you can play today.' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+
+  // ---- Guitar: Strum along in time ----------------------------------------------------
+  'g-strum-em-am': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, foot tapping.', say: 'Hey friend, grab your guitar, let\'s play something good. Today we play in time, with a click.' },
+      { shot: 'Graphic: 1 2 3 4 with a down-arrow on each.', say: 'Strum down on every beat: one, two, three, four. Keep your strumming hand moving like a pendulum, even between chords.', screen: 'Down on every beat: 1 2 3 4' },
+      { shot: 'Close-up on the left hand lifting on beat 4.', say: 'Here\'s the secret: start changing chords on beat four. Let the last strum be a little loose, so the new chord is ready right on one.', screen: 'Change on beat 4' },
+      { shot: 'Over the shoulder on the app chart, Em and Am lighting up.', say: 'E minor and A minor, one bar each. The chord to play lights up. Watch it, and stay with the click.' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-strum-gcd': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up.', say: 'Hey friend, grab your guitar, let\'s play something good. G, C and D, now in time.' },
+      { shot: 'Over the shoulder on the chart: G C G D G C D G.', say: 'Eight bars, one chord each: G, C, G, D, then G, C, D, G. Four down-strums per bar.', screen: 'G C G D · G C D G' },
+      { shot: 'Close-up on the left hand moving early, on beat 4.', say: 'And remember: change on beat four. If you wait for one, you\'ll always be late. Move early, land on time.' },
+      { shot: 'Medium shot, playing along steadily.', say: 'If you miss a chord, don\'t stop. Keep strumming, catch the next one. That\'s what real players do.' },
+      { shot: 'Medium close-up.', say: 'Sweet, that rang out clean! Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-worship-flow': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, soft worship lighting.', say: 'Hey friend, grab your guitar, let\'s play something good. Let\'s play a whole song: Worship Flow.' },
+      { shot: 'Graphic: G, D/F#, Em, C.', say: 'It\'s the worship four you learned: G, D over F sharp, E minor, C. Then the chorus moves things around a little.', screen: 'G · D/F# · Em · C' },
+      { shot: 'Over the shoulder on the app chart.', say: 'The chart shows the chord to play, and the app listens through the microphone to check you\'re on the right one.' },
+      { shot: 'Medium shot, playing along, eyes closed for a moment.', say: 'Once the changes feel easy, stop looking at your hands. Look up, and worship. That\'s the whole point.' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-amazing': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, reverent.', say: 'Hey friend, grab your guitar, let\'s play something good. Today: a hymn everybody knows. Amazing Grace.' },
+      { shot: 'Graphic: 1 2 3 with a big DOWN on 1.', say: 'Amazing Grace is in three-four. Count one, two, three, and strum DOWN, down, down. Strong on one, lighter on two and three.', screen: '3/4: DOWN down down' },
+      { shot: 'Close-up on G, C and D.', say: 'Just three chords: G, C and D. You know them all.', screen: 'G · C · D' },
+      { shot: 'Close-up on the left hand: G to C, and D back to G.', say: 'Most of the time you\'re on G. Watch for the C and the D coming, and change on beat three so you\'re ready on one.' },
+      { shot: 'Medium shot, playing along gently.', say: 'Play it gently and let it sway. Think about the words while you play.' },
+      { shot: 'Medium close-up.', say: 'Sweet, that rang out clean! Keep those fingertips tough, and I\'ll see you next time.' },
     ],
   },
 

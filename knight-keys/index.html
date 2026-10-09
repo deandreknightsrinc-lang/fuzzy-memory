@@ -141,6 +141,9 @@
       </section>
     </div>
     <div class="row-area bottom">
+      <section class="panel" data-panel="kit" data-title="Drum kit" style="flex:0 0 320px">
+        <div class="panel-body kit-panel-body"><div id="kitPanelStage" class="kit-stage kit-panel" title="Every drum lights up as it's hit: your e-kit, songs, grooves and Stage. Click a drum to play it."></div></div>
+      </section>
       <section class="panel" data-panel="keyboard" data-title="Keyboard" style="flex:1">
         <div class="panel-body"><canvas id="keysCanvas" class="keys-canvas"></canvas></div>
       </section>
@@ -573,6 +576,36 @@ Every evening I will sing"></textarea>
       <h3 class="home-h">Practice tools</h3>
       <div id="homeTools" class="home-tools"></div>
       <label class="home-start small"><input id="homeAtStart" type="checkbox" /> Open Home when Knight Keys starts</label>
+    </div>
+  </dialog>
+
+  <dialog id="practiceDlg" class="tool-window practice-window" aria-labelledby="prTitle">
+    <header class="dlg-head tool-head">
+      <h2 id="prTitle">🎯 Scales &amp; Chords</h2>
+      <button class="mini" data-close aria-label="Close">✕</button>
+    </header>
+    <div class="tool-body">
+      <div class="stage-row"><span class="stage-label">Instrument</span>
+        <div id="prInstrument" class="stage-seg"><button data-v="piano">🎹 Piano</button><button data-v="guitar">🎸 Guitar</button><button data-v="bass">🎸 Bass</button></div>
+      </div>
+      <div class="stage-row"><span class="stage-label">Practise</span>
+        <div id="prMode" class="stage-seg"><button data-v="scale">Scales</button><button data-v="chord">Chords</button><button data-v="quiz">Chord quiz</button></div>
+      </div>
+      <div class="stage-row">
+        <label id="prKeyWrap" class="field">Key <select id="prKey"></select></label>
+        <label id="prScaleWrap" class="field">Scale <select id="prScale"></select></label>
+        <label id="prChordWrap" class="field">Chord <select id="prChord"></select></label>
+        <label id="prShapeWrap" class="field">Chord <select id="prShape"></select></label>
+        <label id="prPoolWrap" class="field">Quiz <select id="prPool"></select></label>
+        <label id="prOctWrap" class="field">Octaves <select id="prOct"><option value="1">1</option><option value="2">2</option></select></label>
+        <label id="prHandWrap" class="field">Hand <select id="prHand"><option value="right">Right</option><option value="left">Left</option></select></label>
+      </div>
+      <p id="prPreview" class="pr-preview"></p>
+      <div class="row">
+        <button id="prStart" class="primary">Start ▶</button>
+        <span id="prBest" class="small"></span>
+      </div>
+      <p class="hint">It runs like a lesson: the notes light up, and Knight Keys listens (MIDI keyboard, the keys on screen, or 🎤 for guitar and bass).</p>
     </div>
   </dialog>
 

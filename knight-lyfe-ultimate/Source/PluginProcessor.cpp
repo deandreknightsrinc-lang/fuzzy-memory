@@ -45,7 +45,15 @@ KnightLyfeProcessor::KnightLyfeProcessor()
     // keyboard and e-kit stay silent until they're ticked in Options. Turn them all on.
     if (wrapperType == wrapperType_Standalone)
     {
-        juce::MessageManager::callAsync ([this] { openAllMidiInputs(); });
+        juce::MessageManager::callAsync ([this] {
+            openAllMidiInputs();
+           #if JucePlugin_Build_Standalone
+            // The input only feeds the lesson listener and is never played back, so
+            // there's no feedback loop: skip JUCE's "Audio input is muted" warning bar.
+            if (auto* holder = juce::StandalonePluginHolder::getInstance())
+                holder->getMuteInputValue().setValue (false);
+           #endif
+        });
         midiDevicesChanged = juce::MidiDeviceListConnection::make ([this] { openAllMidiInputs(); });
     }
 }
