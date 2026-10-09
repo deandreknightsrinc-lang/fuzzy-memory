@@ -17,6 +17,7 @@ import { KeyboardView, drawStaff, drawControllers, drawGroove, drawPianoRoll, dr
 import { TUNINGS, STRING_NAMES, fretNote, chordShape, chordTarget, chartTimeline, ChartJudge, rootPosition } from './fretted.js';
 import { INSTRUMENTS, instrumentById, instrumentHome, songsToShow, tunerLesson } from './home.js';
 import { videoLessons, videoSummary, videosToShow, watchedBy, markWatched } from './videos.js';
+import { videoScriptFor, filmingScriptText, scriptSeconds, scriptsCsvFor } from './video-scripts.js';
 import { UNITS, COURSES, unitsFor, readNotes, grooveMidi, DrumJudge, addCourse, removeCourse, pathState, lessonStars, starsForMistakes, starsForAccuracy, starsForSinging, updateStreak, currentStreak } from './lessons.js';
 import { PitchListener, SingJudge, RangeFinder, voiceType, freqToCents, midiToFreq, chromaMatches } from './pitch.js';
 import { GameSession, crownsFor, loadStage, saveStage, recordScore, courseState, scoreKey, PLAYER_COLORS } from './game.js';
@@ -6616,6 +6617,7 @@ function renderHome() {
   // Video lessons: open as you reach their lesson.
   const vlist = videoLessons(current, { progress: lessonProgress(), videos: courseVideos, watched: watchedBy(stage, me.id), unlockAll: !!stage.unlockAll });
   const vsum = videoSummary(vlist);
+  $('homeScripts').onclick = () => downloadVideoScripts(current);
   setText($('homeVideosNote'), vsum.made ? `(${vsum.watched} of ${vsum.made} watched · they open as you reach each lesson)` : '(no videos yet: open a lesson\'s card to add one or copy its script for an AI video tool)');
   const vbox = $('homeVideos');
   vbox.innerHTML = '';
@@ -6674,7 +6676,7 @@ async function renderVideoLesson() {
   if (!shown) {
     const script = lessonScriptFor(lesson, course);
     box.append(Object.assign(document.createElement('div'), { className: 'lp-script', textContent: script.text }));
-    setText($('vdNote'), `No video for this lesson yet. Here's ${t.name}'s script (about ${Math.max(1, Math.round(script.seconds / 60))} min): copy it into an AI video tool, then add the video here.`);
+    setText($('vdNote'), `No video for this lesson yet. Here's ${t.name}'s ${script.written ? 'filming script' : 'script'} (about ${Math.max(1, Math.round(script.seconds / 60))} min): copy it into an AI video tool, then add the video here.`);
   } else setText($('vdNote'), entry.watched || watchedBy(stage, stage.current)[lesson.id] ? '✓ You\'ve watched this one.' : '');
   const embedded = shown && !/^idb:|\.(mp4|m4v|webm|mov)(\?|$)/i.test(video?.src || '');
   $('vdWatched').hidden = !embedded;
@@ -6683,13 +6685,28 @@ async function renderVideoLesson() {
   $('vdAddBox').hidden = true;
 }
 
-/** The teacher's script for a built-in lesson (for AI video tools). */
+/** The teacher's script for a built-in lesson (for AI video tools): a written filming
+    script when there is one (video-scripts.js), else one made from the lesson's steps. */
 function lessonScriptFor(lesson, course) {
   const c = COURSES.find((x) => x.id === course);
   const units = unitsFor(course);
   const unit = units.find((u) => u.lessons.includes(lesson));
   const number = units.flatMap((u) => u.lessons).indexOf(lesson) + 1;
+  const written = videoScriptFor(lesson.id);
+  if (written) return { text: filmingScriptText(lesson, written, { number, course: c?.name || course, unit: unit?.title || '' }), seconds: scriptSeconds(written), written: true };
   return lessonScript(lesson, { teacher: teacherForCourse(course), course: c?.name || course, unit: unit?.title || '', number, songTitle });
+}
+
+/** Every video script of an instrument: a text file to read or film from, and a CSV for bulk AI video tools. */
+function downloadVideoScripts(instrumentId) {
+  const inst = instrumentById(instrumentId);
+  const entries = videoLessons(inst.id).map((v) => {
+    const units = unitsFor(v.course);
+    return { ...v, number: units.flatMap((u) => u.lessons).indexOf(v.lesson) + 1, courseName: COURSES.find((c) => c.id === v.course)?.name || v.course };
+  });
+  const text = entries.map((e) => lessonScriptFor(e.lesson, e.course).text).join('\n\n' + '='.repeat(60) + '\n\n');
+  download(text, `${inst.name} video scripts.txt`, 'text/plain');
+  if (entries.some((e) => videoScriptFor(e.lesson.id))) download(scriptsCsvFor(entries.map((e) => ({ ...e, course: e.courseName }))), `${inst.name} video scripts.csv`, 'text/csv');
 }
 
 function setLessonVideo(lessonId, video) {
