@@ -72,7 +72,7 @@ test('tuners, ranks and tools', () => {
   assert.equal(tunerLesson('bass').steps.find((st) => st.tune).instrument, 'bass');
   assert.equal(tunerLesson('piano'), null);
   assert.deepEqual([0, 0.2, 0.5, 0.8, 1].map(rankFor), ['New', 'Beginner', 'Improving', 'Confident', 'Graduate']);
-  const known = ['songs', 'score', 'learn', 'grooves', 'kit', 'booth', 'lyrics', 'mic', 'tuner'];
+  const known = ['practice', 'songs', 'score', 'learn', 'grooves', 'kit', 'booth', 'lyrics', 'mic', 'tuner'];
   for (const inst of INSTRUMENTS) for (const t of inst.tools) assert.ok(known.includes(t), `${inst.id}: ${t}`);
   assert.ok(ALL_LESSONS.length > 0);
 });

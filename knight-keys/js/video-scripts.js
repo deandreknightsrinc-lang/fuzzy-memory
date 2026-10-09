@@ -1,4 +1,4 @@
-// Filming scripts for the video lessons (drums, bass, and the newer guitar lessons): what the teacher says,
+// Filming scripts for the video lessons (drums, bass and guitar): what the teacher says,
 // what the camera shows and what appears on screen, scene by scene. Written to
 // match each lesson's steps exactly, so the video teaches what the lesson then
 // asks you to play. Paste one into an AI video tool (HeyGen, Synthesia,
@@ -253,6 +253,138 @@ export const VIDEO_SCRIPTS = {
       { shot: 'Over-the-shoulder on the app.', say: 'Here the song waits for you, so learn every hit slowly first. Fast comes from slow, every single time.' },
       { shot: 'Medium shot, wiping forehead and laughing.', say: 'Stay relaxed. Tight arms get tired, loose arms keep going. Locked in! That\'s the pocket!' },
       { shot: 'Medium shot.', say: 'Then take it to Stage and go for the crowns. Practice slow, play it clean, and I\'ll catch you on the next beat.' },
+    ],
+  },
+
+  // ---- Guitar: Getting started ----------------------------------------------------------
+  'g-tune': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up on the stool, acoustic guitar on the right leg, warm lamps.', say: 'Hey friend, grab your guitar, let\'s play something good. Welcome to guitar! First: how to hold it, and how to tune it.' },
+      { shot: 'Wide shot from the front: body on the right leg, neck angled up to the left.', say: 'Sit with the guitar\'s body on your right leg, the neck pointing left and a little up. Your left hand presses the strings on the neck, thumb behind it. Your right hand strums over the sound hole.', screen: 'Body on the right leg · neck up and left' },
+      { shot: 'Close-up: the six strings lighting up one by one, thickest to thinnest.', say: 'Six strings. From the thickest, number six, to the thinnest, number one: E, A, D, G, B, E. Remember it like this: Eddie Ate Dynamite, Good Bye Eddie.', screen: 'E A D G B E · "Eddie Ate Dynamite, Good Bye Eddie"' },
+      { shot: 'Over the shoulder: the app\'s tuner needle while a string is plucked and a peg turned.', say: 'Now tune. Turn on the microphone in the app. Pluck one string, and turn its tuning peg slowly until the needle sits right in the middle.', screen: '🎤 on · needle in the middle' },
+      { shot: 'Close-up on the tuning pegs, small turns.', say: 'Small turns. A tiny turn changes a lot. Go string by string, six through one.' },
+      { shot: 'Medium close-up.', say: 'A tuned guitar sounds good even with one chord. Tune every time. Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-open': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up.', say: 'Hey friend, grab your guitar, let\'s play something good. Your first notes, and you don\'t even need your left hand.' },
+      { shot: 'Close-up on the right hand picking a single open string, letting it ring.', say: 'An open string is played without pressing any fret. Pick one string with your thumb or a pick, and let it ring.', screen: 'Open string = no frets pressed' },
+      { shot: 'Close-up, picking each string from the thickest to the thinnest, slowly.', say: 'From the thickest to the thinnest: E, A, D, G, B, E. One at a time. Hear each one ring out.' },
+      { shot: 'Close-up, picking back up from the thinnest to the thickest.', say: 'And back the other way: E, B, G, D, A, E. Try to hit only one string each time. That\'s the real skill here.', screen: 'Hit only one string' },
+      { shot: 'Medium close-up.', say: 'The app listens to every note, so take your time. Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+
+  // ---- Guitar: First notes and melodies -----------------------------------------------
+  'g-frets': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up.', say: 'Hey friend, grab your guitar, let\'s play something good. Today your left hand joins in: frets one and three.' },
+      { shot: 'Extreme close-up: fingertip pressing just behind the fret wire.', say: 'Press with the very tip of your finger, just behind the metal fret wire. Not on top of it, just behind. That\'s where it sounds clean.', screen: 'Fingertip, just behind the fret wire' },
+      { shot: 'Close-up: index on fret 1, ring finger on fret 3 of the high E string.', say: 'Finger one, your index, plays fret one. Finger three, your ring finger, plays fret three. On the high E string: open is E, fret one is F, fret three is G.', screen: 'High E string: open E · 1 F · 3 G' },
+      { shot: 'Close-up, playing E F G F E, then on the B string B C D C B.', say: 'E, F, G, F, E. Then the same on the B string: B, C, D, C, B. Up and back down.' },
+      { shot: 'Medium close-up, rubbing fingertips.', say: 'Fingertips sore? That\'s normal for the first couple of weeks. They toughen up. Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-mary': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, playful.', say: 'Hey friend, grab your guitar, let\'s play something good. Time for your first song: Mary Had a Little Lamb.' },
+      { shot: 'Fretboard graphic: E (high E open), D (B fret 3), C (B fret 1), G (high E fret 3).', say: 'Four notes on two strings. E is the open high E string. D is the B string, third fret. C is the B string, first fret. And G is the high E string, third fret.', screen: 'E: open · D: B3 · C: B1 · G: E3' },
+      { shot: 'Close-up, playing the first line slowly while singing along softly.', say: 'Ma-ry had a lit-tle lamb: E, D, C, D, E, E, E. Little lamb: D, D, D. Little lamb: E, G, G.' },
+      { shot: 'Medium shot, playing it through with a smile.', say: 'Sing it in your head while you play. If you know how a song goes, your fingers find it faster.' },
+      { shot: 'Medium close-up.', say: 'Sweet, that rang out clean! Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-joyful': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, warm.', say: 'Hey friend, grab your guitar, let\'s play something good. Today: a hymn with a famous melody. Joyful, Joyful, We Adore Thee.' },
+      { shot: 'Graphic: "Ode to Joy" with the hymn title under it.', say: 'The melody is Beethoven\'s Ode to Joy. Same notes you just learned, on the high E and B strings.', screen: 'Ode to Joy = Joyful, Joyful' },
+      { shot: 'Close-up, playing the first phrase slowly: E E F G G F E D.', say: 'E, E, F, G, G, F, E, D. It climbs up and walks back down, step by step.' },
+      { shot: 'Close-up, the second half: C C D E E D D.', say: 'Then C, C, D, E, E, D, D. Most notes are right next to each other, so your hand barely moves.' },
+      { shot: 'Medium close-up.', say: 'Play it slow and smooth, like you\'re singing it. Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+
+  // ---- Guitar: First chords ----------------------------------------------------------
+  'g-em': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up.', say: 'Hey friend, grab your guitar, let\'s play something good. Today you play your first chords. And the first one is the easiest chord on guitar.' },
+      { shot: 'Close-up: fingers 2 and 3 on the 2nd fret of the A and D strings.', say: 'E minor. Fingers two and three on the second fret of the A and D strings. That\'s it. Now strum all six strings, top to bottom.', screen: 'Em: fingers 2 and 3 on fret 2 (A, D)' },
+      { shot: 'Medium shot, strumming Em and letting it ring.', say: 'Listen to that. A whole chord. Strum it, let it ring, strum it again.' },
+      { shot: 'Close-up: the Em shape moving down a string, finger 1 adding the B string fret 1.', say: 'A minor: move that same shape down one string, onto the D and G strings, and add finger one on the first fret of the B string. And don\'t play the low E string.', screen: 'Am: same shape one string down + finger 1 on B1 · skip low E' },
+      { shot: 'Medium shot, changing slowly Am to Em.', say: 'Now go back and forth. A minor, E minor. Slow is fine. Smooth is the goal.' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-gcd': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, excited.', say: 'Hey friend, grab your guitar, let\'s play something good. Today you learn the three chords behind hundreds of hymns and worship songs: G, C and D.' },
+      { shot: 'Close-up on the G shape: fingers spread wide.', say: 'G: three fingers spread wide. Low E string, third fret, finger two. A string, second fret, finger one. High E, third fret, finger three.', screen: 'G: E3 (2) · A2 (1) · high E3 (3)' },
+      { shot: 'Close-up on the C shape: fingers stepping down from the A string.', say: 'C: fingers three, two, one stepping down from the A string. A string third fret, D string second fret, B string first fret. Skip the low E.', screen: 'C: A3 · D2 · B1 · skip low E' },
+      { shot: 'Close-up on the D triangle, strumming only the top four strings.', say: 'D: a little triangle on the top three strings. G second fret, B third fret, high E second fret. Strum just the top four strings.', screen: 'D: G2 · B3 · E2 · top 4 strings' },
+      { shot: 'Medium shot, G, C, D, G slowly.', say: 'G, C, D, G. Put those together and you can play an amazing number of songs.' },
+      { shot: 'Medium close-up.', say: 'Sweet, that rang out clean! Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-worship4': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, soft worship lighting.', say: 'Hey friend, grab your guitar, let\'s play something good. Today: the four chords of modern worship.' },
+      { shot: 'Graphic: G → D → Em → C, labelled 1 5 6 4.', say: 'G, D, E minor, C. Musicians call it the one-five-six-four. Once you hear it, you\'ll hear it everywhere.', screen: 'The worship four: G · D · Em · C (1-5-6-4)' },
+      { shot: 'Close-up on D/F#: thumb over the neck on the low E string, 2nd fret.', say: 'Worship players love one trick here: D over F sharp. Play D, and put your thumb, or your first finger, on the second fret of the low E string.', screen: 'D/F#: D + low E string fret 2' },
+      { shot: 'Close-up on the low strings: G, F#, E walking down.', say: 'Now listen to the bass: G, F sharp, E. It walks down step by step. Plain D works too, so use whichever you can play today.' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+
+  // ---- Guitar: Strum along in time ----------------------------------------------------
+  'g-strum-em-am': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, foot tapping.', say: 'Hey friend, grab your guitar, let\'s play something good. Today we play in time, with a click.' },
+      { shot: 'Graphic: 1 2 3 4 with a down-arrow on each.', say: 'Strum down on every beat: one, two, three, four. Keep your strumming hand moving like a pendulum, even between chords.', screen: 'Down on every beat: 1 2 3 4' },
+      { shot: 'Close-up on the left hand lifting on beat 4.', say: 'Here\'s the secret: start changing chords on beat four. Let the last strum be a little loose, so the new chord is ready right on one.', screen: 'Change on beat 4' },
+      { shot: 'Over the shoulder on the app chart, Em and Am lighting up.', say: 'E minor and A minor, one bar each. The chord to play lights up. Watch it, and stay with the click.' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-strum-gcd': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up.', say: 'Hey friend, grab your guitar, let\'s play something good. G, C and D, now in time.' },
+      { shot: 'Over the shoulder on the chart: G C G D G C D G.', say: 'Eight bars, one chord each: G, C, G, D, then G, C, D, G. Four down-strums per bar.', screen: 'G C G D · G C D G' },
+      { shot: 'Close-up on the left hand moving early, on beat 4.', say: 'And remember: change on beat four. If you wait for one, you\'ll always be late. Move early, land on time.' },
+      { shot: 'Medium shot, playing along steadily.', say: 'If you miss a chord, don\'t stop. Keep strumming, catch the next one. That\'s what real players do.' },
+      { shot: 'Medium close-up.', say: 'Sweet, that rang out clean! Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-worship-flow': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, soft worship lighting.', say: 'Hey friend, grab your guitar, let\'s play something good. Let\'s play a whole song: Worship Flow.' },
+      { shot: 'Graphic: G, D/F#, Em, C.', say: 'It\'s the worship four you learned: G, D over F sharp, E minor, C. Then the chorus moves things around a little.', screen: 'G · D/F# · Em · C' },
+      { shot: 'Over the shoulder on the app chart.', say: 'The chart shows the chord to play, and the app listens through the microphone to check you\'re on the right one.' },
+      { shot: 'Medium shot, playing along, eyes closed for a moment.', say: 'Once the changes feel easy, stop looking at your hands. Look up, and worship. That\'s the whole point.' },
+      { shot: 'Medium close-up.', say: 'Keep those fingertips tough, and I\'ll see you next time.' },
+    ],
+  },
+  'g-amazing': {
+    teacher: JORDAN,
+    scenes: [
+      { shot: 'Medium close-up, reverent.', say: 'Hey friend, grab your guitar, let\'s play something good. Today: a hymn everybody knows. Amazing Grace.' },
+      { shot: 'Graphic: 1 2 3 with a big DOWN on 1.', say: 'Amazing Grace is in three-four. Count one, two, three, and strum DOWN, down, down. Strong on one, lighter on two and three.', screen: '3/4: DOWN down down' },
+      { shot: 'Close-up on G, C and D.', say: 'Just three chords: G, C and D. You know them all.', screen: 'G · C · D' },
+      { shot: 'Close-up on the left hand: G to C, and D back to G.', say: 'Most of the time you\'re on G. Watch for the C and the D coming, and change on beat three so you\'re ready on one.' },
+      { shot: 'Medium shot, playing along gently.', say: 'Play it gently and let it sway. Think about the words while you play.' },
+      { shot: 'Medium close-up.', say: 'Sweet, that rang out clean! Keep those fingertips tough, and I\'ll see you next time.' },
     ],
   },
 

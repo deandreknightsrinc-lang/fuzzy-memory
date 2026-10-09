@@ -6,8 +6,8 @@ import { COURSE_TEACHERS, teacherById } from '../js/teachers.js';
 
 const lessonsOf = (course) => unitsFor(course).flatMap((u) => u.lessons.map((lesson) => ({ lesson, unit: u })));
 
-test('every drum and bass lesson has a filming script by its course teacher', () => {
-  for (const course of ['drums', 'bass']) {
+test('every drum, bass and guitar lesson has a filming script by its course teacher', () => {
+  for (const course of ['drums', 'bass', 'guitar']) {
     const list = lessonsOf(course);
     assert.ok(list.length > 0);
     for (const { lesson } of list) {
@@ -16,11 +16,6 @@ test('every drum and bass lesson has a filming script by its course teacher', ()
       assert.equal(s.teacher, COURSE_TEACHERS[course], `${lesson.id}: taught by the ${course} teacher`);
     }
   }
-  for (const unit of ['guitar-chords2', 'guitar-strum', 'guitar-church'])
-    for (const { lesson } of lessonsOf('guitar').filter((e) => e.unit.id === unit)) {
-      assert.ok(videoScriptFor(lesson.id), `${lesson.id} has a script`);
-      assert.equal(videoScriptFor(lesson.id).teacher, COURSE_TEACHERS.guitar);
-    }
   const ids = new Set(ALL_LESSONS.map((l) => l.id));
   for (const id of Object.keys(VIDEO_SCRIPTS)) assert.ok(ids.has(id), `${id} is a real lesson`);
 });
