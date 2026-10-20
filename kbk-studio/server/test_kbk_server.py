@@ -95,6 +95,26 @@ class SunoTests(unittest.TestCase):
         self.assertLessEqual(len(k.clean_suno(long, d)[0]), 200)
 
 
+class OriginTests(unittest.TestCase):
+    def test_origins(self):
+        self.assertTrue(k.origin_allowed(""))
+        self.assertTrue(k.origin_allowed("https://deandreknightsrinc-lang.github.io"))
+        self.assertTrue(k.origin_allowed("http://localhost:5174"))
+        self.assertTrue(k.origin_allowed("http://127.0.0.1:8765"))
+        self.assertTrue(k.origin_allowed("https://192.168.1.172:8443"))
+        self.assertTrue(k.origin_allowed("http://kk-server.local:8765"))
+        self.assertTrue(k.origin_allowed("http://studio.example:8765", "studio.example:8765"))
+        self.assertFalse(k.origin_allowed("https://evil.example"))
+        self.assertFalse(k.origin_allowed("https://deandreknightsrinc-lang.github.io.evil.example"))
+        self.assertFalse(k.origin_allowed("null"))
+        self.assertFalse(k.origin_allowed("http://8.8.8.8"))
+
+    def test_hosts(self):
+        for h in ("", "localhost:8765", "127.0.0.1:8765", "[::1]:8765", "192.168.1.172:8765", "kk-server.local"):
+            self.assertTrue(k.host_allowed(h), h)
+        self.assertFalse(k.host_allowed("rebind.evil.example:8765"))
+
+
 class ServerTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -106,8 +126,8 @@ class ServerTests(unittest.TestCase):
     def tearDownClass(cls):
         cls.srv.shutdown()
 
-    def get(self, path, data=None, method=None):
-        req = urllib.request.Request(self.base + path, data=data, method=method)
+    def get(self, path, data=None, method=None, headers=None):
+        req = urllib.request.Request(self.base + path, data=data, method=method, headers=headers or {})
         try:
             with urllib.request.urlopen(req, timeout=60) as r:
                 return r.status, dict(r.headers), r.read()
@@ -122,6 +142,15 @@ class ServerTests(unittest.TestCase):
         s, h, _ = self.get("/health", method="OPTIONS")
         self.assertEqual(s, 204)
         self.assertEqual(h["Access-Control-Allow-Private-Network"], "true")
+
+    def test_other_sites_are_refused(self):
+        s, h, _ = self.get("/health", headers={"Origin": "https://deandreknightsrinc-lang.github.io"})
+        self.assertEqual(s, 200)
+        self.assertEqual(h["Access-Control-Allow-Origin"], "https://deandreknightsrinc-lang.github.io")
+        self.assertEqual(self.get("/health", headers={"Origin": "https://evil.example"})[0], 403)
+        self.assertEqual(self.get("/health", method="OPTIONS", headers={"Origin": "https://evil.example"})[0], 403)
+        self.assertEqual(self.get("/convert?format=wav", data=tiny_wav(), headers={"Origin": "https://evil.example"})[0], 403)
+        self.assertEqual(self.get("/health", headers={"Host": "rebind.evil.example:8765"})[0], 403)
 
     def test_serves_studio_but_not_server_code(self):
         s, h, b = self.get("/")

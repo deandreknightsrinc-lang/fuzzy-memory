@@ -222,8 +222,10 @@ function flashPad(i) {
 engine.onTrigger = (i) => flashPad(i);
 
 function selectPad(i) {
+  if (i === state.selected) return;
   state.selected = i;
-  refreshPads();
+  // only the highlight moves; the 16 waveforms stay as drawn
+  padEls.forEach((el, j) => el?.classList.toggle('sel', j === i));
   renderEditor();
 }
 
@@ -283,7 +285,8 @@ function spreadToPads(clip, how = 'auto') {
     persistNow(i);
   }
   $('undoChop').hidden = false;
-  selectPad(0);
+  state.selected = 0;
+  refreshPads(); renderEditor();
   return { kind, bpm, ranges, count: parts.length };
 }
 
@@ -640,7 +643,7 @@ async function readUrl(input, log = () => {}) {
         const r = await fetch(info.url, { signal: ctl.signal, redirect: 'follow' });
         clearTimeout(timer);
         if (r.ok) fetched = await r.arrayBuffer();
-        else failure = Object.assign(new Error(`The site answered ${r.status} ${r.statusText || ''}`.trim()), { http: true });
+        else failure = Object.assign(new Error(`The site answered ${r.status} ${r.statusText || ''}`.trim()), { http: true, status: r.status });
       } catch (err) {
         failure = err;
       }
@@ -648,8 +651,8 @@ async function readUrl(input, log = () => {}) {
         const kind = sniffAudio(new Uint8Array(fetched, 0, Math.min(512, fetched.byteLength)));
         if (kind === 'html' || kind === 'json') await tryHelper('The link opened a web page instead of an audio file.');
         else bytes = fetched;
-      } else if (failure.http && !helper.online) {
-        throw new Error(`${failure.message}. Check the link opens in a new tab.`);
+      } else if (failure.http && (failure.status === 404 || failure.status === 410)) {
+        throw new Error(`${failure.message}. The file isn't there; check the link opens in a new tab.`);
       } else {
         await tryHelper(failure.name === 'AbortError' ? 'The download timed out.'
           : failure.http ? `${failure.message}.`
@@ -948,8 +951,9 @@ async function convertAll() {
   const rate = Number($('cvRate').value) || 0;
   const ch = Number($('cvCh').value) || 0;
   $('cvGo').disabled = true;
-  for (const item of state.converted) {
-    if (item.out) continue;
+  // a copy: rows can be removed while this runs
+  for (const item of [...state.converted]) {
+    if (item.out || !state.converted.includes(item)) continue;
     try {
       item.state = 'Reading…'; renderConvertList();
       let clip = await decodeBytes(await item.file.arrayBuffer(), item.file.name);

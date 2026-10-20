@@ -356,14 +356,16 @@ export function decodeWav(arrayBuffer, name = 'clip') {
   const v = new DataView(arrayBuffer);
   const tag = (o) => String.fromCharCode(v.getUint8(o), v.getUint8(o + 1), v.getUint8(o + 2), v.getUint8(o + 3));
   if (tag(0) !== 'RIFF' || tag(8) !== 'WAVE') throw new Error('Not a WAV file');
-  let o = 12, fmt = null;
+  let o = 12, fmt = null, data = null;
   while (o + 8 <= v.byteLength) {
     const id = tag(o), len = v.getUint32(o + 4, true), body = o + 8;
     if (id === 'fmt ') {
       let format = v.getUint16(body, true);
       if (format === 0xfffe) format = v.getUint16(body + 24, true);
       fmt = { format, ch: v.getUint16(body + 2, true), rate: v.getUint32(body + 4, true), bits: v.getUint16(body + 14, true) };
-    } else if (id === 'data' && fmt) {
+    } else if (id === 'data') data = { body, len }; // some writers put it before 'fmt '
+    if (fmt && data) {
+      const { body, len } = data;
       const bps = fmt.bits / 8;
       const end = Math.min(v.byteLength, body + len);
       const frames = Math.floor((end - body) / (bps * fmt.ch));
@@ -468,7 +470,10 @@ export function safeFileName(name, ext) {
 
 export function formatTime(sec) {
   if (!Number.isFinite(sec)) return '0:00';
-  const m = Math.floor(sec / 60);
-  const s = sec - m * 60;
-  return `${m}:${s < 10 ? '0' : ''}${s.toFixed(sec < 10 ? 2 : 1)}`;
+  // round first, so 59.96 s reads 1:00.0 and not 0:60.0
+  const digits = sec < 10 ? 2 : 1;
+  const r = Math.round(Math.max(0, sec) * 10 ** digits) / 10 ** digits;
+  const m = Math.floor(r / 60);
+  const s = r - m * 60;
+  return `${m}:${s < 10 ? '0' : ''}${s.toFixed(digits)}`;
 }
