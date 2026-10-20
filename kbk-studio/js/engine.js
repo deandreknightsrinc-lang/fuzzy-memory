@@ -98,8 +98,11 @@ export class Engine {
     const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
     if (pan) { pan.pan.value = p.pan; src.connect(g).connect(pan).connect(this.master); } else src.connect(g).connect(this.master);
     const dur = buf.duration;
-    const a = Math.min(p.start, p.end) * dur;
-    const b = Math.max(p.start, p.end) * dur;
+    // start/end mark the region on the forward waveform; a reversed buffer
+    // holds that region mirrored, so play it from the other end
+    const lo = Math.min(p.start, p.end), hi = Math.max(p.start, p.end);
+    const a = (p.reverse ? 1 - hi : lo) * dur;
+    const b = (p.reverse ? 1 - lo : hi) * dur;
     const len = Math.max(0.005, b - a);
     if (p.mode === 'loop') {
       src.loop = true; src.loopStart = a; src.loopEnd = a + len;
@@ -170,7 +173,8 @@ export class Engine {
 
   level() {
     if (!this.analyser) return 0;
-    const a = new Float32Array(this.analyser.fftSize);
+    // reused: this runs every frame for the meter
+    const a = this._levelBuf || (this._levelBuf = new Float32Array(this.analyser.fftSize));
     this.analyser.getFloatTimeDomainData(a);
     let p = 0;
     for (const v of a) { const x = Math.abs(v); if (x > p) p = x; }

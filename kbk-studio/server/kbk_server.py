@@ -20,6 +20,7 @@ otherwise.
 """
 
 import argparse
+import ipaddress
 import json
 import mimetypes
 import os
@@ -66,6 +67,19 @@ OLLAMA_URL = os.environ.get("KBK_OLLAMA_URL", "http://127.0.0.1:11434").rstrip("
 OLLAMA_MODEL = os.environ.get("KBK_OLLAMA_MODEL", "llama3.1:8b")
 
 DEMUCS_MODELS = {"htdemucs", "htdemucs_ft", "htdemucs_6s", "mdx_extra", "mdx_extra_q"}
+
+# Which web pages may use the helper. Without this, any site open in the
+# browser could drive it: browsers send simple GETs and POSTs to localhost
+# without asking first, so a stranger's page could read the home network
+# through /fetch or keep the Mac busy with hours of Demucs.
+# The plug-in, curl and the studio served by the helper itself send no
+# foreign Origin and are always let in. Add more with
+# KBK_ALLOW_ORIGINS="https://a.example,https://b.example".
+PAGES_ORIGIN = "https://deandreknightsrinc-lang.github.io"
+EXTRA_ORIGINS = {o.strip().rstrip("/").lower() for o in os.environ.get("KBK_ALLOW_ORIGINS", "").split(",") if o.strip()}
+# Host names the helper answers to besides localhost, IP addresses and
+# *.local (stops DNS-rebinding tricks). Add more with KBK_ALLOW_HOSTS.
+EXTRA_HOSTS = {h.strip().lower() for h in os.environ.get("KBK_ALLOW_HOSTS", "").split(",") if h.strip()}
 
 
 # ---- pure helpers (unit tested) --------------------------------------------
@@ -226,6 +240,53 @@ def ask_ollama(prompt, timeout=90):
         return json.loads(r.read().decode()).get("response", "")
 
 
+def _host_name(netloc):
+    netloc = (netloc or "").strip().lower()
+    if netloc.startswith("["):
+        return netloc[1:].split("]")[0]
+    return netloc.rsplit(":", 1)[0] if netloc.count(":") == 1 else netloc
+
+
+def _local_name(name):
+    """localhost, a private or loopback IP address, or a .local name."""
+    if name == "localhost" or name.endswith(".local"):
+        return True
+    try:
+        ip = ipaddress.ip_address(name)
+    except ValueError:
+        return False
+    return ip.is_private or ip.is_loopback or ip.is_link_local
+
+
+def host_allowed(host):
+    """The Host header names this machine, not somebody's domain."""
+    if not host:
+        return True
+    name = _host_name(host)
+    if name in EXTRA_HOSTS or _local_name(name):
+        return True
+    try:
+        ipaddress.ip_address(name)  # any IP address typed in directly
+        return True
+    except ValueError:
+        return False
+
+
+def origin_allowed(origin, host=""):
+    """The page making the request is KBK Studio, not some other site."""
+    if not origin:
+        return True
+    origin = origin.strip().rstrip("/").lower()
+    if origin in (PAGES_ORIGIN, *EXTRA_ORIGINS):
+        return True
+    u = urllib.parse.urlparse(origin)
+    if u.scheme not in ("http", "https") or not u.netloc:
+        return False  # "null": a file:// page or a sandboxed frame
+    if host and u.netloc == host.strip().lower():
+        return True  # the studio served by this helper
+    return _local_name(_host_name(u.netloc))
+
+
 def tools():
     demucs = bool(shutil.which("demucs"))
     if not demucs:
@@ -276,15 +337,33 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         sys.stderr.write("%s %s\n" % (time.strftime("%H:%M:%S"), fmt % args))
 
-    # CORS, including Chrome's private-network check (https page -> localhost)
+    # CORS, including Chrome's private-network check (https page -> localhost).
+    # Only pages that pass origin_allowed get here.
     def cors(self):
-        self.send_header("Access-Control-Allow-Origin", "*")
+        origin = self.headers.get("Origin")
+        self.send_header("Access-Control-Allow-Origin", origin or "*")
+        if origin:
+            self.send_header("Vary", "Origin")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.send_header("Access-Control-Allow-Private-Network", "true")
         self.send_header("Access-Control-Expose-Headers", "Content-Disposition, X-Title")
 
+    def refuse_stranger(self):
+        """True (and answers 403) when another site or a foreign host name is calling."""
+        if host_allowed(self.headers.get("Host", "")) and origin_allowed(self.headers.get("Origin", ""), self.headers.get("Host", "")):
+            return False
+        body = json.dumps({"error": "This page isn't allowed to use the KBK helper. Open KBK Studio from GitHub Pages or http://localhost:8765, or add the site to KBK_ALLOW_ORIGINS."}).encode()
+        self.send_response(403)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+        return True
+
     def do_OPTIONS(self):
+        if self.refuse_stranger():
+            return
         self.send_response(204)
         self.cors()
         self.end_headers()
@@ -332,6 +411,8 @@ class Handler(BaseHTTPRequestHandler):
         self.route("POST")
 
     def route(self, method):
+        if self.refuse_stranger():
+            return
         u = urllib.parse.urlparse(self.path)
         q = {k: v[0] for k, v in urllib.parse.parse_qs(u.query).items()}
         try:

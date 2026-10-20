@@ -37,6 +37,8 @@ Add `--stems` (`bash setup-helper.sh --stems`) to also install Demucs for Pro st
 
 The website finds a helper running on the same computer (`http://localhost:8765`) by itself; the **Helper** chip turns green. To run it on the Proxmox server for the whole network, `bash start-helper.sh --host 0.0.0.0` and open `http://<server-ip>:8765` there. That address is http, so the website can't use it and MIDI won't work on it; use it for stems and conversions, or put it behind the HTTPS Caddy from AI Studio.
 
+The helper only answers KBK Studio itself: the GitHub Pages site, pages on `localhost`, a home-network address or a `.local` name, and the plug-in. Any other website open in the browser gets a 403, so it can't use the helper to read your home network or keep the Mac busy. To let another site in, start it with `KBK_ALLOW_ORIGINS="https://that.site" bash start-helper.sh`; to reach it by a host name other than an IP address or `.local` name, add `KBK_ALLOW_HOSTS="that.name"`.
+
 Only pull audio you own or have the rights to use.
 
 ## Gap analysis: why "paste a URL, load it into a pad" stopped working

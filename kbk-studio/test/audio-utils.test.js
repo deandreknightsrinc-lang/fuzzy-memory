@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
   makeClip, encodeWav, decodeWav, encodeAiff, readExtended, writeExtended, resample, normalize, peak,
-  trimSilence, slice, toMono, toStereo, detectOnsets, chop, equalStarts, encodeMp3, mp3Rate, safeFileName, peaks, clipDuration,
+  trimSilence, slice, toMono, toStereo, detectOnsets, chop, equalStarts, encodeMp3, mp3Rate, safeFileName, peaks, clipDuration, formatTime,
 } from '../js/audio-utils.js';
 
 const sine = (n, f, rate = 44100, a = 0.5) => Float32Array.from({ length: n }, (_, i) => a * Math.sin((2 * Math.PI * f * i) / rate));
@@ -132,4 +132,21 @@ test('autoChop: one-shots stay whole, loops cut at hits, songs spread across the
   const parts = chopRanges(clip, sc.ranges);
   assert.equal(parts.length, 16);
   assert.equal(parts[15].name, 'song 16');
+});
+
+test('times round before the minute rolls over', () => {
+  assert.equal(formatTime(59.96), '1:00.0');
+  assert.equal(formatTime(9.999), '0:10.00');
+  assert.equal(formatTime(75.04), '1:15.0');
+});
+
+test('WAV with the data chunk before fmt still reads', () => {
+  const good = new Uint8Array(encodeWav(makeClip([[0.5, -0.5, 0.25]], 8000), { bitDepth: 16 }));
+  const fmt = good.slice(12, 36), data = good.slice(36);
+  const swapped = new Uint8Array(good.length);
+  swapped.set(good.slice(0, 12)); swapped.set(data, 12); swapped.set(fmt, 12 + data.length);
+  const c = decodeWav(swapped.buffer);
+  assert.equal(c.sampleRate, 8000);
+  assert.equal(c.channels[0].length, 3);
+  assert.ok(Math.abs(c.channels[0][0] - 0.5) < 1e-3);
 });
