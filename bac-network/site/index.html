@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BAC Network and Media</title>
+  <meta name="description" content="Live TV, news, magazines and on-demand shows from BAC Network and Media.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/"><span class="mark">BAC</span><span class="brand-name">Network &amp; Media</span></a>
+    <nav>
+      <a href="#live">Live TV</a>
+      <a data-link="news" href="#">News</a>
+      <a data-link="magazine" href="#">Magazine</a>
+      <a data-link="watch" href="#">Watch</a>
+      <a href="#schedule">Schedule</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Your news. Your shows. Your network.</h1>
+      <p>Live channels, a daily newspaper, a magazine and a full library of shows, all in one place.</p>
+    </section>
+
+    <section id="live">
+      <h2>Live TV</h2>
+      <div class="channels" id="channels"></div>
+    </section>
+
+    <section class="split">
+      <div>
+        <h2><a data-link="news" href="#">BAC News</a></h2>
+        <ul class="stories" id="news-list"><li class="muted">Loading headlines…</li></ul>
+      </div>
+      <div>
+        <h2><a data-link="magazine" href="#">BAC Magazine</a></h2>
+        <ul class="stories" id="magazine-list"><li class="muted">Loading features…</li></ul>
+      </div>
+    </section>
+
+    <section id="watch-cta" class="cta">
+      <div>
+        <h2>BAC Watch</h2>
+        <p>Missed a show? Every episode, documentary and replay lives in the library.</p>
+      </div>
+      <a class="button" data-link="watch" href="#">Open the library</a>
+    </section>
+
+    <section id="schedule">
+      <h2>Schedule</h2>
+      <table class="schedule"><thead><tr><th>Channel</th><th>Day</th><th>Time</th><th>Show</th></tr></thead><tbody id="schedule-body"></tbody></table>
+    </section>
+  </main>
+
+  <footer>
+    <p>© <span id="year"></span> BAC Network and Media</p>
+    <p><a data-link="news" data-path="/#/portal/signup" href="#">Subscribe to the newsletter</a></p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
