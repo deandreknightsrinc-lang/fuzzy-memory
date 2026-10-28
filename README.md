@@ -1,5 +1,6 @@
 # fuzzy-memory
 
+- [`bac-network/`](bac-network/) - BAC Network and Media: the whole media company on one server. BAC News and BAC Magazine (Ghost), live channels BAC TV and BAC News Live (Owncast), BAC Watch on-demand library (PeerTube), a status page, and the BAC Network home site (see its README)
 - [`church/`](church/) - the BAC Ministries church home and the free white-label church platform for other churches, with the Bible: dramatized audio Bible, cinematic Bible, many versions and the extra books (see its README)
 - [`studio-desk/`](studio-desk/) - Studio Road Case Desk: an interactive template for an L-shaped studio desk built from two flight cases (laminated cardboard or plywood, faux-leather finish, cut lists, shopping list, desk ↔ road case conversion)
 - [`dashboard/`](dashboard/) - artist dashboard

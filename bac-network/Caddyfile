@@ -1,0 +1,37 @@
+{
+	email {$ADMIN_EMAIL}
+}
+
+# BAC Network home site
+{$DOMAIN}, www.{$DOMAIN} {
+	root * /srv/site
+	file_server
+	encode gzip
+}
+
+news.{$DOMAIN} {
+	reverse_proxy news:2368
+}
+
+magazine.{$DOMAIN} {
+	reverse_proxy magazine:2368
+}
+
+tv1.{$DOMAIN} {
+	reverse_proxy tv1:8080
+}
+
+newslive.{$DOMAIN} {
+	reverse_proxy tv2:8080
+}
+
+watch.{$DOMAIN} {
+	request_body {
+		max_size 10GB
+	}
+	reverse_proxy watch:9000
+}
+
+status.{$DOMAIN} {
+	reverse_proxy status:3001
+}

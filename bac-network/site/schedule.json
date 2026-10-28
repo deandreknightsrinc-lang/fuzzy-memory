@@ -1,0 +1,8 @@
+[
+  { "channel": "BAC News Live", "day": "Weekdays", "time": "7:00 AM", "show": "BAC Morning News" },
+  { "channel": "BAC News Live", "day": "Weekdays", "time": "12:00 PM", "show": "Midday Headlines" },
+  { "channel": "BAC News Live", "day": "Weekdays", "time": "6:00 PM", "show": "BAC Evening Report" },
+  { "channel": "BAC TV", "day": "Weekdays", "time": "8:00 PM", "show": "Prime Time Feature" },
+  { "channel": "BAC TV", "day": "Saturday", "time": "7:00 PM", "show": "BAC Weekend Live" },
+  { "channel": "BAC TV", "day": "Sunday", "time": "5:00 PM", "show": "Community Spotlight" }
+]

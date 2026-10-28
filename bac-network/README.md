@@ -1,0 +1,79 @@
+# BAC Network and Media
+
+Everything BAC needs to go live, running on one server:
+
+| Address | What it is | Built on |
+|---|---|---|
+| `bacnetwork.com` | Home site: live players, headlines, schedule | Custom (in `site/`) |
+| `news.bacnetwork.com` | BAC News, the daily newspaper, with newsletter and paid subscriptions | Ghost |
+| `magazine.bacnetwork.com` | BAC Magazine, features and issues | Ghost |
+| `tv1.bacnetwork.com` | BAC TV, live entertainment channel with chat | Owncast |
+| `newslive.bacnetwork.com` | BAC News Live, live news channel with chat | Owncast |
+| `watch.bacnetwork.com` | BAC Watch, on-demand episodes and replays | PeerTube |
+| `status.bacnetwork.com` | BAC Status, uptime monitoring and down alerts for everything above | Uptime Kuma |
+
+## What you need
+
+1. **A server.** Ubuntu 24.04 with 4 CPUs, 8 GB RAM and 160 GB disk. Hetzner (about $15/month) or DigitalOcean (about $48/month) both work. Video storage grows over time; add a storage volume when needed.
+2. **A domain name**, such as bacnetwork.com (about $12/year).
+3. **An email sending service** for newsletters and sign-ups: Mailgun, Postmark or Brevo (free tiers exist).
+4. **OBS Studio** (free) on the computer you broadcast from.
+
+## Step 1: Point your domain at the server
+
+In your domain provider's DNS settings, create these **A records**, all pointing to your server's IP address:
+`@`, `www`, `news`, `magazine`, `tv1`, `newslive`, `watch`, `status`
+
+## Step 2: Install
+
+Log in to the server and run:
+
+```bash
+git clone <your repo> /opt/bac-network   # or upload this folder there
+cd /opt/bac-network
+bash scripts/setup-server.sh              # first run creates .env with random passwords
+nano .env                                 # set DOMAIN, ADMIN_EMAIL and the SMTP lines
+bash scripts/setup-server.sh              # second run starts everything
+```
+
+Also edit `site/config.js` and set `domain` to the same domain.
+
+## First login
+
+Do these right away, because the first person to open each admin page becomes its owner.
+
+- **News:** open `https://news.YOURDOMAIN/ghost` and create the admin account.
+- **Magazine:** open `https://magazine.YOURDOMAIN/ghost` and create the admin account.
+- **Live channels:** open `https://tv1.YOURDOMAIN/admin` and `https://newslive.YOURDOMAIN/admin`. Username `admin`, password `abc123`. **Change the admin password immediately** and create a new stream key, both under Configuration > Server Setup.
+- **Status monitor:** open `https://status.YOURDOMAIN` and create the admin account. Then add an HTTP monitor for each address in the table above, and a notification (email, Telegram, Discord and many others are built in) so you hear about an outage before your viewers do.
+- **Video library:** open `https://watch.YOURDOMAIN` and log in as `root`. The password was printed at the end of setup, or run `docker compose logs watch | grep -A1 -i password`.
+
+## Show headlines on the home site
+
+In each Ghost admin, go to Settings > Integrations > Add custom integration, name it "Home site", and copy the **Content API key** into `site/config.js` (`newsKey` and `magazineKey`).
+
+## Going live
+
+In OBS: Settings > Stream > Service: Custom.
+
+| Channel | Server | Stream key |
+|---|---|---|
+| BAC TV | `rtmp://YOURDOMAIN:1935/live` | From BAC TV admin > Server Setup > Stream Keys |
+| BAC News Live | `rtmp://YOURDOMAIN:1936/live` | From BAC News Live admin > Server Setup > Stream Keys |
+| BAC Watch live events | `rtmp://YOURDOMAIN:1937/live` | Shown when you create a live video in PeerTube |
+
+Press Start Streaming and the channel goes live on its page and on the home site.
+
+## Day to day
+
+- **Publish a story:** write it in the News or Magazine admin and press Publish. It appears on the home site automatically.
+- **Upload an episode:** BAC Watch > Publish.
+- **Change the schedule:** edit `site/schedule.json`.
+- **Add a channel:** copy the `tv2` block in `docker-compose.yml` with a new name and port (1938, 1939...), add a matching block in `Caddyfile` and an entry in `site/config.js`, then `docker compose up -d`.
+- **Backups:** `bash scripts/backup.sh`, or schedule it nightly with cron (see the top of that file). Copy the `backups` folder off the server regularly.
+- **Updates:** `docker compose pull && docker compose up -d`.
+
+## Earning money
+
+- Ghost has paid memberships built in: connect Stripe under Settings > Membership in the News or Magazine admin.
+- Both Ghost sites send email newsletters to subscribers.

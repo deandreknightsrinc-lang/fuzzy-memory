@@ -1,0 +1,164 @@
+# BAC Network and Media: full platform on one server.
+# Start with:  docker compose up -d
+# Every public address is set from the DOMAIN value in your .env file.
+
+services:
+  # Front door: gives every site its own address and free HTTPS certificates.
+  caddy:
+    image: caddy:2.8
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./site:/srv/site:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [news, magazine, tv1, tv2, watch, status]
+
+  # Shared database for the two publications.
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./scripts/mysql-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      retries: 10
+
+  # BAC News: the daily newspaper (Ghost).
+  news:
+    image: ghost:5-alpine
+    restart: unless-stopped
+    environment:
+      url: https://news.${DOMAIN}
+      database__client: mysql
+      database__connection__host: mysql
+      database__connection__user: root
+      database__connection__password: ${MYSQL_ROOT_PASSWORD}
+      database__connection__database: bac_news
+      mail__transport: SMTP
+      mail__options__host: ${SMTP_HOST}
+      mail__options__port: ${SMTP_PORT}
+      mail__options__auth__user: ${SMTP_USER}
+      mail__options__auth__pass: ${SMTP_PASS}
+      mail__from: ${MAIL_FROM}
+    volumes:
+      - news_content:/var/lib/ghost/content
+    depends_on:
+      mysql: { condition: service_healthy }
+
+  # BAC Magazine: long-form features and paid issues (Ghost).
+  magazine:
+    image: ghost:5-alpine
+    restart: unless-stopped
+    environment:
+      url: https://magazine.${DOMAIN}
+      database__client: mysql
+      database__connection__host: mysql
+      database__connection__user: root
+      database__connection__password: ${MYSQL_ROOT_PASSWORD}
+      database__connection__database: bac_magazine
+      mail__transport: SMTP
+      mail__options__host: ${SMTP_HOST}
+      mail__options__port: ${SMTP_PORT}
+      mail__options__auth__user: ${SMTP_USER}
+      mail__options__auth__pass: ${SMTP_PASS}
+      mail__from: ${MAIL_FROM}
+    volumes:
+      - magazine_content:/var/lib/ghost/content
+    depends_on:
+      mysql: { condition: service_healthy }
+
+  # BAC TV 1: main entertainment channel (Owncast). Stream in on port 1935.
+  tv1:
+    image: owncast/owncast:latest
+    restart: unless-stopped
+    ports:
+      - "1935:1935"
+    volumes:
+      - tv1_data:/app/data
+
+  # BAC News Live: the live news channel (Owncast). Stream in on port 1936.
+  tv2:
+    image: owncast/owncast:latest
+    restart: unless-stopped
+    ports:
+      - "1936:1935"
+    volumes:
+      - tv2_data:/app/data
+
+  # BAC Watch: on-demand shows, episodes and archives (PeerTube).
+  watch:
+    image: chocobozzz/peertube:production-bookworm
+    restart: unless-stopped
+    ports:
+      - "1937:1935"
+    environment:
+      PEERTUBE_WEBSERVER_HOSTNAME: watch.${DOMAIN}
+      PEERTUBE_WEBSERVER_PORT: 443
+      PEERTUBE_WEBSERVER_HTTPS: "true"
+      PEERTUBE_TRUST_PROXY: '["127.0.0.1", "loopback", "172.16.0.0/12"]'
+      PEERTUBE_SECRET: ${PEERTUBE_SECRET}
+      PEERTUBE_DB_HOSTNAME: postgres
+      PEERTUBE_DB_USERNAME: peertube
+      PEERTUBE_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      PEERTUBE_DB_SSL: "false"
+      PEERTUBE_REDIS_HOSTNAME: redis
+      PEERTUBE_ADMIN_EMAIL: ${ADMIN_EMAIL}
+      PEERTUBE_SMTP_HOSTNAME: ${SMTP_HOST}
+      PEERTUBE_SMTP_PORT: ${SMTP_PORT}
+      PEERTUBE_SMTP_USERNAME: ${SMTP_USER}
+      PEERTUBE_SMTP_PASSWORD: ${SMTP_PASS}
+      PEERTUBE_SMTP_FROM: ${MAIL_FROM}
+      PEERTUBE_SMTP_TLS: "false"
+      PEERTUBE_SMTP_DISABLE_STARTTLS: "false"
+    volumes:
+      - watch_data:/data
+      - watch_config:/config
+    depends_on: [postgres, redis]
+
+  # BAC Status: watches every site and channel and alerts you when one goes down (Uptime Kuma).
+  status:
+    image: louislam/uptime-kuma:1
+    restart: unless-stopped
+    volumes:
+      - status_data:/app/data
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: peertube
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: peertube
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+volumes:
+  caddy_data:
+  caddy_config:
+  mysql_data:
+  news_content:
+  magazine_content:
+  tv1_data:
+  tv2_data:
+  watch_data:
+  watch_config:
+  postgres_data:
+  redis_data:
+  status_data:
