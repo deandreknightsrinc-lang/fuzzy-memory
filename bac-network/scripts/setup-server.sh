@@ -25,6 +25,7 @@ fi
 
 docker compose pull --ignore-buildable
 docker compose up -d --build
+bash scripts/set-stream-keys.sh
 echo
 echo "BAC Network is starting. Give it two minutes, then see README.md, section 'First login'."
 echo "Video library admin password:"

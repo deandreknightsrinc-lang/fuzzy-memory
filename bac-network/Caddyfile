@@ -26,10 +26,14 @@ magazine.{$DOMAIN} {
 }
 
 tv1.{$DOMAIN} {
+	# Lets the home site show the on-air badge
+	header /api/status Access-Control-Allow-Origin *
 	reverse_proxy tv1:8080
 }
 
 newslive.{$DOMAIN} {
+	# Lets the home site show the on-air badge
+	header /api/status Access-Control-Allow-Origin *
 	reverse_proxy tv2:8080
 }
 

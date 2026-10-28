@@ -41,6 +41,7 @@ services:
     restart: unless-stopped
     environment:
       url: https://news.${DOMAIN}
+      server__host: 0.0.0.0
       database__client: mysql
       database__connection__host: mysql
       database__connection__user: root
@@ -63,6 +64,7 @@ services:
     restart: unless-stopped
     environment:
       url: https://magazine.${DOMAIN}
+      server__host: 0.0.0.0
       database__client: mysql
       database__connection__host: mysql
       database__connection__user: root

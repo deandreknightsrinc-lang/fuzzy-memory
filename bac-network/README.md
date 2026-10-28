@@ -12,6 +12,18 @@ Everything BAC needs to go live, running on one server:
 | `watch.bacnetwork.com` | BAC Watch, on-demand episodes and replays | PeerTube |
 | `status.bacnetwork.com` | BAC Status, uptime monitoring and down alerts for everything above | Uptime Kuma |
 
+## Try it on your own computer first (free)
+
+You can run the whole network privately on a Mac or PC before paying for a server. Nobody else can watch, but everything works: both channels broadcast, and the news site, magazine, video library and status page are all usable.
+
+1. Install and open [Docker Desktop](https://www.docker.com/products/docker-desktop/). Give it at least 6 GB of memory (Settings > Resources).
+2. Open Terminal in this `bac-network` folder and run `bash scripts/try-local.sh`. The first run downloads a few GB and takes several minutes.
+3. Open http://localhost:8000. Both channels start playing a demo video within a minute.
+
+Everything runs on `localhost` ports 8000 to 8006; the script prints the full list. To test going live, point OBS at `rtmp://localhost:1935/live` with stream key `abc123`, during a slot marked `"type": "live"`. Stop everything with `bash scripts/try-local.sh stop`. Your posts and uploads are kept for next time.
+
+When you move to a server, the same folder works unchanged: follow the steps below.
+
 ## What you need
 
 1. **A server.** Ubuntu 24.04 with 4 CPUs, 8 GB RAM and 160 GB disk. Hetzner (about $15/month) or DigitalOcean (about $48/month) both work. Video storage grows over time; add a storage volume when needed.
@@ -44,7 +56,7 @@ Do these right away, because the first person to open each admin page becomes it
 
 - **News:** open `https://news.YOURDOMAIN/ghost` and create the admin account.
 - **Magazine:** open `https://magazine.YOURDOMAIN/ghost` and create the admin account.
-- **Live channels:** open `https://tv1.YOURDOMAIN/admin` and `https://newslive.YOURDOMAIN/admin`. Username `admin`, password `abc123`. **Change the admin password immediately**. Then under Configuration > Server Setup > Stream Keys, add a stream key with the exact value of `TV1_STREAM_KEY` (BAC TV) or `TV2_STREAM_KEY` (BAC News Live) from your `.env` file, so the 24/7 playout can broadcast. Delete the default `abc123` key.
+- **Live channels:** open `https://tv1.YOURDOMAIN/admin` and `https://newslive.YOURDOMAIN/admin`. Username `admin`, password `abc123`. Setup has already given each channel its own stream key (`TV1_STREAM_KEY` and `TV2_STREAM_KEY` in `.env`) and removed the default one. **Change the admin password immediately** under Configuration > Server Setup.
 - **Status monitor:** open `https://status.YOURDOMAIN` and create the admin account. Then add an HTTP monitor for each address in the table above, and a notification (email, Telegram, Discord and many others are built in) so you hear about an outage before your viewers do.
 - **Video library:** open `https://watch.YOURDOMAIN` and log in as `root`. The password was printed at the end of setup, or run `docker compose logs watch | grep -A1 -i password`.
 
@@ -58,8 +70,8 @@ In OBS: Settings > Stream > Service: Custom.
 
 | Channel | Server | Stream key |
 |---|---|---|
-| BAC TV | `rtmp://YOURDOMAIN:1935/live` | From BAC TV admin > Server Setup > Stream Keys |
-| BAC News Live | `rtmp://YOURDOMAIN:1936/live` | From BAC News Live admin > Server Setup > Stream Keys |
+| BAC TV | `rtmp://YOURDOMAIN:1935/live` | `TV1_STREAM_KEY` from your `.env` file |
+| BAC News Live | `rtmp://YOURDOMAIN:1936/live` | `TV2_STREAM_KEY` from your `.env` file |
 | BAC Watch live events | `rtmp://YOURDOMAIN:1937/live` | Shown when you create a live video in PeerTube |
 
 Press Start Streaming and the channel goes live on its page and on the home site.
