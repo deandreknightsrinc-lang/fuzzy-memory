@@ -3,3 +3,4 @@ backups/
 media/**/*
 !media/**/
 !media/**/.keep
+__pycache__/
