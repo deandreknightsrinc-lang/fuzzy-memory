@@ -1,0 +1,12 @@
+{
+  "channel": "BAC TV",
+  "timezone": "America/New_York",
+  "filler": "filler",
+  "filler_title": "BAC TV",
+  "slots": [
+    { "days": "weekdays", "start": "06:00", "end": "09:00", "title": "Morning Music Videos", "folder": "music-videos", "order": "shuffle" },
+    { "days": "weekdays", "start": "20:00", "end": "22:00", "title": "Prime Time Feature", "folder": "prime-time" },
+    { "days": "sat", "start": "19:00", "end": "21:00", "title": "BAC Weekend Live", "type": "live" },
+    { "days": "sun", "start": "17:00", "end": "18:00", "title": "Community Spotlight", "folder": "community-spotlight" }
+  ]
+}

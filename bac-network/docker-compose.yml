@@ -16,6 +16,7 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./site:/srv/site:ro
+      - broadcast_public:/srv/broadcast:ro
       - caddy_data:/data
       - caddy_config:/config
     depends_on: [news, magazine, tv1, tv2, watch, status]
@@ -126,6 +127,35 @@ services:
       - watch_config:/config
     depends_on: [postgres, redis]
 
+  # BAC Playout: keeps each live channel on air 24/7 from its weekly schedule
+  # (broadcast/schedule/*.json), playing videos from ./media/<channel>/.
+  # It steps aside during "live" slots so you can go live from OBS.
+  playout-tv1:
+    build: ./broadcast
+    restart: unless-stopped
+    environment:
+      CHANNEL: tv1
+      OUTPUT: rtmp://tv1:1935/live/${TV1_STREAM_KEY}
+    volumes:
+      - ./broadcast/schedule:/schedule:ro
+      - ./media:/media:ro
+      - playout_state:/state
+      - broadcast_public:/public
+    depends_on: [tv1]
+
+  playout-tv2:
+    build: ./broadcast
+    restart: unless-stopped
+    environment:
+      CHANNEL: tv2
+      OUTPUT: rtmp://tv2:1935/live/${TV2_STREAM_KEY}
+    volumes:
+      - ./broadcast/schedule:/schedule:ro
+      - ./media:/media:ro
+      - playout_state:/state
+      - broadcast_public:/public
+    depends_on: [tv2]
+
   # BAC Status: watches every site and channel and alerts you when one goes down (Uptime Kuma).
   status:
     image: louislam/uptime-kuma:1
@@ -162,3 +192,5 @@ volumes:
   postgres_data:
   redis_data:
   status_data:
+  playout_state:
+  broadcast_public:

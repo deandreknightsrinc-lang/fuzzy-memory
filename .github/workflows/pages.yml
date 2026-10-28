@@ -35,6 +35,8 @@ jobs:
         run: python3 -m unittest discover -s kbk-studio/server
       - name: Run Bible studio tests
         run: python3 -m unittest discover ai-studio/bible
+      - name: Run BAC playout tests
+        run: python3 -m unittest discover -s bac-network/broadcast/tests
       - name: Collect site files
         run: |
           mkdir _site

@@ -8,7 +8,7 @@ fi
 
 if [ ! -f .env ]; then
   cp .env.example .env
-  for key in MYSQL_ROOT_PASSWORD POSTGRES_PASSWORD PEERTUBE_SECRET; do
+  for key in MYSQL_ROOT_PASSWORD POSTGRES_PASSWORD PEERTUBE_SECRET TV1_STREAM_KEY TV2_STREAM_KEY; do
     sed -i "s|^$key=.*|$key=$(openssl rand -hex 24)|" .env
   done
   echo "Created .env with random passwords. Now edit DOMAIN, ADMIN_EMAIL and the SMTP lines, then run this script again."
@@ -23,8 +23,8 @@ if command -v ufw >/dev/null; then
   ufw --force enable
 fi
 
-docker compose pull
-docker compose up -d
+docker compose pull --ignore-buildable
+docker compose up -d --build
 echo
 echo "BAC Network is starting. Give it two minutes, then see README.md, section 'First login'."
 echo "Video library admin password:"

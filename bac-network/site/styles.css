@@ -45,6 +45,7 @@ h2 a:hover { color: var(--gold); }
 .channel-info { padding: 14px 16px 18px; }
 .channel-info h3 { margin: 0 0 4px; display: flex; align-items: center; gap: 10px; }
 .channel-info p { margin: 0 0 8px; color: var(--muted); }
+.channel-info .onair { color: var(--text); font-size: 0.92rem; }
 .channel-info a { color: var(--gold); font-weight: 600; text-decoration: none; }
 .badge { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; padding: 2px 8px; border-radius: 999px; }
 .badge.on { background: var(--live); color: #04130a; }

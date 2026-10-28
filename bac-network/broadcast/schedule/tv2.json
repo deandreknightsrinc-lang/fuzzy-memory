@@ -1,0 +1,14 @@
+{
+  "channel": "BAC News Live",
+  "timezone": "America/New_York",
+  "filler": "filler",
+  "filler_title": "BAC News",
+  "slots": [
+    { "days": "weekdays", "start": "07:00", "end": "08:00", "title": "BAC Morning News", "type": "live" },
+    { "days": "weekdays", "start": "08:00", "end": "12:00", "title": "Morning News Replay", "folder": "morning-news" },
+    { "days": "weekdays", "start": "12:00", "end": "12:30", "title": "Midday Headlines", "type": "live" },
+    { "days": "weekdays", "start": "18:00", "end": "19:00", "title": "BAC Evening Report", "type": "live" },
+    { "days": "weekdays", "start": "19:00", "end": "23:00", "title": "Evening Report Replay", "folder": "evening-report" },
+    { "days": "weekends", "start": "10:00", "end": "11:00", "title": "Week in Review", "folder": "week-in-review" }
+  ]
+}
