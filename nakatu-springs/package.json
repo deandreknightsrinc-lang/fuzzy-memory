@@ -1,0 +1,9 @@
+{
+  "name": "nakatu-springs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "npx --yes serve -l 5175 .",
+    "test": "node --test"
+  }
+}

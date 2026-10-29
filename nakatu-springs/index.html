@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Naka'tu Springs Designer</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/" } }
+  </script>
+</head>
+<body>
+  <header class="bar">
+    <h1>Naka'tu Springs <span>Family Compound Designer</span></h1>
+    <div class="bar-tools">
+      <button id="undo" title="Undo (Ctrl+Z)">Undo</button>
+      <label class="sun" title="Time of day">Sun <input id="sun" type="range" min="6" max="19.5" step="0.25" value="15" /> <output id="sun-out">3:00 pm</output></label>
+      <button id="walk" class="primary">Walk</button>
+      <button id="site-btn">Site</button>
+      <button id="file-btn">Save and export</button>
+    </div>
+  </header>
+
+  <aside class="panel left">
+    <section>
+      <h2>Compound templates</h2>
+      <p class="hint" id="tpl-hint">Pick an estate on the map, then click a template (or drag a template onto an estate).</p>
+      <div id="templates" class="cards"></div>
+    </section>
+    <section>
+      <h2>Estates</h2>
+      <ul id="estates" class="estates"></ul>
+    </section>
+  </aside>
+
+  <main class="view">
+    <canvas id="scene"></canvas>
+    <div id="walk-help" class="overlay" hidden>Walking: W A S D or arrow keys to move, drag to look, Shift to run, Esc to stop.</div>
+    <div id="tour" class="tour" hidden>
+      <strong>Design a compound in five steps</strong>
+      <ol>
+        <li>Click an estate on the map.</li>
+        <li>Click a template on the left to drop a compound on it.</li>
+        <li>Click a building to change it, drag it to move it.</li>
+        <li>Fix anything listed under Site rules.</li>
+        <li>Press Walk to explore, then Save and export to keep an option.</li>
+      </ol>
+      <button id="tour-ok">Got it</button>
+    </div>
+  </main>
+
+  <aside class="panel right">
+    <section>
+      <h2>Inspector</h2>
+      <div id="inspector"><p class="hint">Nothing selected.</p></div>
+    </section>
+    <section>
+      <h2>Site rules <span id="rule-count" class="badge"></span></h2>
+      <ul id="issues" class="issues"></ul>
+    </section>
+    <section>
+      <h2>Live stats</h2>
+      <dl id="stats" class="stats"></dl>
+    </section>
+  </aside>
+
+  <dialog id="site-dlg">
+    <form method="dialog">
+      <h2>Site settings</h2>
+      <p class="hint">The site is a placeholder until the real boundary arrives. Latitude and longitude place it on the map for GeoJSON and Unreal.</p>
+      <label>Site name <input name="name" /></label>
+      <div class="row">
+        <label>Latitude <input name="lat" type="number" step="any" placeholder="e.g. 35.1234" /></label>
+        <label>Longitude <input name="lon" type="number" step="any" placeholder="e.g. -110.5678" /></label>
+      </div>
+      <div class="row">
+        <label>Setback from estate line (m) <input name="setback" type="number" min="0" step="1" /></label>
+        <label>Keep away from the springs (m) <input name="springBuffer" type="number" min="0" step="1" /></label>
+      </div>
+      <div class="row">
+        <label>Space between buildings (m) <input name="minGap" type="number" min="0" step="1" /></label>
+        <label>Number of estates <input name="estates" type="number" min="2" max="40" step="1" /></label>
+      </div>
+      <p class="hint warn">Changing the number of estates starts a new layout. Save an option first if you want to keep this one.</p>
+      <menu><button value="cancel">Cancel</button><button value="ok" class="primary">Apply</button></menu>
+    </form>
+  </dialog>
+
+  <dialog id="file-dlg">
+    <form method="dialog">
+      <h2>Save and export</h2>
+      <h3>Design options</h3>
+      <div class="row">
+        <input id="opt-name" placeholder="Option name, e.g. Courtyards everywhere" />
+        <button type="button" id="opt-save" class="primary">Save option</button>
+      </div>
+      <ul id="options" class="options"></ul>
+      <button type="button" id="opt-compare">Compare options</button>
+      <div id="compare"></div>
+      <h3>Files</h3>
+      <div class="file-buttons">
+        <button type="button" id="exp-json">Design for Unreal (.json)</button>
+        <button type="button" id="exp-geo">Map layers (.geojson)</button>
+        <button type="button" id="exp-png">Picture (.png)</button>
+        <label class="button">Open a design <input id="imp-json" type="file" accept=".json,application/json" hidden /></label>
+        <button type="button" id="new-design">Start over</button>
+      </div>
+      <p id="file-msg" class="hint"></p>
+      <menu><button value="close">Close</button></menu>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
