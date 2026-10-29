@@ -19,7 +19,7 @@ services:
       - broadcast_public:/srv/broadcast:ro
       - caddy_data:/data
       - caddy_config:/config
-    depends_on: [news, magazine, tv1, tv2, watch, status]
+    depends_on: [news, magazine, tv1, tv2, watch, status, control]
 
   # Shared database for the two publications.
   mysql:
@@ -41,6 +41,7 @@ services:
     restart: unless-stopped
     environment:
       url: https://news.${DOMAIN}
+      server__host: 0.0.0.0
       database__client: mysql
       database__connection__host: mysql
       database__connection__user: root
@@ -63,6 +64,7 @@ services:
     restart: unless-stopped
     environment:
       url: https://magazine.${DOMAIN}
+      server__host: 0.0.0.0
       database__client: mysql
       database__connection__host: mysql
       database__connection__user: root
@@ -155,6 +157,21 @@ services:
       - playout_state:/state
       - broadcast_public:/public
     depends_on: [tv2]
+
+  # BAC Control Room: password-protected page for uploading shows and editing
+  # the channel schedules. Log in as "bac" with CONTROL_PASSWORD from .env.
+  control:
+    image: python:3.12-slim
+    restart: unless-stopped
+    command: ["python", "-u", "/app/app.py"]
+    environment:
+      CONTROL_PASSWORD: ${CONTROL_PASSWORD}
+      CHANNELS: tv1,tv2
+    volumes:
+      - ./control:/app:ro
+      - ./broadcast/schedule:/schedule
+      - ./media:/media
+      - broadcast_public:/public:ro
 
   # BAC Status: watches every site and channel and alerts you when one goes down (Uptime Kuma).
   status:

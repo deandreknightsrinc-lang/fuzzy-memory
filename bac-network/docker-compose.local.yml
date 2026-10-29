@@ -1,0 +1,29 @@
+# Trial run on your own computer: no domain, no HTTPS, everything on localhost.
+# Start with:  bash scripts/try-local.sh
+# (it runs: docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build)
+
+services:
+  caddy:
+    ports: !override
+      - "8000-8007:8000-8007"
+    volumes: !override
+      - ./Caddyfile.local:/etc/caddy/Caddyfile:ro
+      - ./site:/srv/site:ro
+      - ./site/config.local.js:/srv/site/config.js:ro
+      - broadcast_public:/srv/broadcast:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+  news:
+    environment:
+      url: http://localhost:8001
+
+  magazine:
+    environment:
+      url: http://localhost:8002
+
+  watch:
+    environment:
+      PEERTUBE_WEBSERVER_HOSTNAME: localhost
+      PEERTUBE_WEBSERVER_PORT: 8005
+      PEERTUBE_WEBSERVER_HTTPS: "false"

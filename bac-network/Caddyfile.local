@@ -1,0 +1,51 @@
+{
+	auto_https off
+}
+
+# BAC Network home site
+http://localhost:8000 {
+	handle_path /broadcast/* {
+		root * /srv/broadcast
+		header Cache-Control "no-cache"
+		file_server
+	}
+	handle {
+		root * /srv/site
+		file_server
+	}
+}
+
+http://localhost:8001 {
+	reverse_proxy news:2368
+}
+
+http://localhost:8002 {
+	reverse_proxy magazine:2368
+}
+
+http://localhost:8003 {
+	# Lets the home site show the on-air badge
+	header /api/status Access-Control-Allow-Origin *
+	reverse_proxy tv1:8080
+}
+
+http://localhost:8004 {
+	# Lets the home site show the on-air badge
+	header /api/status Access-Control-Allow-Origin *
+	reverse_proxy tv2:8080
+}
+
+http://localhost:8005 {
+	request_body {
+		max_size 10GB
+	}
+	reverse_proxy watch:9000
+}
+
+http://localhost:8006 {
+	reverse_proxy status:3001
+}
+
+http://localhost:8007 {
+	reverse_proxy control:8080
+}

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BAC Control Room</title>
+  <link rel="stylesheet" href="control.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><span class="mark">BAC</span><span>Control Room</span></div>
+    <nav id="tabs" role="tablist"></nav>
+  </header>
+
+  <main id="main">
+    <p class="muted" id="loading">Loading…</p>
+  </main>
+
+  <dialog id="slot-dialog">
+    <form id="slot-form" method="dialog">
+      <h3 id="slot-dialog-title">Add a slot</h3>
+      <label>Show title <input name="title" required maxlength="80" placeholder="BAC Evening Report"></label>
+      <fieldset>
+        <legend>Days</legend>
+        <div class="presets">
+          <button type="button" data-days="daily">Every day</button>
+          <button type="button" data-days="weekdays">Weekdays</button>
+          <button type="button" data-days="weekends">Weekends</button>
+        </div>
+        <div class="days" id="day-boxes"></div>
+      </fieldset>
+      <div class="row">
+        <label>Starts <input name="start" type="time" required></label>
+        <label>Ends <input name="end" type="time" required></label>
+      </div>
+      <fieldset>
+        <legend>What plays</legend>
+        <label class="radio"><input type="radio" name="type" value="shows" checked> Videos from a show folder</label>
+        <label class="radio"><input type="radio" name="type" value="live"> Live show from OBS (the 24/7 playout steps aside)</label>
+      </fieldset>
+      <div id="shows-fields">
+        <label>Show folder <select name="folder"></select></label>
+        <label class="radio"><input type="checkbox" name="shuffle"> Shuffle (otherwise episodes play in order)</label>
+      </div>
+      <p class="error" id="slot-error" hidden></p>
+      <div class="actions">
+        <button type="button" class="ghost" id="slot-cancel">Cancel</button>
+        <button type="submit" class="primary">Save slot</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" role="status" hidden></div>
+  <script src="control.js"></script>
+</body>
+</html>

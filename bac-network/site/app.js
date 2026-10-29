@@ -1,6 +1,6 @@
 (function () {
   const cfg = window.BAC;
-  const url = (sub) => `https://${sub}.${cfg.domain}`;
+  const url = (sub) => (cfg.urls && cfg.urls[sub]) || `https://${sub}.${cfg.domain}`;
   const hosts = { news: "news", magazine: "magazine", watch: "watch" };
 
   document.getElementById("year").textContent = new Date().getFullYear();
