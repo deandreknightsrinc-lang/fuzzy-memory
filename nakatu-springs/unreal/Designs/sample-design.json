@@ -1,0 +1,842 @@
+{
+  "format": "nakatu-design",
+  "version": 1,
+  "site": {
+    "name": "Naka'tu Springs (sample)",
+    "origin": {
+      "lat": null,
+      "lon": null,
+      "height": 0
+    },
+    "boundary": {
+      "x0": -700,
+      "y0": -400,
+      "x1": 700,
+      "y1": 400
+    },
+    "road": {
+      "width": 12,
+      "points": [
+        [
+          -700,
+          0
+        ],
+        [
+          480,
+          0
+        ]
+      ]
+    },
+    "spring": {
+      "name": "The Springs",
+      "x": 570,
+      "y": 40,
+      "radius": 45
+    },
+    "preserve": {
+      "x0": 440,
+      "y0": -400,
+      "x1": 700,
+      "y1": 400
+    }
+  },
+  "rules": {
+    "setback": 15,
+    "springBuffer": 60,
+    "minGap": 4
+  },
+  "parcels": [
+    {
+      "id": "E1",
+      "name": "Estate 1",
+      "family": "",
+      "facing": 0,
+      "x0": -700,
+      "y0": 6,
+      "x1": -510,
+      "y1": 400,
+      "acres": 18.5
+    },
+    {
+      "id": "E2",
+      "name": "Estate 2",
+      "family": "",
+      "facing": 0,
+      "x0": -510,
+      "y0": 6,
+      "x1": -320,
+      "y1": 400,
+      "acres": 18.5
+    },
+    {
+      "id": "E3",
+      "name": "Estate 3",
+      "family": "",
+      "facing": 0,
+      "x0": -320,
+      "y0": 6,
+      "x1": -130,
+      "y1": 400,
+      "acres": 18.5
+    },
+    {
+      "id": "E4",
+      "name": "Estate 4",
+      "family": "",
+      "facing": 0,
+      "x0": -130,
+      "y0": 6,
+      "x1": 60,
+      "y1": 400,
+      "acres": 18.5
+    },
+    {
+      "id": "E5",
+      "name": "Estate 5",
+      "family": "",
+      "facing": 0,
+      "x0": 60,
+      "y0": 6,
+      "x1": 250,
+      "y1": 400,
+      "acres": 18.5
+    },
+    {
+      "id": "E6",
+      "name": "Estate 6",
+      "family": "",
+      "facing": 0,
+      "x0": 250,
+      "y0": 6,
+      "x1": 440,
+      "y1": 400,
+      "acres": 18.5
+    },
+    {
+      "id": "E7",
+      "name": "Estate 7",
+      "family": "",
+      "facing": 3.141592653589793,
+      "x0": -700,
+      "y0": -400,
+      "x1": -510,
+      "y1": -6,
+      "acres": 18.5
+    },
+    {
+      "id": "E8",
+      "name": "Estate 8",
+      "family": "",
+      "facing": 3.141592653589793,
+      "x0": -510,
+      "y0": -400,
+      "x1": -320,
+      "y1": -6,
+      "acres": 18.5
+    },
+    {
+      "id": "E9",
+      "name": "Estate 9",
+      "family": "",
+      "facing": 3.141592653589793,
+      "x0": -320,
+      "y0": -400,
+      "x1": -130,
+      "y1": -6,
+      "acres": 18.5
+    },
+    {
+      "id": "E10",
+      "name": "Estate 10",
+      "family": "",
+      "facing": 3.141592653589793,
+      "x0": -130,
+      "y0": -400,
+      "x1": 60,
+      "y1": -6,
+      "acres": 18.5
+    },
+    {
+      "id": "E11",
+      "name": "Estate 11",
+      "family": "",
+      "facing": 3.141592653589793,
+      "x0": 60,
+      "y0": -400,
+      "x1": 250,
+      "y1": -6,
+      "acres": 18.5
+    },
+    {
+      "id": "E12",
+      "name": "Estate 12",
+      "family": "",
+      "facing": 3.141592653589793,
+      "x0": 250,
+      "y0": -400,
+      "x1": 440,
+      "y1": -6,
+      "acres": 18.5
+    }
+  ],
+  "compounds": [
+    {
+      "id": "C-E1",
+      "parcelId": "E1",
+      "templateId": "courtyard-ring",
+      "rotation": 0,
+      "buildings": [
+        {
+          "id": "B1",
+          "type": "main",
+          "x": 0,
+          "y": 40,
+          "rot": 0,
+          "w": 24,
+          "d": 16,
+          "h": 8,
+          "bedrooms": 5
+        },
+        {
+          "id": "B2",
+          "type": "home",
+          "x": -38,
+          "y": 10,
+          "rot": 1.5707963267948966,
+          "w": 16,
+          "d": 12,
+          "h": 7,
+          "bedrooms": 3
+        },
+        {
+          "id": "B3",
+          "type": "home",
+          "x": 38,
+          "y": 10,
+          "rot": -1.5707963267948966,
+          "w": 16,
+          "d": 12,
+          "h": 7,
+          "bedrooms": 3
+        },
+        {
+          "id": "B4",
+          "type": "guest",
+          "x": -26,
+          "y": -24,
+          "rot": 0,
+          "w": 10,
+          "d": 8,
+          "h": 5,
+          "bedrooms": 1
+        },
+        {
+          "id": "B5",
+          "type": "garage",
+          "x": 26,
+          "y": -26,
+          "rot": 0,
+          "w": 12,
+          "d": 8,
+          "h": 4,
+          "bedrooms": 0
+        },
+        {
+          "id": "B6",
+          "type": "pavilion",
+          "x": 0,
+          "y": 6,
+          "rot": 0,
+          "w": 10,
+          "d": 10,
+          "h": 4,
+          "bedrooms": 0
+        }
+      ]
+    },
+    {
+      "id": "C-E2",
+      "parcelId": "E2",
+      "templateId": "ranch-row",
+      "rotation": 0,
+      "buildings": [
+        {
+          "id": "B1",
+          "type": "home",
+          "x": -48,
+          "y": 0,
+          "rot": 0,
+          "w": 16,
+          "d": 12,
+          "h": 7,
+          "bedrooms": 3
+        },
+        {
+          "id": "B2",
+          "type": "main",
+          "x": -16,
+          "y": 0,
+          "rot": 0,
+          "w": 24,
+          "d": 16,
+          "h": 8,
+          "bedrooms": 5
+        },
+        {
+          "id": "B3",
+          "type": "home",
+          "x": 16,
+          "y": 0,
+          "rot": 0,
+          "w": 16,
+          "d": 12,
+          "h": 7,
+          "bedrooms": 3
+        },
+        {
+          "id": "B4",
+          "type": "home",
+          "x": 48,
+          "y": 0,
+          "rot": 0,
+          "w": 16,
+          "d": 12,
+          "h": 7,
+          "bedrooms": 3
+        },
+        {
+          "id": "B5",
+          "type": "workshop",
+          "x": -24,
+          "y": 44,
+          "rot": 0,
+          "w": 14,
+          "d": 10,
+          "h": 6,
+          "bedrooms": 0
+        },
+        {
+          "id": "B6",
+          "type": "garage",
+          "x": 24,
+          "y": 44,
+          "rot": 0,
+          "w": 12,
+          "d": 8,
+          "h": 4,
+          "bedrooms": 0
+        }
+      ]
+    },
+    {
+      "id": "C-E3",
+      "parcelId": "E3",
+      "templateId": "multi-generation",
+      "rotation": 0,
+      "buildings": [
+        {
+          "id": "B1",
+          "type": "hall",
+          "x": 0,
+          "y": 10,
+          "rot": 0,
+          "w": 26,
+          "d": 18,
+          "h": 9,
+          "bedrooms": 0
+        },
+        {
+          "id": "B2",
+          "type": "main",
+          "x": -42,
+          "y": 40,
+          "rot": 0,
+          "w": 24,
+          "d": 16,
+          "h": 8,
+          "bedrooms": 5
+        },
+        {
+          "id": "B3",
+          "type": "home",
+          "x": 40,
+          "y": 42,
+          "rot": 0,
+          "w": 16,
+          "d": 12,
+          "h": 7,
+          "bedrooms": 3
+        },
+        {
+          "id": "B4",
+          "type": "home",
+          "x": -44,
+          "y": -18,
+          "rot": 0,
+          "w": 16,
+          "d": 12,
+          "h": 7,
+          "bedrooms": 3
+        },
+        {
+          "id": "B5",
+          "type": "home",
+          "x": 44,
+          "y": -18,
+          "rot": 0,
+          "w": 16,
+          "d": 12,
+          "h": 7,
+          "bedrooms": 3
+        },
+        {
+          "id": "B6",
+          "type": "guest",
+          "x": -14,
+          "y": -36,
+          "rot": 0,
+          "w": 10,
+          "d": 8,
+          "h": 5,
+          "bedrooms": 1
+        },
+        {
+          "id": "B7",
+          "type": "guest",
+          "x": 14,
+          "y": -36,
+          "rot": 0,
+          "w": 10,
+          "d": 8,
+          "h": 5,
+          "bedrooms": 1
+        }
+      ]
+    },
+    {
+      "id": "C-E7",
+      "parcelId": "E7",
+      "templateId": "hillside-terrace",
+      "rotation": 0,
+      "buildings": [
+        {
+          "id": "B1",
+          "type": "home",
+          "x": -36,
+          "y": -20,
+          "rot": 0,
+          "w": 16,
+          "d": 12,
+          "h": 7,
+          "bedrooms": 3
+        },
+        {
+          "id": "B2",
+          "type": "home",
+          "x": 0,
+          "y": -20,
+          "rot": 0,
+          "w": 16,
+          "d": 12,
+          "h": 7,
+          "bedrooms": 3
+        },
+        {
+          "id": "B3",
+          "type": "home",
+          "x": 36,
+          "y": -20,
+          "rot": 0,
+          "w": 16,
+          "d": 12,
+          "h": 7,
+          "bedrooms": 3
+        },
+        {
+          "id": "B4",
+          "type": "main",
+          "x": -20,
+          "y": 30,
+          "rot": 0,
+          "w": 24,
+          "d": 16,
+          "h": 8,
+          "bedrooms": 5
+        },
+        {
+          "id": "B5",
+          "type": "guest",
+          "x": 20,
+          "y": 30,
+          "rot": 0,
+          "w": 10,
+          "d": 8,
+          "h": 5,
+          "bedrooms": 1
+        }
+      ]
+    },
+    {
+      "id": "C-E8",
+      "parcelId": "E8",
+      "templateId": "estate-manor",
+      "rotation": 0,
+      "buildings": [
+        {
+          "id": "B1",
+          "type": "main",
+          "x": 0,
+          "y": 24,
+          "rot": 0,
+          "w": 24,
+          "d": 16,
+          "h": 8,
+          "bedrooms": 5
+        },
+        {
+          "id": "B2",
+          "type": "guest",
+          "x": -36,
+          "y": -6,
+          "rot": 1.5707963267948966,
+          "w": 10,
+          "d": 8,
+          "h": 5,
+          "bedrooms": 1
+        },
+        {
+          "id": "B3",
+          "type": "garage",
+          "x": 34,
+          "y": -6,
+          "rot": 0,
+          "w": 12,
+          "d": 8,
+          "h": 4,
+          "bedrooms": 0
+        },
+        {
+          "id": "B4",
+          "type": "workshop",
+          "x": 34,
+          "y": 50,
+          "rot": 0,
+          "w": 14,
+          "d": 10,
+          "h": 6,
+          "bedrooms": 0
+        }
+      ]
+    }
+  ],
+  "placements": [
+    {
+      "estate": "E1",
+      "id": "B1",
+      "type": "main",
+      "x": -605,
+      "y": 243,
+      "yawDeg": 0,
+      "w": 24,
+      "d": 16,
+      "h": 8
+    },
+    {
+      "estate": "E1",
+      "id": "B2",
+      "type": "home",
+      "x": -643,
+      "y": 213,
+      "yawDeg": 90,
+      "w": 16,
+      "d": 12,
+      "h": 7
+    },
+    {
+      "estate": "E1",
+      "id": "B3",
+      "type": "home",
+      "x": -567,
+      "y": 213,
+      "yawDeg": -90,
+      "w": 16,
+      "d": 12,
+      "h": 7
+    },
+    {
+      "estate": "E1",
+      "id": "B4",
+      "type": "guest",
+      "x": -631,
+      "y": 179,
+      "yawDeg": 0,
+      "w": 10,
+      "d": 8,
+      "h": 5
+    },
+    {
+      "estate": "E1",
+      "id": "B5",
+      "type": "garage",
+      "x": -579,
+      "y": 177,
+      "yawDeg": 0,
+      "w": 12,
+      "d": 8,
+      "h": 4
+    },
+    {
+      "estate": "E1",
+      "id": "B6",
+      "type": "pavilion",
+      "x": -605,
+      "y": 209,
+      "yawDeg": 0,
+      "w": 10,
+      "d": 10,
+      "h": 4
+    },
+    {
+      "estate": "E2",
+      "id": "B1",
+      "type": "home",
+      "x": -463,
+      "y": 203,
+      "yawDeg": 0,
+      "w": 16,
+      "d": 12,
+      "h": 7
+    },
+    {
+      "estate": "E2",
+      "id": "B2",
+      "type": "main",
+      "x": -431,
+      "y": 203,
+      "yawDeg": 0,
+      "w": 24,
+      "d": 16,
+      "h": 8
+    },
+    {
+      "estate": "E2",
+      "id": "B3",
+      "type": "home",
+      "x": -399,
+      "y": 203,
+      "yawDeg": 0,
+      "w": 16,
+      "d": 12,
+      "h": 7
+    },
+    {
+      "estate": "E2",
+      "id": "B4",
+      "type": "home",
+      "x": -367,
+      "y": 203,
+      "yawDeg": 0,
+      "w": 16,
+      "d": 12,
+      "h": 7
+    },
+    {
+      "estate": "E2",
+      "id": "B5",
+      "type": "workshop",
+      "x": -439,
+      "y": 247,
+      "yawDeg": 0,
+      "w": 14,
+      "d": 10,
+      "h": 6
+    },
+    {
+      "estate": "E2",
+      "id": "B6",
+      "type": "garage",
+      "x": -391,
+      "y": 247,
+      "yawDeg": 0,
+      "w": 12,
+      "d": 8,
+      "h": 4
+    },
+    {
+      "estate": "E3",
+      "id": "B1",
+      "type": "hall",
+      "x": -225,
+      "y": 213,
+      "yawDeg": 0,
+      "w": 26,
+      "d": 18,
+      "h": 9
+    },
+    {
+      "estate": "E3",
+      "id": "B2",
+      "type": "main",
+      "x": -267,
+      "y": 243,
+      "yawDeg": 0,
+      "w": 24,
+      "d": 16,
+      "h": 8
+    },
+    {
+      "estate": "E3",
+      "id": "B3",
+      "type": "home",
+      "x": -185,
+      "y": 245,
+      "yawDeg": 0,
+      "w": 16,
+      "d": 12,
+      "h": 7
+    },
+    {
+      "estate": "E3",
+      "id": "B4",
+      "type": "home",
+      "x": -269,
+      "y": 185,
+      "yawDeg": 0,
+      "w": 16,
+      "d": 12,
+      "h": 7
+    },
+    {
+      "estate": "E3",
+      "id": "B5",
+      "type": "home",
+      "x": -181,
+      "y": 185,
+      "yawDeg": 0,
+      "w": 16,
+      "d": 12,
+      "h": 7
+    },
+    {
+      "estate": "E3",
+      "id": "B6",
+      "type": "guest",
+      "x": -239,
+      "y": 167,
+      "yawDeg": 0,
+      "w": 10,
+      "d": 8,
+      "h": 5
+    },
+    {
+      "estate": "E3",
+      "id": "B7",
+      "type": "guest",
+      "x": -211,
+      "y": 167,
+      "yawDeg": 0,
+      "w": 10,
+      "d": 8,
+      "h": 5
+    },
+    {
+      "estate": "E7",
+      "id": "B1",
+      "type": "home",
+      "x": -569,
+      "y": -183,
+      "yawDeg": 180,
+      "w": 16,
+      "d": 12,
+      "h": 7
+    },
+    {
+      "estate": "E7",
+      "id": "B2",
+      "type": "home",
+      "x": -605,
+      "y": -183,
+      "yawDeg": 180,
+      "w": 16,
+      "d": 12,
+      "h": 7
+    },
+    {
+      "estate": "E7",
+      "id": "B3",
+      "type": "home",
+      "x": -641,
+      "y": -183,
+      "yawDeg": 180,
+      "w": 16,
+      "d": 12,
+      "h": 7
+    },
+    {
+      "estate": "E7",
+      "id": "B4",
+      "type": "main",
+      "x": -585,
+      "y": -233,
+      "yawDeg": 180,
+      "w": 24,
+      "d": 16,
+      "h": 8
+    },
+    {
+      "estate": "E7",
+      "id": "B5",
+      "type": "guest",
+      "x": -625,
+      "y": -233,
+      "yawDeg": 180,
+      "w": 10,
+      "d": 8,
+      "h": 5
+    },
+    {
+      "estate": "E8",
+      "id": "B1",
+      "type": "main",
+      "x": -415,
+      "y": -227,
+      "yawDeg": 180,
+      "w": 24,
+      "d": 16,
+      "h": 8
+    },
+    {
+      "estate": "E8",
+      "id": "B2",
+      "type": "guest",
+      "x": -379,
+      "y": -197,
+      "yawDeg": 270,
+      "w": 10,
+      "d": 8,
+      "h": 5
+    },
+    {
+      "estate": "E8",
+      "id": "B3",
+      "type": "garage",
+      "x": -449,
+      "y": -197,
+      "yawDeg": 180,
+      "w": 12,
+      "d": 8,
+      "h": 4
+    },
+    {
+      "estate": "E8",
+      "id": "B4",
+      "type": "workshop",
+      "x": -449,
+      "y": -253,
+      "yawDeg": 180,
+      "w": 14,
+      "d": 10,
+      "h": 6
+    }
+  ]
+}
