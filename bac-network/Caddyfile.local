@@ -45,3 +45,7 @@ http://localhost:8005 {
 http://localhost:8006 {
 	reverse_proxy status:3001
 }
+
+http://localhost:8007 {
+	reverse_proxy control:8080
+}

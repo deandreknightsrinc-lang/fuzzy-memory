@@ -23,12 +23,15 @@ rand() { openssl rand -hex 16 2>/dev/null || LC_ALL=C tr -dc a-f0-9 </dev/urando
 if [ ! -f .env ]; then
   cp .env.example .env
   sed -i.bak "s|^DOMAIN=.*|DOMAIN=localhost|; s|^ADMIN_EMAIL=.*|ADMIN_EMAIL=admin@example.com|" .env
-  for key in MYSQL_ROOT_PASSWORD POSTGRES_PASSWORD PEERTUBE_SECRET TV1_STREAM_KEY TV2_STREAM_KEY; do
+  for key in MYSQL_ROOT_PASSWORD POSTGRES_PASSWORD PEERTUBE_SECRET TV1_STREAM_KEY TV2_STREAM_KEY CONTROL_PASSWORD; do
     sed -i.bak "s|^$key=.*|$key=$(rand)|" .env
   done
   rm -f .env.bak
   echo "Created .env for the trial run."
 fi
+
+# Older .env files predate the Control Room: give them a password too.
+grep -q '^CONTROL_PASSWORD=' .env || echo "CONTROL_PASSWORD=$(openssl rand -hex 12)" >> .env
 
 echo "Building and starting BAC Network (the first run downloads a few GB and takes several minutes)..."
 compose build playout-tv1 playout-tv2
@@ -61,6 +64,7 @@ BAC Network is running on this computer:
   BAC News Live    http://localhost:8004   (admin: /admin, login admin / abc123)
   BAC Watch        http://localhost:8005   (login root; password: docker compose logs watch | grep -A1 -i password)
   Status           http://localhost:8006
+  Control Room     http://localhost:8007   (login bac, password $(grep '^CONTROL_PASSWORD=' .env | cut -d= -f2))
 
 The channels start playing the demo videos within a minute.
 Go live from OBS: server rtmp://localhost:1935/live (BAC TV) or rtmp://localhost:1936/live (BAC News Live), stream key abc123.

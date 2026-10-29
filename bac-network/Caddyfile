@@ -47,3 +47,10 @@ watch.{$DOMAIN} {
 status.{$DOMAIN} {
 	reverse_proxy status:3001
 }
+
+control.{$DOMAIN} {
+	request_body {
+		max_size 20GB
+	}
+	reverse_proxy control:8080
+}

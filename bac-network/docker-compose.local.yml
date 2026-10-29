@@ -5,7 +5,7 @@
 services:
   caddy:
     ports: !override
-      - "8000-8006:8000-8006"
+      - "8000-8007:8000-8007"
     volumes: !override
       - ./Caddyfile.local:/etc/caddy/Caddyfile:ro
       - ./site:/srv/site:ro
