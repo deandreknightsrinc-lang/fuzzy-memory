@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Caller Guard</title>
+  <meta name="description" content="Read, check and log blocked and unknown callers." />
+  <meta name="theme-color" content="#0e0f13" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Caller Guard" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0e0f13; --card: #171920; --line: #2c303b; --text: #e8e9ee; --muted: #9097a6;
+      --accent: #4f8cff; --ok: #3fb97a; --warn: #e0a43a; --bad: #e5534b;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, -apple-system, sans-serif;
+      padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+    main { max-width: 560px; margin: 0 auto; padding: 16px 16px 96px; }
+    h1 { font-size: 24px; margin: 8px 0 2px; display: flex; align-items: center; gap: 10px; }
+    h1 img { width: 32px; height: 32px; }
+    h2 { font-size: 19px; margin: 22px 0 8px; }
+    h3 { font-size: 16px; margin: 0 0 4px; }
+    p { margin: 6px 0; }
+    .sub { color: var(--muted); margin: 0 0 12px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin: 10px 0; }
+    .path { display: inline-block; font-size: 14px; color: var(--muted); background: #0e0f13; border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; margin: 4px 0; }
+    .pick { color: var(--accent); font-weight: 600; }
+    .note { font-size: 14px; color: var(--muted); }
+    nav { position: fixed; left: 0; right: 0; bottom: 0; display: flex; background: #12141a; border-top: 1px solid var(--line);
+      padding-bottom: env(safe-area-inset-bottom); z-index: 5; }
+    nav button { flex: 1; background: none; border: 0; color: var(--muted); font: inherit; font-size: 13px; padding: 10px 4px 12px; }
+    nav button span { display: block; font-size: 20px; }
+    nav button[aria-selected="true"] { color: var(--accent); }
+    section[hidden] { display: none; }
+    label { display: block; font-size: 14px; color: var(--muted); margin: 10px 0 4px; }
+    input, textarea, select { width: 100%; font: inherit; font-size: 17px; color: var(--text); background: #0e0f13;
+      border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+    textarea { min-height: 70px; resize: vertical; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .btn { font: inherit; font-weight: 600; border-radius: 10px; padding: 11px 16px; border: 1px solid var(--line);
+      background: #20232c; color: var(--text); cursor: pointer; }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn.small { padding: 6px 10px; font-size: 14px; font-weight: 500; }
+    .result h3 { font-size: 22px; }
+    .badge { display: inline-block; font-size: 13px; font-weight: 700; border-radius: 999px; padding: 2px 10px; margin-left: 6px; vertical-align: middle; }
+    .risk-high { background: rgba(229,83,75,.18); color: var(--bad); }
+    .risk-caution { background: rgba(224,164,58,.18); color: var(--warn); }
+    .risk-low { background: rgba(63,185,122,.18); color: var(--ok); }
+    .risk-unknown { background: rgba(144,151,166,.18); color: var(--muted); }
+    ul.flags { padding-left: 18px; margin: 8px 0; }
+    ul.flags li { margin: 4px 0; }
+    .links a { color: var(--accent); }
+    .log-item { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; }
+    .log-item .when { font-size: 13px; color: var(--muted); }
+    .log-item .said { grid-column: 1 / -1; font-size: 15px; }
+    .log-item .acts { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
+    .empty { color: var(--muted); text-align: center; padding: 24px 0; }
+    .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .toggle input { width: auto; transform: scale(1.3); }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+<main>
+  <h1><img src="icon.svg" alt="" />Caller Guard</h1>
+  <p class="sub">Have blocked and unknown calls read out to you, screened for you, checked and logged.</p>
+
+  <!-- 1. SET UP -->
+  <section id="tab-setup">
+    <div class="card">
+      <h3>The honest part first</h3>
+      <p>No app can show the real number behind <b>No Caller ID</b> or <b>Blocked</b>. The phone company never sends it to your phone. What your iPhone <i>can</i> do is read every caller out loud and make unknown callers say who they are before your phone rings. Turn on the settings below once and it all runs on its own.</p>
+    </div>
+
+    <h2>On your iPhone (about 2 minutes)</h2>
+
+    <div class="card">
+      <h3>1. Read every caller out loud</h3>
+      <p>Siri says the caller's name, or the number, or "Unknown caller", when the phone rings.</p>
+      <span class="path">Settings › Apps › Phone › Announce Calls</span>
+      <p>Choose <span class="pick">Always</span>.</p>
+      <p class="note">On older iOS: Settings › Phone › Announce Calls.</p>
+    </div>
+
+    <div class="card">
+      <h3>2. Make unknown callers say who they are</h3>
+      <p>Your iPhone answers numbers that are not in your contacts, asks the caller for their name and why they are calling, then rings you and shows what they said on screen. Blocked and No Caller ID calls get screened too.</p>
+      <span class="path">Settings › Apps › Phone › Screen Unknown Callers</span>
+      <p>Choose <span class="pick">Ask Reason for Calling</span>.</p>
+      <p class="note">On iOS 17 or 18 this is called <b>Silence Unknown Callers</b>: it sends those calls straight to voicemail instead.</p>
+    </div>
+
+    <div class="card">
+      <h3>3. Read voicemails live</h3>
+      <p>If a screened caller leaves a message, you see the words appear on screen while they talk, and you can pick up if it matters.</p>
+      <span class="path">Settings › Apps › Phone › Live Voicemail</span>
+      <p>Turn it <span class="pick">On</span>.</p>
+    </div>
+
+    <div class="card">
+      <h3>4. Free spam blocking from your carrier</h3>
+      <p>Your carrier's free app labels and blocks known spam before it reaches you.</p>
+      <p>Verizon: <b>Call Filter</b> · AT&amp;T: <b>ActiveArmor</b> · T-Mobile / Metro: <b>Scam Shield</b>. Get it from the App Store, then turn it on in <span class="path">Settings › Apps › Phone › Call Blocking &amp; Identification</span></p>
+    </div>
+
+    <div class="card">
+      <h3>5. One tap to check a number (optional)</h3>
+      <p>Make a Shortcut so you can copy a number from your Recents and check it here in one tap.</p>
+      <ol>
+        <li>Open the <b>Shortcuts</b> app, tap <b>+</b>.</li>
+        <li>Add <b>Get Clipboard</b>, then <b>URL</b> with this text, putting the Clipboard variable at the end:<br /><span class="path" id="shortcutUrl"></span></li>
+        <li>Add <b>Open URLs</b>. Name it "Check Caller".</li>
+        <li>Optional: <span class="path">Settings › Accessibility › Touch › Back Tap › Double Tap</span> › Check Caller.</li>
+      </ol>
+      <p class="note">Then: in Recents tap the ⓘ next to the call, press and hold the number, Copy, and run Check Caller.</p>
+    </div>
+
+    <div class="card">
+      <h3>Add Caller Guard to your Home Screen</h3>
+      <p>In Safari tap <b>Share</b> › <b>Add to Home Screen</b>. It opens like an app and your call log stays on this phone.</p>
+    </div>
+
+    <div class="card">
+      <h3>Must you see blocked numbers?</h3>
+      <p class="note">Paid services such as TrapCall work by having you decline the call so it forwards through their phone system, which can see the real number. They cost a monthly fee, need call forwarding set up with your carrier, and do not work on every carrier. Caller Guard does not need one.</p>
+    </div>
+
+    <details class="card">
+      <summary><b>On Android instead</b></summary>
+      <p><b>Pixel:</b> Phone app › Settings › Spam and Call Screen › Call Screen › Unknown numbers › <span class="pick">Automatically screen</span>. Then Settings › Caller ID announcement › <span class="pick">Always</span>.</p>
+      <p><b>Samsung:</b> Phone app › Settings › Caller ID and spam protection, and Settings › Answering and ending calls › Read caller names aloud. Bixby Text Call answers unknown callers for you.</p>
+    </details>
+  </section>
+
+  <!-- 2. CHECK -->
+  <section id="tab-check" hidden>
+    <h2>Check a number</h2>
+    <div class="card">
+      <label for="num">Phone number, or type "blocked"</label>
+      <input id="num" inputmode="tel" autocomplete="off" placeholder="(760) 555-0134" />
+      <div class="row">
+        <button class="btn primary" id="checkBtn">Check</button>
+        <button class="btn" id="pasteBtn">Paste</button>
+        <button class="btn" id="readBtn">🔊 Read it</button>
+      </div>
+    </div>
+    <div id="result"></div>
+  </section>
+
+  <!-- 3. LOG -->
+  <section id="tab-log" hidden>
+    <h2>Call log</h2>
+    <p class="sub">Write down who called and what they said. Saved only on this phone.</p>
+    <div class="card">
+      <label for="logNum">Number (leave empty if it was blocked)</label>
+      <input id="logNum" inputmode="tel" autocomplete="off" placeholder="Blocked" />
+      <label for="logSaid">What they said (from the screen or voicemail)</label>
+      <textarea id="logSaid" placeholder="Said they were from the county about a package…"></textarea>
+      <label for="logVerdict">Verdict</label>
+      <select id="logVerdict">
+        <option value="Unsure">Unsure</option>
+        <option value="Safe">Safe</option>
+        <option value="Spam / scam">Spam / scam</option>
+        <option value="Call back">Call back</option>
+      </select>
+      <div class="row"><button class="btn primary" id="logAdd">Save to log</button></div>
+    </div>
+    <div class="row">
+      <button class="btn small" id="logRead">🔊 Read the log</button>
+      <button class="btn small" id="logExport">Export (CSV)</button>
+      <button class="btn small" id="logClear">Clear log</button>
+    </div>
+    <div id="logList"></div>
+  </section>
+
+  <!-- 4. SETTINGS -->
+  <section id="tab-settings" hidden>
+    <h2>Settings</h2>
+    <div class="card">
+      <label for="mine">Your own number (stays on this phone)</label>
+      <input id="mine" inputmode="tel" autocomplete="tel" placeholder="Used to spot calls faking your area code" />
+      <div class="toggle" style="margin-top:12px"><span>Read results out loud automatically</span><input type="checkbox" id="autoRead" /></div>
+      <label for="voice">Voice</label>
+      <select id="voice"></select>
+      <div class="row"><button class="btn" id="voiceTest">🔊 Test voice</button></div>
+    </div>
+    <div class="card">
+      <h3>Report scam callers</h3>
+      <p class="links"><a href="https://reportfraud.ftc.gov/" target="_blank" rel="noopener">FTC: report fraud</a> · <a href="https://www.donotcall.gov/" target="_blank" rel="noopener">Do Not Call Registry</a> · <a href="https://consumercomplaints.fcc.gov/" target="_blank" rel="noopener">FCC complaint</a></p>
+    </div>
+  </section>
+</main>
+
+<nav role="tablist">
+  <button role="tab" data-tab="setup" aria-selected="true"><span>🛡</span>Set up</button>
+  <button role="tab" data-tab="check" aria-selected="false"><span>🔎</span>Check</button>
+  <button role="tab" data-tab="log" aria-selected="false"><span>📋</span>Log</button>
+  <button role="tab" data-tab="settings" aria-selected="false"><span>⚙️</span>Settings</button>
+</nav>
+
+<script src="lookup.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

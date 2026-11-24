@@ -37,6 +37,8 @@ jobs:
         run: python3 -m unittest discover ai-studio/bible
       - name: Run BAC playout tests
         run: python3 -m unittest discover -s bac-network/broadcast/tests
+      - name: Run Caller Guard tests
+        run: node --test caller-guard/tests/*.test.js
       - name: Collect site files
         run: |
           mkdir _site
@@ -44,6 +46,8 @@ jobs:
           cp -r dashboard _site/
           cp -r church _site/
           cp -r studio-desk _site/
+          mkdir _site/caller-guard
+          cp caller-guard/index.html caller-guard/app.js caller-guard/lookup.js caller-guard/manifest.webmanifest caller-guard/icon.svg _site/caller-guard/
           mkdir _site/kbk-studio
           cp -r kbk-studio/index.html kbk-studio/styles.css kbk-studio/js kbk-studio/vendor _site/kbk-studio/
           mkdir _site/knight-keys
