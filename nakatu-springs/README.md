@@ -25,7 +25,16 @@ Open `index.html` through a local server (`npm start`, then http://localhost:517
 
 Everything is saved in the browser as you go, and **Undo** (Ctrl+Z) steps back.
 
-The site is a placeholder (about 277 acres, 12 estates of 18.5 acres on both sides of a main road, with a springs preserve at the east end) until the real boundary and coordinates are in. **Site** changes the name, coordinates, rule distances and number of estates.
+### Using the real land
+
+Until the real boundary is loaded, the designer uses a placeholder site: about 277 acres, with 12 estates of 18.5 acres on both sides of a main road and a springs preserve at the east end.
+
+1. In Google Earth (or Google My Maps), draw the land as a polygon and export it as KML. A GeoJSON file from a surveyor works too.
+2. Open **Site** and press **Load boundary**. The designer sets the latitude and longitude from the boundary. It runs the main road along the long side of the land, keeps a preserve at the far end, and splits the rest into estates (slivers under half an acre are left out).
+3. Press **Place the springs on the map** and click where the springs really are.
+4. Change the number of estates in **Site** at any time. Names, family names and compounds on estates that still exist are kept.
+
+**Site** also sets the name, the coordinates and the rule distances. Designs saved before estates could have real shapes open as before.
 
 ## Code
 

@@ -3,7 +3,11 @@
 // The same JSON loads into the Unreal project (see ../unreal/README.md).
 
 export const FORMAT = 'nakatu-design';
-export const VERSION = 1;
+export const VERSION = 2;
+
+import { bbox, ccw, centroid, clipRect, distToEdges, fromLatLon, longAxisAngle, pointInPoly, polyArea, rectPoly, rotate, toLatLon } from './geo.js';
+
+export { toLatLon };
 
 const SQ_M_PER_ACRE = 4046.8564224;
 export const acres = (sqm) => sqm / SQ_M_PER_ACRE;
@@ -84,50 +88,87 @@ export const templateById = (id) => TEMPLATES.find((t) => t.id === id);
 
 export const DEFAULT_RULES = { setback: 15, springBuffer: 60, minGap: 4 };
 
-// A placeholder site until the real boundary and coordinates arrive.
+// The site until the real boundary arrives: 1400 x 800 m, 12 estates, preserve at the east end.
+export const PLACEHOLDER = { x0: -700, y0: -400, x1: 700, y1: 400 };
+
 export function makeSite(opts = {}) {
-  const width = opts.width ?? 1400;
-  const depth = opts.depth ?? 800;
-  const estates = opts.estates ?? 12;
-  const roadWidth = opts.roadWidth ?? 12;
-  const preserveWidth = opts.preserveWidth ?? 260;
-  const x0 = -width / 2, x1 = width / 2, y0 = -depth / 2, y1 = depth / 2;
-  const lotsEnd = x1 - preserveWidth;
-  const perRow = Math.ceil(estates / 2);
-  const lotW = (lotsEnd - x0) / perRow;
-  const parcels = [];
-  for (let i = 0; i < estates; i++) {
-    const north = i < perRow;
-    const col = north ? i : i - perRow;
-    const px0 = x0 + col * lotW;
-    const rect = north
-      ? { x0: px0, y0: roadWidth / 2, x1: px0 + lotW, y1 }
-      : { x0: px0, y0, x1: px0 + lotW, y1: -roadWidth / 2 };
-    parcels.push(makeParcel(`E${i + 1}`, `Estate ${i + 1}`, rect, north ? 0 : Math.PI));
-  }
-  const preserve = { x0: lotsEnd, y0, x1, y1 };
-  return {
+  const poly = ccw(opts.poly ?? rectPoly(PLACEHOLDER));
+  const angle = opts.angle ?? (opts.poly ? longAxisAngle(poly) : 0);
+  const site = {
+    name: opts.name ?? "Naka'tu Springs",
+    origin: { lat: opts.lat ?? null, lon: opts.lon ?? null, height: 0 },
+    poly,
+    boundary: bbox(poly),
+    angle,
+    estates: opts.estates ?? 12,
+    roadWidth: opts.roadWidth ?? 12,
+    preserveShare: opts.preserveShare ?? 260 / 1400,
+  };
+  const design = {
     format: FORMAT,
     version: VERSION,
-    site: {
-      name: opts.name ?? "Naka'tu Springs",
-      origin: { lat: opts.lat ?? null, lon: opts.lon ?? null, height: 0 },
-      boundary: { x0, y0, x1, y1 },
-      road: { width: roadWidth, points: [[x0, 0], [lotsEnd + 40, 0]] },
-      spring: { name: 'The Springs', x: (lotsEnd + x1) / 2, y: 40, radius: 45 },
-      preserve,
-    },
+    site,
     rules: { ...DEFAULT_RULES, ...(opts.rules || {}) },
-    parcels,
+    parcels: [],
     compounds: [],
   };
+  relayout(design);
+  return design;
 }
 
-function makeParcel(id, name, rect, facing) {
-  return {
-    id, name, family: '', facing, ...rect,
-    acres: round(acres((rect.x1 - rect.x0) * (rect.y1 - rect.y0)), 1),
-  };
+// A site from a boundary ring of [lon, lat] pairs (from parseBoundary).
+export function siteFromBoundary(ring, opts = {}) {
+  const first = { lat: ring[0][1], lon: ring[0][0] };
+  const rough = ring.map(([lon, lat]) => fromLatLon(first, lon, lat));
+  const c = centroid(ccw(rough));
+  const [lon, lat] = toLatLon(first, c.x, c.y);
+  const origin = { lat, lon };
+  const poly = ring.map(([lo, la]) => fromLatLon(origin, lo, la));
+  return makeSite({ ...opts, poly, lat, lon });
+}
+
+// Splits the boundary into estates on both sides of a main road along the site's
+// long axis, with the springs preserve at the far end. Compounds on estates that
+// no longer exist are dropped; the springs stay where they are if still on site.
+export function relayout(design, changes = {}) {
+  const site = Object.assign(design.site, changes);
+  const a = site.angle;
+  const rp = rotate(site.poly, -a);
+  const b = bbox(rp);
+  const roadY = (b.y0 + b.y1) / 2;
+  const half = site.roadWidth / 2;
+  const lotsEnd = b.x1 - (b.x1 - b.x0) * site.preserveShare;
+  const perRow = Math.ceil(site.estates / 2);
+  const lotW = (lotsEnd - b.x0) / perRow;
+  const back = (poly) => rotate(poly, a);
+  const parcels = [];
+  for (let i = 0; i < site.estates; i++) {
+    const north = i < perRow;
+    const col = north ? i : i - perRow;
+    const x0 = b.x0 + col * lotW;
+    const rect = north ? { x0, y0: roadY + half, x1: x0 + lotW, y1: b.y1 } : { x0, y0: b.y0, x1: x0 + lotW, y1: roadY - half };
+    const piece = clipRect(rp, rect);
+    if (Math.abs(polyArea(piece)) < 2000) continue;
+    const n = parcels.length + 1;
+    const old = design.parcels.find((p) => p.id === `E${n}`);
+    parcels.push(makeParcel(`E${n}`, old?.name ?? `Estate ${n}`, back(piece), north ? a : a + Math.PI, old?.family ?? ''));
+  }
+  site.preserve = back(clipRect(rp, { x0: lotsEnd, y0: b.y0, x1: b.x1, y1: b.y1 }));
+  site.road = { width: site.roadWidth, points: back([[b.x0, roadY], [Math.min(b.x1, lotsEnd + 40), roadY]]) };
+  site.boundary = bbox(site.poly);
+  if (!site.spring || !pointInPoly(site.spring.x, site.spring.y, site.poly)) {
+    const c = site.preserve.length ? centroid(site.preserve) : centroid(site.poly);
+    const [[fx, fy]] = rotate([[c.x, c.y]], -a);
+    const [[sx, sy]] = back([[fx, fy + 40]]);
+    site.spring = { name: site.spring?.name ?? 'The Springs', x: sx, y: sy, radius: site.spring?.radius ?? 45 };
+  }
+  design.parcels = parcels;
+  design.compounds = design.compounds.filter((c) => parcels.some((p) => p.id === c.parcelId));
+  return design;
+}
+
+function makeParcel(id, name, poly, facing, family = '') {
+  return { id, name, family, facing, poly, ...bbox(poly), acres: round(acres(Math.abs(polyArea(poly))), 1) };
 }
 
 const round = (v, n = 0) => Math.round(v * 10 ** n) / 10 ** n;
@@ -139,7 +180,7 @@ const uid = (prefix, list) => {
 
 export const parcelById = (design, id) => design.parcels.find((p) => p.id === id);
 export const compoundOnParcel = (design, parcelId) => design.compounds.find((c) => c.parcelId === parcelId);
-export const parcelCenter = (p) => ({ x: (p.x0 + p.x1) / 2, y: (p.y0 + p.y1) / 2 });
+export const parcelCenter = (p) => centroid(p.poly);
 
 export function newBuilding(type, x = 0, y = 0, rot = 0, id = 'B1') {
   const t = BUILDING_TYPES[type];
@@ -236,7 +277,7 @@ export function checkRules(design) {
     c.buildings.forEach((b, i) => {
       const label = `${BUILDING_TYPES[b.type]?.label ?? b.type} ${b.id}`;
       const pts = footprint(worlds[i]);
-      const inside = pts.every(([x, y]) => x >= p.x0 + setback && x <= p.x1 - setback && y >= p.y0 + setback && y <= p.y1 - setback);
+      const inside = pts.every(([x, y]) => pointInPoly(x, y, p.poly) && distToEdges(x, y, p.poly) >= setback);
       if (!inside) issues.push({ compoundId: c.id, buildingId: b.id, rule: 'setback', message: `${label} is closer than ${setback} m to the ${p.name} line` });
       const near = Math.min(...pts.map(([x, y]) => Math.hypot(x - spring.x, y - spring.y))) - spring.radius;
       if (near < springBuffer) issues.push({ compoundId: c.id, buildingId: b.id, rule: 'spring', message: `${label} is ${Math.max(0, Math.round(near))} m from the springs (keep ${springBuffer} m)` });
@@ -251,8 +292,7 @@ export function checkRules(design) {
 }
 
 export function stats(design) {
-  const b = design.site.boundary;
-  const siteArea = (b.x1 - b.x0) * (b.y1 - b.y0);
+  const siteArea = Math.abs(polyArea(design.site.poly));
   let homes = 0, bedrooms = 0, buildings = 0, roof = 0;
   for (const c of design.compounds) {
     for (const x of c.buildings) {
@@ -277,26 +317,18 @@ export function stats(design) {
   };
 }
 
-// Site meters to WGS84 degrees, a flat-earth approximation that is accurate to
-// well under a meter across a site of a few kilometers.
-export function toLatLon(origin, x, y) {
-  const mLat = 111320;
-  const mLon = 111320 * Math.cos((origin.lat * Math.PI) / 180);
-  return [round(origin.lon + x / mLon, 7), round(origin.lat + y / mLat, 7)];
-}
-
 export function toGeoJSON(design) {
   const o = design.site.origin;
   if (typeof o.lat !== 'number' || typeof o.lon !== 'number') throw new Error('Set the site latitude and longitude first');
   const ll = (x, y) => toLatLon(o, x, y);
-  const rect = (r) => [[ll(r.x0, r.y0), ll(r.x1, r.y0), ll(r.x1, r.y1), ll(r.x0, r.y1), ll(r.x0, r.y0)]];
+  const ring = (poly) => [[...poly.map(([x, y]) => ll(x, y)), ll(...poly[0])]];
   const features = [
-    { type: 'Feature', properties: { kind: 'site', name: design.site.name }, geometry: { type: 'Polygon', coordinates: rect(design.site.boundary) } },
+    { type: 'Feature', properties: { kind: 'site', name: design.site.name }, geometry: { type: 'Polygon', coordinates: ring(design.site.poly) } },
     { type: 'Feature', properties: { kind: 'road', width: design.site.road.width }, geometry: { type: 'LineString', coordinates: design.site.road.points.map(([x, y]) => ll(x, y)) } },
     { type: 'Feature', properties: { kind: 'spring', name: design.site.spring.name, radius: design.site.spring.radius }, geometry: { type: 'Point', coordinates: ll(design.site.spring.x, design.site.spring.y) } },
   ];
   for (const p of design.parcels) {
-    features.push({ type: 'Feature', properties: { kind: 'estate', id: p.id, name: p.name, family: p.family, acres: p.acres }, geometry: { type: 'Polygon', coordinates: rect(p) } });
+    features.push({ type: 'Feature', properties: { kind: 'estate', id: p.id, name: p.name, family: p.family, acres: p.acres }, geometry: { type: 'Polygon', coordinates: ring(p.poly) } });
   }
   for (const c of design.compounds) {
     for (const b of c.buildings) {
@@ -329,5 +361,19 @@ export function parseDesign(text) {
   for (const key of ['site', 'parcels', 'compounds', 'rules']) if (!d[key]) throw new Error(`Design is missing ${key}`);
   d.rules = { ...DEFAULT_RULES, ...d.rules };
   delete d.placements;
+  if (d.version < 2) migrateV1(d);
   return d;
+}
+
+// Version 1 stored the site, estates and preserve as rectangles.
+function migrateV1(d) {
+  const s = d.site;
+  s.poly = rectPoly(s.boundary);
+  s.preserve = rectPoly(s.preserve);
+  s.angle = 0;
+  s.estates = d.parcels.length;
+  s.roadWidth = s.road.width;
+  s.preserveShare = Math.abs(polyArea(s.preserve)) / Math.abs(polyArea(s.poly));
+  for (const p of d.parcels) p.poly = rectPoly(p);
+  d.version = VERSION;
 }

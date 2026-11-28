@@ -9,7 +9,7 @@
 namespace
 {
 	const FString DesignFormat = TEXT("nakatu-design");
-	constexpr int32 MaxVersion = 1;
+	constexpr int32 MaxVersion = 2;
 }
 
 bool UNakatuDesignLibrary::ParseDesign(const FString& JsonText, FNakatuSiteInfo& OutSite, TArray<FNakatuPlacement>& OutPlacements, FString& OutError)

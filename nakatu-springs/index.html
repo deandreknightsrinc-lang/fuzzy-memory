@@ -35,6 +35,7 @@
 
   <main class="view">
     <canvas id="scene"></canvas>
+    <div id="spring-help" class="overlay" hidden>Click where the springs are. Esc to cancel.</div>
     <div id="walk-help" class="overlay" hidden>Walking: W A S D or arrow keys to move, drag to look, Shift to run, Esc to stop.</div>
     <div id="tour" class="tour" hidden>
       <strong>Design a compound in five steps</strong>
@@ -67,7 +68,16 @@
   <dialog id="site-dlg">
     <form method="dialog">
       <h2>Site settings</h2>
-      <p class="hint">The site is a placeholder until the real boundary arrives. Latitude and longitude place it on the map for GeoJSON and Unreal.</p>
+      <h3>Real boundary</h3>
+      <p class="hint">In Google Earth or Google My Maps, draw the land as a polygon, then export it as KML (or use a GeoJSON file from a surveyor). Loading it sets the location and splits the land into estates along a main road.</p>
+      <div class="file-buttons">
+        <label class="button primary-outline">Load boundary (KML or GeoJSON) <input id="imp-boundary" type="file" accept=".kml,.geojson,.json,application/vnd.google-earth.kml+xml,application/geo+json,application/json" hidden /></label>
+        <button type="button" id="place-spring">Place the springs on the map</button>
+        <button type="button" id="use-placeholder">Use the placeholder site</button>
+      </div>
+      <p id="site-msg" class="hint" role="status"></p>
+      <h3>Location and rules</h3>
+      <p class="hint">Latitude and longitude place the site on the map for GeoJSON and Unreal. A loaded boundary fills them in.</p>
       <label>Site name <input name="name" /></label>
       <div class="row">
         <label>Latitude <input name="lat" type="number" step="any" placeholder="e.g. 35.1234" /></label>
@@ -81,7 +91,7 @@
         <label>Space between buildings (m) <input name="minGap" type="number" min="0" step="1" /></label>
         <label>Number of estates <input name="estates" type="number" min="2" max="40" step="1" /></label>
       </div>
-      <p class="hint warn">Changing the number of estates starts a new layout. Save an option first if you want to keep this one.</p>
+      <p class="hint warn">Changing the number of estates redraws them. Compounds on estates that still exist stay.</p>
       <menu><button value="cancel">Cancel</button><button value="ok" class="primary">Apply</button></menu>
     </form>
   </dialog>

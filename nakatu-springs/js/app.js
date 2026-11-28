@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/OrbitControls.js';
 import {
-  TEMPLATES, BUILDING_TYPES, makeSite, placeCompound, removeCompound, addBuilding, setBuildingType,
+  TEMPLATES, BUILDING_TYPES, makeSite, siteFromBoundary, relayout, placeCompound, removeCompound, addBuilding, setBuildingType,
   checkRules, stats, compoundFrame, toWorld, toLocal, buildingWorld, parcelById, compoundOnParcel, parcelCenter,
   templateById, toGeoJSON, toUnreal, parseDesign,
 } from './model.js';
+import { distToEdges, parseBoundary, pointInPoly, polyArea } from './geo.js';
 
 const KEY = 'nakatu-design-v1';
 const OPTIONS_KEY = 'nakatu-options-v1';
@@ -33,8 +34,12 @@ function commit(mutate) {
   changed();
 }
 
+let siteKey = '';
 function changed() {
   store.set(KEY, design);
+  const { poly, preserve, road, spring } = design.site;
+  const key = JSON.stringify([poly, preserve, road, spring]);
+  if (key !== siteKey) { siteKey = key; buildStatic(); }
   issues = checkRules(design);
   rebuildScene();
   renderPanels();
@@ -50,7 +55,7 @@ function undo() {
 
 // ---------- 3D scene (three.js y is up; site y = north maps to -z) ----------
 const canvas = $('scene');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true, logarithmicDepthBuffer: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -72,6 +77,7 @@ sun.castShadow = true;
 sun.shadow.mapSize.set(4096, 4096);
 Object.assign(sun.shadow.camera, { left: -900, right: 900, top: 900, bottom: -900, near: 10, far: 4000 });
 sun.shadow.bias = -0.0005;
+sun.shadow.normalBias = 1.5;
 scene.add(sun, sun.target);
 
 const P = (x, y, h = 0) => new THREE.Vector3(x, h, -y);
@@ -103,18 +109,28 @@ function buildStatic() {
   disposeGroup(staticGroup);
   const { boundary: b, preserve, spring, road } = design.site;
   const W = b.x1 - b.x0, D = b.y1 - b.y0;
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(W + 3000, D + 3000), mat(COLORS.ground));
+  // Fit fog, shadows and zoom limits to the size of the site.
+  const span = Math.max(W, D);
+  scene.fog.near = Math.max(1800, span * 1.5);
+  scene.fog.far = Math.max(4200, span * 4);
+  const half = Math.max(900, span * 0.75);
+  Object.assign(sun.shadow.camera, { left: -half, right: half, top: half, bottom: -half, far: Math.max(4000, span * 4) });
+  sun.shadow.camera.updateProjectionMatrix();
+  controls.maxDistance = Math.max(2600, span * 2.5);
+  camera.far = Math.max(8000, span * 8);
+  camera.updateProjectionMatrix();
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(span * 12 + 3000, span * 12 + 3000), mat(COLORS.ground));
   ground.rotation.x = -Math.PI / 2;
-  ground.position.y = -0.3;
+  ground.position.set((b.x0 + b.x1) / 2, -0.3, -(b.y0 + b.y1) / 2);
   ground.receiveShadow = true;
   ground.userData.ground = true;
   staticGroup.add(ground);
 
-  const pres = new THREE.Mesh(new THREE.PlaneGeometry(preserve.x1 - preserve.x0, preserve.y1 - preserve.y0), mat(COLORS.preserve));
-  pres.rotation.x = -Math.PI / 2;
-  pres.position.copy(P((preserve.x0 + preserve.x1) / 2, (preserve.y0 + preserve.y1) / 2, -0.1));
-  pres.receiveShadow = true;
-  staticGroup.add(pres);
+  if (preserve.length >= 3) {
+    const pres = flat(preserve, mat(COLORS.preserve), -0.1);
+    pres.receiveShadow = true;
+    staticGroup.add(pres);
+  }
 
   const water = new THREE.Mesh(new THREE.CircleGeometry(spring.radius, 48), mat(COLORS.water, { roughness: 0.15, metalness: 0.1 }));
   water.rotation.x = -Math.PI / 2;
@@ -134,32 +150,50 @@ function buildStatic() {
   }
 
   const outline = new THREE.LineLoop(
-    new THREE.BufferGeometry().setFromPoints([P(b.x0, b.y0, 0.3), P(b.x1, b.y0, 0.3), P(b.x1, b.y1, 0.3), P(b.x0, b.y1, 0.3)]),
+    new THREE.BufferGeometry().setFromPoints(design.site.poly.map(([x, y]) => P(x, y, 0.3))),
     new THREE.LineBasicMaterial({ color: 0xffe9a8 }),
   );
   staticGroup.add(outline);
   staticGroup.add(trees());
 }
 
+// A flat polygon on the ground: shape x, y are site x, y, turned to lie on x, -z.
+function flat(poly, material, h) {
+  const shape = new THREE.Shape(poly.map(([x, y]) => new THREE.Vector2(x, y)));
+  const m = new THREE.Mesh(new THREE.ShapeGeometry(shape), material);
+  m.rotation.x = -Math.PI / 2;
+  m.position.y = h;
+  return m;
+}
+
 function trees() {
-  const { preserve, spring, boundary: b, road } = design.site;
+  const { preserve, spring, boundary: b, road, poly } = design.site;
   const rnd = seeded(7);
   const spots = [];
-  for (let i = 0; i < 700; i++) {
-    const x = preserve.x0 + 10 + rnd() * (preserve.x1 - preserve.x0 - 20);
-    const y = preserve.y0 + 10 + rnd() * (preserve.y1 - preserve.y0 - 20);
-    const dist = Math.hypot(x - spring.x, y - spring.y);
-    if (dist < spring.radius + 18 || Math.abs(y) < road.width) continue;
-    spots.push([x, y, 0.7 + rnd() * 0.7]);
+  const [[rx0, ry0], [rx1, ry1]] = road.points;
+  const roadLen = Math.hypot(rx1 - rx0, ry1 - ry0) || 1;
+  const nearRoad = (x, y) => Math.abs(((x - rx0) * (ry1 - ry0) - (y - ry0) * (rx1 - rx0)) / roadLen) < road.width + 4;
+  if (preserve.length >= 3) {
+    const pb = { x0: Math.min(...preserve.map((q) => q[0])), x1: Math.max(...preserve.map((q) => q[0])), y0: Math.min(...preserve.map((q) => q[1])), y1: Math.max(...preserve.map((q) => q[1])) };
+    const count = Math.min(1500, Math.round(Math.abs(polyArea(preserve)) / 300));
+    for (let i = 0; i < count; i++) {
+      const x = pb.x0 + rnd() * (pb.x1 - pb.x0), y = pb.y0 + rnd() * (pb.y1 - pb.y0);
+      if (!pointInPoly(x, y, preserve) || Math.hypot(x - spring.x, y - spring.y) < spring.radius + 18 || nearRoad(x, y)) continue;
+      spots.push([x, y, 0.7 + rnd() * 0.7]);
+    }
   }
-  for (let x = b.x0 + 10; x < preserve.x0; x += 22) {
-    spots.push([x, road.width / 2 + 5, 0.8], [x, -road.width / 2 - 5, 0.8]);
+  // A row of trees each side of the main road.
+  const ux = (rx1 - rx0) / roadLen, uy = (ry1 - ry0) / roadLen, off = road.width / 2 + 5;
+  for (let t = 10; t < roadLen - 10; t += 22) {
+    for (const side of [1, -1]) {
+      const x = rx0 + ux * t - uy * off * side, y = ry0 + uy * t + ux * off * side;
+      if (pointInPoly(x, y, poly)) spots.push([x, y, 0.8]);
+    }
   }
-  for (let i = 0; i < 500; i++) {
-    const side = Math.floor(rnd() * 4);
-    const t = rnd();
-    const x = side < 2 ? b.x0 - 40 + t * (b.x1 - b.x0 + 80) : (side === 2 ? b.x0 - 30 - rnd() * 300 : b.x1 + 30 + rnd() * 300);
-    const y = side === 0 ? b.y1 + 30 + rnd() * 300 : side === 1 ? b.y0 - 30 - rnd() * 300 : b.y0 + t * (b.y1 - b.y0);
+  // Woods around the outside of the site.
+  for (let i = 0; i < 900 && spots.length < 4000; i++) {
+    const x = b.x0 - 350 + rnd() * (b.x1 - b.x0 + 700), y = b.y0 - 350 + rnd() * (b.y1 - b.y0 + 700);
+    if (pointInPoly(x, y, poly) || distToEdges(x, y, poly) < 25) continue;
     spots.push([x, y, 0.7 + rnd() * 0.8]);
   }
   const g = new THREE.Group();
@@ -192,7 +226,10 @@ function label(text, pos, color = 0xffffff) {
   ctx.textBaseline = 'middle';
   ctx.fillText(text, 14, 32);
   const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false }));
-  sprite.scale.set(c.width / 3, c.height / 3, 1);
+  // Bigger sites get bigger labels so they stay readable from the overview.
+  const b = design.site.boundary;
+  const k = Math.max(1, Math.max(b.x1 - b.x0, b.y1 - b.y0) / 1400);
+  sprite.scale.set((k * c.width) / 3, (k * c.height) / 3, 1);
   sprite.position.copy(pos);
   sprite.renderOrder = 10;
   return sprite;
@@ -223,20 +260,19 @@ function rebuildScene() {
   for (const p of design.parcels) {
     const used = !!compoundOnParcel(design, p.id);
     const isSel = sel.parcelId === p.id;
-    const w = p.x1 - p.x0, d = p.y1 - p.y0;
-    const plane = new THREE.Mesh(new THREE.PlaneGeometry(w - 2, d - 2), mat(isSel ? COLORS.parcelSel : used ? COLORS.parcelUsed : COLORS.parcel));
-    plane.rotation.x = -Math.PI / 2;
-    plane.position.copy(P((p.x0 + p.x1) / 2, (p.y0 + p.y1) / 2, 0.02));
+    const plane = flat(p.poly, mat(isSel ? COLORS.parcelSel : used ? COLORS.parcelUsed : COLORS.parcel), 0.02);
     plane.receiveShadow = true;
     plane.userData = { parcelId: p.id };
     pickables.push(plane);
     const edge = new THREE.LineLoop(
-      new THREE.BufferGeometry().setFromPoints([P(p.x0 + 1, p.y0 + 1, 0.2), P(p.x1 - 1, p.y0 + 1, 0.2), P(p.x1 - 1, p.y1 - 1, 0.2), P(p.x0 + 1, p.y1 - 1, 0.2)]),
+      new THREE.BufferGeometry().setFromPoints(p.poly.map(([x, y]) => P(x, y, 0.2))),
       new THREE.LineBasicMaterial({ color: isSel ? COLORS.edgeSel : COLORS.edge, transparent: true, opacity: isSel ? 1 : 0.45 }),
     );
     const c = parcelCenter(p);
     const name = p.family ? `${p.name}: ${p.family}` : p.name;
-    dynamicGroup.add(plane, edge, label(name, P(c.x, p.y0 > 0 ? p.y1 - 30 : p.y0 + 30, 10)));
+    const back = toWorld({ cx: c.x, cy: c.y, angle: p.facing }, 0, Math.min(p.x1 - p.x0, p.y1 - p.y0) * 0.38);
+    const at = pointInPoly(back.x, back.y, p.poly) ? back : c;
+    dynamicGroup.add(plane, edge, label(name, P(at.x, at.y, 10)));
   }
   for (const c of design.compounds) {
     for (const b of c.buildings) {
@@ -297,6 +333,7 @@ function groundPoint(e) {
 
 canvas.addEventListener('pointerdown', (e) => {
   if (walk.on) return;
+  if (placingSpring) { placeSpring(e); return; }
   const hit = pick(e);
   if (!hit) return;
   if (hit.buildingId && sel.buildingId === hit.buildingId && sel.parcelId === hit.parcelId) {
@@ -372,7 +409,7 @@ function startWalk() {
   const compound = compoundOnParcel(design, p.id);
   // Start in front of the compound (or at the estate's road edge) looking in.
   const frame = compound ? compoundFrame(design, compound) : { cx: c.x, cy: c.y, angle: p.facing };
-  const start = compound ? toWorld(frame, 0, -75) : { x: c.x, y: p.y0 > 0 ? p.y0 + 8 : p.y1 - 8 };
+  const start = compound ? toWorld(frame, 0, -75) : c;
   walk.saved = { pos: camera.position.clone(), target: controls.target.clone() };
   walk.on = true;
   controls.enabled = false;
@@ -400,6 +437,7 @@ function stopWalk() {
 canvas.tabIndex = 0;
 addEventListener('keydown', (e) => {
   if (e.target.matches('input, select, textarea')) return;
+  if (e.key === 'Escape' && placingSpring) { placingSpring = false; $('spring-help').hidden = true; return; }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); return; }
   if (walk.on) {
     if (e.key === 'Escape') stopWalk();
@@ -529,7 +567,7 @@ function renderInspector() {
 
   box.innerHTML = `
     <h3>${esc(p.name)}</h3>
-    <p class="hint">${p.acres} acres · ${Math.round(p.x1 - p.x0)} × ${Math.round(p.y1 - p.y0)} m</p>
+    <p class="hint">${p.acres} acres</p>
     <label>Family <input id="p-fam" placeholder="Family name" value="${esc(p.family)}" /></label>
     ${c ? `
       <p>Compound: <strong>${esc(templateById(c.templateId)?.name ?? 'Custom')}</strong>, ${c.buildings.length} buildings</p>
@@ -570,7 +608,8 @@ $('site-btn').onclick = () => {
   f.setback.value = design.rules.setback;
   f.springBuffer.value = design.rules.springBuffer;
   f.minGap.value = design.rules.minGap;
-  f.estates.value = design.parcels.length;
+  f.estates.value = design.site.estates;
+  $('site-msg').textContent = '';
   $('site-dlg').showModal();
 };
 $('site-dlg').addEventListener('close', () => {
@@ -579,13 +618,9 @@ $('site-dlg').addEventListener('close', () => {
   const num = (v) => (v === '' || !Number.isFinite(Number(v)) ? null : Number(v));
   const n = Math.max(2, Math.min(40, Math.round(num(f.estates.value) ?? design.parcels.length)));
   commit(() => {
-    if (n !== design.parcels.length) {
-      const fresh = makeSite({ estates: n });
-      design.parcels = fresh.parcels;
-      design.compounds = [];
-      design.site = { ...fresh.site, name: design.site.name, origin: design.site.origin };
-      sel = { parcelId: null, buildingId: null };
-      buildStatic();
+    if (n !== design.site.estates) {
+      relayout(design, { estates: n });
+      if (!parcelById(design, sel.parcelId ?? '')) sel = { parcelId: null, buildingId: null };
     }
     design.site.name = f.name.value.trim() || design.site.name;
     design.site.origin = { lat: num(f.lat.value), lon: num(f.lon.value), height: design.site.origin.height ?? 0 };
@@ -602,7 +637,7 @@ function renderOptions() {
     ? names.map((n) => `<li><span>${esc(n)} <small class="hint">${new Date(opts[n].savedAt).toLocaleString()}</small></span><button type="button" data-open="${esc(n)}">Open</button><button type="button" class="danger" data-del="${esc(n)}">Delete</button></li>`).join('')
     : '<li class="hint">No saved options yet.</li>';
   for (const el of $('options').querySelectorAll('[data-open]')) {
-    el.onclick = () => { const d = opts[el.dataset.open].design; commit(() => { design = parseDesign(d); sel = { parcelId: null, buildingId: null }; }); buildStatic(); rebuildScene(); msg(`Opened "${el.dataset.open}".`); };
+    el.onclick = () => { const d = opts[el.dataset.open].design; commit(() => { design = parseDesign(d); sel = { parcelId: null, buildingId: null }; }); msg(`Opened "${el.dataset.open}".`); };
   }
   for (const el of $('options').querySelectorAll('[data-del]')) {
     el.onclick = () => { const o = loadOptions(); delete o[el.dataset.del]; store.set(OPTIONS_KEY, o); renderOptions(); };
@@ -653,16 +688,61 @@ $('imp-json').onchange = async (e) => {
   try {
     const d = parseDesign(await file.text());
     commit(() => { design = d; sel = { parcelId: null, buildingId: null }; });
-    buildStatic(); rebuildScene();
     msg(`Opened ${file.name}.`);
   } catch (err) { msg(err.message); }
   e.target.value = '';
 };
 $('new-design').onclick = () => {
-  if (!confirm('Start a new layout? Save an option first if you want to keep this one.')) return;
-  commit(() => { design = makeSite({ name: design.site.name, lat: design.site.origin.lat, lon: design.site.origin.lon }); sel = { parcelId: null, buildingId: null }; });
-  buildStatic(); rebuildScene();
+  if (!confirm('Clear every compound and start a new layout on this site? Save an option first if you want to keep this one.')) return;
+  const s = design.site;
+  commit(() => {
+    design = makeSite({ name: s.name, lat: s.origin.lat, lon: s.origin.lon, poly: s.poly, angle: s.angle, estates: s.estates, rules: design.rules });
+    sel = { parcelId: null, buildingId: null };
+  });
 };
+
+// ---------- real boundary and the springs ----------
+function newSite(next, note) {
+  commit(() => { design = next; sel = { parcelId: null, buildingId: null }; });
+  const c = design.site.boundary;
+  const span = Math.max(c.x1 - c.x0, c.y1 - c.y0);
+  controls.target.set(0, 0, 0);
+  camera.position.set(-span * 0.3, span * 0.75, span * 0.8);
+  $('site-msg').textContent = note;
+}
+$('imp-boundary').onchange = async (e) => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  try {
+    const ring = parseBoundary(await file.text());
+    if (design.compounds.length && !confirm('Use this boundary? The estates are redrawn and the compounds placed so far are cleared. Save an option first if you want to keep them.')) return;
+    const f = $('site-dlg').querySelector('form');
+    const n = Math.max(2, Math.min(40, Math.round(Number(f.estates.value) || design.site.estates)));
+    const next = siteFromBoundary(ring, { name: design.site.name, estates: n, rules: design.rules });
+    newSite(next, `Boundary loaded: ${stats(next).siteAcres} acres, ${next.parcels.length} estates. Place the springs next.`);
+    f.lat.value = next.site.origin.lat;
+    f.lon.value = next.site.origin.lon;
+  } catch (err) { $('site-msg').textContent = err.message; }
+};
+$('use-placeholder').onclick = () => {
+  if (!confirm('Go back to the placeholder site? The estates are redrawn and the compounds are cleared.')) return;
+  newSite(makeSite({ name: design.site.name, estates: design.site.estates, rules: design.rules }), 'Back on the placeholder site.');
+};
+let placingSpring = false;
+$('place-spring').onclick = () => {
+  $('site-dlg').close('cancel');
+  placingSpring = true;
+  $('spring-help').hidden = false;
+};
+function placeSpring(e) {
+  const gp = groundPoint(e);
+  placingSpring = false;
+  $('spring-help').hidden = true;
+  if (!gp) return;
+  if (!pointInPoly(gp.x, gp.y, design.site.poly)) { alert('The springs need to be inside the site boundary.'); return; }
+  commit(() => { design.site.spring = { ...design.site.spring, x: Math.round(gp.x), y: Math.round(gp.y) }; });
+}
 
 $('undo').onclick = undo;
 $('walk').onclick = () => (walk.on ? stopWalk() : startWalk());
@@ -671,7 +751,6 @@ if (!store.get(TOUR_KEY)) $('tour').hidden = false;
 $('tour-ok').onclick = () => { $('tour').hidden = true; store.set(TOUR_KEY, true); };
 
 renderTemplates();
-buildStatic();
 setSun(15);
 resize();
 changed();

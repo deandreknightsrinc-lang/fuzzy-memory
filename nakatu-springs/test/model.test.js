@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import {
   TEMPLATES, BUILDING_TYPES, makeSite, placeCompound, removeCompound, addBuilding, setBuildingType,
   checkRules, stats, compoundFrame, toWorld, toLocal, toGeoJSON, toUnreal, parseDesign, toLatLon, compoundOnParcel,
+  siteFromBoundary, relayout, parcelCenter,
 } from '../js/model.js';
+import { parseBoundary, polyArea, pointInPoly, fromLatLon } from '../js/geo.js';
 
 test('placeholder site: estates on both sides of the road, springs preserve at the east end', () => {
   const d = makeSite({ estates: 12 });
@@ -13,9 +15,10 @@ test('placeholder site: estates on both sides of the road, springs preserve at t
   assert.equal(south.length, 6);
   for (const p of d.parcels) {
     assert.ok(p.acres > 10, `${p.id} has ${p.acres} acres`);
-    assert.ok(p.x1 <= d.site.preserve.x0, 'estates stay out of the preserve');
+    assert.ok(p.x1 <= Math.min(...d.site.preserve.map((q) => q[0])) + 1e-9, 'estates stay out of the preserve');
   }
-  assert.ok(d.site.spring.x > d.site.preserve.x0);
+  assert.equal(d.parcels[0].acres, 18.5);
+  assert.ok(d.site.spring.x > 440);
   assert.equal(d.site.origin.lat, null, 'no coordinates until the real site is known');
 });
 
@@ -136,4 +139,89 @@ test('the Unreal sample design is current', async () => {
   const { sampleDesign } = await import('../unreal/make-sample.mjs');
   const saved = JSON.parse(readFileSync(new URL('../unreal/Designs/sample-design.json', import.meta.url), 'utf8'));
   assert.deepEqual(saved, JSON.parse(JSON.stringify(sampleDesign())), 'run: node unreal/make-sample.mjs');
+});
+
+// A rough L-shaped site near 35 N, 111 W, about 1.6 km by 1 km, drawn clockwise like many KML exports.
+const L_RING = [[-111.0, 35.0], [-111.0, 35.009], [-110.991, 35.009], [-110.991, 35.0045], [-110.9825, 35.0045], [-110.9825, 35.0], [-111.0, 35.0]];
+const KML = `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"><Document><Placemark><name>Pin</name><Point><coordinates>-110.99,35.003,0</coordinates></Point></Placemark>
+<Placemark><name>Naka'tu boundary</name><Polygon><outerBoundaryIs><LinearRing><coordinates>
+${L_RING.map(([lon, lat]) => `${lon},${lat},0`).join(' ')}
+</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark></Document></kml>`;
+
+test('boundary import: KML from Google Earth or My Maps, and GeoJSON', () => {
+  assert.deepEqual(parseBoundary(KML), L_RING);
+  const gj = { type: 'FeatureCollection', features: [
+    { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[-111, 35], [-111, 35.0001], [-110.9999, 35]]] } },
+    { type: 'Feature', geometry: { type: 'Polygon', coordinates: [L_RING] } },
+  ] };
+  assert.deepEqual(parseBoundary(JSON.stringify(gj)), L_RING, 'the largest shape wins');
+  assert.throws(() => parseBoundary('{"type":"Point","coordinates":[1,2]}'), /No boundary shape/);
+});
+
+test('a real boundary becomes a site: origin at its middle, estates inside it, nothing over the line', () => {
+  const d = siteFromBoundary(parseBoundary(KML), { estates: 10 });
+  const o = d.site.origin;
+  assert.ok(Math.abs(o.lat - 35.004) < 0.003 && Math.abs(o.lon + 110.992) < 0.006, `origin ${o.lat}, ${o.lon}`);
+  const siteArea = Math.abs(polyArea(d.site.poly));
+  const mLon = 111320 * Math.cos((o.lat * Math.PI) / 180);
+  const lArea = (0.009 * 111320) * (0.0175 * mLon) - (0.0045 * 111320) * (0.0085 * mLon);
+  assert.ok(Math.abs(siteArea - lArea) / lArea < 0.01, `site ${siteArea} vs ${lArea}`);
+  assert.ok(d.parcels.length >= 6 && d.parcels.length <= 10, `${d.parcels.length} estates`);
+  let used = Math.abs(polyArea(d.site.preserve));
+  for (const p of d.parcels) {
+    used += Math.abs(polyArea(p.poly));
+    const c = parcelCenter(p);
+    assert.ok(pointInPoly(c.x, c.y, d.site.poly), `${p.id} sits inside the boundary`);
+  }
+  assert.ok(used <= siteArea + 1 && used > siteArea * 0.9, 'estates, preserve and road fill the site');
+  assert.ok(pointInPoly(d.site.spring.x, d.site.spring.y, d.site.poly), 'springs on site');
+  const big = d.parcels.reduce((a, b) => (b.acres > a.acres ? b : a));
+  placeCompound(d, big.id, 'estate-manor');
+  assert.deepEqual(checkRules(d), []);
+  assert.ok(toGeoJSON(d).features.length > d.parcels.length);
+});
+
+test('the road follows the long side of a turned site', () => {
+  const o = { lat: 35, lon: -111 };
+  // A 2000 x 600 m strip running northeast.
+  const a = Math.PI / 4, c = Math.cos(a), s = Math.sin(a);
+  const local = [[-1000, -300], [1000, -300], [1000, 300], [-1000, 300]].map(([x, y]) => [x * c - y * s, x * s + y * c]);
+  const ring = local.map(([x, y]) => toLatLon(o, x, y));
+  const d = siteFromBoundary(ring, { estates: 8 });
+  assert.ok(Math.abs(d.site.angle - a) < 0.05, `angle ${d.site.angle}`);
+  const [[x0, y0], [x1, y1]] = d.site.road.points;
+  assert.ok(Math.abs(Math.atan2(y1 - y0, x1 - x0) - a) < 0.05);
+  assert.equal(d.parcels.length, 8);
+  for (const p of d.parcels) assert.ok(p.acres > 25, `${p.id} ${p.acres} ac`);
+});
+
+test('changing the number of estates keeps names, families and compounds that still fit', () => {
+  const d = makeSite();
+  d.parcels[0].family = 'Knight';
+  placeCompound(d, 'E1', 'ranch-row');
+  placeCompound(d, 'E12', 'ranch-row');
+  relayout(d, { estates: 8 });
+  assert.equal(d.parcels.length, 8);
+  assert.equal(d.parcels[0].family, 'Knight');
+  assert.deepEqual(d.compounds.map((c) => c.parcelId), ['E1']);
+});
+
+test('designs saved before estates had shapes still open', () => {
+  const v1 = {
+    format: 'nakatu-design', version: 1,
+    site: { name: 'Old', origin: { lat: null, lon: null, height: 0 }, boundary: { x0: -700, y0: -400, x1: 700, y1: 400 },
+      road: { width: 12, points: [[-700, 0], [480, 0]] }, spring: { name: 'The Springs', x: 570, y: 40, radius: 45 },
+      preserve: { x0: 440, y0: -400, x1: 700, y1: 400 } },
+    rules: { setback: 15, springBuffer: 60, minGap: 4 },
+    parcels: [{ id: 'E1', name: 'Estate 1', family: '', facing: 0, x0: -700, y0: 6, x1: -510, y1: 400, acres: 18.5 }],
+    compounds: [],
+  };
+  const d = parseDesign(JSON.stringify(v1));
+  assert.equal(d.version, 2);
+  assert.equal(d.parcels[0].poly.length, 4);
+  placeCompound(d, 'E1', 'courtyard-ring');
+  assert.deepEqual(checkRules(d), []);
+  assert.equal(stats(d).siteAcres, makeSite().parcels.length && stats(makeSite()).siteAcres);
+  assert.deepEqual(fromLatLon({ lat: 35, lon: -111 }, -111, 35), [0, 0]);
 });
