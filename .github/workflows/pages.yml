@@ -31,6 +31,9 @@ jobs:
       - name: Run KBK Studio tests
         run: npm test
         working-directory: kbk-studio
+      - name: Run Naka'tu Springs tests
+        run: npm test
+        working-directory: nakatu-springs
       - name: Run KBK helper tests
         run: python3 -m unittest discover -s kbk-studio/server
       - name: Run Bible studio tests
@@ -44,6 +47,8 @@ jobs:
           cp -r dashboard _site/
           cp -r church _site/
           cp -r studio-desk _site/
+          mkdir _site/nakatu-springs
+          cp -r nakatu-springs/index.html nakatu-springs/styles.css nakatu-springs/js nakatu-springs/vendor _site/nakatu-springs/
           mkdir _site/kbk-studio
           cp -r kbk-studio/index.html kbk-studio/styles.css kbk-studio/js kbk-studio/vendor _site/kbk-studio/
           mkdir _site/knight-keys
